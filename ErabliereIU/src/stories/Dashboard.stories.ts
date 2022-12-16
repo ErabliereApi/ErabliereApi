@@ -16,7 +16,23 @@ const Template: Story = (args) => ({
 });
 
 //👇 Each story then reuses that template
-export const Primary = Template.bind({});
+export const UserLoggedIn = Template.bind({});
 
-Primary.args = {
+UserLoggedIn.args = {
+  isLoggedIn: true,
+  useAuthentication: true
+};
+
+export const AuthEnabled = Template.bind({});
+
+AuthEnabled.args = {
+  isLoggedIn: false,
+  useAuthentication: true
+};
+
+export const NoAuthentication = Template.bind({});
+
+NoAuthentication.args = {
+  isLoggedIn: false,
+  useAuthentication: false
 };
