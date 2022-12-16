@@ -1,7 +1,7 @@
 # Build the angular app
 FROM node:18.12.1-alpine AS angular-builder
 WORKDIR /usr/src/app
-COPY ErabliereIU/package.json ErabliereIU/package-lock.json ./
+COPY ErabliereIU/package.json ErabliereIU/package-lock.json ErabliereIU/.npmrc ./
 RUN npm install
 RUN npm install -g @angular/cli
 COPY ErabliereIU/ .
