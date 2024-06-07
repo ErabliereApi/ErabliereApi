@@ -185,6 +185,10 @@ public class ErablieresController : ControllerBase
             }
         }
 
+        erabliere.AfficherPredictionMeteoHeure ??= true;
+        erabliere.AfficherPredictionMeteoJour ??= true;
+        erabliere.DimensionPanneauImage ??= 12;
+
         var entity = await _context.Erabliere.AddAsync(erabliere, token);
 
         if (isAuthenticate)
@@ -240,6 +244,7 @@ public class ErablieresController : ControllerBase
     ///     3. Si le nom est modifié, il ne doit pas être pris par une autre érablière.
     /// 
     /// Pour modifier l'adresse IP, vous devez entrer quelque chose. "-" pour supprimer les règles déjà existante.</param>
+    /// <param name="token">Un jeton d'annulation</param>
     /// <response code="200">L'érablière a été correctement modifiée.</response>
     /// <response code="400">Une des validations des paramètres a échoué.</response>
     /// <response code="404">L'érablière n'a pas été trouvée.</response>
@@ -247,14 +252,14 @@ public class ErablieresController : ControllerBase
     [HttpPut("{id}")]
     [ValiderIPRules]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, PutErabliere erabliere)
+    public async Task<IActionResult> Modifier(Guid id, PutErabliere erabliere, CancellationToken token)
     {
         if (id != erabliere.Id)
         {
             return BadRequest($"L'id de la route ne concorde pas avec l'id de l'érablière à modifier.");
         }
 
-        var entity = await _context.Erabliere.FindAsync(id);
+        var entity = await _context.Erabliere.FindAsync([id], token);
 
         if (entity == null)
         {
@@ -308,11 +313,26 @@ public class ErablieresController : ControllerBase
             entity.IsPublic = erabliere.IsPublic.Value;
         }
 
+        if (erabliere.AfficherPredictionMeteoJour.HasValue)
+        {
+            entity.AfficherPredictionMeteoJour = erabliere.AfficherPredictionMeteoJour;
+        }
+
+        if (erabliere.AfficherPredictionMeteoHeure.HasValue)
+        {
+            entity.AfficherPredictionMeteoHeure = erabliere.AfficherPredictionMeteoHeure;
+        }
+
+        if (erabliere.DimensionPanneauImage.HasValue)
+        {
+            entity.DimensionPanneauImage = (byte)erabliere.DimensionPanneauImage;
+        }
+
         _context.Erabliere.Update(entity);
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(token);
 
-        await _cache.RemoveAsync($"Erabliere_{id}");
+        await _cache.RemoveAsync($"Erabliere_{id}", token);
 
         return Ok();
     }
@@ -322,26 +342,27 @@ public class ErablieresController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant de l'érablière</param>
     /// <param name="erabliere">L'érablière a supprimer</param>
+    /// <param name="token">Un jeton d'annulation</param>
     [HttpDelete("{id}")]
     [ValiderIPRules]
     [ValiderOwnership("id")]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> Supprimer(Guid id, DeleteErabliere<Guid> erabliere)
+    public async Task<IActionResult> Supprimer(Guid id, DeleteErabliere<Guid> erabliere, CancellationToken token)
     {
         if (id != erabliere.Id)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de la donnée");
         }
 
-        var entity = await _context.Erabliere.FindAsync(erabliere.Id);
+        var entity = await _context.Erabliere.FindAsync([erabliere.Id], token);
 
         if (entity != null)
         {
             _context.Remove(entity);
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(token);
 
-            await _cache.RemoveAsync($"Erabliere_{id}");
+            await _cache.RemoveAsync($"Erabliere_{id}", token);
         }
 
         return NoContent();
