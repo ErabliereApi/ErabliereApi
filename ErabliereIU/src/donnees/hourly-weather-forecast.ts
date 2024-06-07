@@ -85,7 +85,11 @@ export class HourlyWeatherForecastComponent {
 
     getHour(_t12: HourlyWeatherForecast): string {
         if (_t12.dateTime) {
-            return _t12.dateTime.split('T')[1].split(':')[0];
+            var date = new Date(_t12.dateTime);
+
+            var hours = date.getHours();
+
+            return hours + 'h';
         }
         return '';
     }
