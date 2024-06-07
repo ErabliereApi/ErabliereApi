@@ -77,6 +77,11 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable
     [Range(1, 12, ErrorMessage = "La taille du graphique doit être comprise entre 1 et 12")]
     public byte? Taille { get; set; }
 
+    /// <summary>
+    /// Byte qui représente le niveau de la batterie
+    /// </summary>
+    public byte? BatteryLevel { get; set; }
+
     /// <inheritdoc />
     public int CompareTo(Capteur? other)
     {

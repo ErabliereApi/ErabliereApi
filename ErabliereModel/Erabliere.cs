@@ -42,6 +42,22 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable
     public string? CodePostal { get; set; }
 
     /// <summary>
+    /// Indicateur pour l'affichage du panneau de prédiction météo par jour
+    /// </summary>
+    public bool? AfficherPredictionMeteoJour { get; set; }
+
+    /// <summary>
+    /// Indicateur pour l'affichage du panneau de prédiction météo par heure
+    /// </summary>
+    public bool? AfficherPredictionMeteoHeure { get; set; }
+
+    /// <summary>
+    /// Nombre de colonne pris par le panneau image sur la grille
+    /// </summary>
+    [Range(1, 12, ErrorMessage = "La taille du graphique doit être comprise entre 1 et 12")]
+    public byte? DimensionPanneauImage { get; set; }
+
+    /// <summary>
     /// Indicateur permettant de déterminer si la section des barils sera utiliser par l'érablière
     /// </summary>
     public bool? AfficherSectionBaril { get; set; }

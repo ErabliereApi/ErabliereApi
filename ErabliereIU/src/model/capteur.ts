@@ -11,4 +11,5 @@ export class Capteur {
     donnees?: DonneeCapteur[];
     indiceOrdre?: number;
     taille?: number;
+    batteryLevel?: number;
 }
