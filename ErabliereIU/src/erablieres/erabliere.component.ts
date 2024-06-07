@@ -9,6 +9,7 @@ import { Subject } from 'rxjs';
 import { ImagePanelComponent } from 'src/donnees/sub-panel/image-pannel.component';
 import { RappelsComponent } from 'src/rappel/rappels.component';
 import { WeatherForecastComponent } from 'src/donnees/weather-forecast.component';
+import { HourlyWeatherForecastComponent } from 'src/donnees/hourly-weather-forecast';
 
 @Component({
     selector: 'erablieres',
@@ -20,7 +21,8 @@ import { WeatherForecastComponent } from 'src/donnees/weather-forecast.component
       BarilsComponent,
       ImagePanelComponent,
       RappelsComponent,
-      WeatherForecastComponent
+      WeatherForecastComponent,
+      HourlyWeatherForecastComponent
     ]
 })
 export class ErabliereComponent implements OnInit {
@@ -56,5 +58,13 @@ export class ErabliereComponent implements OnInit {
         });
       }
     });
+  }
+
+  getClassPanneauImage(arg0: Erabliere|undefined) {
+    if (arg0?.dimensionPanneauImage) {
+      return 'col-md-' + arg0.dimensionPanneauImage;
+    }
+
+    return 'col-md-12';
   }
 }

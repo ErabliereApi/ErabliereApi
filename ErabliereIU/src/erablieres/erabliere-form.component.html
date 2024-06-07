@@ -28,6 +28,16 @@
             <input-error [errorObj]="errorObj" [controlName]="'indiceOrdre'"></input-error>
         </div>
         <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoJour" name="afficherPredictionMeteoJour"
+            [(ngModel)]="erabliere.afficherPredictionMeteoJour">
+            <label for="afficherPredictionMeteoJour" class="form-check-label">Afficher des prédictions météos par jour</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoHeure" name="afficherPredictionMeteoHeure"
+            [(ngModel)]="erabliere.afficherPredictionMeteoHeure">
+            <label for="afficherPredictionMeteoHeure" class="form-check-label">Afficher des prédictions météos par heure</label>
+        </div>
+        <div class="form-check">
             <input class="form-label" type="checkbox" class="form-check-input" id="afficherSectionBaril" name="afficherSectionBaril"
             [(ngModel)]="erabliere.afficherSectionBaril">
             <label for="afficherSectionBaril" class="form-check-label">Afficher section barils</label>
@@ -41,6 +51,12 @@
             <input type="checkbox" class="form-check-input" id="afficherSectionDompeux" name="afficherSectionDompeux"
             [(ngModel)]="erabliere.afficherSectionDompeux">
             <label for="afficherSectionDompeux" class="form-check-label">Afficher section dompeux</label>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="codePostal">Dimension panneau image</label>
+            <input type="number" class="form-control" id="dimensionPanneauImage" name="dimensionPanneauImage" rows="3"
+                   [(ngModel)]="erabliere.dimensionPanneauImage">
+            <input-error [errorObj]="errorObj" [controlName]="'dimensionPanneauImage'"></input-error>
         </div>
         <hr />
         <div class="form-check">

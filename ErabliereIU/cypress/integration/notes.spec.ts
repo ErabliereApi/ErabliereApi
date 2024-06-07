@@ -1,5 +1,6 @@
 import { HomePage } from "cypress/pages/home.page";
 import { NotesPage } from "cypress/pages/notes.page";
+import { pad } from "cypress/types/lodash";
 
 describe("Notes page", { testIsolation: false }, () => {
     const homePage = new HomePage();
@@ -32,7 +33,7 @@ describe("Notes page", { testIsolation: false }, () => {
         // validate that note is added
         notesPage.getNoteTitle().should('have.text', title);
         notesPage.getNoteDescription().should('have.text', content);
-        notesPage.getNoteDate().should('have.text', dstring + "T00:00:00+00:00");
+        notesPage.getNoteDate().should('have.text', `Date de Création: ${pad2(date.getDate())}-${pad2(date.getMonth() + 1)}-${date.getFullYear()}`);
     });
 
     it("should click on cancel button", () => {

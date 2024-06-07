@@ -37,6 +37,22 @@ public class PutErabliere
     public string? CodePostal { get; set; }
 
     /// <summary>
+    /// Indicateur permettant de déterminer si la section des prédictions météo sera utiliser par l'érablière
+    /// </summary>
+    public bool? AfficherPredictionMeteoJour { get; set; }
+
+    /// <summary>
+    /// Indicateur permettant de déterminer si la section des prédictions météo sera utiliser par l'érablière
+    /// </summary>
+    public bool? AfficherPredictionMeteoHeure { get; set; }
+
+    /// <summary>
+    /// Nombre de colonnes utiliser par le panneau d'image
+    /// </summary>
+    [Range(1, 12, ErrorMessage = "Le nombre de colonne doit être entre 1 et 12")]
+    public int? DimensionPanneauImage { get; set; }
+
+    /// <summary>
     /// Indicateur permettant de déterminer si la section des barils sera utiliser par l'érablière
     /// </summary>
     public bool? AfficherSectionBaril { get; set; }

@@ -55,6 +55,11 @@ public class Customer
     public DateTimeOffset CreationTime { get; set; } = DateTimeOffset.Now;
 
     /// <summary>
+    /// La date de la dernière utilisation de l'utilisateur
+    /// </summary>
+    public DateTimeOffset? LastAccessTime { get; set; }
+
+    /// <summary>
     /// La liste des clés d'api de l'utilisateur
     /// </summary>
     public List<ApiKey>? ApiKeys { get; set; }

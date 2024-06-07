@@ -23,6 +23,7 @@ import {PostCapteurImage} from "../model/postCapteurImage";
 import {CapteurImage} from "../model/capteurImage";
 import {PutCapteurImage} from "../model/putCapteurImage";
 import { WeatherForecast } from 'src/model/weatherForecast';
+import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
@@ -439,8 +440,16 @@ export class ErabliereApi {
 
     async getWeatherForecast(idErabliere: any): Promise<WeatherForecast> {
         const headers = await this.getHeaders();
-        const rtn = await this._httpClient.get<WeatherForecast>(this._environmentService.apiUrl + '/Erablieres/' + idErabliere + "/WeatherForecast", { headers: headers }).toPromise();
+        const rtn = await this._httpClient.get<WeatherForecast>(
+            this._environmentService.apiUrl + '/Erablieres/' + idErabliere + "/WeatherForecast", { headers: headers }).toPromise();
         return rtn ?? new WeatherForecast();
+    }
+
+    async geHourlyWeatherForecast(id: any): Promise<HourlyWeatherForecast[]> {
+        const headers = await this.getHeaders();
+        const rtn = await this._httpClient.get<HourlyWeatherForecast[]>(
+            this._environmentService.apiUrl + '/Erablieres/' + id + "/WeatherForecast/Hourly", { headers: headers }).toPromise();
+        return rtn ?? [];
     }
 
     async startCheckoutSession(): Promise<any> {

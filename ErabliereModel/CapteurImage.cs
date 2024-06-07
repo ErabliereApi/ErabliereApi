@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ErabliereApi.Donnees
 {
+    /// <summary>
+    /// Représente un capteur d'image
+    /// </summary>
     public class CapteurImage
     {
         /// <summary>

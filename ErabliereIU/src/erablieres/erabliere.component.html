@@ -2,14 +2,21 @@
     <div class="col-md-10 order-2 order-md-1">
         @if (erabliere?.codePostal?.trim() || displayImages) {
         <div class="row border-top py-2">
-            @if (erabliere?.codePostal?.trim()) {
+            @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoJour) {
             <weather-forecast
                 class="col-md-6"
                 [erabliere]="erabliere">
             </weather-forecast>
             }
+            @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoHeure) {
+            <hourly-weather-forecast
+                class="col-md-6"
+                style="max-height: 250px; overflow-y: auto; overflow-x: auto;"
+                [erabliere]="erabliere">
+            </hourly-weather-forecast>
+            }
             @if (displayImages) {
-            <image-panel class="col-md-6" [idErabliereSelectionnee]="idErabliereSelectionee"></image-panel>
+                <image-panel [className]="getClassPanneauImage(erabliere)" [idErabliereSelectionnee]="idErabliereSelectionee"></image-panel>
             }
         </div>
         }
