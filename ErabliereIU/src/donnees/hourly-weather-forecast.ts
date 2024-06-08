@@ -23,9 +23,9 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
                     <td>{{ getHour(forecast) }}</td>
                     <td>{{ convertToCelsius(forecast.temperature?.value) }}°C</td>
                     <td>{{ forecast.iconPhrase }}</td>
-                    <td>{{ forecast.hasPrecipitation }}</td>
-                    <td>{{ forecast.precipitationType }}</td>
-                    <td>{{ forecast.precipitationIntensity }}</td>
+                    <td>{{ forecast.hasPrecipitation ? 'Oui' : 'Non' }}</td>
+                    <td>{{ precipitationTypeText(forecast.precipitationType) }}</td>
+                    <td>{{ precipitationIntensityText(forecast.precipitationIntensity) }}</td>
                 </tr>
             </tbody>
         </table>
@@ -92,5 +92,41 @@ export class HourlyWeatherForecastComponent {
             return hours + 'h';
         }
         return '';
+    }
+
+    precipitationTypeText(arg0: string|undefined) {
+        if (arg0 == null) {
+            return '';
+        }
+
+        switch (arg0) {
+            case 'Rain':
+                return 'Pluie';
+            case 'Snow':
+                return 'Neige';
+            case 'Ice':
+                return 'Glace';
+            case 'Mixed':
+                return 'Mixte';
+            default:
+                return arg0;
+        }
+    }
+
+    precipitationIntensityText(arg0: string|undefined) {
+        if (arg0 == null) {
+            return '';
+        }
+
+        switch (arg0) {
+            case 'Light':
+                return 'Légère';
+            case 'Moderate':
+                return 'Modérée';
+            case 'Heavy':
+                return 'Forte';
+            default:
+                return arg0;
+        }
     }
 }
