@@ -51,5 +51,10 @@ namespace ErabliereApi.Donnees.Action.Get
         /// la string bootstrap pour chnager les dimensions du graphique
         /// </summary>
         public string? Taille { get; set; }
+
+        /// <summary>
+        /// Le niveau de la batterie
+        /// </summary>
+        public byte? BatteryLevel { get; set; }
     }
 }

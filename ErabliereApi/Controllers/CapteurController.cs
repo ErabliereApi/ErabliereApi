@@ -254,6 +254,11 @@ public class CapteursController : ControllerBase
             capteurEntity.Taille = capteur.Taille.Value;
         }
 
+        if (capteur.BatteryLevel.HasValue)
+        {
+            capteurEntity.BatteryLevel = capteur.BatteryLevel.Value;
+        }
+
         _depot.Update(capteurEntity);
 
         await _depot.SaveChangesAsync(token);

@@ -59,6 +59,7 @@ export class VacciumGraphPannelComponent implements OnInit {
     @Input() symbole: string | undefined;
     @Input() textActuel?: string | undefined | null;
     @Input() ajouterDonneeDepuisInterface: boolean = false;
+    @Input() batteryLevel?: number | undefined;
 
     constructor(private _api: ErabliereApi) { this.chart = undefined; }
 

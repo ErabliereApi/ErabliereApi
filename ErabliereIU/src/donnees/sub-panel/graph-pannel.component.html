@@ -1,5 +1,26 @@
 <div id="graph-pannel-{{idCapteur}}">
-    <h3>{{ titre }} {{ valeurActuel }} {{ symbole }} {{ mean }}</h3>
+    <div class="row">
+        <div class="col-10">
+            <h3>{{ titre }} {{ valeurActuel }} {{ symbole }} {{ mean }}</h3>
+        </div>
+        <div class="col-2">
+            @if (batteryLevel != null) {
+                <div class="mt-2">
+                    <div class="progress" title="Niveau de la batterie">
+                        <div class="progress-bar"
+                                role="progressbar"
+                                [style.width.%]="batteryLevel"
+                                [attr.aria-valuenow]="batteryLevel"
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                            {{ batteryLevel }}%
+                        </div>
+                    </div>
+                </div>
+                }
+        </div>
+    </div>
+
 
     <div class="container">
         <div class="row">
@@ -27,6 +48,8 @@
                             <button class="btn btn-secondary m-2" (click)="updateGraphUsingFixRange()">Appliquer</button>
                         </a>
                     </div>
+
+                    <span class="ms-2 mt-2">{{ textActuel }}</span>
                 </div>
             </div>
             @if (ajouterDonneeDepuisInterface) {
@@ -35,7 +58,6 @@
                     [idCapteur]="idCapteur"
                     (needToUpdate)="updateDonneesCapteur($event)"
                     [symbole]="symbole" />
-                <h6 class="ms-2 mt-2">{{ textActuel }}</h6>
             }
         </div>
     </div>
