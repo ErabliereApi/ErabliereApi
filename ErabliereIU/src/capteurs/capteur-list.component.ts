@@ -46,8 +46,7 @@ export class CapteurListComponent implements OnChanges {
                             validators: [
                                 Validators.required,
                                 Validators.min(0)
-                            ],
-                            updateOn: 'blur'
+                            ]
                         }
                     ),
                     nom: new FormControl(
