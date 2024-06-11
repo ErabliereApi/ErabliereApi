@@ -1,5 +1,5 @@
 requests==2.32.0
-azure-identity==1.15.0
+azure-identity==1.16.1
 pillow==10.3.0
 pytesseract==0.3.10
 flask-restful==0.3.10
