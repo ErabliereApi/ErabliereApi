@@ -34,7 +34,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build-api-env /app/ErabliereApi/out ./
 RUN chmod u+x docker-entrypoint.sh
-COPY --from=angular-builder /usr/src/app/dist/ErabliereIU ./wwwroot
+COPY --from=angular-builder /usr/src/app/dist/ErabliereIU/browser ./wwwroot
 RUN rm ./wwwroot/assets/config/oauth-oidc.json && mv ./wwwroot/assets/config/oauth-oidc-docker.json ./wwwroot/assets/config/oauth-oidc.json
 
 # Expose port
