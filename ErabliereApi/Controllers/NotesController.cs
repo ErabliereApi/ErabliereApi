@@ -4,7 +4,6 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
-using ErabliereApi.Extensions;
 using ErabliereApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +22,22 @@ public class NotesController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
     private readonly IMapper _mapper;
+    private readonly ILogger<NotesController> _logger;
 
     /// <summary>
     /// Constructeur par défaut
     /// </summary>
     /// <param name="depot"></param>
     /// <param name="mapper"></param>
-    public NotesController(ErabliereDbContext depot, IMapper mapper)
+    /// <param name="logger"></param>
+    public NotesController(
+        ErabliereDbContext depot, 
+        IMapper mapper,
+        ILogger<NotesController> logger)
     {
         _depot = depot;
         _mapper = mapper;
+        _logger = logger;
     }
 
     /// <summary>
@@ -339,6 +344,15 @@ public class NotesController : ControllerBase
 
         foreach (var note in notesWithRappel)
         {
+            if (note == null || 
+                note.Rappel == null || 
+                note.Rappel.Periodicite == null ||
+                note.Rappel.DateRappel == null) 
+            {
+                _logger.LogWarning("Note with id {noteId} has a null rappel or rappel properties", note?.Id);
+                continue;
+            }
+
             if (note.Rappel.Periodicite == "annuel")
             {
                 note.Rappel.DateRappel = note.Rappel.DateRappel.Value.AddYears(1);
@@ -353,6 +367,14 @@ public class NotesController : ControllerBase
                 if (note.Rappel.DateRappelFin != null)
                 {
                     note.Rappel.DateRappelFin = note.Rappel.DateRappelFin.Value.AddMonths(1);
+                }
+            }
+            else if (note.Rappel.Periodicite == "bihebo") 
+            {
+                note.Rappel.DateRappel = note.Rappel.DateRappel.Value.AddDays(14);
+                if (note.Rappel.DateRappelFin != null)
+                {
+                    note.Rappel.DateRappelFin = note.Rappel.DateRappelFin.Value.AddDays(14);
                 }
             }
             else if (note.Rappel.Periodicite == "hebdo")
