@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, NgModule, DoBootstrap, ApplicationRef } from '@angular/core';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { MsalService, MSAL_INSTANCE } from '@azure/msal-angular';
 import { BrowserCacheLocation, Configuration, IPublicClientApplication, LogLevel, PublicClientApplication } from '@azure/msal-browser';
@@ -87,8 +87,7 @@ export function MSALInstanceFactory(appConfig: EnvironmentService): IPublicClien
   return pca;
 }
 
-@NgModule({
-    providers: [
+@NgModule({ imports: [BrowserModule], providers: [
         {
             provide: APP_INITIALIZER,
             useFactory: initConfig,
@@ -102,13 +101,9 @@ export function MSALInstanceFactory(appConfig: EnvironmentService): IPublicClien
         },
         MsalService,
         provideNgxMask(),
-        provideRouter(routes, withComponentInputBinding())
-    ],
-    imports: [
-        BrowserModule,
-        HttpClientModule
-    ]
-})
+        provideRouter(routes, withComponentInputBinding()),
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule implements DoBootstrap {
   constructor() {}
 
