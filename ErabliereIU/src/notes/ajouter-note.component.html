@@ -101,6 +101,15 @@
       }
       <button id="creerNote" class="btn btn-primary me-2" (click)="onButtonCreerClick()">Créer</button>
       <button id="annulerCreerNote" class="btn btn-secondary" (click)="onButtonAnnuleClick()">Annuler</button>
+      @if (uploadInProgress) {
+        <div>
+          <span class="text-success">Téléchargement en cours... Total: {{totalSize}} Mb</span>
+          <!-- add a spinner to indicate the user the upload is in progress -->
+          <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>      
+        </div>
+      }
     </form>
   </div>
 } @else {

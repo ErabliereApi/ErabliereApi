@@ -33,6 +33,8 @@ export class AjouterNoteComponent implements OnInit {
     errorObj: any;
     fileToLargeErrorMessage?: string | null;
     generalError?: string | null;
+    uploadInProgress: boolean = false
+    totalSize?: number = 0;
 
     constructor(private _api: ErabliereApi, private fb: UntypedFormBuilder) {
         this.noteForm = this.fb.group({});
@@ -143,6 +145,8 @@ export class AjouterNoteComponent implements OnInit {
                   }
               }
 
+              this.uploadInProgress = true;
+
               this._api.postNote(this.idErabliereSelectionee, this.note)
                 .then(r => {
                   this.errorObj = null;
@@ -167,6 +171,9 @@ export class AjouterNoteComponent implements OnInit {
                     this.fileToLargeErrorMessage = null;
                     this.generalError = "Une erreur est survenue. " + this.errorObj.error.errors['postNote'];
                   }
+                }).finally(() => {
+                  this.uploadInProgress = false;
+                  this.totalSize = undefined;
                 });
             } else {
               this.validateForm();
@@ -183,7 +190,9 @@ export class AjouterNoteComponent implements OnInit {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            this.noteForm.controls['fileBase64'].setValue(reader.result?.toString().split(',')[1]);
+            let data = reader.result?.toString().split(',')[1];
+            this.noteForm.controls['fileBase64'].setValue(data);
+            this.totalSize = Math.floor((data ? (data.length * (3/4) / 1024 / 1024) : 0) * 1000) / 1000;
         };
     }
 
