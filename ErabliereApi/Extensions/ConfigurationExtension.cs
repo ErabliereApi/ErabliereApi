@@ -46,4 +46,15 @@ public static class ConfigurationExtension
     {
         return string.Equals(config["ASPNETCORE_ENVIRONMENT"], Environments.Development, OrdinalIgnoreCase);
     }
+
+    /// <summary>
+    /// Check if the variable USEMQTT is equal to true
+    /// </summary>
+    /// <param name="config"></param>
+    /// <returns></returns>
+    /// <remarks>USEMQTT is used to enable or disable the MQTT service</remarks>
+    public static bool UseMQTT(this IConfiguration config)
+    {
+        return string.Equals(config["USEMQTT"]?.Trim(), TrueString, OrdinalIgnoreCase);
+    }
 }
