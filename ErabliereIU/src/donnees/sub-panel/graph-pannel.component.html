@@ -1,10 +1,11 @@
 <div id="graph-pannel-{{idCapteur}}">
     <div class="row">
-        <div class="col-10">
+        <div [className]="batteryLevel ? col10 : col12">
             <h3>{{ titre }} {{ valeurActuel }} {{ symbole }} {{ mean }}</h3>
         </div>
+        @if (batteryLevel != null) {
         <div class="col-2">
-            @if (batteryLevel != null) {
+            
                 <div class="mt-2">
                     <div class="progress" title="Niveau de la batterie">
                         <div class="progress-bar"
@@ -17,8 +18,8 @@
                         </div>
                     </div>
                 </div>
-                }
-        </div>
+            </div>
+        }
     </div>
 
 

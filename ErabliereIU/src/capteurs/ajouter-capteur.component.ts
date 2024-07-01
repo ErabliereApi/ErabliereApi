@@ -46,7 +46,7 @@ export class AjouterCapteurComponent {
                 }
             ),
             affichageDashboard: new FormControl(
-                false
+                true
             ),
             saisieManuelle: new FormControl(
                 false
@@ -62,7 +62,9 @@ export class AjouterCapteurComponent {
         this.capteur.ajouterDonneeDepuisInterface = this.ajoutCapteurForm.controls['saisieManuelle'].value;
         this.erabliereApi.postCapteur(this.idErabliere, this.capteur).then(() => {
             this.shouldReloadCapteurs.emit();
-            this.ajoutCapteurForm.reset();
+            this.ajoutCapteurForm.reset({
+                affichageDashboard: true
+            });
         }).catch(error => {
             if (error.status == 400) {
                 this.errorObj = error

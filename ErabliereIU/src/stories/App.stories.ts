@@ -18,5 +18,12 @@ export default meta;
 type Story = StoryObj<AppComponent>;
 
 export const Primary: Story = {
+  
+};
 
+export const ErabliereAIEnable: Story = {
+  args: {
+    erabliereAIEnable: true,
+    erabliereAIUserRole: true
+  }
 };

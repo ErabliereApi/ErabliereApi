@@ -1,7 +1,6 @@
 ﻿using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
-using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc.Filters;
 using MimeKit;
 using System.Text;
@@ -11,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Services;
 
-namespace ErabliereApi.Controllers.Attributes;
+namespace ErabliereApi.Attributes;
 
 /// <summary>
 /// Classe qui permet de rechercher et lancer les alertes relier à une action.

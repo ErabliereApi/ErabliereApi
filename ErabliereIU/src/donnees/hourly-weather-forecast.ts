@@ -12,8 +12,7 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
                 <tr>
                     <th>Heure</th>
                     <th>Température</th>
-                    <th>Info</th>
-                    <th>Précipitation</th>
+                    <th>Icône</th>
                     <th>Type</th>
                     <th>Intensité</th>
                 </tr>
@@ -22,8 +21,12 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
                 <tr *ngFor="let forecast of weatherData">
                     <td>{{ getHour(forecast) }}</td>
                     <td>{{ convertToCelsius(forecast.temperature?.value) }}°C</td>
-                    <td>{{ forecast.iconPhrase }}</td>
-                    <td>{{ forecast.hasPrecipitation ? 'Oui' : 'Non' }}</td>
+                    <td>
+                        <img 
+                            [src]="'/assets/weathericons/accuweather/' + pad2(forecast.weatherIcon) + '-s.png'"
+                            [alt]="forecast.iconPhrase"
+                            [title]="forecast.iconPhrase">
+                    </td>
                     <td>{{ precipitationTypeText(forecast.precipitationType) }}</td>
                     <td>{{ precipitationIntensityText(forecast.precipitationIntensity) }}</td>
                 </tr>
@@ -128,5 +131,13 @@ export class HourlyWeatherForecastComponent {
             default:
                 return arg0;
         }
+    }
+
+    pad2(n?: number): string {
+        if (n == null) {
+            return '';
+        }
+
+        return n.toString().padStart(2, '0');
     }
 }

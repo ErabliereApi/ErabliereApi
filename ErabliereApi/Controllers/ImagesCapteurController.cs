@@ -1,15 +1,7 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErabliereApi.Attributes;
-using ErabliereApi.Controllers.Attributes;
-using ErabliereApi.Depot.Sql;
-using ErabliereApi.Donnees;
+﻿using ErabliereApi.Attributes;
 using ErabliereApi.Donnees.Action.Get;
-using ErabliereApi.Donnees.Action.Post;
-using ErabliereApi.Donnees.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ErabliereApi.Controllers;
 

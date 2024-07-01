@@ -25,7 +25,7 @@ export class AjouterAlerteComponent implements OnInit {
         this.alerte = new Alerte();
         this.alerteCapteur = new AlerteCapteur();
         this.typeAlerteSelectListForm = new UntypedFormGroup({
-            state: new UntypedFormControl(1) // 1 is the value of the first option in the select list
+            state: new UntypedFormControl(1)
         });
         this.display = false;
         this.alerteForm = this.fb.group({});
@@ -74,10 +74,6 @@ export class AjouterAlerteComponent implements OnInit {
     alerteCapteurForm: UntypedFormGroup;
 
     typeAlerte:number = 1;
-
-    onSubmit() {
-
-    }
 
     onButtonAjouterClick() {
         this.display = true;

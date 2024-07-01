@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Services;
 
-namespace ErabliereApi.Controllers.Attributes;
+namespace ErabliereApi.Attributes;
 
 /// <summary>
 /// Classe qui permet de rechercher et lancer les alertes relier à une action.
@@ -65,7 +65,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         {
             try
             {
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertAttribute>>();
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV2Attribute>>();
                 var depot = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
                 var emailConfig = context.HttpContext.RequestServices.GetRequiredService<IOptions<EmailConfig>>();
                 var emailService = context.HttpContext.RequestServices.GetRequiredService<IEmailService>();
@@ -101,16 +101,16 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
             }
             catch (Exception e)
             {
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertAttribute>>();
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV2Attribute>>();
 
-                logger.LogCritical(new EventId(92837485, "TriggerAlertAttribute.OnActionExecuted"), e, "Une erreur imprévue est survenu lors de l'execution de la fonction d'alertage.");
+                logger.LogCritical(new EventId(92837485, "TriggerAlertV2Attribute.OnActionExecuted"), e, "Une erreur imprévue est survenu lors de l'execution de la fonction d'alertage.");
             }
         }
     }
 
     private void MaybeTriggerAlerte(
         AlerteCapteur alerte, 
-        ILogger<TriggerAlertAttribute> logger, 
+        ILogger<TriggerAlertV2Attribute> logger, 
         EmailConfig emailConfig, 
         IEmailService emailService, 
         SMSConfig smsConfig, 
@@ -160,7 +160,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
 
     private async void TriggerAlerteCourriel(
         AlerteCapteur alerte, 
-        ILogger<TriggerAlertAttribute> logger, 
+        ILogger<TriggerAlertV2Attribute> logger, 
         EmailConfig emailConfig, 
         IEmailService emailService,
         PostDonneeCapteur? _donnee)
@@ -199,7 +199,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
 
     private async void TriggerAlerteSMS(
         AlerteCapteur alerte, 
-        ILogger<TriggerAlertAttribute> logger, 
+        ILogger<TriggerAlertV2Attribute> logger, 
         SMSConfig smsConfig, 
         ISMSService smsService,
         PostDonneeCapteur? _donnee)
@@ -225,7 +225,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         }
         catch (Exception e)
         {
-            logger.LogCritical(new EventId(92837486, "TriggerAlertAttribute.TriggerAlerte"), e, "Une erreur imprévue est survenu lors de l'envoie de l'alerte.");
+            logger.LogCritical(new EventId(92837486, "TriggerAlertV2Attribute.TriggerAlerte"), e, "Une erreur imprévue est survenu lors de l'envoie de l'alerte.");
         }
     }
 

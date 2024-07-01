@@ -19,11 +19,11 @@
     <div *ngIf="typeAlerte == 1">
       <form [formGroup]="alerteForm">
           <div class="form-group mb-2">
-            <label class="form-label">Nom: </label>
+            <label class="form-label" title="Nom de l'alerte utiliser pour l'affichage">Nom: </label>
             <input class="form-control" type="text" formControlName="nom">
           </div>
           <div class="form-group mb-2">
-            <label class="form-label">Destinataires du courriel: </label>
+            <label class="form-label" title="Adresses courriel des destinataires. Vous pouvez entrer plusieurs adresses séparer par des points virgules.">Destinataires du courriel: </label>
             <input class="form-control" type="text" formControlName="destinataireCourriel">
           </div>
           <div class="form-group mb-2">

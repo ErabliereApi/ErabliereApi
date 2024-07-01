@@ -18,5 +18,5 @@ export default meta;
 type Story = StoryObj<AjouterErabliereComponent>;
 
 export const Primary: Story = {
-
+  
 };

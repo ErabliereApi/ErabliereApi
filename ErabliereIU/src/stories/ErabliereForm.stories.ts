@@ -20,3 +20,9 @@ type Story = StoryObj<ErabliereFormComponent>;
 export const Primary: Story = {
 
 };
+
+export const Secondary: Story = {
+    args: {
+      plusdOptions: true
+    }  
+};

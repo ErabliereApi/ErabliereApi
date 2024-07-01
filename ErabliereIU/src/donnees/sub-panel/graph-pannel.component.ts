@@ -45,6 +45,9 @@ export class GraphPannelComponent implements OnInit {
         }
     };
 
+    col12: string = "col-12";
+    col10: string = "col-10";
+
     lineChartLegend = true;
     lineChartPlugins = [];
 

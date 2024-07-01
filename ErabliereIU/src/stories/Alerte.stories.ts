@@ -18,5 +18,35 @@ export default meta;
 type Story = StoryObj<AlerteComponent>;
 
 export const Primary: Story = {
+  args: {
+    alertes: [
+      {
+        id: "guid1",
+        idErabliere: "guid2",
+        emails: [
+          "demo@email.com",
+          "demo2@email.com"
+        ]
+      }
+    ],
+    alertesCapteur: [
+      {
+        id: "guid3",
+        idCapteur: "guid4",
+        minVaue: 1,
+        maxValue: 30,
+        capteur: {
+          id: "guid4",
+          idErabliere: "guid2",
+          nom: "Temperature",
+          symbole: "°C",
+          ajouterDonneeDepuisInterface: false
+        }
+      }
+    ],
+  }  
+};
+
+export const Empty: Story = {
 
 };
