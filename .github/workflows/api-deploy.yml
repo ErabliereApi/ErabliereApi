@@ -32,4 +32,8 @@ jobs:
 
       - name: Wake up service with get swagger
         run: |
-          curl https://erabliereapi-demo.azurewebsites.net/api/v1/swagger.json
+          curl https://erabliereapi.freddycoder.com/api/v1/swagger.json
+
+      - name: Wake up database service with get
+        run: |
+          curl https://erabliereapi.freddycoder.com/Erablieres?%24top=10
