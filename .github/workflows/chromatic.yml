@@ -39,8 +39,8 @@ jobs:
       # If the CHROMATIC_PROJECT_TOKEN secret is empty, use npm run chromatic
       - name: Build the storybook
         env:
-          chromatictoken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-        if: chromatictoken == ''
+          CHROMATIC_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        if: $CHROMATIC_TOKEN == ''
         run: |
           cd ErabliereIU
           npm run chromatic
