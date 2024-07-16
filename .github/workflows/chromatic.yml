@@ -41,14 +41,14 @@ jobs:
 
       # If the CHROMATIC_PROJECT_TOKEN secret is empty, use npm run chromatic
       - name: Build the storybook
-        if: ${{ $CHROMATIC_TOKEN == '' }}
+        if: ${{ env.CHROMATIC_TOKEN == '' }}
         run: |
           cd ErabliereIU
           npm run chromatic
 
       #👇 Adds Chromatic as a step in the workflow
       - uses: chromaui/action@latest
-        if: ${{ $CHROMATIC_TOKEN != '' }}
+        if: ${{ env.CHROMATIC_TOKEN != '' }}
         # Options required for Chromatic's GitHub Action
         with:
           workingDir: ./ErabliereIU
