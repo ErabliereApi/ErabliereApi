@@ -1,3 +1,12 @@
+using ErabliereApi.Authorization;
+using ErabliereApi.Authorization.Customers;
+using ErabliereApi.Authorization.Policies.Handlers;
+using ErabliereApi.Authorization.Policies.Requirements;
+using ErabliereApi.Services.Users;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Identity.Web;
+
 namespace ErabliereApi.Extensions;
 
 /// <summary>
@@ -8,37 +17,37 @@ public static class AuthenticationExtension
     /// <summary>
     /// Ajoute l'authentification à l'API
     /// </summary>
-    public static IServiceCollection AddErabliereAPIAuthentication(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddErabliereAPIAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<IUserService, UserService>()
                 .Decorate<IUserService, UserCacheDecorator>()
                 .AddHttpContextAccessor();
         
-        if (Configuration.IsAuthEnabled())
+        if (configuration.IsAuthEnabled())
         {
             Console.WriteLine("Authentication enabled.");
             
-            SetAzureADVariables();
+            SetAzureADVariables(configuration);
 
-            if (!string.IsNullOrWhiteSpace(Configuration["AzureAD:ClientId"]))
+            if (!string.IsNullOrWhiteSpace(configuration["AzureAD:ClientId"]))
             {
                 services.AddSingleton<IAuthorizationHandler, TenantIdHandler>();
                 services.AddAuthorization(options =>
                 {
                     options.AddPolicy("TenantIdPrincipal", policy =>
                     {
-                        policy.Requirements.Add(new TenantIdRequirement(Configuration["AzureAD:TenantIdPrincipal"] ?? ""));
+                        policy.Requirements.Add(new TenantIdRequirement(configuration["AzureAD:TenantIdPrincipal"] ?? ""));
                     });
                 });
 
-                services.AddMicrosoftIdentityWebApiAuthentication(Configuration);
+                services.AddMicrosoftIdentityWebApiAuthentication(configuration);
             }
             else
             {
                 services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                         .AddIdentityServerAuthentication(options =>
                         {
-                            options.Authority = Configuration["OIDC_AUTHORITY"];
+                            options.Authority = configuration["OIDC_AUTHORITY"];
 
                             options.ApiName = "erabliereapi";
                         });
@@ -64,26 +73,26 @@ public static class AuthenticationExtension
     /// <summary>
     /// Ensure the AzureAD variables are set. This is for a special case when running in k8s.
     /// </summary>
-    private static void SetAzureADVariables()
+    private static void SetAzureADVariables(IConfiguration configuration)
     {
-        if (Configuration["AzureAD__ClientId"] != null && Configuration["AzureAD:ClientId"] == null)
+        if (configuration["AzureAD__ClientId"] != null && configuration["AzureAD:ClientId"] == null)
         {
-            Configuration["AzureAD:ClientId"] = Configuration["AzureAD__ClientId"];
+            configuration["AzureAD:ClientId"] = configuration["AzureAD__ClientId"];
         }
 
-        if (Configuration["AzureAD__TenantId"] != null && Configuration["AzureAD:TenantId"] == null)
+        if (configuration["AzureAD__TenantId"] != null && configuration["AzureAD:TenantId"] == null)
         {
-            Configuration["AzureAD:TenantId"] = Configuration["AzureAD__TenantId"];
+            configuration["AzureAD:TenantId"] = configuration["AzureAD__TenantId"];
         }
 
-        if (Configuration["AzureAD__ClientSecret"] != null && Configuration["AzureAD:ClientSecret"] == null)
+        if (configuration["AzureAD__ClientSecret"] != null && configuration["AzureAD:ClientSecret"] == null)
         {
-            Configuration["AzureAD:ClientSecret"] = Configuration["AzureAD__ClientSecret"];
+            configuration["AzureAD:ClientSecret"] = configuration["AzureAD__ClientSecret"];
         }
 
-        if (Configuration["AzureAD__TenantIdPrincipal"] != null && Configuration["AzureAD:TenantIdPrincipal"] == null)
+        if (configuration["AzureAD__TenantIdPrincipal"] != null && configuration["AzureAD:TenantIdPrincipal"] == null)
         {
-            Configuration["AzureAD:TenantIdPrincipal"] = Configuration["AzureAD__TenantIdPrincipal"];
+            configuration["AzureAD:TenantIdPrincipal"] = configuration["AzureAD__TenantIdPrincipal"];
         }
     }
 }
