@@ -30,5 +30,5 @@ catch (Exception e)
 {
     logger.LogCritical(e, "Error in Program.cs");
 
-    throw;
+    return 1;
 }

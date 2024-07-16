@@ -132,65 +132,7 @@ public class Startup
         services.AddErabliereAPIForwardedHeaders(Configuration);
 
         // Authentication
-        services.AddTransient<IUserService, UserService>()
-                .Decorate<IUserService, UserCacheDecorator>()
-                .AddHttpContextAccessor();
-        if (Configuration.IsAuthEnabled())
-        {
-            Console.WriteLine("Authentication enabled.");
-
-            if (Configuration["AzureAD__ClientId"] != null && Configuration["AzureAD:ClientId"] == null)
-            {
-                Configuration["AzureAD:ClientId"] = Configuration["AzureAD__ClientId"];
-            }
-
-            if (Configuration["AzureAD__TenantId"] != null && Configuration["AzureAD:TenantId"] == null)
-            {
-                Configuration["AzureAD:TenantId"] = Configuration["AzureAD__TenantId"];
-            }
-
-            if (Configuration["AzureAD__ClientSecret"] != null && Configuration["AzureAD:ClientSecret"] == null)
-            {
-                Configuration["AzureAD:ClientSecret"] = Configuration["AzureAD__ClientSecret"];
-            }
-
-            if (string.IsNullOrWhiteSpace(Configuration["AzureAD:ClientId"]) == false)
-            {
-                services.AddSingleton<IAuthorizationHandler, TenantIdHandler>();
-                services.AddAuthorization(options =>
-                {
-                    options.AddPolicy("TenantIdPrincipal", policy =>
-                    {
-                        policy.Requirements.Add(new TenantIdRequirement(Configuration["AzureAD:TenantIdPrincipal"] ?? ""));
-                    });
-                });
-
-                services.AddMicrosoftIdentityWebApiAuthentication(Configuration);
-            }
-            else
-            {
-                services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-                        .AddIdentityServerAuthentication(options =>
-                        {
-                            options.Authority = Configuration["OIDC_AUTHORITY"];
-
-                            options.ApiName = "erabliereapi";
-                        });
-            }
-
-            services.AddTransient<EnsureCustomerExist>();
-        }
-        else
-        {
-            services.AddSingleton<IAuthorizationHandler, AllowAnonymous>();
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("TenantIdPrincipal", policy =>
-                {
-                    policy.Requirements.Add(new TenantIdRequirement(""));
-                });
-            });
-        }
+        services.AddErabliereAPIAuthentication(Configuration);
 
         // Swagger
         services.AjouterSwagger(Configuration);
@@ -515,7 +457,7 @@ public class Startup
             endpoints.MapControllers();
             endpoints.MapHealthChecks("/health", new HealthCheckOptions
             {
-                Predicate = r => r.Tags.Contains("live") == false
+                Predicate = r => !r.Tags.Contains("live")
             });
             endpoints.MapHealthChecks("/live", new HealthCheckOptions
             {
