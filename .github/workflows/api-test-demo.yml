@@ -83,8 +83,8 @@ jobs:
       - name: Tag the v3-dev as v3 and latest
         if: github.event_name != 'pull_request'
         run: |
-          docker tag erabliereapi:v3-dev erabliereapi/erabliereapi:v3
-          docker tag erabliereapi:v3-dev erabliereapi/erabliereapi:latest
+          docker tag erabliereapi/erabliereapi:v3-dev erabliereapi/erabliereapi:v3
+          docker tag erabliereapi/erabliereapi:v3-dev erabliereapi/erabliereapi:latest
 
       - name: Push the image
         if: github.event_name != 'pull_request'
