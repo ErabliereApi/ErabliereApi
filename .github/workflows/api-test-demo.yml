@@ -75,14 +75,19 @@ jobs:
           username: ${{ secrets.registryUsername }}
           password: ${{ secrets.registryPassword }}
 
+      - name: Pull the image
+        if: github.event_name != 'pull_request'
+        run: |
+          docker pull erabliereapi/erabliereapi:v3-dev
+
       - name: Tag the v3-dev as v3 and latest
         if: github.event_name != 'pull_request'
         run: |
-          docker tag erabliereapi:v3-dev erabliereapi:v3
-          docker tag erabliereapi:v3-dev erabliereapi:latest
+          docker tag erabliereapi:v3-dev erabliereapi/erabliereapi:v3
+          docker tag erabliereapi:v3-dev erabliereapi/erabliereapi:latest
 
       - name: Push the image
         if: github.event_name != 'pull_request'
         run: |
-          docker push erabliereapi:v3
-          docker push erabliereapi:latest
+          docker push erabliereapi/erabliereapi:v3
+          docker push erabliereapi/erabliereapi:latest
