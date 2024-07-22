@@ -41,7 +41,7 @@ namespace ErabliereApi.Depot.Sql
         public DbSet<Dompeux> Dompeux { get; private set; }
 
         /// <summary>
-        /// Table des données
+        /// Table des données du trio de données
         /// </summary>
         public DbSet<Donnee> Donnees { get; private set; }
 

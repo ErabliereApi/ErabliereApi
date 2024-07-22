@@ -21,7 +21,7 @@ public class Donnee : IIdentifiable<Guid?, Donnee>, IErabliereOwnable
     public DateTimeOffset? D { get; set; }
 
     /// <summary>
-    /// Temperature en dixi�me de celcius
+    /// Temperature en dixième de celcius
     /// </summary>
     public short? T { get; set; }
 
