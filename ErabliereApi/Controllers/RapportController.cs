@@ -27,6 +27,15 @@ public class RapportController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// Effectue le rapport de degré jour pour une érablière
+    /// en se basant soit sur l'id du capteur ou sur les données de température
+    /// provenat du trio de données.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="rapportDegreeJour"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     [HttpPost("[action]")]
     [ValiderOwnership("id")]
     [ProducesResponseType(200, Type = typeof(PostRapportDegreeJourResponse))]

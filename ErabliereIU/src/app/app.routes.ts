@@ -12,6 +12,7 @@ import {AdminViewComponent} from "./admin-view/admin-view.component";
 import {AdminErablieresComponent} from "../admin/admin-erablieres/admin-erablieres.component";
 import {ClientViewComponent} from "./client-view/client-view.component";
 import {GestionCapteursComponent} from "../capteurs/gestion-capteurs.component";
+import { ReportsComponent } from 'src/rapport/rapports.component';
 
 export const routes: Routes = [
     {
@@ -84,6 +85,11 @@ export const routes: Routes = [
                 path: 'e/:idErabliereSelectionee/capteurs',
                 title: 'ÉrablièreIU - Capteurs',
                 component: GestionCapteursComponent
+            },
+            {
+                path: 'e/:idErabliereSelectionee/rapports',
+                title: 'ÉrablièreIU - Rapports',
+                component: ReportsComponent
             },
             {
                 path: 'apropos',
