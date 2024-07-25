@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RapportDegreJourComponent } from './degreejour/rapport-degre-jour.component';
+import { NgIf } from '@angular/common';
 
 @Component({
     selector: 'app-reports',
@@ -7,7 +8,8 @@ import { RapportDegreJourComponent } from './degreejour/rapport-degre-jour.compo
     styleUrls: ['./rapports.component.css'],
     standalone: true,
     imports: [
-        RapportDegreJourComponent
+        RapportDegreJourComponent,
+        NgIf
     ]
 })
 export class ReportsComponent implements OnInit {
@@ -15,7 +17,7 @@ export class ReportsComponent implements OnInit {
     constructor() { }
 
     ngOnInit(): void {
-        // Initialize component
+        console.log('ReportsComponent onInit');
     }
 
 }

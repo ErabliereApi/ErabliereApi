@@ -24,6 +24,7 @@ import {CapteurImage} from "../model/capteurImage";
 import {PutCapteurImage} from "../model/putCapteurImage";
 import { WeatherForecast } from 'src/model/weatherForecast';
 import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
+import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
@@ -533,6 +534,11 @@ export class ErabliereApi {
     async traduire(message: string) {
         const headers = await this.getHeaders();
         return await this._httpClient.post<any>(this._environmentService.apiUrl + '/ErabliereAI/Traduction?from=en&to=fr', { text: message }, { headers: headers }).toPromise();
+    }
+
+    async getDegresJours(idErabliere: any, form: PostDegresJoursRepportRequest) {
+        const headers = await this.getHeaders();
+        return await this._httpClient.post<ResponseRapportDegreeJours>(this._environmentService.apiUrl + '/Erablieres/' + idErabliere + '/Rapport/RapportDegreeJour', form, { headers: headers }).toPromise();
     }
 
     async getHeaders(): Promise<HttpHeaders> {
