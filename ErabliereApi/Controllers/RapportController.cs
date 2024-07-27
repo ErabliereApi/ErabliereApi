@@ -15,15 +15,13 @@ namespace ErabliereApi.Controllers;
 [Authorize]
 public class RapportController : ControllerBase
 {
-    private readonly IConfiguration _config;
     private readonly ErabliereDbContext _context;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
-    public RapportController(IConfiguration config, ErabliereDbContext context)
+    public RapportController(ErabliereDbContext context)
     {
-        _config = config;
         _context = context;
     }
 
@@ -43,9 +41,9 @@ public class RapportController : ControllerBase
                                                        [FromBody] PostRapportDegreeJourRequest rapportDegreeJour,
                                                        CancellationToken token)
     {
-        if (id != rapportDegreeJour.IdErabiere)
+        if (id != rapportDegreeJour.IdErabliere)
         {
-            return BadRequest();
+            return BadRequest($"L'id de la route '{id}' ne concorde pas avec l'id de l'érablière du rapport demandé '{rapportDegreeJour.IdErabliere}'.");
         }
 
         var rapport = new PostRapportDegreeJourResponse
@@ -56,7 +54,7 @@ public class RapportController : ControllerBase
         if (rapportDegreeJour.UtiliserTemperatureTrioDonnee)
         {
             var triodonnees = await _context.Donnees
-                .Where(d => d.IdErabliere == rapportDegreeJour.IdErabiere && d.D >= rapportDegreeJour.DateDebut && d.D <= rapportDegreeJour.DateFin)
+                .Where(d => d.IdErabliere == rapportDegreeJour.IdErabliere && d.D >= rapportDegreeJour.DateDebut && d.D <= rapportDegreeJour.DateFin)
                 .OrderBy(d => d.D)
                 .ToListAsync(token);
 
@@ -92,7 +90,9 @@ public class RapportController : ControllerBase
 
             if (capteur == null)
             {
-                return BadRequest();
+                ModelState.AddModelError(nameof(rapportDegreeJour.IdCapteur), "Le capteur n'existe pas ou n'appartient pas à l'érablière.");
+                
+                return BadRequest(new ValidationProblemDetails(ModelState));
             }
 
             var donnees = await _context.DonneesCapteur

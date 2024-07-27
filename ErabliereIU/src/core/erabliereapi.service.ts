@@ -25,6 +25,7 @@ import {PutCapteurImage} from "../model/putCapteurImage";
 import { WeatherForecast } from 'src/model/weatherForecast';
 import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
@@ -38,9 +39,11 @@ export class ErabliereApi {
 
     async getErabliere(idErabliereSelectionee: any): Promise<Erabliere> {
         const headers = await this.getHeaders();
-        const rtn = await this._httpClient.get<Erabliere[]>(
+        const req = this._httpClient.get<Erabliere[]>(
             this._environmentService.apiUrl + '/erablieres?$filter=id eq ' + idErabliereSelectionee + '&$expand=Capteurs($filter=afficherCapteurDashboard eq true;$orderby=indiceOrdre)',
-            { headers: headers }).toPromise();
+            { headers: headers });
+
+        const rtn = await firstValueFrom(req);
 
         if (rtn != null && rtn.length > 0) {
             return rtn[0];
@@ -50,13 +53,13 @@ export class ErabliereApi {
 
     async getErablieres(my: boolean): Promise<Erabliere[]> {
         const headers = await this.getHeaders();
-        const rtn = await this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/erablieres?my=' + my, { headers: headers }).toPromise();
+        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/erablieres?my=' + my, { headers: headers }));
         return rtn ?? [];
     }
 
     async getErablieresAdmin(): Promise<Erabliere[]> {
         const headers = await this.getHeaders();
-        const rtn = await this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/admin/erablieres', { headers: headers }).toPromise();
+        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/admin/erablieres', { headers: headers }));
         return rtn ?? [];
     }
 

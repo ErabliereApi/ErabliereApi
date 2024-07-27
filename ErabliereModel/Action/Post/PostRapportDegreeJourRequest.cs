@@ -10,7 +10,7 @@ namespace ErabliereApi.Donnees.Action.Post
         /// <summary>
         /// Identifiant de l'érablière
         /// </summary>
-        public Guid IdErabiere { get; set; }
+        public Guid IdErabliere { get; set; }
 
         /// <summary>
         /// Identifiant du capteur

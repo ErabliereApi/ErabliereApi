@@ -9,7 +9,7 @@ import { NgIf } from "@angular/common";
         <div [formGroup]="formGroup" class="input-group">
             <input 
                 class="form-control" 
-                type="text" 
+                type="{{ type }}" 
                 formControlName="{{ name }}" 
                 name="{{ name }}"
                 placeholder="{{ placeholder }}"
@@ -37,6 +37,7 @@ export class EinputComponent implements OnInit {
     @Input() decimalMarker: "." | "," | [".", ","] = ".";
     @Input() customPatterns: any
     @Input() spChar: string[] = []
+    @Input() type: "text" | "number" | "date" | "checkbox" = "text"
 
     constructor() {
 

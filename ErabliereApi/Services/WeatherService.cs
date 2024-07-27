@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ErabliereApi.Services;
 using ErabliereApi.Services.AccuWeatherModels;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -66,7 +65,7 @@ public class WeatherService : IWeaterService
         }
         catch (Exception ex)
         {
-            _logger.LogCritical($"Error retrieving location code: {ex.Message}");
+            _logger.LogCritical(ex, "Error retrieving location code: {Message}", ex.Message);
             return "";
         }
     }
@@ -112,11 +111,14 @@ $"http://dataservice.accuweather.com/forecasts/v1/daily/5day/{location}?apikey={
         }
         catch (Exception ex)
         {
-            _logger.LogCritical($"Error retrieving weather forecast: {ex.Message}");
+            _logger.LogCritical(ex, "Error retrieving weather forecast: {Message}", ex.Message);
             return new WeatherForecastResponse();
         }
     }
 
+    /// <summary>
+    /// Obtenir les prévisions météo horaires à partir d'un code de localisation
+    /// </summary>
     public async ValueTask<HourlyWeatherForecastResponse[]?> GetHoulyForecastAsync(string location, string lang)
     {
         var cacheKey = $"WeatherService.GetHoulyForecastAsync.{location}";
@@ -156,7 +158,7 @@ $"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/45942_PC?apikey=
         }
         catch (Exception ex)
         {
-            _logger.LogCritical($"Error retrieving hourly weather forecast: {ex.Message}");
+            _logger.LogCritical(ex, "Error retrieving hourly weather forecast: {Message}", ex.Message);
             return [];
         }
     }

@@ -60,7 +60,7 @@ public class DonneesController : ControllerBase
     {
         IEnumerable<GetDonnee> list;
 
-        switch (HttpContext.Request.Headers["Accept"].ToString().ToLowerInvariant())
+        switch (HttpContext.Request.Headers.Accept.ToString().ToLowerInvariant())
         {
             case "text/csv":
                 list = await ListerGenerique(id, ddr, dd, df, q, o);
@@ -118,11 +118,12 @@ public class DonneesController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant de l'érablière</param>
     /// <param name="donneeRecu">La donnée à ajouter</param>
+    /// <param name="token">Le token d'annulation</param>
     [HttpPost]
     [ValiderIPRules]
     [ValiderOwnership("id")]
     [TriggerAlert]
-    public async Task<IActionResult> Ajouter(Guid id, [FromBody] PostDonnee donneeRecu)
+    public async Task<IActionResult> Ajouter(Guid id, [FromBody] PostDonnee donneeRecu, CancellationToken token)
     {
         if (id != donneeRecu.IdErabliere)
         {
@@ -134,52 +135,12 @@ public class DonneesController : ControllerBase
             donneeRecu.D = DateTimeOffset.Now;
         }
 
-        var donnePlusRecente = _context.Donnees.OrderBy(d => d.D).LastOrDefault(d => d.IdErabliere == id);
+        var donnePlusRecente = await _context.Donnees.OrderBy(d => d.D).LastOrDefaultAsync(d => d.IdErabliere == id, token);
 
         if (donnePlusRecente != null &&
             donnePlusRecente.IdentiqueMemeLigneDeTemps(donneeRecu))
         {
-            if (donnePlusRecente.D.HasValue == false || donneeRecu.D.HasValue == false)
-            {
-                throw new InvalidProgramException("Les dates des données ne devrait pas être null rendu à cette étape.");
-            }
-
-            var interval = donneeRecu.D.Value - donnePlusRecente.D.Value;
-
-            if (donnePlusRecente.Iddp != null)
-            {
-                donnePlusRecente.D = donneeRecu.D;
-
-                if (donnePlusRecente.PI.HasValue == false)
-                {
-                    if (interval.Milliseconds > donnePlusRecente.PI)
-                    {
-                        donnePlusRecente.PI = (int)interval.TotalSeconds;
-                    }
-                }
-                else
-                {
-                    donnePlusRecente.PI = (int)interval.TotalSeconds;
-                }
-
-                donnePlusRecente.Nboc++;
-
-                _context.Donnees.Update(donnePlusRecente);
-
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                var donnee = _mapper.Map<Donnee>(donneeRecu);
-
-                donnee.Iddp = donnePlusRecente.Id;
-
-                donnee.PI = (int)interval.TotalSeconds;
-
-                _context.Donnees.Add(donnee);
-
-                await _context.SaveChangesAsync();
-            }
+            await UpdateWhenIdentique(donneeRecu, donnePlusRecente);
         }
         else
         {
@@ -189,6 +150,51 @@ public class DonneesController : ControllerBase
         }
 
         return Ok();
+    }
+
+    private async Task UpdateWhenIdentique(PostDonnee donneeRecu, Donnee donnePlusRecente)
+    {
+        if (!donnePlusRecente.D.HasValue || !donneeRecu.D.HasValue)
+        {
+            throw new InvalidProgramException("Les dates des données ne devrait pas être null rendu à cette étape.");
+        }
+
+        var interval = donneeRecu.D.Value - donnePlusRecente.D.Value;
+
+        if (donnePlusRecente.Iddp != null)
+        {
+            donnePlusRecente.D = donneeRecu.D;
+
+            if (!donnePlusRecente.PI.HasValue)
+            {
+                if (interval.Milliseconds > donnePlusRecente.PI)
+                {
+                    donnePlusRecente.PI = (int)interval.TotalSeconds;
+                }
+            }
+            else
+            {
+                donnePlusRecente.PI = (int)interval.TotalSeconds;
+            }
+
+            donnePlusRecente.Nboc++;
+
+            _context.Donnees.Update(donnePlusRecente);
+
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            var donnee = _mapper.Map<Donnee>(donneeRecu);
+
+            donnee.Iddp = donnePlusRecente.Id;
+
+            donnee.PI = (int)interval.TotalSeconds;
+
+            _context.Donnees.Add(donnee);
+
+            await _context.SaveChangesAsync();
+        }
     }
 
     /// <summary>

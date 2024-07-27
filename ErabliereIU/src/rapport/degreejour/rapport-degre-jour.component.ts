@@ -14,12 +14,12 @@ import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
     styleUrls: ['./rapport-degre-jour.component.css'],
     standalone: true,
     imports: [
-    NgFor,
-    FormsModule,
-    ReactiveFormsModule,
-    EinputComponent,
-    InputErrorComponent
-]
+        NgFor,
+        FormsModule,
+        ReactiveFormsModule,
+        EinputComponent,
+        InputErrorComponent
+    ]
 })
 export class RapportDegreJourComponent implements OnInit {
     form: PostDegresJoursRepportRequest = new PostDegresJoursRepportRequest();
@@ -27,13 +27,10 @@ export class RapportDegreJourComponent implements OnInit {
     degresJours?: ResponseRapportDegreeJours;
     idErabliere: any;
     errorObj: any;
-    myGroup: FormGroup;
     generalError?: string;
 
     constructor(private api: ErabliereApi, private route: ActivatedRoute) {
-        this.myGroup = new FormGroup({
-            
-        });
+
     }
 
     ngOnInit(): void {
@@ -48,11 +45,31 @@ export class RapportDegreJourComponent implements OnInit {
 
     async onSubmit() {
         console.log('RapportDegreJourComponent onSubmit');
-        const rapport = await this.api.getDegresJours(this.idErabliere, this.form);
-        this.degresJours = rapport;
+        try {
+            this.form.idErabliere = this.idErabliere;
+            const rapport = await this.api.getDegresJours(this.idErabliere, this.form);
+            this.degresJours = rapport;
+        }
+        catch (error: any) {
+            console.error('RapportDegreJourComponent error', error);
+            this.degresJours = undefined;
+            this.errorObj = error;
+            if (error.error.errors) {
+                this.generalError = error.error.title;
+            }
+            else {
+                this.generalError = error.error;
+            }
+        }
     }
 
     onKeyPress(event: KeyboardEvent) {
         console.log('RapportDegreJourComponent onKeyPress', event);
+    }
+
+    idCapteurChanged($event: Event) {
+        console.log('RapportDegreJourComponent idCapteurChanged', $event);
+
+        this.form.idCapteur = ($event.target as HTMLSelectElement).value;
     }
 }
