@@ -86,6 +86,11 @@ public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable
     /// </summary>
     public bool IsEnable { get; set; }
 
+    /// <summary>
+    /// Dernière occurence
+    /// </summary>
+    public DateTimeOffset? LastOccurence { get; set; }
+
     /// <inheritdoc />
     public int CompareTo([AllowNull] Alerte other)
     {

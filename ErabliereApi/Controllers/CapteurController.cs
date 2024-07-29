@@ -49,7 +49,7 @@ public class CapteursController : ControllerBase
     {
         return await _depot.Capteurs.AsNoTracking()
                             .Where(b => b.IdErabliere == id &&
-                                    (filtreNom == null || (b.Nom != null && b.Nom.Contains(filtreNom) == true)))
+                                    (filtreNom == null || (b.Nom != null && b.Nom.Contains(filtreNom))))
                             .ProjectTo<GetCapteur>(_mapper.ConfigurationProvider)
                             .ToArrayAsync(token);
     }

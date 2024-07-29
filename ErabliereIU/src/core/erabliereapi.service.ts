@@ -65,15 +65,15 @@ export class ErabliereApi {
 
     async getErablieresAdminExpandAccess(): Promise<Erabliere[]> {
         const headers = await this.getHeaders();
-        const rtn = await this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/admin/erablieres?$expand=customerErablieres', { headers: headers }).toPromise();
+        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/admin/erablieres?$expand=customerErablieres', { headers: headers }));
         return rtn ?? [];
     }
 
     async getErablieresExpandCapteurs(my: boolean): Promise<Erabliere[]> {
         let headers = await this.getHeaders();
         headers = headers.set('Accept', 'application/json');
-        const rtn = await this._httpClient.get<Erabliere[]>(
-            this._environmentService.apiUrl + '/erablieres?my=' + my + '&$expand=Capteurs($filter=afficherCapteurDashboard eq true)', { headers: headers }).toPromise();
+        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(
+            this._environmentService.apiUrl + '/erablieres?my=' + my + '&$expand=Capteurs($filter=afficherCapteurDashboard eq true)', { headers: headers }));
         return rtn ?? [];
     }
 
@@ -227,30 +227,36 @@ export class ErabliereApi {
         return await this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation/" + idDocumentation, { headers: headers }).toPromise();
     }
 
-    async getNotes(idErabliereSelectionnee:any, skip: number = 0, top?: number): Promise<Note[]> {
+    async getNotes(idErabliereSelectionnee:any, search?: string, skip: number = 0, top?: number): Promise<Note[]> {
         const headers = await this.getHeaders();
         let odataOptions = "?$orderby=NoteDate desc";
             odataOptions += "&$skip=" + skip;
             odataOptions += top ? "&$top=" + top : "";
             odataOptions += "&$select=id,idErabliere,noteDate,created,text,title,fileExtension,notificationFilter";
             odataOptions += "&$expand=rappel";
-        const rtn = await this._httpClient.get<Note[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes" + odataOptions, { headers: headers }).toPromise();
+        if (search) {
+            odataOptions += "&$filter=contains(text, '" + search + "') or contains(title, '" + search + "')";
+        }
+        const rtn = await firstValueFrom(this._httpClient.get<Note[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes" + odataOptions, { headers: headers }));
         return rtn ?? [];
     }
 
     async getActiveRappelNotes(idErabliereSelectionee: any): Promise<Note[]> {
         let headers = await this.getHeaders();
         headers = headers.set('Accept', 'application/json');
-        const rtn = await this._httpClient.get<Note[]>(
+        const rtn = firstValueFrom(await this._httpClient.get<Note[]>(
             this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/Notes' + "/ActiveRappelsNotes",
-            { headers: headers }).toPromise();
+            { headers: headers }));
         return rtn ?? [];
     }
 
-    async getNotesCount(idErabliereSelectionnee:any): Promise<number> {
+    async getNotesCount(idErabliereSelectionnee:any, search?: string): Promise<number> {
         let headers = await this.getHeaders();
         headers = headers.set('Accept', 'application/json');
-        const rtn = await this._httpClient.get<number>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/quantite", { headers: headers }).toPromise();
+        const rtn = await firstValueFrom(
+            this._httpClient.get<number>(
+                this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/quantite?search=" + search, 
+                { headers: headers }));
         return rtn ?? 0;
     }
 
@@ -528,20 +534,22 @@ export class ErabliereApi {
             url += "&search=" + search;
         }
 
-        return await this._httpClient.get<any>(
+        return await firstValueFrom(this._httpClient.get<any>(
             url,
-            { headers: headers })
-            .toPromise();
+            { headers: headers }));
     }
 
     async traduire(message: string) {
         const headers = await this.getHeaders();
-        return await this._httpClient.post<any>(this._environmentService.apiUrl + '/ErabliereAI/Traduction?from=en&to=fr', { text: message }, { headers: headers }).toPromise();
+        return await firstValueFrom(this._httpClient.post<any>(
+            this._environmentService.apiUrl + '/ErabliereAI/Traduction?from=en&to=fr', 
+            { text: message }, 
+            { headers: headers }));
     }
 
     async getDegresJours(idErabliere: any, form: PostDegresJoursRepportRequest) {
         const headers = await this.getHeaders();
-        return await this._httpClient.post<ResponseRapportDegreeJours>(this._environmentService.apiUrl + '/Erablieres/' + idErabliere + '/Rapport/RapportDegreeJour', form, { headers: headers }).toPromise();
+        return await firstValueFrom(this._httpClient.post<ResponseRapportDegreeJours>(this._environmentService.apiUrl + '/Erablieres/' + idErabliere + '/Rapport/RapportDegreeJour', form, { headers: headers }));
     }
 
     async getHeaders(): Promise<HttpHeaders> {

@@ -7,7 +7,7 @@ import { ModifierNoteComponent } from './modifier-note.component';
 import { Subject } from 'rxjs';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ActivatedRoute } from '@angular/router';
-import {PaginationComponent} from "../pagination/pagination.component";
+import { PaginationComponent } from "../pagination/pagination.component";
 import { ca } from 'date-fns/locale';
 
 @Component({
@@ -26,6 +26,7 @@ import { ca } from 'date-fns/locale';
 export class NotesComponent implements OnInit {
     @Input() idErabliereSelectionee: any
     @Input() notes?: Note[];
+    private search: string = "";
     private _nombreParPage: number = 5;
     private _nombreTotal: number = 0;
     get nombreTotal() {
@@ -35,14 +36,14 @@ export class NotesComponent implements OnInit {
         return this._nombreParPage;
     }
     set nombreParPage(value: number) {
-        if(value != this._nombreParPage) {
+        if (value != this._nombreParPage) {
             this._nombreParPage = value;
             this.loadNotes();
         }
     }
     private _pageActuelle: number = 1;
     set pageActuelle(value: number) {
-        if(value != this._pageActuelle) {
+        if (value != this._pageActuelle) {
             this._pageActuelle = value;
             this.loadNotes();
         }
@@ -64,8 +65,8 @@ export class NotesComponent implements OnInit {
     }
 
     loadNotes() {
-        this._api.getNotesCount(this.idErabliereSelectionee).then(count => this._nombreTotal = count);
-        this._api.getNotes(this.idErabliereSelectionee, (this._pageActuelle - 1) * this._nombreParPage, this._nombreParPage)
+        this._api.getNotesCount(this.idErabliereSelectionee, this.search).then(count => this._nombreTotal = count);
+        this._api.getNotes(this.idErabliereSelectionee, this.search, (this._pageActuelle - 1) * this._nombreParPage, this._nombreParPage)
             .then(async notes => {
                 this.notes = notes;
                 this.error = null;
@@ -115,5 +116,10 @@ export class NotesComponent implements OnInit {
                     }
                 }
             });
+    }
+
+    searchChanged($event: Event) {
+        this.search = ($event.target as HTMLInputElement).value;
+        this.loadNotes();
     }
 }

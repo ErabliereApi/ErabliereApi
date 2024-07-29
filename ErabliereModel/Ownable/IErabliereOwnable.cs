@@ -13,7 +13,7 @@ public interface IErabliereOwnable : IOwnable
     public Guid? IdErabliere { get; set; }
 
     /// <summary>
-    /// L'érablière qui possède la note
+    /// L'érablière qui possède l'entité
     /// </summary>
     public Erabliere? Erabliere { get; set; }
 }

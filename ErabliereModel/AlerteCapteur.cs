@@ -64,6 +64,11 @@ public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnab
     /// </summary>
     public bool IsEnable { get; set; }
 
+    /// <summary>
+    /// Dernière occurence de l'alerte
+    /// </summary>
+    public DateTimeOffset? LastOccurence { get; set; }
+
     /// <inheritdoc />
     public Capteur? Owner { get => Capteur; set { Capteur = value; } }
 

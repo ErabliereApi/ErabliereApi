@@ -50,7 +50,26 @@ public class NotesController : ControllerBase
     [ValiderOwnership("id")]
     public IQueryable<Note> Lister(Guid id)
     {
-        return _depot.Notes.AsNoTracking().Include(n => n.Rappel).Where(n => n.IdErabliere == id);
+        return _depot.Notes.AsNoTracking().Where(n => n.IdErabliere == id);
+    }
+
+    /// <summary>
+    /// Récupère la quantité de notes
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("Quantite")]
+    [ProducesResponseType(200, Type = typeof(int))]
+    public async Task<IActionResult> Compter(Guid id, [FromQuery] string? search, CancellationToken token)
+    {
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+#nullable disable
+            return Ok(await _depot.Notes
+                .CountAsync(n => n.IdErabliere == id && (n.Title.Contains(search) || n.Text.Contains(search)), token));
+#nullable enable
+        }
+
+        return Ok(await _depot.Notes.CountAsync(n => n.IdErabliere == id, token));
     }
 
     /// <summary>
@@ -117,17 +136,6 @@ public class NotesController : ControllerBase
         Response.Headers.Append("Cache-Control", "private, max-age=2592000");
 
         return File(note.File, $"image/{note.FileExtension ?? "jpg"}");
-    }
-
-    /// <summary>
-    /// Récupère la quantité de notes
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("Quantite")]
-    [ProducesResponseType(200, Type = typeof(int))]
-    public async Task<IActionResult> Compter(Guid id, CancellationToken token)
-    {
-        return Ok(await _depot.Notes.CountAsync(n => n.IdErabliere == id, token));
     }
 
     /// <summary>
@@ -349,7 +357,7 @@ public class NotesController : ControllerBase
                 note.Rappel.Periodicite == null ||
                 note.Rappel.DateRappel == null) 
             {
-                _logger.LogWarning("Note with id {noteId} has a null rappel or rappel properties", note?.Id);
+                _logger.LogWarning("Note with id {NoteId} has a null rappel or rappel properties", note?.Id);
                 continue;
             }
 

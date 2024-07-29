@@ -9,7 +9,7 @@ namespace ErabliereApi.Donnees.Ownable;
 public interface ILevelTwoOwnable<T> : IOwnable where T : class, IErabliereOwnable
 {
     /// <summary>
-    /// Référence vers le premier niveau dans la hierachie.
+    /// Référence vers le premier niveau dans la hiérarchie.
     /// </summary>
     public T? Owner { get; set; }
 

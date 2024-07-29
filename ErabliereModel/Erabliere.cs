@@ -118,6 +118,16 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable
     public List<Alerte>? Alertes { get; set; }
 
     /// <summary>
+    /// Liste des rapports de l'érablière
+    /// </summary>
+    public List<Rapport>? Rapports { get; set; }
+
+    /// <summary>
+    /// Liste des inspections de l'érablière
+    /// </summary>
+    public List<Inspection>? Inspections { get; set; }
+
+    /// <summary>
     /// Liste de jonction entre l'utilisateurs et ses érablières
     /// </summary>
     public List<CustomerErabliere>? CustomerErablieres { get; set; }

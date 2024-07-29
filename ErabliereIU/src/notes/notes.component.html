@@ -23,6 +23,16 @@
             <p>Aucune note</p>
         </div>
     }
+    @else {
+        <div class="form-group mb-2">
+            <label for="recherche">Recherche</label>
+            <input
+                type="text"
+                id="recherche"
+                class="form-control"
+                (keyup)="searchChanged($event)" />
+        </div>
+    }
 
     @for(note of notes; track note.id) {
         <div>
