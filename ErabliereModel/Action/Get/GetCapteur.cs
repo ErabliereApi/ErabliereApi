@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ErabliereApi.Donnees.Action.Get
 {
@@ -56,5 +57,31 @@ namespace ErabliereApi.Donnees.Action.Get
         /// Le niveau de la batterie
         /// </summary>
         public byte? BatteryLevel { get; set; }
+
+        /// <summary>
+        /// Type du capteur
+        /// </summary>
+        [MaxLength(50)]
+        public string? Type { get; set; }
+
+        /// <summary>
+        /// Id du capteur externe. Représente l'id du capteur dans le système externe.
+        /// </summary>
+        public string? ExternalId { get; set; }
+
+        /// <summary>
+        /// Date du dernier message
+        /// </summary>
+        public DateTimeOffset? LastMessageTime { get; set; }
+
+        /// <summary>
+        /// Indique si le capteur est en ligne
+        /// </summary>
+        public bool? Online { get; set; }
+
+        /// <summary>
+        /// Fréquence de rapport
+        /// </summary>
+        public int? ReportFrequency { get; set; }
     }
 }

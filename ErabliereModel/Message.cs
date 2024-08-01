@@ -1,5 +1,5 @@
 using System;
-using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Interfaces;
 
 /// <summary>
 /// Classe représentant un message dans une conversation avec ErabliereAI

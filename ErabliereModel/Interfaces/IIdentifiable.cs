@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ErabliereApi.Donnees;
+namespace ErabliereApi.Donnees.Interfaces;
 
 /// <summary>
 /// Interface pour le classe possédant un Id

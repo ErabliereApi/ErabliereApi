@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Donnees.Ownable;
+﻿using ErabliereApi.Donnees.Interfaces;
+using ErabliereApi.Donnees.Ownable;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -6,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace ErabliereApi.Donnees;
 
 /// <summary>
-/// Une alerte
+/// Une alerte pour la fonction trio de données
 /// </summary>
 public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable
 {

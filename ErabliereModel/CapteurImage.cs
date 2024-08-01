@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ErabliereApi.Donnees.Interfaces;
+using ErabliereApi.Donnees.Ownable;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,17 +13,17 @@ namespace ErabliereApi.Donnees
     /// <summary>
     /// Représente un capteur d'image
     /// </summary>
-    public class CapteurImage
+    public class CapteurImage : IIdentifiable<Guid?, CapteurImage>, IErabliereOwnable, ILocalizable
     {
         /// <summary>
         /// L'id du capteur
         /// </summary>
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
         /// <summary>
         /// Id de l'érablière lié à ce capteur
         /// </summary>
-        public Guid IdErabliere { get; set; }
+        public Guid? IdErabliere { get; set; }
 
         /// <summary>
         /// L'érablière liée à ce capteur
@@ -34,7 +36,7 @@ namespace ErabliereApi.Donnees
         /// </summary>
         [Required]
         [MaxLength(50)]
-        public string Nom { get; set; }
+        public string? Nom { get; set; }
 
         /// <summary>
         /// L'url du capteur (au protocol rtsp)
@@ -45,14 +47,14 @@ namespace ErabliereApi.Donnees
         [Required]
         [MaxLength(200)]
         [RegularExpression("/^rtsp:\\/\\/[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)$/i", ErrorMessage = "L'url doit être une url au protocol rtsp valide")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// Le port du capteur.
         /// </summary>
         [Required]
         [MaxLength(5)]
-        public string Port { get; set; }
+        public string? Port { get; set; }
 
         /// <summary>
         /// L'identifiant utilisé pour se connecter au flux d'image.
@@ -71,5 +73,22 @@ namespace ErabliereApi.Donnees
         /// </summary>
         [Range(0, int.MaxValue, ErrorMessage = "La valeur doit être plus grande que 0")]
         public int Ordre { get; set; }
+
+        /// <inheritdoc />
+        public double Latitude { get; set; }
+
+        /// <inheritdoc />
+        public double Longitude { get; set; }
+
+        /// <inheritdoc />
+        public int CompareTo(CapteurImage? other)
+        {
+            if (other == null)
+            {
+                return 1;
+            }
+
+            return Ordre.CompareTo(other.Ordre);
+        }
     }
 }

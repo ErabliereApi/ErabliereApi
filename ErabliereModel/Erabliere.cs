@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Donnees.Ownable;
+﻿using ErabliereApi.Donnees.Interfaces;
+using ErabliereApi.Donnees.Ownable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Modèle représentant une érablière
 /// </summary>
-public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable
+public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocalizable
 {
     /// <summary>
     /// L'id de l'érablière
@@ -131,6 +132,12 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable
     /// Liste de jonction entre l'utilisateurs et ses érablières
     /// </summary>
     public List<CustomerErabliere>? CustomerErablieres { get; set; }
+
+    /// <inheritdoc />
+    public double Latitude { get; set; }
+
+    /// <inheritdoc />
+    public double Longitude { get; set; }
 
     /// <inheritdoc />
     public int CompareTo([AllowNull] Erabliere other)

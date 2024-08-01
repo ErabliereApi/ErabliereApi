@@ -176,6 +176,36 @@ public class CapteursController : ControllerBase
                 capteurEntity.Taille = capteur.Taille.Value;
             }
 
+            if (capteur.BatteryLevel.HasValue)
+            {
+                capteurEntity.BatteryLevel = capteur.BatteryLevel.Value;
+            }
+
+            if (capteur.Type != null)
+            {
+                capteurEntity.Type = capteur.Type;
+            }
+
+            if (capteur.ExternalId != null)
+            {
+                capteurEntity.ExternalId = capteur.ExternalId;
+            }
+
+            if (capteur.Online != null)
+            {
+                capteurEntity.Online = capteur.Online.Value;
+            }
+
+            if (capteur.ReportFrequency.HasValue)
+            {
+                capteurEntity.ReportFrequency = capteur.ReportFrequency;
+            }
+
+            if (capteur.LastMessageTime.HasValue)
+            {
+                capteurEntity.LastMessageTime = capteur.LastMessageTime;
+            }
+
             _depot.Update(capteurEntity);
         }
 
@@ -257,6 +287,31 @@ public class CapteursController : ControllerBase
         if (capteur.BatteryLevel.HasValue)
         {
             capteurEntity.BatteryLevel = capteur.BatteryLevel.Value;
+        }
+
+        if (capteur.Type != null)
+        {
+            capteurEntity.Type = capteur.Type;
+        }
+
+        if (capteur.ExternalId != null)
+        {
+            capteurEntity.ExternalId = capteur.ExternalId;
+        }
+
+        if (capteur.Online != null) 
+        {
+            capteurEntity.Online = capteur.Online.Value;
+        }
+
+        if (capteur.ReportFrequency.HasValue)
+        {
+            capteurEntity.ReportFrequency = capteur.ReportFrequency;
+        }
+
+        if (capteur.LastMessageTime.HasValue)
+        {
+            capteurEntity.LastMessageTime = capteur.LastMessageTime;
         }
 
         _depot.Update(capteurEntity);

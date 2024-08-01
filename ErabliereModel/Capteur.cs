@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Donnees.Ownable;
+﻿using ErabliereApi.Donnees.Interfaces;
+using ErabliereApi.Donnees.Ownable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,27 +9,12 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Représente un capteur
 /// </summary>
-public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable
+public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocalizable
 {
     /// <summary>
     /// L'id de l'occurence
     /// </summary>
     public Guid? Id { get; set; }
-
-    /// <summary>
-    /// Date de l'ajout du capteur
-    /// </summary>
-    public DateTimeOffset? DC { get; set; }
-
-    /// <summary>
-    /// Indicateur permettant d'afficher ou non le graphique relié au capteur.
-    /// </summary>
-    public bool AfficherCapteurDashboard { get; set; }
-
-    /// <summary>
-    /// Indicateur permettant d'indiquer si les données sont entré depuis un interface graphique
-    /// </summary>
-    public bool AjouterDonneeDepuisInterface { get; set; }
 
     /// <summary>
     /// Id de l'érablière relier a cette donnée
@@ -81,6 +67,53 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable
     /// Byte qui représente le niveau de la batterie
     /// </summary>
     public byte? BatteryLevel { get; set; }
+
+    /// <summary>
+    /// Type du capteur
+    /// </summary>
+    [MaxLength(50)]
+    public string? Type { get; set; }
+
+    /// <summary>
+    /// Id du capteur externe. Représente l'id du capteur dans le système externe.
+    /// </summary>
+    public string? ExternalId { get; set; }
+
+    /// <summary>
+    /// Date du dernier message
+    /// </summary>
+    public DateTimeOffset? LastMessageTime { get; set; }
+
+    /// <summary>
+    /// Indique si le capteur est en ligne
+    /// </summary>
+    public bool? Online { get; set; }
+
+    /// <summary>
+    /// Fréquence de rapport
+    /// </summary>
+    public int? ReportFrequency { get; set; }
+
+    /// <summary>
+    /// Indicateur permettant d'afficher ou non le graphique relié au capteur.
+    /// </summary>
+    public bool AfficherCapteurDashboard { get; set; }
+
+    /// <summary>
+    /// Indicateur permettant d'indiquer si les données sont entré depuis un interface graphique
+    /// </summary>
+    public bool AjouterDonneeDepuisInterface { get; set; }
+
+    /// <summary>
+    /// Date de l'ajout du capteur
+    /// </summary>
+    public DateTimeOffset? DC { get; set; }
+
+    /// <inheritdoc />
+    public double Latitude { get; set; }
+
+    /// <inheritdoc />
+    public double Longitude { get; set; }
 
     /// <inheritdoc />
     public int CompareTo(Capteur? other)

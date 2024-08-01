@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Interfaces;
 
 /// <summary>
 /// Entité représentant une conversation entre avec ErabliereAI.
