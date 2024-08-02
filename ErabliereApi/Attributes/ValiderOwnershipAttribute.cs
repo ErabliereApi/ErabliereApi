@@ -72,8 +72,8 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
             context.HttpContext.Response.Headers["X-ErabliereApi-ForbidenReason"] = forbidenReasonMessage;
             context.Result = new ForbidResult();
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
-            logger.LogWarning("Access Denied for {Method} {Path} for user {User}", context.HttpContext.Request.Method, context.HttpContext.Request.Path, context.HttpContext.User.Identity?.Name ??
-                "Anonymous");                                                                                                                            context.HttpContext.User.GetDisplayName();
+            using var scope = context.HttpContext.RequestServices.CreateScope();
+            logger.LogWarning("Access Denied for {Method} {Path} for user {User}", context.HttpContext.Request.Method, context.HttpContext.Request.Path, UsersUtils.GetUniqueName(scope, context.HttpContext.User));
         }
     }
 
