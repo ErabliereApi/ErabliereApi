@@ -27,7 +27,7 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
     public ValiderOwnershipAttribute(string idParamName, Type? levelTwoRelationType = null)
     {
         if (levelTwoRelationType != null &&
-            !levelTwoRelationType.GetInterfaces().Any(i => i == typeof(IErabliereOwnable)))
+            !Array.Exists(levelTwoRelationType.GetInterfaces(), i => i == typeof(IErabliereOwnable)))
         {
             throw new ArgumentException($"The type of arg {nameof(levelTwoRelationType)} must implement {nameof(ILevelTwoOwnable<IErabliereOwnable>)}");
         }
@@ -56,55 +56,9 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
 
         var config = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
 
-        if (config.IsAuthEnabled()) 
+        if (config.IsAuthEnabled())
         {
-            var dbContext = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
-            var cache = context.HttpContext.RequestServices.GetRequiredService<IDistributedCache>();
-
-            Erabliere? erabliere = await GetErabliere(dbContext, cache, strId, context.HttpContext.RequestAborted);
-
-            // Valider les droits d'accès sur l'érablière
-            // Si l'érablière a été trouvé
-            // Si l'érablière est publique et que l'accès est en lecture, l'accès est autorisé
-            if (erabliere == null) 
-            {
-                context.Result = new NotFoundResult();
-            }
-            else if (erabliere != null && 
-                (erabliere.IsPublic == true && context.HttpContext.Request.Method == "GET") == false)
-            {
-                var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-
-                var customer = await userService.GetCurrentUserWithAccessAsync(erabliere, context.HttpContext.RequestAborted);
-
-                if (customer == null)
-                {
-                    throw new InvalidOperationException("Customer should exist at this point...");
-                }
-
-                if (customer.CustomerErablieres == null || customer.CustomerErablieres.Count == 0)
-                {
-                    allowAccess = false;
-                }
-                else
-                {
-                    var type = context.HttpContext.Request.Method switch
-                    {
-                        "GET" => 1,
-                        "POST" => 2,
-                        "PUT" => 4,
-                        "DELETE" => 8,
-                        _ => throw new InvalidOperationException($"Ownership not implement for HTTP Verb {context.HttpContext.Request.Method}"),
-                    };
-
-                    for (int i = 0; i < customer.CustomerErablieres.Count && allowAccess; i++)
-                    {
-                        var access = customer.CustomerErablieres[i].Access;
-
-                        allowAccess = (access & type) > 0;
-                    }
-                }
-            }
+            allowAccess = await CheckAllowAccess(context, allowAccess, strId);
         }
 
         if (allowAccess)
@@ -113,10 +67,64 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
         }
         else
         {
-            context.HttpContext.Response.Headers["X-ErabliereApi-ForbidenReason"] = 
-                $"Access Denied for {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+            var forbidenReasonMessage = $"Access Denied for {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+            context.HttpContext.Response.Headers["X-ErabliereApi-ForbidenReason"] = forbidenReasonMessage;
             context.Result = new ForbidResult();
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+            logger.LogWarning(forbidenReasonMessage);
         }
+    }
+
+    private async Task<bool> CheckAllowAccess(ActionExecutingContext context, bool allowAccess, string strId)
+    {
+        var dbContext = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
+        var cache = context.HttpContext.RequestServices.GetRequiredService<IDistributedCache>();
+
+        Erabliere? erabliere = await GetErabliere(dbContext, cache, strId, context.HttpContext.RequestAborted);
+
+        // Valider les droits d'accès sur l'érablière
+        // Si l'érablière a été trouvé
+        // Si l'érablière est publique et que l'accès est en lecture, l'accès est autorisé
+        if (erabliere == null)
+        {
+            context.Result = new NotFoundResult();
+        }
+        else if (!(erabliere.IsPublic && context.HttpContext.Request.Method == "GET"))
+        {
+            var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+
+            var customer = await userService.GetCurrentUserWithAccessAsync(erabliere, context.HttpContext.RequestAborted);
+
+            if (customer == null)
+            {
+                throw new InvalidOperationException("Customer should exist at this point...");
+            }
+
+            if (customer.CustomerErablieres == null || customer.CustomerErablieres.Count == 0)
+            {
+                allowAccess = false;
+            }
+            else
+            {
+                var type = context.HttpContext.Request.Method switch
+                {
+                    "GET" => 1,
+                    "POST" => 2,
+                    "PUT" => 4,
+                    "DELETE" => 8,
+                    _ => throw new InvalidOperationException($"Ownership not implement for HTTP Verb {context.HttpContext.Request.Method}"),
+                };
+
+                for (int i = 0; i < customer.CustomerErablieres.Count && allowAccess; i++)
+                {
+                    var access = customer.CustomerErablieres[i].Access;
+
+                    allowAccess = (access & type) > 0;
+                }
+            }
+        }
+
+        return allowAccess;
     }
 
     private async Task<Erabliere?> GetErabliere(ErabliereDbContext context, IDistributedCache cache, string strId, CancellationToken token)
@@ -139,7 +147,7 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
                 throw new InvalidOperationException($"type {entity.GetType().Name} cannot be convert into {nameof(IErabliereOwnable)}");
             }
 
-            if (instance.IdErabliere.HasValue == false)
+            if (!instance.IdErabliere.HasValue)
             {
                 return null;
             }
