@@ -40,6 +40,20 @@
         <input-error [errorObj]="errorObj" [controlName]="'ajouterDonneeDepuisInterface'"></input-error>
     </div>
 
+    <div [class]="'mb-3' + (ajoutCapteurForm.controls['type'].touched ? ' was-validated' : '')">
+        <label for="symbole" class="form-label" title="Permet d'indiquer le type du capteur. Par exemple si les données provienne d'un système externe comme Senscap. Le champs est optionnel">Type</label>
+        <input type="text" class="form-control" id="type" name="type" formControlName="type"
+               placeholder="">
+        <input-error [errorObj]="errorObj" [controlName]="'type'"></input-error>
+    </div>
+
+    <div [class]="'mb-3' + (ajoutCapteurForm.controls['externalId'].touched ? ' was-validated' : '')">
+        <label for="externalId" class="form-label" title="L'id du capteur dans un autre sytème. Le champs est optionnel.">Id externe</label>
+        <input type="text" class="form-control" id="externalId" name="externalId" formControlName="externalId"
+               placeholder="">
+        <input-error [errorObj]="errorObj" [controlName]="'externalId'"></input-error>
+    </div>
+
     <button class="btn btn-primary me-2" (click)="ajouterCapteur()">Ajouter</button>
     <button type="button" class="btn btn-secondary" (click)="buttonAnnuler()">Annuler</button>
 </form>

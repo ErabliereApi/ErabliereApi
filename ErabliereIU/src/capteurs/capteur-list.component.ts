@@ -234,4 +234,9 @@ export class CapteurListComponent implements OnChanges {
         this.leftPosition = undefined;
         console.log("closeTooltip");
     }
+
+    editDetailsNeedToUdate($event: any) {
+        this.shouldRefreshCapteurs.emit();
+        this.displayEditDetailsForm = false;
+    }
 }

@@ -1427,6 +1427,27 @@ namespace ErabliereAPI.Proxy
         System.Threading.Tasks.Task Desactiver2Async(System.Guid id, System.Guid idAlerte, Alerte? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Modifier un capteur depuis son identifiant externe
+        /// </summary>
+        /// <param name="id">L'identifiant de l'érablière</param>
+        /// <param name="externalId">L'identifiant du système externe du capteur</param>
+        /// <param name="body">Le capteur à modifier</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ExternalIdAsync(System.Guid id, string externalId, PutCapteur? body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Modifier un capteur depuis son identifiant externe
+        /// </summary>
+        /// <param name="id">L'identifiant de l'érablière</param>
+        /// <param name="externalId">L'identifiant du système externe du capteur</param>
+        /// <param name="body">Le capteur à modifier</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ExternalIdAsync(System.Guid id, string externalId, PutCapteur? body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Modifier un capteur d'image
         /// </summary>
         /// <param name="id">L'identifiant de l'érablière</param>

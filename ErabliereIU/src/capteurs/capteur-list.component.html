@@ -1,9 +1,11 @@
 <!-- Une table qui liste les page-capteurs -->
-<capteur-detail-tooltip [capteur]="capteurTT" [showsTooltip]="displayTooltip" [leftPosition]="leftPosition"
-    [topPosition]="topPosition"></capteur-detail-tooltip>
+@if (displayTooltip) {
+<capteur-detail-tooltip [capteur]="capteurTT" [leftPosition]="leftPosition" [topPosition]="topPosition"
+    (needToUpdate)="closeTooltip()"></capteur-detail-tooltip>
+}
 
 @if (this.displayEditDetailsForm && this.editDetailsCapteurSelected) {
-<modifier-capteur-details [inputCapteur]="editDetailsCapteurSelected"></modifier-capteur-details>
+<modifier-capteur-details [inputCapteur]="editDetailsCapteurSelected" (needToUpdate)="editDetailsNeedToUdate($event)"></modifier-capteur-details>
 }
 
 <form class="table-responsive" novalidate>
@@ -119,7 +121,8 @@
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li>
-                                    <button class="dropdown-item" type="button" (click)="showModifierCapteurDetails(capteur)">
+                                    <button class="dropdown-item" type="button"
+                                        (click)="showModifierCapteurDetails(capteur)">
                                         Modifier les détails
                                     </button>
                                 </li>

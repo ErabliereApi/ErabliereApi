@@ -46,5 +46,16 @@ namespace ErabliereApi.Donnees.Action.Post
         /// L'id de l'érablière
         /// </summary>
         public Guid? IdErabliere { get; set; }
+
+        /// <summary>
+        /// Type du capteur
+        /// </summary>
+        [MaxLength(50)]
+        public string? Type { get; set; }
+
+        /// <summary>
+        /// Id du capteur externe. Représente l'id du capteur dans le système externe.
+        /// </summary>
+        public string? ExternalId { get; set; }
     }
 }

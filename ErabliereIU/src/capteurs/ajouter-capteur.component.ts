@@ -50,6 +50,20 @@ export class AjouterCapteurComponent {
             ),
             saisieManuelle: new FormControl(
                 false
+            ),
+            type: new FormControl(
+                '',
+                {
+                    validators: [],
+                    updateOn: 'blur'
+                }
+            ),
+            externalId: new FormControl(
+                '',
+                {
+                    validators: [Validators.maxLength(50)],
+                    updateOn: 'blur'
+                }
             )
         })
     }
@@ -60,6 +74,8 @@ export class AjouterCapteurComponent {
         this.capteur.symbole = this.ajoutCapteurForm.controls['symbole'].value;
         this.capteur.afficherCapteurDashboard = this.ajoutCapteurForm.controls['affichageDashboard'].value;
         this.capteur.ajouterDonneeDepuisInterface = this.ajoutCapteurForm.controls['saisieManuelle'].value;
+        this.capteur.type = this.ajoutCapteurForm.controls['type'].value;
+        this.capteur.externalId = this.ajoutCapteurForm.controls['externalId'].value;
         this.erabliereApi.postCapteur(this.idErabliere, this.capteur).then(() => {
             this.shouldReloadCapteurs.emit();
             this.ajoutCapteurForm.reset({

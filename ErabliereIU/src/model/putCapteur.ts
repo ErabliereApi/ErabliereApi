@@ -1,5 +1,3 @@
-import { DonneeCapteur } from "./donneeCapteur";
-
 export class PutCapteur {
     id?: number;
     idErabliere?: string;
@@ -9,4 +7,10 @@ export class PutCapteur {
     ajouterDonneeDepuisInterface: boolean = false
     dc?: string;
     taille?: number;
+    batteryLevel?: number;
+    type?: string;
+    externalId?: string;
+    lastMessageTime?: string;
+    online?: boolean;
+    reportFrequency?: number;
 }
