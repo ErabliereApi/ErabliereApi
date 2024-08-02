@@ -19,6 +19,7 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
 {
     private readonly string _idParamName;
     private readonly Type? _levelTwoRelationType;
+    private ILogger<ValiderOwnershipAttribute>? _logger;
 
     /// <summary>
     /// Valider les droits d'accès
@@ -71,9 +72,12 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
             var forbidenReasonMessage = $"Access Denied for {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
             context.HttpContext.Response.Headers["X-ErabliereApi-ForbidenReason"] = forbidenReasonMessage;
             context.Result = new ForbidResult();
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+            if (_logger == null)
+            {
+                _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+            }
             using var scope = context.HttpContext.RequestServices.CreateScope();
-            logger.LogWarning("Access Denied for {Method} {Path} for user {User}", context.HttpContext.Request.Method, context.HttpContext.Request.Path, UsersUtils.GetUniqueName(scope, context.HttpContext.User));
+            _logger.LogWarning("Access Denied for {Method} {Path} for user {User}", context.HttpContext.Request.Method, context.HttpContext.Request.Path, UsersUtils.GetUniqueName(scope, context.HttpContext.User));
         }
     }
 
@@ -105,6 +109,18 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
             if (customer.CustomerErablieres == null || customer.CustomerErablieres.Count == 0)
             {
                 allowAccess = false;
+                if (_logger == null)
+                {
+                    _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+                }
+                if (customer.CustomerErablieres == null) 
+                {
+                    _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres == null", customer.Id);
+                }
+                else 
+                {
+                    _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres.Count == 0", customer.Id);
+                }
             }
             else
             {
@@ -119,9 +135,23 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
 
                 for (int i = 0; i < customer.CustomerErablieres.Count && allowAccess; i++)
                 {
+                    if (customer.CustomerErablieres[i].IdErabliere != erabliere.Id)
+                    {
+                        continue;
+                    }
+
                     var access = customer.CustomerErablieres[i].Access;
 
                     allowAccess = (access & type) > 0;
+                }
+
+                if (!allowAccess) 
+                {
+                    if (_logger == null)
+                    {
+                        _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+                    }
+                    _logger.LogWarning("Customer {CustomerId} has no access to erabliere {ErabliereId} for {Method}", customer.Id, erabliere.Id, context.HttpContext.Request.Method);
                 }
             }
         }

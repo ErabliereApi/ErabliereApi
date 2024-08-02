@@ -41,7 +41,7 @@ public class UserCacheDecorator : IUserService
     /// <inheritdoc />
     public async Task<CustomerOwnershipAccess?> GetCurrentUserWithAccessAsync(Erabliere erabliere, CancellationToken token)
     {
-        if (erabliere.Id.HasValue == false)
+        if (!erabliere.Id.HasValue)
         {
             throw new InvalidOperationException("Cannot get user acces of an erabliere with Id null");
         }
