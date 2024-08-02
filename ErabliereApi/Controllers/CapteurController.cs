@@ -106,7 +106,6 @@ public class CapteursController : ControllerBase
             capteur.DC = DateTimeOffset.Now;
         }
 
-
         var entity = await _depot.Capteurs.AddAsync(_mapper.Map<Capteur>(capteur), token);
 
         entity.Entity.IndiceOrdre = await _depot.Capteurs.Where(c => capteur.IdErabliere == c.IdErabliere).CountAsync(token);
@@ -142,71 +141,12 @@ public class CapteursController : ControllerBase
                 return NotFound($"Le capteur avec l'id {capteur.Id} n'existe pas.");
             }
 
-            if (capteur.AfficherCapteurDashboard.HasValue)
-            {
-                capteurEntity.AfficherCapteurDashboard = capteur.AfficherCapteurDashboard.Value;
-            }
+            var result = UpdateCapteur(capteur, capteurEntity);
 
-            if (capteur.AjouterDonneeDepuisInterface.HasValue)
+            if (result is not NoContentResult)
             {
-                capteurEntity.AjouterDonneeDepuisInterface = capteur.AjouterDonneeDepuisInterface.Value;
+                return result;
             }
-
-            if (capteur.DC.HasValue)
-            {
-                capteurEntity.DC = capteur.DC;
-            }
-
-            if (!string.IsNullOrWhiteSpace(capteur.Nom))
-            {
-                capteurEntity.Nom = capteur.Nom;
-            }
-
-            if (capteur.IndiceOrdre.HasValue)
-            {
-                capteurEntity.IndiceOrdre = capteur.IndiceOrdre;
-            }
-
-            if (capteur.Taille.HasValue)
-            {
-                if (capteur.Taille.Value <= 0 || capteur.Taille.Value > 12)
-                {
-                    BadRequest("La taille du graphique doit être comprise entre 1 et 12");
-                }
-                capteurEntity.Taille = capteur.Taille.Value;
-            }
-
-            if (capteur.BatteryLevel.HasValue)
-            {
-                capteurEntity.BatteryLevel = capteur.BatteryLevel.Value;
-            }
-
-            if (capteur.Type != null)
-            {
-                capteurEntity.Type = capteur.Type;
-            }
-
-            if (capteur.ExternalId != null)
-            {
-                capteurEntity.ExternalId = capteur.ExternalId;
-            }
-
-            if (capteur.Online != null)
-            {
-                capteurEntity.Online = capteur.Online.Value;
-            }
-
-            if (capteur.ReportFrequency.HasValue)
-            {
-                capteurEntity.ReportFrequency = capteur.ReportFrequency;
-            }
-
-            if (capteur.LastMessageTime.HasValue)
-            {
-                capteurEntity.LastMessageTime = capteur.LastMessageTime;
-            }
-
-            _depot.Update(capteurEntity);
         }
 
         await _depot.SaveChangesAsync(token);
@@ -242,12 +182,70 @@ public class CapteursController : ControllerBase
 
         if (capteurEntity == null)
         {
-            return NotFound("Le capteur à modifier n'existe pas.");
+            return NotFound($"Le capteur avec l'id {capteur.Id} n'existe pas.");
         }
 
+        var result = UpdateCapteur(capteur, capteurEntity);
+
+        if (result is NoContentResult)
+        {
+            await _depot.SaveChangesAsync(token);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Modifier un capteur depuis son identifiant externe
+    /// </summary>
+    /// <param name="id">L'identifiant de l'érablière</param>
+    /// <param name="externalId">L'identifiant du système externe du capteur</param>
+    /// <param name="capteur">Le capteur à modifier</param>
+    /// <param name="token">Le jeton d'annulation</param>
+    /// <response code="204">Le capteur a été correctement modifié.</response>
+    /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à modifier.</response>
+    /// <response code="404">Le capteur n'existe pas.</response>
+    [HttpPut("ExternalId/{externalId}")]
+    [ValiderOwnership("id")]
+    public async Task<IActionResult> ModifierDepuisIdentifiantExterne(Guid id, string externalId, PutCapteur capteur, CancellationToken token)
+    {
+        if (id != capteur.IdErabliere)
+        {
+            return BadRequest("L'id de la route ne concorde pas avec l'id de l'érablière possédant le capteur à modifier.");
+        }
+
+        if (string.IsNullOrWhiteSpace(externalId))
+        {
+            return BadRequest("L'identifiant externe du capteur ne peut pas être vide.");
+        }
+
+        var capteurEntities = await _depot.Capteurs.Where(c => c.ExternalId == externalId && c.IdErabliere == id).ToArrayAsync(token);
+
+        if (capteurEntities.Length == 0)
+        {
+            return NotFound($"Le capteur avec l'identifiant externe {externalId} n'existe pas.");
+        }
+
+        foreach (var capteurEntity in capteurEntities)
+        {
+            var result = UpdateCapteur(capteur, capteurEntity);
+
+            if (result is not NoContentResult)
+            {
+                return result;
+            }
+        }
+
+        await _depot.SaveChangesAsync(token);
+
+        return NoContent();
+    }
+
+    private IActionResult UpdateCapteur(PutCapteur capteur, Capteur capteurEntity)
+    {
         if (capteur.AfficherCapteurDashboard.HasValue)
         {
-            capteurEntity.AfficherCapteurDashboard = capteur.AfficherCapteurDashboard ?? false;
+            capteurEntity.AfficherCapteurDashboard = capteur.AfficherCapteurDashboard.Value;
         }
 
         if (capteur.AjouterDonneeDepuisInterface.HasValue)
@@ -265,12 +263,7 @@ public class CapteursController : ControllerBase
             capteurEntity.Nom = capteur.Nom;
         }
 
-        if (!string.IsNullOrWhiteSpace(capteur.Symbole))
-        {
-            capteurEntity.Symbole = capteur.Symbole;
-        }
-
-        if (capteur.IndiceOrdre != null) 
+        if (capteur.IndiceOrdre.HasValue)
         {
             capteurEntity.IndiceOrdre = capteur.IndiceOrdre;
         }
@@ -279,7 +272,7 @@ public class CapteursController : ControllerBase
         {
             if (capteur.Taille.Value <= 0 || capteur.Taille.Value > 12)
             {
-                BadRequest("La taille du graphique doit être comprise entre 1 et 12");
+                return BadRequest("La taille du graphique doit être comprise entre 1 et 12");
             }
             capteurEntity.Taille = capteur.Taille.Value;
         }
@@ -299,7 +292,7 @@ public class CapteursController : ControllerBase
             capteurEntity.ExternalId = capteur.ExternalId;
         }
 
-        if (capteur.Online != null) 
+        if (capteur.Online != null)
         {
             capteurEntity.Online = capteur.Online.Value;
         }
@@ -315,8 +308,6 @@ public class CapteursController : ControllerBase
         }
 
         _depot.Update(capteurEntity);
-
-        await _depot.SaveChangesAsync(token);
 
         return NoContent();
     }

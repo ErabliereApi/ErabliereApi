@@ -8,9 +8,9 @@ import {
     UntypedFormBuilder,
     Validators
 } from "@angular/forms";
-import {ErabliereApi} from "../core/erabliereapi.service";
-import {CapteurImage} from "../model/capteurImage";
-import {PutCapteurImage} from "../model/putCapteurImage";
+import {ErabliereApi} from "../../core/erabliereapi.service";
+import {CapteurImage} from "../../model/capteurImage";
+import {PutCapteurImage} from "../../model/putCapteurImage";
 
 @Component({
   selector: 'app-capteur-image-list',

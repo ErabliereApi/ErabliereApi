@@ -1,9 +1,9 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {InputErrorComponent} from "../formsComponents/input-error.component";
+import {InputErrorComponent} from "../../formsComponents/input-error.component";
 import {FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
-import {OnlyDigitsDirective} from "../directives/only-digits.directive";
-import {PostCapteurImage} from "../model/postCapteurImage";
-import {ErabliereApi} from "../core/erabliereapi.service";
+import {OnlyDigitsDirective} from "../../directives/only-digits.directive";
+import {PostCapteurImage} from "../../model/postCapteurImage";
+import {ErabliereApi} from "../../core/erabliereapi.service";
 
 @Component({
   selector: 'ajouter-capteur-image',

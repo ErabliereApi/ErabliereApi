@@ -12,4 +12,9 @@ export class Capteur {
     indiceOrdre?: number;
     taille?: number;
     batteryLevel?: number;
+    type?: string;
+    externalId?: string;
+    lastMessageTime?: string;
+    online?: boolean;
+    reportFrequency?: number;
 }

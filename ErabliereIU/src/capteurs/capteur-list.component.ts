@@ -10,13 +10,15 @@ import {
     UntypedFormBuilder,
     Validators
 } from "@angular/forms";
+import { CapteurDetailTooltipComponent } from "./capteur-detail-tooltip.component";
+import { ModifierCapteurDetailsComponent } from "./modifier-capteur-details.component";
 
 @Component({
     selector: 'capteur-list',
     templateUrl: 'capteur-list.component.html',
     styleUrl: 'capteur-list.component.css',
     standalone: true,
-    imports: [ReactiveFormsModule]
+    imports: [ReactiveFormsModule, CapteurDetailTooltipComponent, ModifierCapteurDetailsComponent]
 })
 export class CapteurListComponent implements OnChanges {
     @Input() idErabliere?: string;
@@ -28,11 +30,19 @@ export class CapteurListComponent implements OnChanges {
     form: FormGroup;
     displayEdits: { [id: string]: boolean } = {};
     editedCapteurs: { [id: string]: Capteur } = {};
+    capteurTT: Capteur;
+    displayTooltip: boolean = false;
+    topPosition?: number;
+    leftPosition?: number;
+
+    displayEditDetailsForm: boolean = false;
+    editDetailsCapteurSelected?: Capteur;
 
     constructor(private readonly erabliereApi: ErabliereApi, private fb: UntypedFormBuilder) {
         this.form = this.fb.group({
             capteurs: new FormArray([])
         });
+        this.capteurTT = new Capteur();
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -199,5 +209,29 @@ export class CapteurListComponent implements OnChanges {
         const form = document.getElementById('capteur-' + capteurId);
         this.getCapteur(capteurId).updateValueAndValidity();
         form?.classList.add('was-validated');
+    }
+
+    showModifierCapteurDetails(_t17: Capteur) {
+        this.displayEditDetailsForm = true;
+        this.editDetailsCapteurSelected = _t17;
+    }
+
+    openTooltip(_t19: Capteur, e: MouseEvent) {
+        if (this.displayTooltip) {
+            this.closeTooltip();
+        }
+        this.capteurTT = _t19;
+        this.displayTooltip = true;
+        this.topPosition = e.clientY;
+        this.leftPosition = e.clientX;
+        console.log("openTooltip");
+    }
+
+    closeTooltip() {
+        this.capteurTT = new Capteur();
+        this.displayTooltip = false;
+        this.topPosition = undefined;
+        this.leftPosition = undefined;
+        console.log("closeTooltip");
     }
 }

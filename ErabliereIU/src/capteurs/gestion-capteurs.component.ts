@@ -1,11 +1,11 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges} from "@angular/core";
+import {Component, Input, OnChanges, SimpleChanges} from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Capteur } from "src/model/capteur";
 import { CapteurListComponent } from "./capteur-list.component";
 import { AjouterCapteurComponent } from "./ajouter-capteur.component";
-import {AjouterCapteurImageComponent} from "./ajouter-capteur-image.component";
+import {AjouterCapteurImageComponent} from "./images/ajouter-capteur-image.component";
 import {CapteurImage} from "../model/capteurImage";
-import {CapteurImageListComponent} from "./capteur-image-list.component";
+import {CapteurImageListComponent} from "./images/capteur-image-list.component";
 
 @Component({
     selector: 'gestion-capteurs',
