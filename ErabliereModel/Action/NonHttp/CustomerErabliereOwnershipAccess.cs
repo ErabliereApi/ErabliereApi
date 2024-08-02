@@ -12,6 +12,16 @@ public class CustomerErabliereOwnershipAccess
     /// </summary>
     public Guid? Id { get; set; }
 
-    /// <inheritdoc cref="Donnees.CustomerErabliere.Access" />
+    /// <summary>
+    /// Clé étrangère de l'utilisateur
+    /// </summary>
+    public Guid? IdCustomer { get; set; }
+
+    /// <summary>
+    /// Clé étrangère de l'érablière
+    /// </summary>
+    public Guid? IdErabliere { get; set; }
+
+    /// <inheritdoc cref="CustomerErabliere.Access" />
     public byte Access { get; set; }
 }
