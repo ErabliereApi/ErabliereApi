@@ -7,6 +7,7 @@ using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Identity.Web;
 
 namespace ErabliereApi.Attributes;
 
@@ -71,7 +72,8 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
             context.HttpContext.Response.Headers["X-ErabliereApi-ForbidenReason"] = forbidenReasonMessage;
             context.Result = new ForbidResult();
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
-            logger.LogWarning(forbidenReasonMessage);
+            logger.LogWarning("Access Denied for {Method} {Path} for user {User}", context.HttpContext.Request.Method, context.HttpContext.Request.Path, context.HttpContext.User.Identity?.Name ??
+                "Anonymous");                                                                                                                            context.HttpContext.User.GetDisplayName();
         }
     }
 
@@ -133,7 +135,7 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
 
         if (_levelTwoRelationType != null)
         {
-            var entity = await context.FindAsync(_levelTwoRelationType, new object?[] { idGuid }, token);
+            var entity = await context.FindAsync(_levelTwoRelationType, [idGuid], token);
 
             if (entity == null)
             {
