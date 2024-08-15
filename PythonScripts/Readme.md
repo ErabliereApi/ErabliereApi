@@ -4,6 +4,14 @@ Les scripts python sont installé sur des ordinateurs permettant d'interoger des
 
 ### Installer les dépendances
 
+Sous Linux:
+```
+cd ErabliereApi/PythonScripts
+sudo sh instal.sh
+python3 -m venv my-venv
+./my-venv/bin/pip3 install -r requirements.txt
+```
+
 Sous windows:
 ```
 pip install -r requirements.txt
@@ -27,7 +35,6 @@ E:\config\python\aad-client-credentials.json
 
 Le json de configuration devra ressembler à ceci:
 
-
 ```
 [
     {
@@ -38,14 +45,6 @@ Le json de configuration devra ressembler à ceci:
         "Scopes": "api://<api-clientId>/.default"
     }
 ]
-```
-
-### Dépendances
-
-Les dépendances des scripts sont restauré utilisant pip et le fichier requirements.txt
-
-```
-pip install -r requirements.txt
 ```
 
 ## extraireInfoHmi.py
@@ -74,4 +73,10 @@ python3 getweather.py /home/ubuntu/.erabliereapi/acuweather.key 1365711 https://
 
 ```docker
 docker run -d -p 39000:5000 erabliereapi/extraireinfohmi:latest flask run --host=0.0.0.0
+```
+
+## monitorRaspberry.py
+
+```
+python3 monitorRaspberry.py
 ```
