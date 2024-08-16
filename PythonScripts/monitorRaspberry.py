@@ -42,7 +42,7 @@ if len(sys.argv) > 2:
 
 proxy = ErabliereApiProxy(sys.argv[1], authType)
 
-def getAllDigit(x):
+def get_all_digit(x):
   xp = ""
   for c in x:
     if c.isdigit():
@@ -50,6 +50,6 @@ def getAllDigit(x):
 
   return int(xp)
 
-r = proxy.envoyer_donnee_capteur(int(sys.argv[len(sys.argv)-1]), getAllDigit(t))
+r = proxy.envoyer_donnee_capteur(sys.argv[len(sys.argv)-1], get_all_digit(t))
 
 print(r)

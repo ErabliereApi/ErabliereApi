@@ -78,5 +78,11 @@ docker run -d -p 39000:5000 erabliereapi/extraireinfohmi:latest flask run --host
 ## monitorRaspberry.py
 
 ```
-python3 monitorRaspberry.py
+python3 monitorRaspberry.py https://erabliereapi.freddycoder.com AzureAD <capteur-id>
 ```
+ou en utilisant un environnement virtuel
+```
+./my-venv/bin/python3 monitorRaspberry.py https://erabliereapi.freddycoder.com AzureAD <capteur-id>
+```
+
+> Afin de récupérer l'id du capteur, il est possible de le récupérer dans la page capteur de l'api. Utiliser le bouton dans la colonne 'id' pour copier l'id du capteur.
