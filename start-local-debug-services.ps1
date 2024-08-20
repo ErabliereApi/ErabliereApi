@@ -22,7 +22,7 @@ Set-Location ErabliereIU
 
 Start-Process npm -ArgumentList "start"
 
-# Start-Process npm -ArgumentList "run", "storybook"
+Start-Process npm -ArgumentList "run", "storybook"
 
 # Start-Process npx -ArgumentList "cypress", "open"
 
