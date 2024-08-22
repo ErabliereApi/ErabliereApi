@@ -36,7 +36,7 @@ public class EnsureCustomerExist : IMiddleware
 
             if (customer == null)
             {
-                await HandleCaseCustomerNotInCache(context, uniqueName, cache, customer);
+                await HandleCaseCustomerNotInCache(context, uniqueName, cache);
             }
             else // The customer exists and was found in the cache
             {
@@ -63,15 +63,17 @@ public class EnsureCustomerExist : IMiddleware
             {
                 dbCustomer.LastAccessTime = DateTimeOffset.Now;
 
-                await dbContext.TrySaveChangesAsync(context.RequestAborted);
+                await dbContext.TrySaveChangesAsync(context.RequestAborted, logger);
 
                 await cache.SetAsync($"Customer_{uniqueName}", dbCustomer, context.RequestAborted);
             }
         }
     }
 
-    private static async Task HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer? customer)
+    private static async Task HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache)
     {
+        Customer? customer = null;
+
         var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
         if (!await dbContext.Customers.AnyAsync(c => c.UniqueName == uniqueName, context.RequestAborted))
@@ -125,7 +127,7 @@ public class EnsureCustomerExist : IMiddleware
             {
                 customer.LastAccessTime = DateTimeOffset.Now;
 
-                await dbContext.TrySaveChangesAsync(context.RequestAborted);
+                await dbContext.TrySaveChangesAsync(context.RequestAborted, context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>());
             }
 
             await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
