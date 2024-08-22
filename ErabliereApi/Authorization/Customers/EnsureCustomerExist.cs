@@ -18,7 +18,9 @@ public class EnsureCustomerExist : IMiddleware
     {
         if (context.User?.Identity?.IsAuthenticated == true)
         {
-            var uniqueName = UsersUtils.GetUniqueName(context.RequestServices.CreateScope(), context.User);
+            using var scope = context.RequestServices.CreateScope();
+            
+            var uniqueName = UsersUtils.GetUniqueName(scope, context.User);
 
             if (uniqueName == null)
             {
@@ -38,10 +40,16 @@ public class EnsureCustomerExist : IMiddleware
             {
                 await HandleCaseCustomerNotInCache(context, uniqueName, cache);
             }
-            else // The customer exists and was found in the cache
+            else
             {
                 await HandleCaseCustomerIsInCache(context, uniqueName, cache, customer);
             }
+        }
+        else 
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
+
+            logger.LogWarning("User is not authenticated");
         }
 
         await next(context);
@@ -67,13 +75,19 @@ public class EnsureCustomerExist : IMiddleware
 
                 await cache.SetAsync($"Customer_{uniqueName}", dbCustomer, context.RequestAborted);
             }
+            else
+            {
+                logger.LogCritical("Customer {Customer} was not found in database after it was found in cache", uniqueName);
+            }
+        }
+        else 
+        {
+            logger.LogInformation("Customer {Customer} lastAccessTime is not null and is today", customer);
         }
     }
 
     private static async Task HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache)
     {
-        Customer? customer = null;
-
         var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
         if (!await dbContext.Customers.AnyAsync(c => c.UniqueName == uniqueName, context.RequestAborted))
@@ -114,20 +128,26 @@ public class EnsureCustomerExist : IMiddleware
 
                 await dbContext.SaveChangesAsync(context.RequestAborted);
 
-                customer = customerEntity.Entity;
+                var customer = customerEntity.Entity;
 
                 await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
             }
         }
         else
         {
-            customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
+            var customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
 
             if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
             {
                 customer.LastAccessTime = DateTimeOffset.Now;
 
                 await dbContext.TrySaveChangesAsync(context.RequestAborted, context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>());
+            }
+            else 
+            {
+                var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
+
+                logger.LogInformation("User lastAccessTime is not null and is today");
             }
 
             await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
