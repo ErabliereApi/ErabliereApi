@@ -5,5 +5,11 @@ export class Customer {
     name?: string
     uniqueName?: string
     email?: string
+    secondaryEmail?: string
+    accountType?: string
+    stripeId?: string
+    externalAccountUrl?: string
+    creationTime?: string
+    lastAccessTime?: string
     customerErablieres?: Array<CustomerAccess>
 }

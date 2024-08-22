@@ -110,5 +110,24 @@ namespace ErabliereApi.Depot.Sql
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ErabliereDbContext).Assembly);
         }
+
+        /// <summary>
+        /// Try to save changes to the database.
+        /// If succeeded, it return the number of state entry modified and no exception.
+        /// If failed, it return 0 as the number of state entry modified and the exception that occure.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task<(int, Exception?)> TrySaveChangesAsync(CancellationToken token)
+        {
+            try
+            {
+                return (await SaveChangesAsync(token), null);
+            }
+            catch (Exception e)
+            {
+                return (0, e);
+            }
+        }
     }
 }

@@ -34,63 +34,93 @@ public class EnsureCustomerExist : IMiddleware
 
             var customer = await cache.GetAsync<Customer>($"Customer_{uniqueName}", context.RequestAborted);
 
-            if (customer == null) 
+            if (customer == null)
             {
-                var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
+                await HandleCaseCustomerNotInCache(context, uniqueName, cache, customer);
+            }
+            else // The customer exists and was found in the cache
+            {
+                var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
 
-                if (!(await dbContext.Customers.AnyAsync(c => c.UniqueName == uniqueName)))
+                logger.LogDebug("Customer {Customer} was found in cache", customer);
+
+                if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
                 {
-                    // Cas spécial ou l'utilisateur aurait été créé précédement
-                    // et le uniqueName est vide.
-                    if ((await dbContext.Customers.AnyAsync(c => c.UniqueName == "", context.RequestAborted))) 
-                    {
-                        var cust = await dbContext.Customers.SingleAsync(c => c.UniqueName == "", context.RequestAborted);
+                    var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
-                        cust.UniqueName = uniqueName;
+                    customer.LastAccessTime = DateTimeOffset.Now;
 
-                        if (!cust.AccountType.Contains("AzureAD", StringComparison.OrdinalIgnoreCase))
-                        {
-                            cust.AccountType = string.Concat(cust.AccountType, ',', "AzureAD");
-                        }
-
-                        await dbContext.SaveChangesAsync(context.RequestAborted);
-
-                        await cache.SetAsync($"Customer_{uniqueName}", cust, context.RequestAborted);
-                    }
-                    else
-                    {
-                        var customerEntity = await dbContext.Customers.AddAsync(new Donnees.Customer
-                        {
-                            Email = uniqueName,
-                            UniqueName = uniqueName,
-                            Name = context.User.FindFirst("name")?.Value ?? "",
-                            AccountType = "AzureAD",
-                            CreationTime = DateTimeOffset.Now
-                        }, context.RequestAborted);
-
-                        await dbContext.SaveChangesAsync(context.RequestAborted);
-
-                        customer = customerEntity.Entity;
-
-                        await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
-                    }
-                }
-                else 
-                {
-                    customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
+                    await dbContext.TrySaveChangesAsync(context.RequestAborted);
 
                     await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
                 }
             }
-            else 
-            {
-                // Log the was found in cache
-                var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
-
-                logger.LogDebug("Customer {Customer} was found in cache", customer);
-            }
         }
 
         await next(context);
+    }
+
+    private static async Task<Customer?> HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer? customer)
+    {
+        var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
+
+        if (!await dbContext.Customers.AnyAsync(c => c.UniqueName == uniqueName, context.RequestAborted))
+        {
+            // Cas spécial ou l'utilisateur aurait été créé précédement
+            // et le uniqueName est vide.
+            if (await dbContext.Customers.AnyAsync(c => c.UniqueName == "", context.RequestAborted))
+            {
+                var cust = await dbContext.Customers.SingleAsync(c => c.UniqueName == "", context.RequestAborted);
+
+                cust.UniqueName = uniqueName;
+
+                if (!cust.AccountType.Contains("AzureAD", StringComparison.OrdinalIgnoreCase))
+                {
+                    cust.AccountType = string.Concat(cust.AccountType, ',', "AzureAD");
+                }
+
+                if (cust.LastAccessTime == null || cust.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
+                {
+                    cust.LastAccessTime = DateTimeOffset.Now;
+                }
+
+                await dbContext.SaveChangesAsync(context.RequestAborted);
+
+                await cache.SetAsync($"Customer_{uniqueName}", cust, context.RequestAborted);
+            }
+            else
+            {
+                var customerEntity = await dbContext.Customers.AddAsync(new Customer
+                {
+                    Email = uniqueName,
+                    UniqueName = uniqueName,
+                    Name = context.User.FindFirst("name")?.Value ?? "",
+                    AccountType = "AzureAD",
+                    CreationTime = DateTimeOffset.Now,
+                    LastAccessTime = DateTimeOffset.Now
+                }, context.RequestAborted);
+
+                await dbContext.SaveChangesAsync(context.RequestAborted);
+
+                customer = customerEntity.Entity;
+
+                await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+            }
+        }
+        else
+        {
+            customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
+
+            if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
+            {
+                customer.LastAccessTime = DateTimeOffset.Now;
+
+                await dbContext.TrySaveChangesAsync(context.RequestAborted);
+            }
+
+            await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+        }
+
+        return customer;
     }
 }

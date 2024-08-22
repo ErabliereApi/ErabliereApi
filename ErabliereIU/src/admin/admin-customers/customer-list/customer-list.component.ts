@@ -8,6 +8,9 @@ import {
 import {
     AdminCustomerAccessListComponent
 } from "../../../access/customer-access-list/admin-customer-access-list.component";
+import { DatePipe } from '@angular/common';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 @Component({
     selector: 'customer-list',
@@ -15,7 +18,8 @@ import {
     templateUrl: './customer-list.component.html',
     imports: [
         AdminErabliereAccessListComponent,
-        AdminCustomerAccessListComponent
+        AdminCustomerAccessListComponent,
+        DatePipe
     ],
     styleUrl: './customer-list.component.css'
 })
@@ -40,5 +44,12 @@ export class CustomerListComponent {
 
     signalerModification(customer: Customer) {
       this.customerAModifier.emit(customer);
+    }
+
+    formatMessageDate(date: Date | string | undefined): string {
+        if (!date) {
+            return '';
+        }
+        return formatDistanceToNow(new Date(date), { addSuffix: true, locale: fr });
     }
 }
