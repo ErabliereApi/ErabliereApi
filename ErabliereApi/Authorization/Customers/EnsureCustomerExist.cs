@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Extensions;
+using ErabliereApi.Services.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -49,7 +50,7 @@ public class EnsureCustomerExist : IMiddleware
         {
             var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
 
-            logger.LogWarning("User is not authenticated");
+            logger.LogInformation("User is not authenticated");
         }
 
         await next(context);

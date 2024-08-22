@@ -2,7 +2,9 @@ using System.Security.Claims;
 using ErabliereApi.Authorization;
 using ErabliereApi.Extensions;
 
-internal class UsersUtils
+namespace ErabliereApi.Services.Users;
+
+internal static class UsersUtils
 {
     /// <summary>
     /// Permet d'obtenir le nom unique de l'utilisateur.

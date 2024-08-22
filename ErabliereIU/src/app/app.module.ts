@@ -82,7 +82,7 @@ export function MSALInstanceFactory(appConfig: EnvironmentService): IPublicClien
     }
   };
 
-  var pca = new PublicClientApplication(msalConfig);
+  const pca = new PublicClientApplication(msalConfig);
 
   return pca;
 }

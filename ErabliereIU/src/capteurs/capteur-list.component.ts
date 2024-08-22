@@ -227,6 +227,16 @@ export class CapteurListComponent implements OnChanges {
         console.log("openTooltip");
     }
 
+    keyUpTooltip(_t21: Capteur,$event: KeyboardEvent) {
+        if ($event.key === "Escape") {
+            this.closeTooltip();
+        }
+
+        if ($event.key === "Enter" || $event.key === " ") {
+            this.showModifierCapteurDetails(_t21);
+        }
+    }
+
     closeTooltip() {
         this.capteurTT = new Capteur();
         this.displayTooltip = false;
@@ -237,6 +247,10 @@ export class CapteurListComponent implements OnChanges {
 
     editDetailsNeedToUdate($event: any) {
         this.shouldRefreshCapteurs.emit();
+        this.displayEditDetailsForm = false;
+    }
+
+    closeEditDetailsForm($event: any) {
         this.displayEditDetailsForm = false;
     }
 }

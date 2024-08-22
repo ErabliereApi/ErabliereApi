@@ -9,6 +9,7 @@ using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
 using ErabliereApi.Extensions;
+using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -32,6 +33,8 @@ public class ErablieresController : ControllerBase
     private readonly IDistributedCache _cache;
     private readonly IServiceProvider _serviceProvider;
     private readonly IStringLocalizer<ErablieresController> _localizer;
+
+    const string ACCESS_NOT_EMPTY = "AccessCannotBeEmpty";
 
     /// <summary>
     /// Constructeur par initialisation
@@ -67,25 +70,33 @@ public class ErablieresController : ControllerBase
     /// Indique si les érablière retourné seront ceux ayant un lien 
     /// d'appartenance à l'usager authentifier.
     /// </param>
+    /// <param name="orderby">Ordre de tri</param>
+    /// <param name="filter">Filtre</param>
+    /// <param name="top">Nombre d'érablière à retourner</param>
     /// <param name="token">Jeton d'annulation de la requête</param>
     /// <returns>Une liste d'érablière</returns>
     [HttpGet]
     [SecureEnableQuery(MaxTop = TakeErabliereNbMax)]
     [AllowAnonymous]
-    public async Task<IQueryable<Erabliere>> ListerAsync([FromQuery] bool my, CancellationToken token)
+    public async Task<IQueryable<Erabliere>> ListerAsync(
+        [FromQuery] bool my, 
+        [FromQuery(Name = "$orderby")] string? orderby,
+        [FromQuery(Name = "$filter")] string? filter,
+        [FromQuery(Name = "$top")] int? top,
+        CancellationToken token)
     {
         var query = _context.Erabliere.AsNoTracking();
 
         if (_config.IsAuthEnabled() &&
-            (await IsAuthenticatedAsync(token)).Item1 == false)
+            (!(await IsAuthenticatedAsync(token)).Item1))
         {
-            query = query.Where(e => e.IsPublic == true);
+            query = query.Where(e => e.IsPublic);
         }
         else if (my)
         {
-            var (isAuthenticate, authType, customer) = await IsAuthenticatedAsync(token);
+            var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
 
-            if (isAuthenticate == true && customer != null)
+            if (isAuthenticate && customer != null)
             {
                 Guid?[] erablieresOwned
                     = await _context.CustomerErablieres
@@ -100,16 +111,16 @@ public class ErablieresController : ControllerBase
 
         HttpContext.Response.Headers.Append("X-ErabliereTotal", (await query.CountAsync(token)).ToString());
 
-        if (!HttpContext.Request.Query.TryGetValue("$orderby", out _))
+        if (string.IsNullOrWhiteSpace(orderby))
         {
             query = query.OrderBy(e => e.IndiceOrdre).ThenBy(e => e.Nom);
         }
 
-        if (!HttpContext.Request.Query.TryGetValue("$filter", out _))
+        if (string.IsNullOrWhiteSpace(filter))
         {
-            if (HttpContext.Request.Query.TryGetValue("$top", out var top))
+            if (top.HasValue)
             {
-                if (int.TryParse(top, out var topApply) && topApply > TakeErabliereNbMax)
+                if (top > TakeErabliereNbMax)
                 {
                     query = query.Take(TakeErabliereNbMax);
                 }
@@ -162,7 +173,7 @@ public class ErablieresController : ControllerBase
 
         var erabliere = _mapper.Map<Erabliere>(postErabliere);
 
-        var (isAuthenticate, authType, customer) = await IsAuthenticatedAsync(token);
+        var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
 
         if (isAuthenticate)
         {
@@ -217,7 +228,9 @@ public class ErablieresController : ControllerBase
     {
         if (User?.Identity?.IsAuthenticated == true)
         {
-            var unique_name = UsersUtils.GetUniqueName(_serviceProvider.CreateScope(), User);
+            using var scope = _serviceProvider.CreateScope();
+
+            var unique_name = UsersUtils.GetUniqueName(scope, User);
 
             var customer = await _context.Customers.SingleAsync(c => c.UniqueName == unique_name, token);
 
@@ -273,6 +286,19 @@ public class ErablieresController : ControllerBase
 
         // fin des validations
 
+        UpdateErabliereProperties(erabliere, entity);
+
+        _context.Erabliere.Update(entity);
+
+        await _context.SaveChangesAsync(token);
+
+        await _cache.RemoveAsync($"Erabliere_{id}", token);
+
+        return Ok();
+    }
+
+    private static void UpdateErabliereProperties(PutErabliere erabliere, Erabliere entity)
+    {
         if (!string.IsNullOrWhiteSpace(erabliere.Nom))
         {
             entity.Nom = erabliere.Nom;
@@ -327,14 +353,6 @@ public class ErablieresController : ControllerBase
         {
             entity.DimensionPanneauImage = (byte)erabliere.DimensionPanneauImage;
         }
-
-        _context.Erabliere.Update(entity);
-
-        await _context.SaveChangesAsync(token);
-
-        await _cache.RemoveAsync($"Erabliere_{id}", token);
-
-        return Ok();
     }
 
     /// <summary>
@@ -358,6 +376,12 @@ public class ErablieresController : ControllerBase
 
         if (entity != null)
         {
+            var customerErabliere = await _context.CustomerErablieres
+                .Where(c => c.IdErabliere == id)
+                .ToArrayAsync(token);
+
+            _context.CustomerErablieres.RemoveRange(customerErabliere);
+
             _context.Remove(entity);
 
             await _context.SaveChangesAsync(token);
@@ -428,14 +452,13 @@ public class ErablieresController : ControllerBase
 
         if (!access.Access.HasValue)
         {
-            return BadRequest("L'accès du client ne peut pas être vide");
+            return BadRequest(_localizer[ACCESS_NOT_EMPTY]);
         }
 
         if (access.Access.Value < 0 || access.Access.Value > 15)
         {
             return BadRequest("L'accès du client doit être compris entre 0 et 15");
         }
-
 
         if (await _context.CustomerErablieres.AnyAsync(
             c => c.IdCustomer == idCustomer && c.IdErabliere == id, token))
@@ -475,7 +498,7 @@ public class ErablieresController : ControllerBase
     {
         if (!access.Access.HasValue)
         {
-            return BadRequest("L'accès du client ne peut pas être vide");
+            return BadRequest(_localizer[ACCESS_NOT_EMPTY]);
         }
 
         if (access.Access.Value < 0 || access.Access.Value > 15)
@@ -732,7 +755,7 @@ public class ErablieresController : ControllerBase
 
         if (!access.Access.HasValue)
         {
-            return BadRequest("L'accès du client ne peut pas être vide");
+            return BadRequest(_localizer[ACCESS_NOT_EMPTY]);
         }
 
         if (access.Access.Value < 0 || access.Access.Value > 15)
@@ -779,7 +802,7 @@ public class ErablieresController : ControllerBase
     {
         if (!access.Access.HasValue)
         {
-            return BadRequest("L'accès du client ne peut pas être vide");
+            return BadRequest(_localizer[ACCESS_NOT_EMPTY]);
         }
 
         if (access.Access.Value < 0 || access.Access.Value > 15)

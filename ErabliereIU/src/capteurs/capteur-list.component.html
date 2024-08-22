@@ -5,7 +5,7 @@
 }
 
 @if (this.displayEditDetailsForm && this.editDetailsCapteurSelected) {
-<modifier-capteur-details [inputCapteur]="editDetailsCapteurSelected" (needToUpdate)="editDetailsNeedToUdate($event)"></modifier-capteur-details>
+<modifier-capteur-details [inputCapteur]="editDetailsCapteurSelected" (needToUpdate)="editDetailsNeedToUdate($event)" (closeForm)="closeEditDetailsForm($event)"></modifier-capteur-details>
 }
 
 <form class="table-responsive" novalidate>
@@ -58,7 +58,8 @@
                     }
                     } @else {
                     <span style="text-decoration: underline; cursor: pointer;"
-                        (click)="openTooltip(capteur, $event)">{{this.capteur.nom}}</span>
+                        (click)="openTooltip(capteur, $event)"
+                        (keyup)="keyUpTooltip(capteur, $event)">{{this.capteur.nom}}</span>
                     }
                 </td>
                 <td [class.was-validated]="getSymbole(capteur.id ?? '')?.touched">

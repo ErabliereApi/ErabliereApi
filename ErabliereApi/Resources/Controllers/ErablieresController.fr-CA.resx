@@ -12,4 +12,7 @@
     <data name="EnforceIsPublic" xml:space="preserve">
         <value>Impossible de créer une érablière non pubique sans authentification. Veillez assigner la propriété IsPublic à true.</value>
     </data>
+    <data name="AccessCannotBeEmpty" xml:space="preserve">
+        <value>L'accès du client ne peut pas être vide</value>
+    </data>
 </root>

@@ -4,6 +4,7 @@ using Azure.AI.OpenAI;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees.Action.Patch;
 using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Services.Users;
 using ErabliereModel.Action.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,19 +24,16 @@ namespace ErabliereApi.Controllers;
 public class ErabliereAIController : ControllerBase 
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="depot"></param>
-    /// <param name="mapper"></param>
     /// <param name="configuration"></param>
-    public ErabliereAIController(ErabliereDbContext depot, IMapper mapper, IConfiguration configuration)
+    public ErabliereAIController(ErabliereDbContext depot, IConfiguration configuration)
     {
         _depot = depot;
-        _mapper = mapper;
         _configuration = configuration;
     }
 
@@ -44,9 +42,12 @@ public class ErabliereAIController : ControllerBase
     /// </summary>
     [HttpGet("Conversations")]
     [EnableQuery]
+    [ProducesResponseType(200, Type = typeof(List<Conversation>))]
     public IActionResult GetConversation()
     {
-        var userId = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), HttpContext.User);
+        using var scope = HttpContext.RequestServices.CreateScope();
+
+        var userId = UsersUtils.GetUniqueName(scope, HttpContext.User);
 
         return Ok(_depot.Conversations.Where(c => c.UserId == userId));
     }
@@ -56,10 +57,13 @@ public class ErabliereAIController : ControllerBase
     /// </summary>
     [HttpGet("Conversations/{id}/Messages")]
     [EnableQuery]
+    [ProducesResponseType(200, Type = typeof(List<Message>))]
     public IActionResult GetMessages(Guid id)
     {
         // conversation should be filtered by the user
-        var userId = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), HttpContext.User);
+        using var scope = HttpContext.RequestServices.CreateScope();
+
+        var userId = UsersUtils.GetUniqueName(scope, HttpContext.User);
 
 #nullable disable
         return Ok(_depot.Messages.Where(m => m.ConversationId == id && 
@@ -79,9 +83,11 @@ public class ErabliereAIController : ControllerBase
         Conversation? conversation = null;
         if (prompt.ConversationId == null)
         {
+            using var scope = HttpContext.RequestServices.CreateScope();
+
             conversation = new Conversation
             {
-                UserId = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), HttpContext.User),
+                UserId = UsersUtils.GetUniqueName(scope, HttpContext.User),
                 CreatedOn = DateTime.Now,
                 LastMessageDate = DateTime.Now,
                 Name = prompt.Prompt
@@ -294,6 +300,7 @@ public class ErabliereAIController : ControllerBase
     [HttpGet("Admin/Conversations")]
     [EnableQuery]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    [ProducesResponseType(200, Type = typeof(List<Conversation>))]
     public IActionResult GetConversationAsAdmin()
     {
         return Ok(_depot.Conversations);

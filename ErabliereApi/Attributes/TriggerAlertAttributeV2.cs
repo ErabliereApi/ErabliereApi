@@ -32,19 +32,18 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         GetIdAndPostInfo(context);
     }
 
-    private static (Guid, PostDonneeCapteur?) GetIdAndPostInfo(ActionExecutingContext context)
+    private static void GetIdAndPostInfo(ActionExecutingContext context)
     {
-        var id = context.ActionArguments["id"]?.ToString() ?? throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlertV2'.");
+        string id = context.ActionArguments["id"]?.ToString() ?? 
+            throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlertV2'.");
 
-        var _idCapteur = Guid.Parse(id ?? throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlertV2'."));
+        var _idCapteur = Guid.Parse(id);
 
         try
         {
             var _donnee = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonneeCapteur)) as PostDonneeCapteur;
 
             context.HttpContext.Items.Add("TriggerAlertV2Attribute", (_idCapteur, _donnee));
-
-            return (_idCapteur, _donnee);
         }
         catch (InvalidOperationException e)
         {
@@ -61,7 +60,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
     {
         var result = await next();
 
-        if (result.Canceled == false)
+        if (!result.Canceled)
         {
             try
             {
@@ -152,9 +151,8 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         }
         else
         {
-            logger.LogInformation($"Alerte {alerte.Id} {alerte.Nom}");
-            logger.LogInformation($"Validation count greater that 0 {validationCount > 0} && validation count eqal conditionMet {validationCount} == {conditionMet} = false");
-            logger.LogInformation($"Alerte {alerte.Id} {alerte.Nom} not trigger");
+            logger.LogInformation("Alerte {AlerteId} {AlerteNom} not trigger", alerte.Id, alerte.Nom);
+            logger.LogInformation("Validation count greater that 0 {ValidationCountGt0} && validation count eqal conditionMet {ValidationCount} == {ConditionMet} = false", validationCount > 0, validationCount, conditionMet);
         }
     }
 
