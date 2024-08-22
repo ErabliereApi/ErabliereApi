@@ -40,32 +40,37 @@ public class EnsureCustomerExist : IMiddleware
             }
             else // The customer exists and was found in the cache
             {
-                var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
-
-                logger.LogDebug("Customer {Customer} was found in cache", customer);
-
-                if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
-                {
-                    var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
-
-                    customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
-
-                    if (customer != null) 
-                    {
-                        customer.LastAccessTime = DateTimeOffset.Now;
-
-                        await dbContext.TrySaveChangesAsync(context.RequestAborted);
-
-                        await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
-                    }
-                }
+                await HandleCaseCustomerIsInCache(context, uniqueName, cache, customer);
             }
         }
 
         await next(context);
     }
 
-    private static async Task<Customer?> HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer? customer)
+    private static async Task HandleCaseCustomerIsInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer customer)
+    {
+        var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
+
+        logger.LogDebug("Customer {Customer} was found in cache", customer);
+
+        if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
+        {
+            var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
+
+            var dbCustomer = await dbContext.Customers.FirstOrDefaultAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
+
+            if (dbCustomer != null)
+            {
+                dbCustomer.LastAccessTime = DateTimeOffset.Now;
+
+                await dbContext.TrySaveChangesAsync(context.RequestAborted);
+
+                await cache.SetAsync($"Customer_{uniqueName}", dbCustomer, context.RequestAborted);
+            }
+        }
+    }
+
+    private static async Task HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer? customer)
     {
         var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
@@ -125,7 +130,5 @@ public class EnsureCustomerExist : IMiddleware
 
             await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
         }
-
-        return customer;
     }
 }
