@@ -117,8 +117,9 @@ namespace ErabliereApi.Depot.Sql
         /// If failed, it return 0 as the number of state entry modified and the exception that occure.
         /// </summary>
         /// <param name="token"></param>
+        /// <param name="logger">Optionnal logger</param>
         /// <returns></returns>
-        public async Task<(int, Exception?)> TrySaveChangesAsync(CancellationToken token)
+        public async Task<(int, Exception?)> TrySaveChangesAsync(CancellationToken token, ILogger? logger = null)
         {
             try
             {
@@ -126,6 +127,7 @@ namespace ErabliereApi.Depot.Sql
             }
             catch (Exception e)
             {
+                logger?.LogError(e, "Error while tying to save changes to the database");
                 return (0, e);
             }
         }

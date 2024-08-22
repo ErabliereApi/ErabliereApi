@@ -48,11 +48,16 @@ public class EnsureCustomerExist : IMiddleware
                 {
                     var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
-                    customer.LastAccessTime = DateTimeOffset.Now;
+                    customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
 
-                    await dbContext.TrySaveChangesAsync(context.RequestAborted);
+                    if (customer != null) 
+                    {
+                        customer.LastAccessTime = DateTimeOffset.Now;
 
-                    await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+                        await dbContext.TrySaveChangesAsync(context.RequestAborted);
+
+                        await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+                    }
                 }
             }
         }
