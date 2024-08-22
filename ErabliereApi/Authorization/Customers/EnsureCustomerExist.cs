@@ -82,7 +82,7 @@ public class EnsureCustomerExist : IMiddleware
         }
         else 
         {
-            logger.LogInformation("Customer {Customer} lastAccessTime is not null and is today", customer);
+            logger.LogInformation("Customer {Customer} lastAccessTime is today ({Date}) and was in cache", customer.UniqueName, customer.LastAccessTime);
         }
     }
 
@@ -96,23 +96,7 @@ public class EnsureCustomerExist : IMiddleware
             // et le uniqueName est vide.
             if (await dbContext.Customers.AnyAsync(c => c.UniqueName == "", context.RequestAborted))
             {
-                var cust = await dbContext.Customers.SingleAsync(c => c.UniqueName == "", context.RequestAborted);
-
-                cust.UniqueName = uniqueName;
-
-                if (!cust.AccountType.Contains("AzureAD", StringComparison.OrdinalIgnoreCase))
-                {
-                    cust.AccountType = string.Concat(cust.AccountType, ',', "AzureAD");
-                }
-
-                if (cust.LastAccessTime == null || cust.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
-                {
-                    cust.LastAccessTime = DateTimeOffset.Now;
-                }
-
-                await dbContext.SaveChangesAsync(context.RequestAborted);
-
-                await cache.SetAsync($"Customer_{uniqueName}", cust, context.RequestAborted);
+                await HandleSpecialCase(context, uniqueName, cache, dbContext);
             }
             else
             {
@@ -147,10 +131,31 @@ public class EnsureCustomerExist : IMiddleware
             {
                 var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
 
-                logger.LogInformation("User lastAccessTime is not null and is today");
+                logger.LogInformation("User {Customer} was not in cache lastAccessTime is today ({Date})", customer.UniqueName, customer.LastAccessTime);
             }
 
             await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
         }
+    }
+
+    private static async Task HandleSpecialCase(HttpContext context, string uniqueName, IDistributedCache cache, ErabliereDbContext dbContext)
+    {
+        var cust = await dbContext.Customers.SingleAsync(c => c.UniqueName == "", context.RequestAborted);
+
+        cust.UniqueName = uniqueName;
+
+        if (!cust.AccountType.Contains("AzureAD", StringComparison.OrdinalIgnoreCase))
+        {
+            cust.AccountType = string.Concat(cust.AccountType, ',', "AzureAD");
+        }
+
+        if (cust.LastAccessTime == null || cust.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
+        {
+            cust.LastAccessTime = DateTimeOffset.Now;
+        }
+
+        await dbContext.SaveChangesAsync(context.RequestAborted);
+
+        await cache.SetAsync($"Customer_{uniqueName}", cust, context.RequestAborted);
     }
 }
