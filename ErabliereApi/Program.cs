@@ -24,6 +24,8 @@ try
 
     Console.WriteLine("Starting ErabliereApi");
 
+    Console.WriteLine("TimeZone: " + TimeZoneInfo.Local);
+
     await task.RunAsync();
 }
 catch (Exception e)

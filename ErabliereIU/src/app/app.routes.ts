@@ -13,10 +13,11 @@ import {AdminErablieresComponent} from "../admin/admin-erablieres/admin-erablier
 import {ClientViewComponent} from "./client-view/client-view.component";
 import {GestionCapteursComponent} from "../capteurs/gestion-capteurs.component";
 import { ReportsComponent } from 'src/rapport/rapports.component';
+import { AdminAPIKeysComponent } from 'src/admin/admin-apikeys/admin-apikeys.component';
 
 export const routes: Routes = [
     {
-        path: 'admin',
+        path: 'a',
         component: AdminViewComponent,
         children: [
             {
@@ -33,6 +34,11 @@ export const routes: Routes = [
                 path: 'erablieres',
                 title: 'Érablière Admin - Érablières',
                 component: AdminErablieresComponent,
+            },
+            {
+                path: 'apikeys',
+                title: 'Érablière Admin - API Keys',
+                component: AdminAPIKeysComponent,
             },
             {
                 path: '**',

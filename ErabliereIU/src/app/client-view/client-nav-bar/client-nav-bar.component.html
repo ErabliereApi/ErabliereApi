@@ -24,7 +24,7 @@
                 @for (url of urls; track url) {
                 @if (url.requiredLogin && isLoggedIn) {
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url.href }}" role="button" target="_blank" rel="noopener noreferrer">{{
+                    <a class="nav-link" href="{{ url.href }}" target="_blank" rel="noopener noreferrer">{{
                         url.text }}</a>
                 </li>
                 }
@@ -68,7 +68,7 @@
             </ul>
             <div class="d-flex gap-2">
                 @if (!useAuthentication || isAdminUser) {
-                <button id="zone-admin-button" class="btn btn-outline-primary" routerLink="/admin">Érablière
+                <button id="zone-admin-button" class="btn btn-outline-primary" routerLink="/a">Érablière
                     Admin</button>
                 }
                 @if (useAuthentication) {

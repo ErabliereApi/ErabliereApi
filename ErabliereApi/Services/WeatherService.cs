@@ -13,6 +13,7 @@ public class WeatherService : IWeaterService
     private readonly IDistributedCache _cache;
     private readonly ILogger<WeatherService> _logger;
     private readonly string? AccuWeatherApiKey;
+    private readonly string? AccuWeatherBaseUrl;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
@@ -28,6 +29,7 @@ public class WeatherService : IWeaterService
         _cache = memoryCache;
         _logger = logger;
         AccuWeatherApiKey = configuration["AccuWeatherApiKey"];
+        AccuWeatherBaseUrl = configuration["AccuWeatherBaseUrl"];
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -45,7 +47,7 @@ public class WeatherService : IWeaterService
 
         try
         {
-            string url = $"http://dataservice.accuweather.com/locations/v1/postalcodes/search?apikey={AccuWeatherApiKey}&q={postalCode}";
+            string url = $"{AccuWeatherBaseUrl}/locations/v1/postalcodes/search?apikey={AccuWeatherApiKey}&q={postalCode}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
@@ -85,8 +87,7 @@ public class WeatherService : IWeaterService
 
         try
         {
-            string url = 
-$"http://dataservice.accuweather.com/forecasts/v1/daily/5day/{location}?apikey={AccuWeatherApiKey}&language={lang}";
+            string url = $"{AccuWeatherBaseUrl}/forecasts/v1/daily/5day/{location}?apikey={AccuWeatherApiKey}&language={lang}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
@@ -132,7 +133,7 @@ $"http://dataservice.accuweather.com/forecasts/v1/daily/5day/{location}?apikey={
         try
         {
             string url = 
-$"http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/45942_PC?apikey={AccuWeatherApiKey}&language={lang}";
+$"{AccuWeatherBaseUrl}/forecasts/v1/hourly/12hour/45942_PC?apikey={AccuWeatherApiKey}&language={lang}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ErabliereApi.Donnees;
 
@@ -48,6 +49,12 @@ public class Customer
     /// Un url d'un compte externe relié à l'utilisateur
     /// </summary>
     public string? ExternalAccountUrl { get; set; }
+
+    /// <summary>
+    /// Le fuseau horaire de l'utilisateur
+    /// </summary>
+    [MaxLength(25)]
+    public string? TimeZone { get; set; }
 
     /// <summary>
     /// La date de création de l'utilisateur

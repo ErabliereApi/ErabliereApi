@@ -17,6 +17,8 @@ public class EnsureCustomerExist : IMiddleware
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+        var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
+
         if (context.User?.Identity?.IsAuthenticated == true)
         {
             using var scope = context.RequestServices.CreateScope();
@@ -39,30 +41,28 @@ public class EnsureCustomerExist : IMiddleware
 
             if (customer == null)
             {
-                await HandleCaseCustomerNotInCache(context, uniqueName, cache);
+                await HandleCaseCustomerNotInCache(context, uniqueName, cache, logger);
             }
             else
             {
-                await HandleCaseCustomerIsInCache(context, uniqueName, cache, customer);
+                await HandleCaseCustomerIsInCache(context, uniqueName, cache, customer, logger);
             }
         }
         else 
         {
-            var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
-
             logger.LogInformation("User is not authenticated");
         }
 
         await next(context);
     }
 
-    private static async Task HandleCaseCustomerIsInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer customer)
+    private static async Task HandleCaseCustomerIsInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer customer, ILogger<EnsureCustomerExist> logger)
     {
-        var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
-
         logger.LogDebug("Customer {Customer} was found in cache", customer);
 
-        if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
+        var userTime = GetUserDateTimeOffSetNow(customer, logger);
+
+        if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < userTime.Date)
         {
             var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
@@ -70,7 +70,7 @@ public class EnsureCustomerExist : IMiddleware
 
             if (dbCustomer != null)
             {
-                dbCustomer.LastAccessTime = DateTimeOffset.Now;
+                dbCustomer.LastAccessTime = userTime;
 
                 await dbContext.TrySaveChangesAsync(context.RequestAborted, logger);
 
@@ -87,7 +87,7 @@ public class EnsureCustomerExist : IMiddleware
         }
     }
 
-    private static async Task HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache)
+    private static async Task HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache, ILogger<EnsureCustomerExist> logger)
     {
         var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
@@ -97,7 +97,7 @@ public class EnsureCustomerExist : IMiddleware
             // et le uniqueName est vide.
             if (await dbContext.Customers.AnyAsync(c => c.UniqueName == "", context.RequestAborted))
             {
-                await HandleSpecialCase(context, uniqueName, cache, dbContext);
+                await HandleSpecialCase(context, uniqueName, cache, dbContext, logger);
             }
             else
             {
@@ -106,10 +106,11 @@ public class EnsureCustomerExist : IMiddleware
                     Email = uniqueName,
                     UniqueName = uniqueName,
                     Name = context.User.FindFirst("name")?.Value ?? "",
-                    AccountType = "AzureAD",
-                    CreationTime = DateTimeOffset.Now,
-                    LastAccessTime = DateTimeOffset.Now
+                    AccountType = "AzureAD"
                 }, context.RequestAborted);
+
+                customerEntity.Entity.CreationTime = GetUserDateTimeOffSetNow(customerEntity.Entity, logger);
+                customerEntity.Entity.LastAccessTime = customerEntity.Entity.CreationTime;
 
                 await dbContext.SaveChangesAsync(context.RequestAborted);
 
@@ -121,17 +122,17 @@ public class EnsureCustomerExist : IMiddleware
         else
         {
             var customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
+            
+            var userTime = GetUserDateTimeOffSetNow(customer, logger);
 
-            if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
+            if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < userTime.Date)
             {
-                customer.LastAccessTime = DateTimeOffset.Now;
+                customer.LastAccessTime = userTime;
 
                 await dbContext.TrySaveChangesAsync(context.RequestAborted, context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>());
             }
-            else 
+            else
             {
-                var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
-
                 logger.LogInformation("User {Customer} was not in cache lastAccessTime is today ({Date})", customer.UniqueName, customer.LastAccessTime);
             }
 
@@ -139,7 +140,28 @@ public class EnsureCustomerExist : IMiddleware
         }
     }
 
-    private static async Task HandleSpecialCase(HttpContext context, string uniqueName, IDistributedCache cache, ErabliereDbContext dbContext)
+    private static DateTimeOffset GetUserDateTimeOffSetNow(Customer customer, ILogger<EnsureCustomerExist> logger)
+    {
+        if (!string.IsNullOrWhiteSpace(customer.TimeZone))
+        {
+            try
+            {
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(customer.TimeZone);
+
+                var userTime = TimeZoneInfo.ConvertTime(DateTimeOffset.Now, timeZone);
+
+                return userTime;
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error while converting time zone {TimeZone}", customer.TimeZone);
+            }
+        }
+
+        return DateTimeOffset.Now;
+    }
+
+    private static async Task HandleSpecialCase(HttpContext context, string uniqueName, IDistributedCache cache, ErabliereDbContext dbContext, ILogger<EnsureCustomerExist> logger)
     {
         var cust = await dbContext.Customers.SingleAsync(c => c.UniqueName == "", context.RequestAborted);
 
@@ -150,9 +172,11 @@ public class EnsureCustomerExist : IMiddleware
             cust.AccountType = string.Concat(cust.AccountType, ',', "AzureAD");
         }
 
-        if (cust.LastAccessTime == null || cust.LastAccessTime.Value.Date < DateTimeOffset.Now.Date)
+        var userTime = GetUserDateTimeOffSetNow(cust, logger);
+
+        if (cust.LastAccessTime == null || cust.LastAccessTime.Value.Date < userTime.Date)
         {
-            cust.LastAccessTime = DateTimeOffset.Now;
+            cust.LastAccessTime = userTime;
         }
 
         await dbContext.SaveChangesAsync(context.RequestAborted);
