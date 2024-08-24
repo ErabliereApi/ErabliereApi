@@ -60,9 +60,7 @@ public class EnsureCustomerExist : IMiddleware
     {
         logger.LogDebug("Customer {Customer} was found in cache", customer);
 
-        var userTime = GetUserDateTimeOffSetNow(customer, logger);
-
-        if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < userTime.Date)
+        if (ShouldUpdateLastAccessTime(customer, logger, out var userTime))
         {
             var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
@@ -123,9 +121,7 @@ public class EnsureCustomerExist : IMiddleware
         {
             var customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
             
-            var userTime = GetUserDateTimeOffSetNow(customer, logger);
-
-            if (customer.LastAccessTime == null || customer.LastAccessTime.Value.Date < userTime.Date)
+            if (ShouldUpdateLastAccessTime(customer, logger, out var userTime))
             {
                 customer.LastAccessTime = userTime;
 
@@ -182,5 +178,23 @@ public class EnsureCustomerExist : IMiddleware
         await dbContext.SaveChangesAsync(context.RequestAborted);
 
         await cache.SetAsync($"Customer_{uniqueName}", cust, context.RequestAborted);
+    }
+
+    private static bool ShouldUpdateLastAccessTime(Customer customer, ILogger<EnsureCustomerExist> logger, out DateTimeOffset userTime)
+    {
+        userTime = GetUserDateTimeOffSetNow(customer, logger);
+        
+        if (customer.LastAccessTime == null)
+        {
+            return true;
+        }
+
+        if (customer.LastAccessTime.Value < userTime &&
+            userTime - customer.LastAccessTime.Value > TimeSpan.FromMinutes(5))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

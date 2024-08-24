@@ -52,11 +52,12 @@ export class GraphPannelComponent implements OnInit {
     lineChartPlugins = [];
 
     @Input() titre: string | undefined = "";
-    @Input() valeurActuel?: string | null | number | undefined;
+    @Input() valeurActuel: string | null | number | undefined;
     @Input() symbole: string | undefined;
-    @Input() textActuel?: string | undefined | null;
+    @Input() textActuel: string | undefined | null;
     @Input() ajouterDonneeDepuisInterface: boolean = false;
-    @Input() batteryLevel?: number | undefined;
+    @Input() batteryLevel: number | undefined;
+    @Input() online: boolean | undefined;
 
     constructor(private _api: ErabliereApi) {
         this.chart = undefined;
@@ -255,5 +256,9 @@ export class GraphPannelComponent implements OnInit {
 
     captureDateFin($event: SimpleChange) {
         this.dateFinFixRange = $event.currentValue;
+    }
+
+    dropDownKeyUpEvent($event: KeyboardEvent) {
+        console.log($event);
     }
 }

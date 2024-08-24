@@ -1,21 +1,30 @@
-<div id="graph-pannel-{{idCapteur}}">
+<div id="graph-pannel-{{idCapteur}}" [className]="online == undefined || online ? '' : 'border-top border-danger'">
     <div class="row">
         <div [className]="batteryLevel ? col10 : col12">
             <h3>{{ titre }} {{ valeurActuel }} {{ symbole }} {{ mean }}</h3>
         </div>
-        @if (batteryLevel != null) {
+        @if (batteryLevel != null && (online == undefined || online)) {
         <div class="col-2">
-            
                 <div class="mt-2">
-                    <div class="progress" title="Niveau de la batterie">
-                        <div class="progress-bar"
-                                role="progressbar"
+                    <div class="progress" title="Niveau de la batterie {{ batteryLevel }}%">
+                        <div
+                                [className]="batteryLevel < 20 ? 'progress-bar bg-danger text-dark overflow-visible' : batteryLevel < 50 ? 'progress-bar bg-warning overflow-visible' : 'progress-bar bg-success'"
                                 [style.width.%]="batteryLevel"
                                 [attr.aria-valuenow]="batteryLevel"
+                                [textContent]="batteryLevel + '%'"
                                 aria-valuemin="0"
                                 aria-valuemax="100">
                             {{ batteryLevel }}%
-                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (online === false) {
+            <div class="col-2">
+                <div title="Capteur hors ligne">
+                    <div class="text-danger">
+                        Hors ligne
                     </div>
                 </div>
             </div>
@@ -29,10 +38,10 @@
                 <div class="dropdown me-2">
                     <button class="btn btn-secondary dropdown-toggle"
                        href="#"
-                       role="button"
                        data-bs-toggle="dropdown"
                        aria-haspopup="true"
-                       aria-expanded="false">
+                       aria-expanded="false"
+                       (keyup)="dropDownKeyUpEvent($event)">
                         Durée {{ duree }}
                     </button>
 
