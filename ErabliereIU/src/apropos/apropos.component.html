@@ -2,6 +2,12 @@
     <h3>À Propos</h3>
     <hr />
 
+    <div *ngIf="demoMode" class="bg-warning p-1" style="border-radius: 5px;">
+        <h4>Vous utilisez la version Demo de ErabliereAPI.</h4>
+        <p>La version démo est limité en fonctionnalité et les données ne sont pas enregistrer dans une base de données et seront perdu après un certain temps.</p>
+        <p *ngIf="realAppUrl">Vous pouvez trouver l'application officiel à <a href="{{realAppUrl}}">{{realAppUrl}}</a>.</p>
+    </div>
+
     <div *ngIf="checkoutEnabled">
         <h4>Obtenir une clé d'api</h4>
         <p>Il est possible d'obtenir une clé d'api au tarif de 0.01$ par requête. Après l'achat de la clé, vous

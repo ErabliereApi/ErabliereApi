@@ -39,3 +39,10 @@ export const WithEmailSupport: Story = {
     supportEmail: 'exemple@domain.com',
   },
 };
+
+export const DemoMode: Story = {
+  args: {
+    demoMode: true,
+    realAppUrl: 'https://example.com',
+  },
+};

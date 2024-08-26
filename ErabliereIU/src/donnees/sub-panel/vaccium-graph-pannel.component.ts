@@ -23,7 +23,7 @@ export class VacciumGraphPannelComponent implements OnInit {
     @Input() datasets: ChartDataset[] = [];
     @Input() timeaxes: string[] = [];
     @Input() lineChartType = 'line' as ChartType;
-    @Input() lineScaleType: 'time' = 'time'
+    @Input() lineScaleType = 'time' as const
     lineChartOptions: ChartOptions = {
         maintainAspectRatio: false,
         aspectRatio: 1.7,

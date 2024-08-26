@@ -1,11 +1,11 @@
 ﻿using ErabliereApi.Extensions;
 using ErabliereApi.OperationFilter;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 using static System.Boolean;
 using static System.StringComparison;
 
@@ -41,6 +41,11 @@ public static class Swagger
                 {
                     Name = "Apache-2.0",
                     Url = new Uri("https://opensource.org/licenses/Apache-2.0"),
+                },
+                Extensions = new Dictionary<string, IOpenApiExtension>
+                {
+                    { "demoMode", new OpenApiBoolean(config.GetValue<bool>("SWAGGER_DEMO_MODE")) },
+                    { "prodAppUrl", new OpenApiString(config["SWAGGER_PROD_APP_URL"]) }
                 }
             });
 

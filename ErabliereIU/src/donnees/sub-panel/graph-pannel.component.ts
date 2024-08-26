@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
-import { ChartDataset, ChartOptions, ChartType, Color, LinearScale, TickOptions, _adapters } from 'chart.js';
+import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
@@ -72,7 +72,7 @@ export class GraphPannelComponent implements OnInit {
             this.doHttpCall();
 
             this.interval = setInterval(() => {
-                if (this.fixRange == false) {
+                if (!this.fixRange) {
                     this.doHttpCall();
                 }
             }, 1000 * 60);
@@ -102,7 +102,7 @@ export class GraphPannelComponent implements OnInit {
             finFiltre = this.dateFinFixRange;
         }
 
-        var xddr = null;
+        let xddr = null;
         if (this.dernierDonneeRecu != undefined) {
             xddr = this.dernierDonneeRecu.toString();
         }
@@ -113,7 +113,7 @@ export class GraphPannelComponent implements OnInit {
             this.dernierDonneeRecu = h.get("x-dde")?.valueOf();
             this.ddr = h.get("x-ddr")?.valueOf();
 
-            var json = resp.body;
+            let json = resp.body;
 
             if (json == null) {
                 console.log("donneeCapteur response body was null. Return immediatly");
@@ -135,8 +135,8 @@ export class GraphPannelComponent implements OnInit {
             let timeaxes = json.map(donneeCapteur => donneeCapteur.d);
 
             if (json.length > 0) {
-                var actualData = json[json.length - 1];
-                var tva = actualData.valeur;
+                let actualData = json[json.length - 1];
+                let tva = actualData.valeur;
                 this.valeurActuel = tva != null ? (tva / 10).toFixed(1) : null;
                 this.textActuel = actualData.text;
             }
@@ -183,7 +183,7 @@ export class GraphPannelComponent implements OnInit {
     debutEnHeure: number = 12;
 
     obtenirDebutFiltre(): Date {
-        var twelve_hour = 1000 * 60 * 60 * this.debutEnHeure;
+        const twelve_hour = 1000 * 60 * 60 * this.debutEnHeure;
 
         return new Date(Date.now() - twelve_hour);
     }
@@ -239,7 +239,7 @@ export class GraphPannelComponent implements OnInit {
         }
         else {
             // When this.idCapteur is null, we are in a component such as 'donnees.component.ts'
-            var obj = {
+            let obj = {
                 dateDebutFixRange: this.dateDebutFixRange,
                 dateFinFixRange: this.dateFinFixRange
             }

@@ -14,6 +14,9 @@ export class AproposComponent {
     checkoutEnabled?: boolean
     supportEmail?: string
     tenantId?: string
+
+    demoMode?: boolean
+    realAppUrl?: string
     
     constructor(private _enviromentService: EnvironmentService, private _erbliereApi: ErabliereApi){}
 
@@ -24,6 +27,8 @@ export class AproposComponent {
         this._erbliereApi.getOpenApiSpec().then(spec => {
             this.supportEmail = spec.info.contact.email;
             this.checkoutEnabled = spec.paths['/Checkout'] !== undefined;
+            this.demoMode = spec.info.demoMode;
+            this.realAppUrl = spec.info.prodAppUrl;
         })
         .catch(err => {
             console.error(err);
