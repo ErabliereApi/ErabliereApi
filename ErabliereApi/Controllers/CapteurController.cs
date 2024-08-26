@@ -263,6 +263,11 @@ public class CapteursController : ControllerBase
             capteurEntity.Nom = capteur.Nom;
         }
 
+        if (!string.IsNullOrWhiteSpace(capteur.Symbole)) 
+        {
+            capteurEntity.Symbole = capteur.Symbole;
+        }
+
         if (capteur.IndiceOrdre.HasValue)
         {
             capteurEntity.IndiceOrdre = capteur.IndiceOrdre;
