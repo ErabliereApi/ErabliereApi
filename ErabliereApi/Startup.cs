@@ -151,6 +151,16 @@ public class Startup
             }
         );
 
+        // HttpClient
+        var emailImageObserverBaseUrl = Configuration["EmailImageObserverUrl"];
+        if (!string.IsNullOrWhiteSpace(emailImageObserverBaseUrl)) 
+        {
+            services.AddHttpClient("EmailImageObserver", c =>
+            {
+                c.BaseAddress = new Uri(emailImageObserverBaseUrl);
+            });
+        }
+
         // Database
         if (string.Equals(Configuration["USE_SQL"], TrueString, OrdinalIgnoreCase))
         {

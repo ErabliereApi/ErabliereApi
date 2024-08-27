@@ -13,14 +13,14 @@ namespace ErabliereApi.Controllers;
 [Authorize]
 public class ImagesCapteurController : ControllerBase
 {
-    private readonly IConfiguration _config;
+    private readonly IHttpClientFactory _httpClietFactory;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
-    public ImagesCapteurController(IConfiguration config)
+    public ImagesCapteurController(IHttpClientFactory httpClientFactory)
     {
-        _config = config;
+        _httpClietFactory = httpClientFactory;
     }
 
     /// <summary>
@@ -41,11 +41,9 @@ public class ImagesCapteurController : ControllerBase
                                             [FromQuery] string? search,
                                                         CancellationToken token)
     {
-        using var client = new HttpClient();
+        using var client = _httpClietFactory.CreateClient("EmailImageObserver");
 
-        var baseUrl = _config["EmailImageObserverUrl"];
-
-        var route = $"{baseUrl}/api/image?ownerId={id}";
+        string route = $"/api/image?ownerId={id}";
 
         if (take.HasValue)
         {
