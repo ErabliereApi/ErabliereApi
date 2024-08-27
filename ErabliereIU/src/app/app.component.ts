@@ -18,19 +18,25 @@ import { AuthorisationFactoryService } from 'src/authorisation/authorisation-fac
   ]
 })
 export class AppComponent implements OnInit {
-  private _pagesSansMenu = ["apropos"];
   erabliereAIEnable: boolean = false;
   erabliereAIUserRole: boolean = false;
   authService: IAuthorisationSerivce;
 
   constructor(private api: ErabliereApi, authServiceFactory: AuthorisationFactoryService, private msalService: MsalService) {
     this.authService = authServiceFactory.getAuthorisationService();
+    if (this.authService.type == "AzureAD") {
+      this.authService.loginChanged.subscribe(() => {
+        this.checkRoleErabliereAI();
+      });
+      this.msalService.instance.addEventCallback((message) => {
+        this.checkRoleErabliereAI();
+      });
+    }
   }
 
   ngOnInit(): void {
     this.api.getOpenApiSpec().then(spec => {
         this.erabliereAIEnable = spec.paths['/ErabliereAI/Conversations'] !== undefined;
-        console.log("ErabliereAIEnable: " + this.erabliereAIEnable);
     })
     .catch(err => {
         console.error(err);
@@ -40,14 +46,10 @@ export class AppComponent implements OnInit {
     // if so, enable the chat widget
     if (this.authService.type == "AzureAD") {
       this.checkRoleErabliereAI();
-      this.authService.loginChanged.subscribe((val) => {
-        this.checkRoleErabliereAI();
-      });
     }
   }
-
+  
   private checkRoleErabliereAI() {
-    console.log("CheckRoleErabliereAI");
     const account = this.msalService.instance.getActiveAccount();
     if (account?.idTokenClaims) {
       const roles = account?.idTokenClaims['roles'];
@@ -61,6 +63,5 @@ export class AppComponent implements OnInit {
     else {
       this.erabliereAIUserRole = false;
     }
-    console.log("ErabliereAIUserRole: " + this.erabliereAIUserRole);
   }
 }

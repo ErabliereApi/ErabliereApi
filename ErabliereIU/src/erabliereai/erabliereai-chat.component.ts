@@ -1,9 +1,8 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { formatDistanceToNow } from 'date-fns';
-import { HostListener } from '@angular/core';
 import { fr } from 'date-fns/locale';
 import { PromptResponse } from 'src/model/conversation';
 
@@ -59,7 +58,7 @@ export class ErabliereAIComponent {
                     }
                 }
                 else {
-                    var newConversations = conversations.find((c) => {
+                    let newConversations = conversations.find((c) => {
                         return c.id === this.currentConversation.id;
                     });
                     if (newConversations) {
@@ -182,7 +181,7 @@ export class ErabliereAIComponent {
     hideDisplaySearch() {
         this.displaySearch = !this.displaySearch;
 
-        if (this.displaySearch == false) {
+        if (!this.displaySearch) {
             this.search = '';
             this.fetchConversations();
         }

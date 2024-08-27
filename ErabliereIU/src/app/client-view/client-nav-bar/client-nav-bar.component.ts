@@ -48,8 +48,7 @@ export class ClientNavBarComponent implements OnInit {
   checkApiCallFeatureEnable() {
     // look at the openapi spec to see if the call endpoint is enable
     this._api.getOpenApiSpec().then(spec => {
-      this.callFeatureEnable = spec.paths['/Calls/GetAppId'] !== undefined;
-      console.log("CallFeatureEnable: " + this.callFeatureEnable);
+      this.callFeatureEnable = spec.paths['/Calls/GetAppId'] != null;
     })
     .catch(err => {
         console.error(err);
@@ -69,7 +68,6 @@ export class ClientNavBarComponent implements OnInit {
   }
 
   private checkRoleErabliereCalls() {
-    console.log("checkRoleErabliereCalls");
     const account = this._msalService.instance.getActiveAccount();
     if (account?.idTokenClaims) {
       const roles = account?.idTokenClaims['roles'];
@@ -83,7 +81,6 @@ export class ClientNavBarComponent implements OnInit {
     else {
       this.callFeatureEnableForUser = false;
     }
-    console.log("callFeatureEnableForUser: " + this.callFeatureEnableForUser);
   }
 
   private checkRoleAdmin() {
@@ -100,5 +97,6 @@ export class ClientNavBarComponent implements OnInit {
   onLoginChange(loginState: boolean) {
       this.isLoggedIn = loginState;
       this.checkRoleAdmin();
+      this.checkRoleErabliereCalls();
   }
 }

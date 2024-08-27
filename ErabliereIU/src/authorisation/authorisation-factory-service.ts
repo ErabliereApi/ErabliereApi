@@ -18,7 +18,7 @@ export class AuthorisationFactoryService {
 
     getAuthorisationService(): IAuthorisationSerivce {
         if (this._cache == null) {
-            if (this._environment.authEnable == true) {
+            if (this._environment.authEnable) {
                 if (this._environment.tenantId != undefined && this._environment.tenantId?.length > 1) {
                     if (!environment.production && window.Cypress) {
                         this._cache = new AzureADCypressAuthorisationService();
