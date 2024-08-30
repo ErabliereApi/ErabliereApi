@@ -178,7 +178,9 @@ public class NotesController : ControllerBase
             var allowedPeriodiciteValues = new[] { "annuel", "mensuel", "hebdo", "bihebdo", "quotidien", null };
             if (!allowedPeriodiciteValues.Contains(postNote.Rappel.Periodicite, StringComparer.OrdinalIgnoreCase))
             {
-                return BadRequest("Periodicité invalide. Doit être : Annuel, Mensuel, Hebdo, Bihebdo, Quotidien");
+                ModelState.AddModelError("rappel.periodicite", $"Periodicité invalide. Doit être : Annuel, Mensuel, Hebdo, Bihebdo, Quotidien. Était: {postNote.Rappel.Periodicite}");
+
+                return BadRequest(new ValidationProblemDetails(ModelState));
             }
 
             note.Rappel = new Rappel
