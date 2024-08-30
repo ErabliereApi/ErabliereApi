@@ -1,4 +1,6 @@
-﻿namespace ErabliereApi.Donnees.Action.Post;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ErabliereApi.Donnees.Action.Post;
 
 /// <summary>
 /// Modèle pour la génération d'images
@@ -18,6 +20,7 @@ public class PostImagesGenerationModel
     /// <summary>
     /// Taille des images
     /// </summary>
-    /// <example>100x100</example>
+    /// <example>1024x1024</example>
+    [RegularExpression("^(1024x1024|1792x1024|1024x1792)$", ErrorMessage = "La taille devrait être une des suivantes '1024x1024', '1792x1024', '1024x1792'.")]
     public string? Size { get; set; }
 }
