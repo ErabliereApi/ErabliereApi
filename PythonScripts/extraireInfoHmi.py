@@ -16,13 +16,19 @@
 # the location is C:\Users\<USER>\AppData\Local\Tesseract-OCR\
 
 from datetime import datetime as dt
-from datetime import timedelta as td
 from erabliere_api_proxy import ErabliereApiProxy
 import requests
 import os
 import sys
 
-print("Debut execution", (dt.utcnow() - td(hours=5)).strftime("%m/%d/%Y, %H:%M:%S"))
+def get_date():
+  return (dt.now()).strftime("%m/%d/%Y, %H:%M:%S")
+
+print("Debut execution", get_date())
+
+if len(sys.argv) < 1:
+  print("Usage: python extraireInfoHmi.py <url_image>")
+  exit()
 
 print("requests", sys.argv[1])
 response = requests.get(sys.argv[1])
@@ -82,12 +88,9 @@ print("Envoie des données aux adresses suivantes:", sys.argv[2])
 urls = sys.argv[2]
 idErabliere = sys.argv[3]
 
-def getDate():
-  return (dt.utcnow() - td(hours=5)).strftime("%m/%d/%Y, %H:%M:%S")
-
 for url in urls.split(","):
   try:
-    print(getDate(), 'POST to', url)
+    print(get_date(), 'POST to', url)
     
     sslVerify = True
     if url.startswith('[noSslVerify]'):
@@ -104,8 +107,20 @@ for url in urls.split(","):
       if len(temp_precedent) == 1 and temp_precedent[0]['t'] < 0:
         temperature = -77
 
+    try:
+      file_save = "/tmp/{temperature}_{vaccium}_{nb}.jpg"
+      # Check if it is windows
+      if os.name == 'nt':
+          file_save = file_save.replace("/tmp/", "__pycache__\\")
+      file = open(file_save, "wb")
+      print("write file", file_save)
+      file.write(response.content)
+      file.close()
+    except Exception as e:
+      print("erreur lors de la sauvegarde du fichier de cas d'essais", e)
+
     reponse = proxy.envoyer_donnees(idErabliere, temperature, vaccium, nb)
     print("réponse", reponse.status_code)
-    print(getDate(), "terminé.")
+    print(get_date(), "terminé.")
   except Exception as e:
     print("erreur", e)

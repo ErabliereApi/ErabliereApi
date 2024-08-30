@@ -14,6 +14,8 @@ python3 -m venv my-venv
 
 Sous windows:
 ```
+python -m venv my-venv
+.\my-venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
