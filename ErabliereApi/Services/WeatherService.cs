@@ -133,7 +133,7 @@ public class WeatherService : IWeaterService
         try
         {
             string url = 
-$"{AccuWeatherBaseUrl}/forecasts/v1/hourly/12hour/45942_PC?apikey={AccuWeatherApiKey}&language={lang}";
+$"{AccuWeatherBaseUrl}/forecasts/v1/hourly/12hour/{location}?apikey={AccuWeatherApiKey}&language={lang}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
