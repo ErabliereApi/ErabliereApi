@@ -1,5 +1,7 @@
 import { NgFor } from '@angular/common';
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { get } from 'cypress/types/lodash';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Erabliere } from 'src/model/erabliere';
 import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
@@ -19,7 +21,7 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
             </thead>
             <tbody>
                 <tr *ngFor="let forecast of weatherData">
-                    <td>{{ getHour(forecast) }}</td>
+                    <td title={{forecast.link}}>{{ getHour(forecast) }}</td>
                     <td>{{ convertToCelsius(forecast.temperature?.value) }}°C</td>
                     <td>
                         <img 
@@ -38,29 +40,33 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
         NgFor
     ]
 })
-export class HourlyWeatherForecastComponent {
-    @Input() erabliere?: Erabliere;
-
+export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
     weatherData: HourlyWeatherForecast[] = [];
     text?: string;
     error?: any;
     interval?: NodeJS.Timeout;
+    idErabliere: any;
 
-    constructor(private api: ErabliereApi) {
+    constructor(private api: ErabliereApi, private route: ActivatedRoute) {
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (changes['erabliere']) {
+    ngOnInit(): void {
+        this.route.paramMap.subscribe((params) => {
+            this.idErabliere = params.get('idErabliereSelectionee');
+
             if (this.interval != null) {
                 clearInterval(this.interval);
             }
-            if (this.erabliere?.id && this.erabliere?.codePostal) {
+
+            if (this.idErabliere) {
                 this.getWeatherData();
                 this.interval = setInterval(() => {
                     this.getWeatherData();
                 }, 1000 * 60 * 60);
             }
-        }
+        });
+        this.idErabliere = this.route.snapshot.params.idErabliereSelectionee;
+        this.getWeatherData();
     }
 
     ngOnDestroy() {
@@ -68,7 +74,7 @@ export class HourlyWeatherForecastComponent {
     }
 
     getWeatherData() {
-        this.api.geHourlyWeatherForecast(this.erabliere?.id).then((data: HourlyWeatherForecast[]) => {
+        this.api.geHourlyWeatherForecast(this.idErabliere).then((data: HourlyWeatherForecast[]) => {
             this.weatherData = data;
             this.error = null;
         }).catch((error: any) => {
@@ -88,9 +94,9 @@ export class HourlyWeatherForecastComponent {
 
     getHour(_t12: HourlyWeatherForecast): string {
         if (_t12.dateTime) {
-            var date = new Date(_t12.dateTime);
+            const date = new Date(_t12.dateTime);
 
-            var hours = date.getHours();
+            const hours = date.getHours();
 
             return hours + 'h';
         }

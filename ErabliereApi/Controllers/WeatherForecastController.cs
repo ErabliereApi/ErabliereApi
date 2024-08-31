@@ -76,16 +76,17 @@ public class WeatherForecastController
     /// </summary>
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="lang">Paramètre de langue, fr-ca par défaut.</param>
+    /// <param name="cancellationToken">Token d'annulation</param>
     /// <returns>Prévisions météo</returns>
     /// <response code="200">Prévisions météo</response>
     /// <response code="401">Non autorisé</response>
     /// <response code="404">Érablière non trouvée</response>
     [HttpGet("Hourly")]
     [ProducesResponseType(200, Type = typeof(HourlyWeatherForecastResponse[]))]
-    public async Task<IActionResult> GetHourlyWeatherForecast(Guid id, string lang = "fr-ca")
+    public async Task<IActionResult> GetHourlyWeatherForecast(Guid id, string lang = "fr-ca", CancellationToken cancellationToken = default)
     {
         // Résoudre l'érablière
-        var erabliere = await _context.Erabliere.FindAsync(id);
+        var erabliere = await _context.Erabliere.FindAsync([id], cancellationToken);
 
         // Vérifier si l'érablière existe
         if (erabliere == null)

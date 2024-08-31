@@ -7,4 +7,4 @@ Set-Location ErabliereIU
 
 Start-Process npm -ArgumentList "start"
 
-Start-Process "C:\Program Files\JetBrains\WebStorm 2023.3.4\bin\webstorm64.exe" .
+Set-Location ..

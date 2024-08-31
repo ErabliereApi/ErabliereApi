@@ -1,5 +1,5 @@
 <div id="graph-pannel-weather-forecast">
-    <h3>Prévision 5 jours</h3>
+    <h3 title="{{weatherData?.headline?.link}}">Prévision 5 jours</h3>
     @if (error) {
     <div class="alert alert-danger" role="alert">
         {{ error.error }}
