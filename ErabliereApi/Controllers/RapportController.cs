@@ -63,15 +63,15 @@ public class RapportController : ControllerBase
             // Code pour le rapport
             // Pour chaque jour, calculer la température moyenne et le degré jour
             // Ajouter les données au rapport
-            foreach (var donneesJour in triodonnees.GroupBy(d => d.D.Value.Date))
+            foreach (var donneesJour in triodonnees.GroupBy(d => d.D?.Date))
             {
                 // Code pour le rapport
                 // Pour chaque jour, calculer la température moyenne et le degré jour
                 // Ajouter les données au rapport
                 var rapportJour = new PostRapportDegreeJourResponse.RapportDegreeJour
                 {
-                    Date = donneesJour.Key.ToString("yyyy-MM-dd"),
-                    Temperature = (decimal)donneesJour.Average(d => d.T.Value / 10.0)
+                    Date = donneesJour.Key?.ToString("yyyy-MM-dd") ?? "date inconnue",
+                    Temperature = (decimal)donneesJour.Average(d => d.T.GetValueOrDefault() / 10.0)
                 };
 
                 var degreeJour = Math.Max(0, rapportJour.Temperature - rapportDegreeJour.SeuilTemperature);
@@ -105,15 +105,15 @@ public class RapportController : ControllerBase
             // Code pour le rapport
             // Pour chaque jour, calculer la température moyenne et le degré jour
             // Ajouter les données au rapport
-            foreach (var donneesJour in donnees.GroupBy(d => d.D.Value.Date))
+            foreach (var donneesJour in donnees.GroupBy(d => d.D?.Date))
             {
                 // Code pour le rapport
                 // Pour chaque jour, calculer la température moyenne et le degré jour
                 // Ajouter les données au rapport
                 var rapportJour = new PostRapportDegreeJourResponse.RapportDegreeJour
                 {
-                    Date = donneesJour.Key.ToString("yyyy-MM-dd"),
-                    Temperature = (decimal)donneesJour.Average(d => d.Valeur.Value / 10.0)
+                    Date = donneesJour.Key?.ToString("yyyy-MM-dd") ?? "date inconnue",
+                    Temperature = (decimal)donneesJour.Average(d => d.Valeur.GetValueOrDefault() / 10.0)
                 };
 
                 var degreeJour = Math.Max(0, rapportJour.Temperature - rapportDegreeJour.SeuilTemperature);

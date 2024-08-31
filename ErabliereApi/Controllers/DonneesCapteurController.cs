@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace ErabliereApi.Controllers;
 
@@ -41,13 +42,15 @@ public class DonneesCapteurController : ControllerBase
     /// <param name="ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
     /// <param name="dd">Date de début</param>
     /// <param name="df">Date de fin</param>
+    /// <param name="token">Token d'annulation</param>
     /// <response code="200">Une liste de DonneesCapteur.</response>
     [HttpGet]
     [ValiderOwnership("id", typeof(Capteur))]
     public async Task<IEnumerable<GetDonneesCapteur>> Lister(Guid id,
                                                              [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
                                                              DateTimeOffset? dd,
-                                                             DateTimeOffset? df)
+                                                             DateTimeOffset? df,
+                                                             CancellationToken token)
     {
         var donnees = await _depot.DonneesCapteur.AsNoTracking()
                             .Where(b => b.IdCapteur == id &&
@@ -56,7 +59,7 @@ public class DonneesCapteurController : ControllerBase
                                         (df == null || b.D <= df))
                             .OrderBy(b => b.D)
                             .ProjectTo<GetDonneesCapteur>(_mapper.ConfigurationProvider)
-                            .ToArrayAsync();
+                            .ToArrayAsync(token);
 
         if (donnees.Length > 0)
         {
@@ -77,25 +80,27 @@ public class DonneesCapteurController : ControllerBase
     /// <summary>
     /// Liste les données de plusieurs capteurs capteurs
     /// </summary>
-    /// <param name="ids">Identifiant des capteurs</param>
+    /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
     /// <param name="ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
     /// <param name="dd">Date de début</param>
     /// <param name="df">Date de fin</param>
+    /// <param name="token">Token d'annulation</param>
     /// <response code="200">Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</response>
     [HttpGet]
-    [Route("/DonneesCapteur/Grape")]
-    [ValiderOwnership("id", typeof(Capteur))]
+    [Route("/Erablieres/{id}/Capteurs/DonneesCapteur/Grape")]
+    [ValiderOwnership("id")]
     public async IAsyncEnumerable<Pair<Guid, IEnumerable<GetDonneesCapteur>>> ListerPlusieurs(
                                                 [FromQuery] string ids,
                                                 [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
                                                 DateTimeOffset? dd,
-                                                DateTimeOffset? df)
+                                                DateTimeOffset? df,
+                                                [EnumeratorCancellation] CancellationToken token)
     {
         foreach (var idstr in ids.Split(';'))
         {
             var id = Guid.Parse(idstr);
 
-            yield return new Pair<Guid, IEnumerable<GetDonneesCapteur>>(id, await Lister(id, ddr, dd, df));
+            yield return new Pair<Guid, IEnumerable<GetDonneesCapteur>>(id, await Lister(id, ddr, dd, df, token));
         }
     }
 

@@ -35,6 +35,7 @@ public class ErablieresController : ControllerBase
     private readonly IStringLocalizer<ErablieresController> _localizer;
 
     const string ACCESS_NOT_EMPTY = "AccessCannotBeEmpty";
+    const string ACCESS_MUST_BE_IN_0_TO_5 = "AccessMustBeIn0To5";
 
     /// <summary>
     /// Constructeur par initialisation
@@ -457,7 +458,7 @@ public class ErablieresController : ControllerBase
 
         if (access.Access.Value < 0 || access.Access.Value > 15)
         {
-            return BadRequest("L'accès du client doit être compris entre 0 et 15");
+            return BadRequest(_localizer[ACCESS_MUST_BE_IN_0_TO_5]);
         }
 
         if (await _context.CustomerErablieres.AnyAsync(
@@ -503,7 +504,7 @@ public class ErablieresController : ControllerBase
 
         if (access.Access.Value < 0 || access.Access.Value > 15)
         {
-            return BadRequest("L'accès du client doit être compris entre 0 et 15");
+            return BadRequest(_localizer[ACCESS_MUST_BE_IN_0_TO_5]);
         }
 
 
@@ -760,7 +761,7 @@ public class ErablieresController : ControllerBase
 
         if (access.Access.Value < 0 || access.Access.Value > 15)
         {
-            return BadRequest("L'accès du client doit être compris entre 0 et 15");
+            return BadRequest(_localizer[ACCESS_MUST_BE_IN_0_TO_5]);
         }
 
 
@@ -770,7 +771,7 @@ public class ErablieresController : ControllerBase
             return BadRequest($"L'utilisateur avec l'id {idCustomer} a déjà un droit d'accès à l'érablière avec l'id {id}.");
         }
 
-        var entity = await _context.CustomerErablieres.AddAsync(new CustomerErabliere
+        await _context.CustomerErablieres.AddAsync(new CustomerErabliere
         {
             Access = access.Access.Value,
             IdCustomer = idCustomer,
@@ -807,7 +808,7 @@ public class ErablieresController : ControllerBase
 
         if (access.Access.Value < 0 || access.Access.Value > 15)
         {
-            return BadRequest("L'accès du client doit être compris entre 0 et 15");
+            return BadRequest(_localizer[ACCESS_MUST_BE_IN_0_TO_5]);
         }
 
 
