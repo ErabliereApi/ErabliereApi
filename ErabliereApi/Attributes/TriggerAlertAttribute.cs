@@ -34,7 +34,7 @@ public class TriggerAlertAttribute : ActionFilterAttribute
     {
         var id = context.ActionArguments["id"]?.ToString() ?? throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlert'.");
 
-        _idErabliere = Guid.Parse(id ?? throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlert'."));
+        _idErabliere = Guid.Parse(id);
 
         _donnee = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonnee)) as PostDonnee;
     }
@@ -44,7 +44,7 @@ public class TriggerAlertAttribute : ActionFilterAttribute
     {
         var result = await next();
 
-        if (result.Canceled == false)
+        if (!result.Canceled)
         {
             try
             {

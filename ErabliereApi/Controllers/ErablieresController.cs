@@ -508,7 +508,8 @@ public class ErablieresController : ControllerBase
         }
 
 
-        var entity = await _context.CustomerErablieres.FindAsync([idCustomer, id], token) ; 
+        var entity = await _context.CustomerErablieres.FindAsync([idCustomer, id], token);
+         
         if (entity == null)
         {
             return NotFound();

@@ -7,7 +7,7 @@ namespace ErabliereApi.ControllerFeatureProviders;
 /// <summary>
 /// Classe de filtre pour le contrôleur de checkout
 /// </summary>
-public class ErabliereAPIControllerFeatureProvider : ControllerFeatureProvider
+public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
 {
     private readonly IConfiguration _config;
 
@@ -15,7 +15,7 @@ public class ErabliereAPIControllerFeatureProvider : ControllerFeatureProvider
     /// Build a ControllerFeatureProvider that will filter out Stripe integration controllers
     /// base on if there is an api key in the configuration. The key checked is 'Stripe.ApiKey'.
     /// </summary>
-    public ErabliereAPIControllerFeatureProvider(IConfiguration config)
+    public ErabliereApiControllerFeatureProvider(IConfiguration config)
     {
         _config = config;
     }

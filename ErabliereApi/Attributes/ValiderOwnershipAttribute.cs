@@ -191,7 +191,7 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
 
         if (erabliere == null) 
         {
-            erabliere = await context.Erabliere.FindAsync(new object?[] { idGuid }, token);
+            erabliere = await context.Erabliere.FindAsync([idGuid], token);
 
             if (erabliere != null) 
             {

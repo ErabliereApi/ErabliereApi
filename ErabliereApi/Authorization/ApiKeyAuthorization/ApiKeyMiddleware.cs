@@ -46,7 +46,7 @@ public class ApiKeyMiddleware : IMiddleware
                 var apiKeyAuthContext = context.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
 
                 apiKeyAuthContext.Authorize = true;
-                apiKeyAuthContext.Customer = await dbContext.Customers.FindAsync(new object?[] { apiKeyEntity.CustomerId }, cancellationToken: context.RequestAborted);
+                apiKeyAuthContext.Customer = await dbContext.Customers.FindAsync([apiKeyEntity.CustomerId], cancellationToken: context.RequestAborted);
                 apiKeyAuthContext.ApiKey = apiKeyEntity;
             }
             else

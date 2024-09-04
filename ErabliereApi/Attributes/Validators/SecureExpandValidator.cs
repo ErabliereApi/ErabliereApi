@@ -9,29 +9,29 @@ namespace ErabliereApi.Attributes.Validators;
 /// </summary>
 public class SecureExpandValidator : SelectExpandQueryValidator
 {
+    private static readonly string[] _forbiddenExpands = [
+        nameof(Erabliere.Alertes),
+        nameof(Erabliere.Documentations),
+        nameof(Erabliere.Notes),
+        nameof(Erabliere.CustomerErablieres)
+    ];
+
     /// <inheritdoc />
     public override void Validate(SelectExpandQueryOption selectExpandQueryOption, ODataValidationSettings validationSettings)
     {
         string expand = selectExpandQueryOption.RawExpand;
 
-        if (expand.Contains(nameof(Erabliere.Alertes), StringComparison.OrdinalIgnoreCase))
+        if (expand != null) 
         {
-            throw new Microsoft.OData.ODataException($"La requête sur {nameof(Erabliere.Alertes)} n'est pas permise");
-        }
-
-        if (expand.Contains(nameof(Erabliere.Documentations), StringComparison.OrdinalIgnoreCase))
-        {
-            throw new Microsoft.OData.ODataException($"La requête sur {nameof(Erabliere.Documentations)} n'est pas permise");
-        }
-
-        if (expand.Contains(nameof(Erabliere.Notes), StringComparison.OrdinalIgnoreCase))
-        {
-            throw new Microsoft.OData.ODataException($"La requête sur {nameof(Erabliere.Notes)} n'est pas permise");
-        }
-
-        if (expand.Contains(nameof(Erabliere.CustomerErablieres), StringComparison.OrdinalIgnoreCase))
-        {
-            throw new Microsoft.OData.ODataException($"La requête sur {nameof(Erabliere.CustomerErablieres)} n'est pas permise");
+            for (int i = 0; i < _forbiddenExpands.Length; i++)
+            {
+                string forbiddenExpand = _forbiddenExpands[i];
+                
+                if (expand.Contains(forbiddenExpand, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Microsoft.OData.ODataException($"La requête sur {forbiddenExpand} n'est pas permise");
+                }
+            }
         }
 
         base.Validate(selectExpandQueryOption, validationSettings);

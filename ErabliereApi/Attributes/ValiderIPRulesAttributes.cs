@@ -11,6 +11,8 @@ namespace ErabliereApi.Attributes;
 /// </summary>
 public class ValiderIPRulesAttribute : ActionFilterAttribute
 {
+    private const string Key = "X-Real-IP";
+
     /// <summary>
     /// Contructeur par initialisation.
     /// </summary>
@@ -33,7 +35,7 @@ public class ValiderIPRulesAttribute : ActionFilterAttribute
         {
             var depot = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
 
-            erabliere = await depot.Erabliere.FindAsync(new object?[] { id }, context.HttpContext.RequestAborted);
+            erabliere = await depot.Erabliere.FindAsync([id], context.HttpContext.RequestAborted);
 
             if (erabliere != null) 
             {
@@ -42,12 +44,12 @@ public class ValiderIPRulesAttribute : ActionFilterAttribute
         }
         
 
-        if (string.IsNullOrWhiteSpace(erabliere?.IpRule) == false && erabliere.IpRule != "-")
+        if (!string.IsNullOrWhiteSpace(erabliere?.IpRule) && erabliere.IpRule != "-")
         {
             var ip = GetClientIp(context);
 
-            if (context.ModelState.ContainsKey("X-Real-IP") == false &&
-                erabliere.IpRule.Split(';').All(eIp => string.Equals(eIp, ip, StringComparison.OrdinalIgnoreCase) == false))
+            if (!context.ModelState.ContainsKey(Key) &&
+                !Array.TrueForAll(erabliere.IpRule.Split(';'), eIp => string.Equals(eIp, ip, StringComparison.OrdinalIgnoreCase)))
             {
                 context.ModelState.AddModelError("IP", $"L'adresse IP est différente de l'adresse ip aloué pour créer des alimentations à cette érablière. L'adresse IP reçu est {ip}.");
             }
@@ -69,9 +71,9 @@ public class ValiderIPRulesAttribute : ActionFilterAttribute
     /// <returns></returns>
     private static string GetClientIp(ActionExecutingContext context)
     {
-        if (context.HttpContext.Request.Headers.ContainsKey("X-Real-IP"))
+        if (context.HttpContext.Request.Headers.ContainsKey(Key))
         {
-            var ips = context.HttpContext.Request.Headers["X-Real-IP"];
+            var ips = context.HttpContext.Request.Headers[Key];
 
             if (ips.Count == 1)
             {
@@ -80,26 +82,11 @@ public class ValiderIPRulesAttribute : ActionFilterAttribute
 
             else
             {
-                context.ModelState.AddModelError("X-Real-IP", "Une seule entête 'X-Real-IP' doit être trouvé dans la requête.");
+                context.ModelState.AddModelError(Key, "Une seule entête 'X-Real-IP' doit être trouvé dans la requête.");
                 return "";
             }
         }
 
         return context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? throw new InvalidOperationException("Aucune adresse ip distante trouvé.");
-    }
-
-    private static void DebugHeaders(ActionExecutingContext context)
-    {
-        Console.WriteLine($"Debug headers connection id : {context.HttpContext.Connection.Id}");
-
-        foreach (var header in context.HttpContext.Request.Headers)
-        {
-            foreach (var value in header.Value)
-            {
-                Console.WriteLine($"{header.Key}\t\t\t: {value}");
-            }
-        }
-
-        Console.WriteLine("---");
     }
 }

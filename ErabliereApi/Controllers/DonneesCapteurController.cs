@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace ErabliereApi.Controllers;
 
@@ -89,19 +88,28 @@ public class DonneesCapteurController : ControllerBase
     [HttpGet]
     [Route("/Erablieres/{id}/Capteurs/DonneesCapteur/Grape")]
     [ValiderOwnership("id")]
-    public async IAsyncEnumerable<Pair<Guid, IEnumerable<GetDonneesCapteur>>> ListerPlusieurs(
+    [ProducesResponseType(typeof(IEnumerable<Pair<Guid, IEnumerable<GetDonneesCapteur>>>), 200)]
+    public async Task<IActionResult> ListerPlusieurs(
                                                 [FromQuery] string ids,
                                                 [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
                                                 DateTimeOffset? dd,
                                                 DateTimeOffset? df,
-                                                [EnumeratorCancellation] CancellationToken token)
+                                                CancellationToken token)
     {
-        foreach (var idstr in ids.Split(';'))
+        var idsList = ids.Split(';');
+
+        var list = new List<Pair<Guid, IEnumerable<GetDonneesCapteur>>>(idsList.Length);
+
+        foreach (var idstr in idsList)
         {
             var id = Guid.Parse(idstr);
 
-            yield return new Pair<Guid, IEnumerable<GetDonneesCapteur>>(id, await Lister(id, ddr, dd, df, token));
+            var item = await Lister(id, ddr, dd, df, token);
+
+            list.Add(new Pair<Guid, IEnumerable<GetDonneesCapteur>>(id, item));
         }
+
+        return Ok(list);
     }
 
     /// <summary>
@@ -109,12 +117,13 @@ public class DonneesCapteurController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant du capteurs</param>
     /// <param name="donneeCapteur">Le capteur a ajouter</param>
+    /// <param name="token">Token d'annulation</param>
     /// <response code="200">Le capteur a été correctement ajouté.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à ajouter.</response>
     [HttpPost]
     [TriggerAlertV2]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Ajouter(Guid id, PostDonneeCapteur donneeCapteur)
+    public async Task<IActionResult> Ajouter(Guid id, PostDonneeCapteur donneeCapteur, CancellationToken token)
     {
         if (id != donneeCapteur.IdCapteur)
         {
@@ -126,9 +135,9 @@ public class DonneesCapteurController : ControllerBase
             donneeCapteur.D = DateTimeOffset.Now;
         }
 
-        await _depot.DonneesCapteur.AddAsync(_mapper.Map<DonneeCapteur>(donneeCapteur));
+        await _depot.DonneesCapteur.AddAsync(_mapper.Map<DonneeCapteur>(donneeCapteur), token);
 
-        await _depot.SaveChangesAsync();
+        await _depot.SaveChangesAsync(token);
 
         return Ok();
     }
@@ -138,11 +147,12 @@ public class DonneesCapteurController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant du capteur</param>
     /// <param name="capteur">Le capteur a modifier</param>
+    /// <param name="token">Token d'annulation</param>
     /// <response code="200">Le capteur a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à modifier.</response>
     [HttpPut]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Modifier(Guid id, DonneeCapteur capteur)
+    public async Task<IActionResult> Modifier(Guid id, DonneeCapteur capteur, CancellationToken token)
     {
         if (id != capteur.IdCapteur)
         {
@@ -151,7 +161,7 @@ public class DonneesCapteurController : ControllerBase
 
         _depot.Update(capteur);
 
-        await _depot.SaveChangesAsync();
+        await _depot.SaveChangesAsync(token);
 
         return Ok();
     }
@@ -161,11 +171,12 @@ public class DonneesCapteurController : ControllerBase
     /// </summary>
     /// <param name="id">Identifiant du capteur</param>
     /// <param name="capteur">Le capteur a supprimer</param>
-    /// <response code="202">Le capteur a été correctement supprimé.</response>
+    /// <param name="token">Token d'annulation</param>s
+    /// <response code="204">Le capteur a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à supprimer.</response>
     [HttpDelete]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Supprimer(Guid id, DonneeCapteur capteur)
+    public async Task<IActionResult> Supprimer(Guid id, DonneeCapteur capteur, CancellationToken token)
     {
         if (id != capteur.IdCapteur)
         {
@@ -174,7 +185,7 @@ public class DonneesCapteurController : ControllerBase
 
         _depot.Remove(capteur);
 
-        await _depot.SaveChangesAsync();
+        await _depot.SaveChangesAsync(token);
 
         return NoContent();
     }

@@ -29,13 +29,13 @@ public static class Swagger
             c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "v1",
-                Title = "ÉrablièreAPI",
-                Description = "Un API pour assembler les informations de plusieurs appareils électronique de l'érablière",
+                Title = config["SWAGGER_TITLE"] ?? "ÉrablièreAPI",
+                Description = config["SWAGGER_DESCRIPTION"] ?? "API pour l'érablière",
                 Contact = new OpenApiContact
                 {
                     Name = config["SWAGGER_CONTACT_NAME"] ?? string.Empty,
                     Email = config["SWAGGER_CONTACT_EMAIL"] ?? string.Empty,
-                    Url = new Uri("https://github.com/ErabliereApi"),
+                    Url = new Uri(config["SWAGGER_CONTACT_URL"] ?? string.Empty) ?? new Uri(""),
                 },
                 License = new OpenApiLicense
                 {

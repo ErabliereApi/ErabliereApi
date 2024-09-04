@@ -8,12 +8,12 @@ namespace ErabliereApi.Attributes;
 public class SecureEnableQueryAttribute : EnableQueryAttribute
 {
     /// <inheritdoc />
-    public override void ValidateQuery(HttpRequest request, ODataQueryOptions queryOpts)
+    public override void ValidateQuery(HttpRequest request, ODataQueryOptions queryOptions)
     {
-        if (queryOpts.SelectExpand?.RawExpand is not null)
+        if (queryOptions.SelectExpand?.RawExpand is not null)
         {
-            queryOpts.SelectExpand.Validator = new SecureExpandValidator();
+            queryOptions.SelectExpand.Validator = new SecureExpandValidator();
         }
-        base.ValidateQuery(request, queryOpts);
+        base.ValidateQuery(request, queryOptions);
     }
 }
