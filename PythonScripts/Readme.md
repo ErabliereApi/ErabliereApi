@@ -88,3 +88,17 @@ ou en utilisant un environnement virtuel
 ```
 
 > Afin de récupérer l'id du capteur, il est possible de le récupérer dans la page capteur de l'api. Utiliser le bouton dans la colonne 'id' pour copier l'id du capteur.
+
+## Mise à jour automatique des scripts
+
+Afin de mettre à jour automatiquement les scripts, il est possible de créer un cron job sous linux.
+
+```bash
+crontab -e
+```
+
+Ajouter la ligne suivante obtenir une mise à jour quotidienne à minuit.
+
+```bash
+0 0 * * * cd /<path-to-erabliereapi> && git pull
+```
