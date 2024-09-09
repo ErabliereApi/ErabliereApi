@@ -22,7 +22,7 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
     /// Le nom de l'érablière
     /// </summary>
     [Required(ErrorMessage = "Le nom de l'érablière est requis.")]
-    [MaxLength(50, ErrorMessage = "Le nom de l'érablière ne peut pas dépasser 50 caractères.")]
+    [MaxLength(100, ErrorMessage = "Le nom de l'érablière ne peut pas dépasser 100 caractères.")]
     public string? Nom { get; set; }
 
     /// <summary>

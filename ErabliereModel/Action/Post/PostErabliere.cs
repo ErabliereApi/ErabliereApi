@@ -17,14 +17,14 @@ namespace ErabliereApi.Donnees.Action.Post
         /// <summary>
         /// Le nom de l'érablière
         /// </summary>
-        [MaxLength(50)]
+        [MaxLength(100, ErrorMessage = "Le nom de l'érablière ne peut pas dépasser 100 caractères.")]
         [Required(ErrorMessage = "Le nom de l'érablière ne peut pas être vide.")]
         public string? Nom { get; set; }
 
         /// <summary>
         /// Spécifie les ip qui peuvent créer des opérations d'alimentation pour cette érablière.
         /// </summary>
-        [MaxLength(50)]
+        [MaxLength(50, ErrorMessage = "L'adresse IP ne peut pas dépasser 50 caractères.")]
         public string? IpRules { get; set; }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace ErabliereApi.Donnees.Action.Post
         /// <summary>
         /// Code postal, utilisé pour les prédictions météo
         /// </summary>
-        [MaxLength(30)]
+        [MaxLength(30, ErrorMessage = "Le code postal ne peut pas dépasser 30 caractères.")]
         public string? CodePostal { get; set; }
 
         /// <summary>

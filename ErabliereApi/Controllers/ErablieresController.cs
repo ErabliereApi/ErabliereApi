@@ -148,30 +148,69 @@ public class ErablieresController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Ajouter(PostErabliere postErabliere, CancellationToken token)
     {
-        if (string.IsNullOrWhiteSpace(postErabliere.Nom))
-        {
-            ModelState.AddModelError(nameof(postErabliere.Nom), _localizer["NomVide"]);
+        var (isValid, actionResult) = await postErabliere.ValidateAsync(ModelState, _context, _localizer, token);
 
-            return BadRequest(new ValidationProblemDetails(ModelState));
-        }
-        if (await _context.Erabliere.AnyAsync(e => e.Nom == postErabliere.Nom, token))
+        if (!isValid)
         {
-            ModelState.AddModelError(nameof(postErabliere.Nom), string.Format(_localizer["NomExiste"], postErabliere.Nom));
-
-            return BadRequest(new ValidationProblemDetails(ModelState));
-        }
-        if (postErabliere.Id != null) 
-        {
-            var e = await _context.Erabliere.FindAsync([postErabliere.Id], token);
-
-            if (e != null) 
+            if (actionResult != null)
             {
-                ModelState.AddModelError(nameof(postErabliere.Id), string.Format(_localizer["IdExiste"], postErabliere.Id));
-        
-                return Conflict(new ValidationProblemDetails(ModelState));
+                return actionResult;
+            }
+            return BadRequest();
+        }
+
+        var erabliere = await AddErabliereAsync(postErabliere, token);
+
+        if (erabliere.Item2 != null)
+        {
+            return erabliere.Item2;
+        }
+
+        await _context.SaveChangesAsync(token);
+
+        return Ok(new { id = erabliere.Item1?.Id });
+    }
+
+    /// <summary>
+    /// Importer des érablières
+    /// </summary>
+    [HttpPost("[action]")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    public async Task<IActionResult> Import(PostErabliere[] postErablieres, CancellationToken token)
+    {
+        foreach (var postErabliere in postErablieres)
+        {
+            var (isValid, actionResult) = await postErabliere.ValidateAsync(ModelState, _context, _localizer, token);
+
+            if (!isValid)
+            {
+                if (actionResult != null)
+                {
+                    return actionResult;
+                }
+                return BadRequest();
             }
         }
 
+        foreach (var postErabliere in postErablieres)
+        {
+            var erabliere = await AddErabliereAsync(postErabliere, token);
+
+            if (erabliere.Item2 != null)
+            {
+                return erabliere.Item2;
+            }
+        }
+
+        var count = await _context.SaveChangesAsync(token);
+
+        return Ok(new {
+            count
+        });
+    }
+
+    private async Task<(Erabliere?, IActionResult?)> AddErabliereAsync(PostErabliere postErabliere, CancellationToken token)
+    {
         var erabliere = _mapper.Map<Erabliere>(postErabliere);
 
         var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
@@ -193,7 +232,7 @@ public class ErablieresController : ControllerBase
             {
                 ModelState.AddModelError("IsPublic", _localizer["EnforceIsPublic"]);
 
-                return BadRequest(new ValidationProblemDetails(ModelState));
+                return (null, BadRequest(new ValidationProblemDetails(ModelState)));
             }
         }
 
@@ -220,9 +259,7 @@ public class ErablieresController : ControllerBase
             }
         }
 
-        await _context.SaveChangesAsync(token);
-
-        return Ok(new { id = entity.Entity.Id });
+        return (entity.Entity, null);
     }
 
     private async Task<(bool, string, Customer?)> IsAuthenticatedAsync(CancellationToken token)

@@ -54,8 +54,10 @@ public static class RegisterExtension
 
             config.CreateMap<PostErabliere, Erabliere>()
                   .ForMember(e => e.IpRule, a => a.MapFrom(p => p.IpRules))
+                  .ForMember(e => e.CodePostal, a => a.MapFrom(p => p.CodePostal != null ? p.CodePostal.Trim() : null))
                   .ReverseMap()
-                  .ForMember(p => p.IpRules, a => a.MapFrom(e => e.IpRule));
+                  .ForMember(p => p.IpRules, a => a.MapFrom(e => e.IpRule))
+                  .ForMember(p => p.CodePostal, a => a.MapFrom(e => e.CodePostal != null ? e.CodePostal.Trim() : null));
             config.CreateMap<PostCapteur, Capteur>();
             config.CreateMap<PostDonnee, Donnee>();
             config.CreateMap<PostDonneeCapteur, DonneeCapteur>()

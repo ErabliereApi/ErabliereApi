@@ -17,13 +17,13 @@ public class PutErabliere
     /// <summary>
     /// Le nouveau nom de l'érablière, si le nom est modifié
     /// </summary>
-    [MaxLength(50)]
+    [MaxLength(100, ErrorMessage = "Le nom de l'érablière ne peut pas dépasser 100 caractères.")]
     public string? Nom { get; set; }
 
     /// <summary>
     /// Spécifie les ip qui peuvent créer des opérations d'alimentation pour cette érablière. Doivent être séparé par des ';'
     /// </summary>
-    [MaxLength(50)]
+    [MaxLength(50, ErrorMessage = "L'adresse IP ne peut pas dépasser 50 caractères.")]
     public string? IpRule { get; set; }
 
     /// <summary>
@@ -34,6 +34,7 @@ public class PutErabliere
     /// <summary>
     /// Code postal utilisé pour les prédictions météo
     /// </summary>
+    [MaxLength(30, ErrorMessage = "Le code postal ne peut pas dépasser 30 caractères.")]
     public string? CodePostal { get; set; }
 
     /// <summary>
