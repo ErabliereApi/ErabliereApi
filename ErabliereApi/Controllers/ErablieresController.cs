@@ -67,10 +67,6 @@ public class ErablieresController : ControllerBase
     /// <summary>
     /// Liste les érablières
     /// </summary>
-    /// <param name="my">
-    /// Indique si les érablière retourné seront ceux ayant un lien 
-    /// d'appartenance à l'usager authentifier.
-    /// </param>
     /// <param name="orderby">Ordre de tri</param>
     /// <param name="filter">Filtre</param>
     /// <param name="top">Nombre d'érablière à retourner</param>
@@ -80,7 +76,6 @@ public class ErablieresController : ControllerBase
     [SecureEnableQuery(MaxTop = TakeErabliereNbMax)]
     [AllowAnonymous]
     public async Task<IQueryable<Erabliere>> ListerAsync(
-        [FromQuery] bool my, 
         [FromQuery(Name = "$orderby")] string? orderby,
         [FromQuery(Name = "$filter")] string? filter,
         [FromQuery(Name = "$top")] int? top,
@@ -88,15 +83,15 @@ public class ErablieresController : ControllerBase
     {
         var query = _context.Erabliere.AsNoTracking();
 
+        var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
+
         if (_config.IsAuthEnabled() &&
-            (!(await IsAuthenticatedAsync(token)).Item1))
+            (!isAuthenticate))
         {
             query = query.Where(e => e.IsPublic);
         }
-        else if (my)
+        else
         {
-            var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
-
             if (isAuthenticate && customer != null)
             {
                 Guid?[] erablieresOwned
@@ -108,13 +103,17 @@ public class ErablieresController : ControllerBase
 
                 query = query.Where(e => erablieresOwned.Contains(e.Id));
             }
+            else if (isAuthenticate && customer == null)
+            {
+                throw new InvalidOperationException("The user is authenticated, but there is no customer...");
+            }
         }
 
         HttpContext.Response.Headers.Append("X-ErabliereTotal", (await query.CountAsync(token)).ToString());
 
         if (string.IsNullOrWhiteSpace(orderby))
         {
-            query = query.OrderBy(e => e.IndiceOrdre).ThenBy(e => e.Nom);
+            query = query.OrderBy(e => e.IndiceOrdre ?? int.MaxValue).ThenBy(e => e.Nom);
         }
 
         if (string.IsNullOrWhiteSpace(filter))
