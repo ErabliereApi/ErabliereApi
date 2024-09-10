@@ -27,7 +27,7 @@ export class AgoraCallServiceComponent {
 
     showPhoneForm() {
         this.showPhone = true;
-        this.api.getErablieres(true).then((data) => {
+        this.api.getErablieres(20).then((data) => {
             this.erablieres = data;
         });
     }

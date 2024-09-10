@@ -51,9 +51,16 @@ export class ErabliereApi {
         return new Erabliere();
     }
 
-    async getErablieres(my: boolean): Promise<Erabliere[]> {
+    async getErablieres(top?: number, search?: string): Promise<Erabliere[]> {
         const headers = await this.getHeaders();
-        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/erablieres?my=' + my, { headers: headers }));
+        if (!top) {
+            top = 10;
+        }
+        let url = this._environmentService.apiUrl + '/erablieres?$top=' + top;
+        if (search) {
+            url += "&$filter=contains(nom, '" + search + "') or contains(codePostal, '" + search + "')";
+        }
+        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(url, { headers: headers }));
         return rtn ?? [];
     }
 

@@ -30,6 +30,9 @@ export class ErabliereSideBarComponent implements OnInit {
   erabliereSelectionnee?: Erabliere;
   loggedIn: boolean = false;
 
+  search: string = "";
+  displaySearch: boolean = false;
+
   constructor(private _erabliereApi: ErabliereApi,
       authFactory: AuthorisationFactoryService,
       private _router: Router) {
@@ -39,19 +42,18 @@ export class ErabliereSideBarComponent implements OnInit {
     }
     this._authService.loginChanged.subscribe(loggedIn => {
       this.loggedIn = loggedIn;
-      if (loggedIn) {
-        this.loadErablieresPage();
-      }
-      else {
-        this.erablieres = [];
-        this.etat = "Vous n'êtes pas connecté";
-      }
     });
   }
 
   async ngOnInit() {
     this.loggedIn = await this._authService.isLoggedIn();
 
+    await this.loadErablieresPage();
+  }
+
+  async searchChanged($event: any) {
+    this.search = $event.target.value;
+    this.displaySearch = true;
     await this.loadErablieresPage();
   }
 
@@ -64,28 +66,19 @@ export class ErabliereSideBarComponent implements OnInit {
 
     this.etat = titreChargement;
 
-    const erablieres = await (this._erabliereApi.getErablieres(true).catch(err => {
+    const erablieres = await (this._erabliereApi.getErablieres(10, this.search).catch(err => {
       console.error(err);
       this.etat = "Erreur lors du chargement des érablieres";
     }));
 
     if (erablieres != null) {
-      this.erablieres = erablieres.sort((a, b) => {
-        if (a.indiceOrdre != null && b.indiceOrdre == null) {
-          return -1;
-        }
-        else if (b.indiceOrdre != null && a.indiceOrdre == null) {
-          return 1;
-        }
-        else if (a.indiceOrdre != null && b.indiceOrdre != null) {
-          return a.indiceOrdre - b.indiceOrdre;
-        }
-
-        return a.nom?.localeCompare(b.nom ?? "") ?? 0;
-      });
+      this.erablieres = erablieres;
 
       if (this.erablieres.length > 0) {
         this.etat = "Chargement des erablieres terminé";
+        if (this.erablieres.length >= 10 && !this.search) {
+          this.displaySearch = true;
+        }
 
         this.erabliereSelectionnee = this.erablieres.find(e => e.id === this.idSelectionne);
         if(!this.erabliereSelectionnee) {
@@ -99,6 +92,9 @@ export class ErabliereSideBarComponent implements OnInit {
         this.etat = "Aucune erablière";
         this.thereIsAtLeastOneErabliere = false;
         this.thereIsAtLeastOneErabliereChange.emit(false);
+        if (this.search == "") {
+          this.displaySearch = false;
+        }
       }
     }
   }

@@ -30,6 +30,17 @@
             }
         </a>
         }
+        @if (displaySearch) {
+            <li class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Rechercher une erablière" 
+                        (keyup)="searchChanged($event)" />
+                </div>
+            </li>
+        }
         @if (loggedIn) {
         <button
             class="list-group-item list-group-item-action"
