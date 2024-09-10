@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0eef1e21-cfed-4fdd-be25-f84423292b97",
+		"_postman_id": "da6f8554-3a83-475f-aff4-007b5880d1ab",
 		"name": "ErablièreAPI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "6202256"
@@ -211,7 +211,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"nom\": \"Érablière B\",\r\n  \"ipRules\": \"192.160.45.45\",\r\n  \"indiceOrdre\": 0,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
+							"raw": "{\r\n  \"nom\": \"Érablière B\",\r\n  \"ipRules\": \"192.160.45.45\",\r\n  \"indiceOrdre\": 1,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -282,7 +282,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"nom\": \"Érablière Saint-Alfred\",\r\n  \"ipRules\": \"-\",\r\n  \"indiceOrdre\": 0,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
+							"raw": "{\r\n  \"nom\": \"Érablière Saint-Alfred\",\r\n  \"ipRules\": \"-\",\r\n  \"indiceOrdre\": 2,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

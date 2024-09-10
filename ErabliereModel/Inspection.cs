@@ -8,7 +8,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Modèle représentant une inspection
 /// </summary>
-public class Inspection : IIdentifiable<Guid?, Inspection>, IErabliereOwnable
+public class Inspection : IIdentifiable<Guid?, Inspection>, IErabliereOwnable, IDatesInfo
 {
     /// <summary>
     /// La clé primaire de l'inspection
@@ -42,6 +42,9 @@ public class Inspection : IIdentifiable<Guid?, Inspection>, IErabliereOwnable
     /// Les données d'inspection associées à l'inspection
     /// </summary>
     public List<InspectionDonnees> Donnees { get; set; } = new List<InspectionDonnees>();
+
+    /// <inheritdoc />
+    public DateTimeOffset? DC { get; set; }
 
     /// <summary>
     /// Compare les inspections par date

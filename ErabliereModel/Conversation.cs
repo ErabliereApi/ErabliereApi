@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using ErabliereApi.Donnees.Interfaces;
 
 /// <summary>
-/// Entité représentant une conversation entre avec ErabliereAI.
+/// EntitÃ© reprÃ©sentant une conversation entre avec ErabliereAI.
 /// </summary>
 public class Conversation : IIdentifiable<Guid?, Conversation>
 {
     /// <summary>
-    /// La clé primaire de la conversation.
+    /// La clÃ© primaire de la conversation.
     /// </summary>
     public Guid? Id { get; set; }
 
@@ -25,12 +25,12 @@ public class Conversation : IIdentifiable<Guid?, Conversation>
     public string? Name { get; set; }
 
     /// <summary>
-    /// La date de création de la conversation.
+    /// La date de crÃ©ation de la conversation.
     /// </summary>
     public DateTimeOffset? CreatedOn { get; set; }
 
     /// <summary>
-    /// La date du dernier message envoyé
+    /// La date du dernier message envoyÃ©.
     /// </summary>
     public DateTimeOffset? LastMessageDate { get; set; }
 

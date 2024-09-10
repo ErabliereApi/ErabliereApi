@@ -44,7 +44,8 @@ public static class ErabliereFixture
                                            .Without(e => e.Inspections)
                                            .Without(e => e.CustomerErablieres));
 
-        fixture.Customize<Capteur>(c => c.Without(cc => cc.Erabliere));
+        fixture.Customize<Capteur>(c => c.Without(cc => cc.Erabliere)
+                                         .Without(cc => cc.Appareil));
 
         fixture.Customize<CapteurImage>(ci => ci.Without(cc => cc.Erabliere));
 

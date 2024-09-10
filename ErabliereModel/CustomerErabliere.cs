@@ -1,11 +1,12 @@
 using System;
+using ErabliereApi.Donnees.Interfaces;
 
 namespace ErabliereApi.Donnees;
 
 /// <summary>
 /// Jonction entre les érablières et les utilisateurs
 /// </summary>
-public class CustomerErabliere
+public class CustomerErabliere : IDatesInfo
 {
     /// <summary>
     /// Id de l'érablière
@@ -51,6 +52,16 @@ public class CustomerErabliere
     /// 15 (1111): GET + POST + PUT + DELETE
     /// </summary>
     public byte Access { get; set; }
+
+    /// <summary>
+    /// Indique l'ordre de tri des érablières de l'utilisateur
+    /// </summary>
+    public int? IndiceOrdre { get; set; }
+
+    /// <summary>
+    /// La date de création
+    /// </summary>
+    public DateTimeOffset? DC { get; set; }
 
     /// <inheritdoc />
     public int CompareTo(CustomerErabliere? other)

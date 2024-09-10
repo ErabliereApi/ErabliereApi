@@ -42,7 +42,7 @@ public class Donnee : IIdentifiable<Guid?, Donnee>, IErabliereOwnable
     public Guid? IdErabliere { get; set; }
 
     /// <summary>
-    /// L'erabliere relié à la donn�e
+    /// L'erabliere relié à la donnée
     /// </summary>
     public Erabliere? Erabliere { get; set; }
 
@@ -54,7 +54,7 @@ public class Donnee : IIdentifiable<Guid?, Donnee>, IErabliereOwnable
     public int? PI { get; set; }
 
     /// <summary>
-    /// Nombre d'occurence enrgistrer de cette donn�e
+    /// Nombre d'occurence enrgistrer de cette donnée
     /// </summary>
     public int Nboc { get; set; }
 

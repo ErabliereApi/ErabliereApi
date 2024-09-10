@@ -45,6 +45,7 @@ public class DonneesCapteurController : ControllerBase
     /// <response code="200">Une liste de DonneesCapteur.</response>
     [HttpGet]
     [ValiderOwnership("id", typeof(Capteur))]
+    [AllowAnonymous]
     public async Task<IEnumerable<GetDonneesCapteur>> Lister(Guid id,
                                                              [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
                                                              DateTimeOffset? dd,

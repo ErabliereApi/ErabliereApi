@@ -11,7 +11,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Modèle représentant une érablière
 /// </summary>
-public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocalizable
+public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocalizable, IDatesInfo
 {
     /// <summary>
     /// L'id de l'érablière
@@ -138,6 +138,9 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
 
     /// <inheritdoc />
     public double Longitude { get; set; }
+
+    /// <inheritdoc />
+    public DateTimeOffset? DC { get; set; }
 
     /// <inheritdoc />
     public int CompareTo([AllowNull] Erabliere other)

@@ -4,6 +4,7 @@ using ErabliereApi.Depot.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Depot.Sql.Migrations
 {
     [DbContext(typeof(ErabliereDbContext))]
-    partial class ErabliereDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240910122713_AjoutAppareilEtIndiceOrdre")]
+    partial class AjoutAppareilEtIndiceOrdre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,9 +188,6 @@ namespace Depot.Sql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DC")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -316,9 +316,6 @@ namespace Depot.Sql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DC")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<Guid?>("IdErabliere")
                         .HasColumnType("uniqueidentifier");
 
@@ -424,9 +421,6 @@ namespace Depot.Sql.Migrations
 
                     b.Property<byte>("Access")
                         .HasColumnType("tinyint");
-
-                    b.Property<DateTimeOffset?>("DC")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<int?>("IndiceOrdre")
                         .HasColumnType("int");
@@ -591,9 +585,6 @@ namespace Depot.Sql.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<DateTimeOffset?>("DC")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<byte?>("DimensionPanneauImage")
                         .HasColumnType("tinyint");
 
@@ -628,9 +619,6 @@ namespace Depot.Sql.Migrations
                     b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("DC")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -734,9 +722,6 @@ namespace Depot.Sql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DC")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<DateTimeOffset?>("DateRappel")
                         .HasColumnType("datetimeoffset");
 
@@ -771,8 +756,8 @@ namespace Depot.Sql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DC")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("ErabliereId")
                         .HasColumnType("uniqueidentifier");

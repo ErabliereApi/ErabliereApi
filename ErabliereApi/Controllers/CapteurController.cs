@@ -116,6 +116,33 @@ public class CapteursController : ControllerBase
     }
 
     /// <summary>
+    /// Action pour ajouter une liste de capteurs à chaque erabliere d'un filtre
+    /// </summary>
+    /// <param name="capteurs">La liste de capteurs à ajouter</param>
+    /// <param name="token">Le jeton d'annulation</param>
+    /// <response code="204">Les capteurs ont été correctement ajoutés.</response>
+    [HttpPost("/Capteurs/AjouterListe")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    public async Task<IActionResult> AjouterListe(PostCapteur[] capteurs, CancellationToken token)
+    {
+        var erablieres = await _depot.Erabliere.ToArrayAsync(token);
+
+        foreach (var erabliere in erablieres)
+        {
+            foreach (var capteur in capteurs)
+            {
+                capteur.IdErabliere = erabliere.Id;
+
+                var entity = await _depot.Capteurs.AddAsync(_mapper.Map<Capteur>(capteur), token);
+            }
+        }
+
+        await _depot.SaveChangesAsync(token);
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Modifier une liste de capteurs
     /// </summary>
     /// <param name="id">L'identifiant de l'érablière</param>

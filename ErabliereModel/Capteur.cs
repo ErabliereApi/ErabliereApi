@@ -9,7 +9,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Représente un capteur
 /// </summary>
-public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocalizable
+public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocalizable, IDatesInfo
 {
     /// <summary>
     /// L'id de l'occurence
@@ -114,6 +114,16 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
 
     /// <inheritdoc />
     public double Longitude { get; set; }
+
+    /// <summary>
+    /// L'appareil relié au capteur
+    /// </summary>
+    public Appareil? Appareil { get; set; }
+
+    /// <summary>
+    /// Id de l'appareil
+    /// </summary>
+    public Guid? AppareilId { get; set; }
 
     /// <inheritdoc />
     public int CompareTo(Capteur? other)

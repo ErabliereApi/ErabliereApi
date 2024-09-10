@@ -8,7 +8,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Modèle d'un rapport
 /// </summary>
-public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable
+public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesInfo
 {
     /// <summary>
     /// Clé primaire du rapport
@@ -34,14 +34,12 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable
     public string RequestParameters { get; set; } = string.Empty;
 
     /// <summary>
-    /// Date de création du rapport
-    /// </summary>
-    public DateTime DateCreation { get; set; }
-
-    /// <summary>
     /// Données du rapport
     /// </summary>
     public List<RapportDonnees> Donnees { get; set; } = new List<RapportDonnees>();
+
+    /// <inheritdoc />
+    public DateTimeOffset? DC { get; set; }
 
     /// <summary>
     /// Compare les rapports par date de création
@@ -50,11 +48,16 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable
     /// <returns></returns>
     public int CompareTo(Rapport? other)
     {
-        if (other == null)
+        if (other?.DC == null)
         {
             return 1;
         }
 
-        return DateCreation.CompareTo(other.DateCreation);
+        if (DC == null)
+        {
+            return -1;
+        }
+
+        return DC.Value.CompareTo(other.DC.Value);
     }
 }
