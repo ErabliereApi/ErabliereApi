@@ -5,8 +5,10 @@
             <th class="min"></th>
             <th>Nom</th>
             <th>Code Postal</th>
+            <th>Règle IP</th>
             <th>Publique</th>
             <th>Nombre d'utilisateurs</th>
+            <th>Date de création</th>
             <th class="min"></th>
         </tr>
         </thead>
@@ -28,12 +30,14 @@
                     </td>
                     <td>{{erabliere.nom}}</td>
                     <td>{{erabliere.codePostal}}</td>
+                    <td>{{erabliere.ipRule}}</td>
                     @if (erabliere.isPublic) {
                     <td>&check;</td>
                     } @else {
                     <td>&cross;</td>
                     }
                     <td>{{ erabliere.customerErablieres?.length }}</td>
+                    <td>{{ erabliere.dc }}</td>
                     <td class="min">
                         <button
                             type="button"

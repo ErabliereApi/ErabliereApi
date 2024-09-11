@@ -9,6 +9,16 @@
     }
 
     <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col mb-2">
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Rechercher"
+                    (keyup)="rechercher($event)" />
+            </div>
+        </div>
+
         <erabliere-list
             [erablieres]="erablieres"
             (erabliereASupprimer)="supprimerErabliere($event)"

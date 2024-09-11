@@ -70,9 +70,19 @@ export class ErabliereApi {
         return rtn ?? [];
     }
 
-    async getErablieresAdminExpandAccess(): Promise<Erabliere[]> {
+    async getErablieresAdminExpandAccess(search?: string, top?: number, skip?: number): Promise<Erabliere[]> {
         const headers = await this.getHeaders();
-        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(this._environmentService.apiUrl + '/admin/erablieres?$expand=customerErablieres', { headers: headers }));
+        let url = this._environmentService.apiUrl + '/admin/erablieres?$expand=customerErablieres';
+        if (top) {
+            url += "&$top=" + top;
+        }
+        if (skip) {
+            url += "&$skip=" + skip;
+        }
+        if (search) {
+            url += "&$filter=contains(nom, '" + search + "') or contains(codePostal, '" + search + "')";
+        }
+        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(url, { headers: headers }));
         return rtn ?? [];
     }
 

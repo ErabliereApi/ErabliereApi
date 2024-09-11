@@ -52,10 +52,22 @@ export class ModifierErabliereComponent implements OnInit {
                     updateOn: 'blur'
                 }
             ),
+            ipRule: new FormControl(
+                this.erabliere?.ipRule,
+                {
+                    updateOn: 'blur'
+                }
+            ),
             isPublic: new FormControl(
                 this.erabliere?.isPublic,
                 {
                     validators: [Validators.required],
+                    updateOn: 'blur'
+                }
+            ),
+            dc: new FormControl(
+                this.erabliere?.dc,
+                {
                     updateOn: 'blur'
                 }
             )
@@ -81,6 +93,9 @@ export class ModifierErabliereComponent implements OnInit {
         this.erabliere.nom = this.erabliereForm.controls['nom'].value;
         this.erabliere.codePostal = this.erabliereForm.controls['codePostal'].value;
         this.erabliere.isPublic = this.erabliereForm.controls['isPublic'].value;
+        this.erabliere.ipRule = this.erabliereForm.controls['ipRule'].value;
+        this.erabliere.dc = this.erabliereForm.controls['dc'].value?.toString().trim() == '' ?
+                                 null : this.erabliereForm.controls['dc'].value;
 
         this._api.putErabliereAdmin(this.erabliere)
             .then(r => {

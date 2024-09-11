@@ -72,7 +72,12 @@ export class ErabliereSideBarComponent implements OnInit {
     }));
 
     if (erablieres != null) {
-      this.erablieres = erablieres;
+      this.erablieres = erablieres.sort((a, b) => {
+        let ioa = a.indiceOrdre ?? 2_147_483_647;
+        let iob = b.indiceOrdre ?? 2_147_483_647;
+
+        return ioa - iob;
+      });
 
       if (this.erablieres.length > 0) {
         this.etat = "Chargement des erablieres terminé";

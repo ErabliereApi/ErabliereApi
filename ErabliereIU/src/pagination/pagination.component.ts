@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {OnInit} from "@angular/core";
 
 @Component({
     selector: 'app-pagination',
@@ -13,7 +12,6 @@ export class PaginationComponent implements OnChanges {
     @Input() nombreElements: number = 1;
     @Output() changementDePageEvent = new EventEmitter<number>();
 
-    // Initialise un tableau avec le numéro des pages pour l'affichage dans le template
     pages: Array<number> = [];
 
     pageActuelle: number = 1;

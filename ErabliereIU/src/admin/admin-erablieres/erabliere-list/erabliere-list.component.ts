@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Erabliere} from "../../../model/erabliere";
-import {AdminErabliereAccessListComponent} from "../../../access/erabliere-access-list/admin-erabliere-access-list.component";
-import {CustomerAccess} from "../../../model/customerAccess";
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Erabliere } from "../../../model/erabliere";
+import { AdminErabliereAccessListComponent } from "../../../access/erabliere-access-list/admin-erabliere-access-list.component";
+import { CustomerAccess } from "../../../model/customerAccess";
 
 @Component({
     selector: 'erabliere-list',

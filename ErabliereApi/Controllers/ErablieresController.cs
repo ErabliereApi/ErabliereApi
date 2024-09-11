@@ -633,7 +633,7 @@ public class ErablieresController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> ModifierAdmin(Guid id, PutErabliere erabliere, CancellationToken token)
+    public async Task<IActionResult> ModifierAdmin(Guid id, PutAdminErabliere erabliere, CancellationToken token)
     {
         if (id != erabliere.Id)
         {
@@ -692,6 +692,11 @@ public class ErablieresController : ControllerBase
         if (erabliere.IsPublic.HasValue)
         {
             entity.IsPublic = erabliere.IsPublic.Value;
+        }
+
+        if (erabliere.DC.HasValue)
+        {
+            entity.DC = erabliere.DC.Value;
         }
 
         _context.Erabliere.Update(entity);

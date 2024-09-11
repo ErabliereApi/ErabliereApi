@@ -1,4 +1,4 @@
-<div>
+<div class="mb-2">
     <span class="text-danger">
         {{generalError}}
     </span>
@@ -13,12 +13,24 @@
             <input class="form-control" type="text" formControlName="codePostal" id="modifier-customer-code-postal">
             <input-error [errorObj]="errorObj" [controlName]="'codePostal'"></input-error>
         </div>
+        <div [class]="'form-group mb-3' + (erabliereForm.controls['ipRule'].touched ? ' was-validated' : '')">
+            <label class="form-label" for="modifier-customer-ipRule">Règle IP: </label>
+            <input class="form-control" type="text" formControlName="ipRule" id="modifier-customer-ipRule" required>
+            <input-error [errorObj]="errorObj" [controlName]="'ipRule'"></input-error>
+        </div>
         <div class="form-group form-check form-switch mb-3">
             <label class="form-check-label" for="modifier-customer-is-public">Est publique</label>
             <input class="form-check-input" type="checkbox" formControlName="isPublic" id="modifier-customer-is-public">
             <input-error [errorObj]="errorObj" [controlName]="'isPublic'"></input-error>
         </div>
-        <button id="modifierErabliere" class="btn btn-primary me-2" type="submit">Modifier</button>
-        <button id="annulerModifierErabliere" class="btn btn-secondary" type="button" (click)="onAnnuler()">Annuler</button>
+        <div [class]="'form-group mb-3' + (erabliereForm.controls['dc'].touched ? ' was-validated' : '')">
+            <label class="form-label" for="modifier-customer-ipRule">Date de création: </label>
+            <input class="form-control" type="date" formControlName="dc" id="modifier-customer-dc">
+            <input-error [errorObj]="errorObj" [controlName]="'dc'"></input-error>
+        </div>
+        <div class="form-group mt-3">
+            <button id="modifierErabliere" class="btn btn-primary me-2" type="submit">Modifier</button>
+            <button id="annulerModifierErabliere" class="btn btn-secondary" type="button" (click)="onAnnuler()">Annuler</button>
+        </div>
     </form>
 </div>
