@@ -146,7 +146,7 @@ public class CapteursController : ControllerBase
             query = query.Where(e => EF.Functions.Like(e.Nom, $"%{nameLike}%"));
         }
 
-        var erablieres = await _depot.Erabliere.ToArrayAsync(token);
+        var erablieres = await query.ToArrayAsync(token);
 
         foreach (var erabliere in erablieres)
         {
