@@ -118,13 +118,34 @@ public class CapteursController : ControllerBase
     /// <summary>
     /// Action pour ajouter une liste de capteurs à chaque erabliere d'un filtre
     /// </summary>
+    /// <param name="nameLike">Permet de filtrer les érablières recherchées selon leur nom</param>
+    /// <param name="dcNull">Permet de filtrer les érablières qui n'ont pas de date de création</param>
     /// <param name="capteurs">La liste de capteurs à ajouter</param>
     /// <param name="token">Le jeton d'annulation</param>
     /// <response code="204">Les capteurs ont été correctement ajoutés.</response>
     [HttpPost("/Capteurs/AjouterListe")]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
-    public async Task<IActionResult> AjouterListe(PostCapteur[] capteurs, CancellationToken token)
+    public async Task<IActionResult> AjouterListe([FromQuery] string? nameLike, [FromQuery] bool? dcNull, [FromBody] PostCapteur[] capteurs, CancellationToken token)
     {
+        var query = _depot.Erabliere.AsQueryable();
+
+        if (dcNull.HasValue)
+        {
+            if (dcNull.Value)
+            {
+                query = query.Where(e => e.DC == null);
+            }
+            else
+            {
+                query = query.Where(e => e.DC != null);
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(nameLike))
+        {
+            query = query.Where(e => EF.Functions.Like(e.Nom, $"%{nameLike}%"));
+        }
+
         var erablieres = await _depot.Erabliere.ToArrayAsync(token);
 
         foreach (var erabliere in erablieres)
