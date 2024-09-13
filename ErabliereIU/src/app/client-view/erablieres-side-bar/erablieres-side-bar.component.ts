@@ -40,8 +40,11 @@ export class ErabliereSideBarComponent implements OnInit {
     if (this._authService.type == "AuthDisabled") {
       this.authDisabled = true;
     }
-    this._authService.loginChanged.subscribe(loggedIn => {
+    this._authService.loginChanged.subscribe(async loggedIn => {
       this.loggedIn = loggedIn;
+      console.log("erablieres-side-bar: logged in changed. New value is " + loggedIn);
+      this.erablieres = [];
+      await this.loadErablieresPage();
     });
   }
 
