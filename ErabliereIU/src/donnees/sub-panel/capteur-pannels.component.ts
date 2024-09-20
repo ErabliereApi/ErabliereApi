@@ -4,6 +4,7 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Capteur } from 'src/model/capteur';
 import { Erabliere } from 'src/model/erabliere';
 import { GraphPannelComponent } from './graph-pannel.component';
+import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
 
 @Component({
     selector: 'capteur-pannels',
@@ -14,10 +15,19 @@ import { GraphPannelComponent } from './graph-pannel.component';
 export class CapteurPannelsComponent implements OnChanges {
     @Input() capteurs?: Capteur[] = []
     @Input() erabliere?: Erabliere
+    isLogged: boolean = false;
 
     public tailleGraphiques?: number = 6;
 
-    constructor(private _api: ErabliereApi) {
+    constructor(private _api: ErabliereApi, private _authService: AuthorisationFactoryService) {
+        if (this._authService.getAuthorisationService().type == "AuthDisabled") {
+            this.isLogged = true;
+        }
+        else {
+            this._authService.getAuthorisationService().loginChanged.subscribe(loggedIn => {
+                this.isLogged = loggedIn;
+            });
+        }
     }
 
     ngOnChanges(changes: SimpleChanges): void {

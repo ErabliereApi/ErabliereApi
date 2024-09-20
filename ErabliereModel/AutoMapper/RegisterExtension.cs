@@ -41,7 +41,7 @@ public static class RegisterExtension
             config.CreateMap<CapteurImage, GetCapteurImage>()
                 .ForMember(c => c.MotDePasse, a => a.MapFrom(b => "***")).ReverseMap();
             config.CreateMap<CapteurImage, PutCapteurImage>().ReverseMap();
-            config.CreateMap<Capteur, GetCapteur>().ReverseMap();
+            config.CreateMap<Capteur, GetCapteur>();
             config.CreateMap<Customer, GetCustomer>().ReverseMap();
             config.CreateMap<CustomerErabliere, GetCustomerAccess>().ReverseMap();
             config.CreateMap<Erabliere, GetCustomerAccessErabliere>().ReverseMap();
@@ -50,7 +50,9 @@ public static class RegisterExtension
             config.CreateMap<Donnee, GetDonnee>().ReverseMap();
             config.CreateMap<Baril, GetBaril>().ReverseMap();
             config.CreateMap<GetErabliereDashboard, Erabliere>().ReverseMap();
-            config.CreateMap<DonneeCapteur, GetDonneesCapteur>().ReverseMap();
+            config.CreateMap<DonneeCapteur, GetDonneesCapteur>()
+                  .ForMember(d => d.Valeur, o => o.MapFrom(p => (short?)p.Valeur))
+                  .ReverseMap();
 
             config.CreateMap<PostErabliere, Erabliere>()
                   .ForMember(e => e.IpRule, a => a.MapFrom(p => p.IpRules))

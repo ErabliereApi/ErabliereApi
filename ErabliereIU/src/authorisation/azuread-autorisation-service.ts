@@ -1,6 +1,6 @@
 import { MsalService } from '@azure/msal-angular';
 import { AccountInfo, PopupRequest, SilentRequest } from '@azure/msal-browser';
-import { Subject } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { AppUser } from 'src/model/appuser';
 import { AuthResponse } from 'src/model/authresponse';
@@ -13,7 +13,9 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   type: string = "AzureAD";
   initialize: boolean = false;
 
-  constructor(private _msalInstance: MsalService, private _environmentService: EnvironmentService) { }
+  constructor(private _msalInstance: MsalService, private _environmentService: EnvironmentService) {
+    
+  }
 
   async login() {
     console.log("login");
@@ -57,7 +59,7 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     console.log("completeLogin")
     if (this.initialize == false) {
       console.log("Initilize MSAL Instance");
-      await this._msalInstance.initialize().toPromise();
+      await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
     }
     else {
@@ -97,7 +99,7 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     console.log("getAccessToken");
     if (this.initialize == false) {
       console.log("Initilize MSAL Instance");
-      await this._msalInstance.initialize().toPromise();
+      await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
     }
     else {

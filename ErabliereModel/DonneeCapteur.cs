@@ -18,7 +18,7 @@ public class DonneeCapteur : IIdentifiable<Guid?, DonneeCapteur>, ILevelTwoOwnab
     /// <summary>
     /// La valeur de la donnée
     /// </summary>
-    public short? Valeur { get; set; }
+    public decimal? Valeur { get; set; }
 
     /// <summary>
     /// Text associé à la donnée

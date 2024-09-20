@@ -93,7 +93,7 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
         // Si l'érablière est publique et que l'accès est en lecture, l'accès est autorisé
         if (erabliere == null)
         {
-            context.Result = new NotFoundResult();
+            context.Result = new NotFoundObjectResult(new { Message = $"{_levelTwoRelationType?.Name} {strId} n'existe pas." });
         }
         else if (!(erabliere.IsPublic && context.HttpContext.Request.Method == "GET"))
         {

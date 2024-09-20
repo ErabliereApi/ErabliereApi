@@ -30,9 +30,9 @@ Set-Location ..
 
 code .
 
-# if the parent folder contains a folder name LearnNestJS, then start the NestJS server in a new process, also in watch mode
+# if the parent folder contains a folder name ErabliereNestJS, then start the NestJS server in a new process, also in watch mode
 
-$learnNestJS = Get-ChildItem -Path ..\ -Directory -Filter "LearnNestJS" | Select -expand FullName
+$learnNestJS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereNestJS" | Select -expand FullName
 if ($null -ne $learnNestJS) {
     Set-Location $learnNestJS
     Start-Process npm -ArgumentList "run", "start:dev"
@@ -46,6 +46,26 @@ $emailImagesObserver = Get-ChildItem -Path ..\ -Directory -Filter "EmailImagesOb
 if ($null -ne $emailImagesObserver) {
     Set-Location "$emailImagesObserver\BlazorApp"
     Start-Process dotnet -ArgumentList "watch", "run", "$PWD\BlazorApp.csproj", " --no-hot-reload"
+
+    Set-Location ..\..\ErabliereApi
+}
+
+# if the parent folder contains a folder name ErabliereWS, then start the dotnet app in a new process, also in watch mode
+
+$erabliereWS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereWS" | Select -expand FullName
+if ($null -ne $erabliereWS) {
+    Set-Location $erabliereWS
+    Start-Process dotnet -ArgumentList "watch", "run", "$PWD\ErabliereWS.csproj", " --no-hot-reload"
+
+    Set-Location ..\ErabliereApi
+}
+
+# if the parent folder contains a folder name JeuxDonneesErabliereAPI, then start the dotnet app in a new process, also in watch mode
+
+$jeuxDonneesErabliereAPI = Get-ChildItem -Path ..\ -Directory -Filter "JeuxDonneesErabliereAPI" | Select -expand FullName
+if ($null -ne $jeuxDonneesErabliereAPI) {
+    Set-Location $jeuxDonneesErabliereAPI\JeuxDonneesErabliereAPI
+    Start-Process dotnet -ArgumentList "watch", "run", "$PWD\JeuxDonneesErabliereAPI.csproj", " --no-hot-reload"
 
     Set-Location ..\..\ErabliereApi
 }

@@ -113,7 +113,7 @@ public class RapportController : ControllerBase
                 var rapportJour = new PostRapportDegreeJourResponse.RapportDegreeJour
                 {
                     Date = donneesJour.Key?.ToString("yyyy-MM-dd") ?? "date inconnue",
-                    Temperature = (decimal)donneesJour.Average(d => d.Valeur.GetValueOrDefault() / 10.0)
+                    Temperature = donneesJour.Average(d => d.Valeur.GetValueOrDefault() / 10m)
                 };
 
                 var degreeJour = Math.Max(0, rapportJour.Temperature - rapportDegreeJour.SeuilTemperature);

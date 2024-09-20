@@ -45,14 +45,19 @@ public class WeatherService : IWeaterService
             return locationCode;
         }
 
+        string responseBodyString = string.Empty;
+
         try
         {
             string url = $"{AccuWeatherBaseUrl}/locations/v1/postalcodes/search?apikey={AccuWeatherApiKey}&q={postalCode}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+            responseBodyString = await response.Content.ReadAsStringAsync();
+
             response.EnsureSuccessStatusCode();
 
-            var responseBody = JsonSerializer.Deserialize<List<LocationResponse>>(await response.Content.ReadAsStringAsync());
+            var responseBody = JsonSerializer.Deserialize<List<LocationResponse>>(responseBodyString);
             
             if (responseBody == null || responseBody.Count == 0)
             {
@@ -67,7 +72,7 @@ public class WeatherService : IWeaterService
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex, "Error retrieving location code: {Message}", ex.Message);
+            _logger.LogCritical(ex, "Error retrieving location code: {Message} {Response}", ex.Message, responseBodyString);
             return "";
         }
     }

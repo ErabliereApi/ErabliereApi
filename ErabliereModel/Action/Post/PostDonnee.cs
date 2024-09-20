@@ -14,18 +14,20 @@ namespace ErabliereApi.Donnees.Action.Post
         public DateTimeOffset? D { get; set; }
 
         /// <summary>
-        /// Temperature
+        /// La température en dixième de degré Celsius
         /// </summary>
+        /// <example>250 = 25.0</example>
         public short? T { get; set; }
 
         /// <summary>
-        /// Niveau bassin
+        /// Niveau bassin en pourcentage
         /// </summary>
         public short? NB { get; set; }
 
         /// <summary>
-        /// Vaccium
+        /// Vaccium en dixième de HG
         /// </summary>
+        /// <example>250 = 25.0</example>
         public short? V { get; set; }
 
         /// <summary>

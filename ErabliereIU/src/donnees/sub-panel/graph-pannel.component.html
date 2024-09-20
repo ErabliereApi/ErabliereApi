@@ -60,6 +60,12 @@
                     </div>
 
                     <span class="ms-2 mt-2">{{ textActuel }}</span>
+
+                    @if (errorMessage) {
+                        <span class="text-danger">
+                            {{ errorMessage }}
+                        </span>
+                    }
                 </div>
             </div>
             @if (ajouterDonneeDepuisInterface) {

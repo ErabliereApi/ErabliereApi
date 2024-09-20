@@ -59,6 +59,8 @@ export class GraphPannelComponent implements OnInit {
     @Input() batteryLevel: number | undefined;
     @Input() online: boolean | undefined;
 
+    errorMessage: any;
+
     constructor(private _api: ErabliereApi) {
         this.chart = undefined;
     }
@@ -106,6 +108,8 @@ export class GraphPannelComponent implements OnInit {
         if (this.dernierDonneeRecu != undefined) {
             xddr = this.dernierDonneeRecu.toString();
         }
+
+        this.errorMessage = undefined;
 
         this._api.getDonneesCapteur(this.idCapteur, debutFiltre, finFiltre, xddr).then(resp => {
             const h = resp.headers;
@@ -176,6 +180,9 @@ export class GraphPannelComponent implements OnInit {
             else {
                 this.mean = undefined;
             }
+        }).catch(err => {
+            console.error(err);
+            this.errorMessage = err?.message;
         });
     }
 

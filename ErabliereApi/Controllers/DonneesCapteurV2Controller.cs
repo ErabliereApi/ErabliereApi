@@ -18,7 +18,7 @@ namespace ErabliereApi.Controllers;
 [ApiController]
 [Route("Capteurs/{id}/[controller]")]
 [Authorize]
-public class DonneesCapteurController : ControllerBase
+public class DonneesCapteurV2Controller : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
     private readonly IMapper _mapper;
@@ -28,7 +28,7 @@ public class DonneesCapteurController : ControllerBase
     /// </summary>
     /// <param name="depot">Le dépôt des barils</param>
     /// <param name="mapper">Interface de mapping entre les objets</param>
-    public DonneesCapteurController(ErabliereDbContext depot, IMapper mapper)
+    public DonneesCapteurV2Controller(ErabliereDbContext depot, IMapper mapper)
     {
         _depot = depot;
         _mapper = mapper;
@@ -46,8 +46,7 @@ public class DonneesCapteurController : ControllerBase
     [HttpGet]
     [ValiderOwnership("id", typeof(Capteur))]
     [AllowAnonymous]
-    [Obsolete("Utiliser l'action /Capteurs/{id}/DonneesCapteurV2")]
-    public async Task<IEnumerable<GetDonneesCapteur>> Lister(Guid id,
+    public async Task<IEnumerable<GetDonneesCapteurV2>> Lister(Guid id,
                                                              [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
                                                              DateTimeOffset? dd,
                                                              DateTimeOffset? df,
@@ -59,7 +58,7 @@ public class DonneesCapteurController : ControllerBase
                                         (dd == null || b.D >= dd) &&
                                         (df == null || b.D <= df))
                             .OrderBy(b => b.D)
-                            .ProjectTo<GetDonneesCapteur>(_mapper.ConfigurationProvider)
+                            .ProjectTo<GetDonneesCapteurV2>(_mapper.ConfigurationProvider)
                             .ToArrayAsync(token);
 
         if (donnees.Length > 0)
@@ -90,8 +89,7 @@ public class DonneesCapteurController : ControllerBase
     [HttpGet]
     [Route("/Erablieres/{id}/Capteurs/[controller]/Grape")]
     [ValiderOwnership("id")]
-    [ProducesResponseType(typeof(IEnumerable<Pair<Guid, IEnumerable<GetDonneesCapteur>>>), 200)]
-    [Obsolete("Utiliser l'action /Capteurs/{id}/DonneesCapteurV2/Grape")]
+    [ProducesResponseType(typeof(IEnumerable<Pair<Guid, IEnumerable<GetDonneesCapteurV2>>>), 200)]
     public async Task<IActionResult> ListerPlusieurs(
                                                 [FromQuery] string ids,
                                                 [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
@@ -101,7 +99,7 @@ public class DonneesCapteurController : ControllerBase
     {
         var idsList = ids.Split(';');
 
-        var list = new List<Pair<Guid, IEnumerable<GetDonneesCapteur>>>(idsList.Length);
+        var list = new List<Pair<Guid, IEnumerable<GetDonneesCapteurV2>>>(idsList.Length);
 
         foreach (var idstr in idsList)
         {
@@ -109,7 +107,7 @@ public class DonneesCapteurController : ControllerBase
 
             var item = await Lister(id, ddr, dd, df, token);
 
-            list.Add(new Pair<Guid, IEnumerable<GetDonneesCapteur>>(id, item));
+            list.Add(new Pair<Guid, IEnumerable<GetDonneesCapteurV2>>(id, item));
         }
 
         return Ok(list);
@@ -126,8 +124,7 @@ public class DonneesCapteurController : ControllerBase
     [HttpPost]
     [TriggerAlertV2]
     [ValiderOwnership("id", typeof(Capteur))]
-    [Obsolete("Utiliser l'action /Capteurs/{id}/DonneesCapteurV2")]
-    public async Task<IActionResult> Ajouter(Guid id, PostDonneeCapteur donneeCapteur, CancellationToken token)
+    public async Task<IActionResult> Ajouter(Guid id, PostDonneeCapteurV2 donneeCapteur, CancellationToken token)
     {
         if (id != donneeCapteur.IdCapteur)
         {
@@ -144,53 +141,5 @@ public class DonneesCapteurController : ControllerBase
         await _depot.SaveChangesAsync(token);
 
         return Ok();
-    }
-
-    /// <summary>
-    /// Modifier une données d'un capteur
-    /// </summary>
-    /// <param name="id">L'identifiant du capteur</param>
-    /// <param name="capteur">Le capteur a modifier</param>
-    /// <param name="token">Token d'annulation</param>
-    /// <response code="200">Le capteur a été correctement supprimé.</response>
-    /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à modifier.</response>
-    [HttpPut]
-    [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Modifier(Guid id, DonneeCapteur capteur, CancellationToken token)
-    {
-        if (id != capteur.IdCapteur)
-        {
-            return BadRequest("L'id de la route ne concorde pas avec l'id du capteur à modifier.");
-        }
-
-        _depot.Update(capteur);
-
-        await _depot.SaveChangesAsync(token);
-
-        return Ok();
-    }
-
-    /// <summary>
-    /// Supprimer une données d'un capteur
-    /// </summary>
-    /// <param name="id">Identifiant du capteur</param>
-    /// <param name="capteur">Le capteur a supprimer</param>
-    /// <param name="token">Token d'annulation</param>s
-    /// <response code="204">Le capteur a été correctement supprimé.</response>
-    /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à supprimer.</response>
-    [HttpDelete]
-    [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Supprimer(Guid id, DonneeCapteur capteur, CancellationToken token)
-    {
-        if (id != capteur.IdCapteur)
-        {
-            return BadRequest("L'id de la route ne concorde pas avec l'id du baril à supprimer.");
-        }
-
-        _depot.Remove(capteur);
-
-        await _depot.SaveChangesAsync(token);
-
-        return NoContent();
     }
 }

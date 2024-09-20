@@ -239,6 +239,8 @@ public class ErablieresController : ControllerBase
         erabliere.AfficherPredictionMeteoJour ??= true;
         erabliere.DimensionPanneauImage ??= 12;
 
+        erabliere.DC = DateTimeOffset.Now;
+
         var entity = await _context.Erabliere.AddAsync(erabliere, token);
 
         if (isAuthenticate)
@@ -249,7 +251,8 @@ public class ErablieresController : ControllerBase
                 {
                     Access = 15,
                     IdCustomer = customer.Id,
-                    IdErabliere = entity.Entity.Id
+                    IdErabliere = entity.Entity.Id,
+                    DC = DateTimeOffset.Now
                 }, token);
             }
             else
