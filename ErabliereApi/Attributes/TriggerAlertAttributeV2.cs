@@ -195,7 +195,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         }
     }
 
-    private async void TriggerAlerteSMS(
+    private static async void TriggerAlerteSMS(
         AlerteCapteur alerte, 
         ILogger<TriggerAlertV2Attribute> logger, 
         SMSConfig smsConfig, 

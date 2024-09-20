@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Depot.Sql;
+﻿using ErabliereApi.Attributes;
+using ErabliereApi.Depot.Sql;
 using ErabliereApi.Services;
 using ErabliereApi.Services.AccuWeatherModels;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +39,8 @@ public class WeatherForecastController
     /// <response code="500">Erreur interne du serveur</response>
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(WeatherForecastResponse))]
+    [AllowAnonymous]
+    [ValiderOwnership("id")]
     public async Task<IActionResult> GetWeatherForecast(Guid id, string lang = "fr-ca")
     {
         // Résoudre l'érablière
@@ -83,6 +86,8 @@ public class WeatherForecastController
     /// <response code="404">Érablière non trouvée</response>
     [HttpGet("Hourly")]
     [ProducesResponseType(200, Type = typeof(HourlyWeatherForecastResponse[]))]
+    [AllowAnonymous]
+    [ValiderOwnership("id")]
     public async Task<IActionResult> GetHourlyWeatherForecast(Guid id, string lang = "fr-ca", CancellationToken cancellationToken = default)
     {
         // Résoudre l'érablière
