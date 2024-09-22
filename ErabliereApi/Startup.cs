@@ -391,6 +391,19 @@ public class Startup
         {
             var database = serviceProvider.GetRequiredService<ErabliereDbContext>();
 
+            var defaultMigrationTimeout = database.Database.GetCommandTimeout();
+
+            Console.WriteLine("Default migration timeout: " + defaultMigrationTimeout);
+
+            var migrationTimeout = Configuration["SQL_STARTUP_MIGRATION_TIMEOUT"];
+
+            if (migrationTimeout != null)
+            {
+                database.Database.SetCommandTimeout(int.Parse(migrationTimeout));
+
+                Console.WriteLine("Migration timeout: " + migrationTimeout);
+            }
+
             database.Database.Migrate();
         }
 
