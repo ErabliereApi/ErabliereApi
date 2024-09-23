@@ -11,7 +11,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Modèle représentant une érablière
 /// </summary>
-public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocalizable, IDatesInfo
+public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocalizable, IDatesInfo, IIsPublic
 {
     /// <summary>
     /// L'id de l'érablière

@@ -8,7 +8,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Une note
 /// </summary>
-public class Note : IIdentifiable<Guid?, Note>, IErabliereOwnable
+public class Note : IIdentifiable<Guid?, Note>, IErabliereOwnable, IIsPublic, IFileStorage
 {
     /// <summary>
     /// La clé primaire
@@ -47,6 +47,24 @@ public class Note : IIdentifiable<Guid?, Note>, IErabliereOwnable
     /// La fichier de la note
     /// </summary>
     public byte[]? File { get; set; }
+
+    /// <inheritdoc />
+    public int? FileSize { get; set; }
+
+    /// <inheritdoc />
+    [MaxLength(200)]
+    public string? FileName { get; set; }
+
+    /// <inheritdoc />
+    [MaxLength(200)]
+    public string? ExternalStorageType { get; set; }
+
+    /// <inheritdoc />
+    [MaxLength(2000)]
+    public string? ExternalStorageUrl { get; set; }
+
+    /// <inheritdoc />
+    public bool IsPublic { get; set; }
 
     /// <summary>
     /// Date de cération de la note
