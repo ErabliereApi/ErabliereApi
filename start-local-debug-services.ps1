@@ -32,7 +32,7 @@ code .
 
 # if the parent folder contains a folder name ErabliereNestJS, then start the NestJS server in a new process, also in watch mode
 
-$learnNestJS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereNestJS" | Select -expand FullName
+$learnNestJS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereNestJS" | Select-Object -expand FullName
 if ($null -ne $learnNestJS) {
     Set-Location $learnNestJS
     Start-Process npm.cmd -ArgumentList "run", "start:dev"
@@ -42,7 +42,7 @@ if ($null -ne $learnNestJS) {
 
 # if the parent folder contains a folder name EmailImagesObserver, then start the EmailImagesObserver server in a new process, also in watch mode
 
-$emailImagesObserver = Get-ChildItem -Path ..\ -Directory -Filter "EmailImagesObserver" | Select -expand FullName
+$emailImagesObserver = Get-ChildItem -Path ..\ -Directory -Filter "EmailImagesObserver" | Select-Object -expand FullName
 if ($null -ne $emailImagesObserver) {
     Set-Location "$emailImagesObserver\BlazorApp"
     Start-Process dotnet -ArgumentList "watch", "run", "$PWD\BlazorApp.csproj", " --no-hot-reload"
@@ -52,7 +52,7 @@ if ($null -ne $emailImagesObserver) {
 
 # if the parent folder contains a folder name ErabliereWS, then start the dotnet app in a new process, also in watch mode
 
-$erabliereWS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereWS" | Select -expand FullName
+$erabliereWS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereWS" | Select-Object -expand FullName
 if ($null -ne $erabliereWS) {
     Set-Location $erabliereWS
     Start-Process dotnet -ArgumentList "watch", "run", "$PWD\ErabliereWS.csproj", " --no-hot-reload"
@@ -62,7 +62,7 @@ if ($null -ne $erabliereWS) {
 
 # if the parent folder contains a folder name JeuxDonneesErabliereAPI, then start the dotnet app in a new process, also in watch mode
 
-$jeuxDonneesErabliereAPI = Get-ChildItem -Path ..\ -Directory -Filter "JeuxDonneesErabliereAPI" | Select -expand FullName
+$jeuxDonneesErabliereAPI = Get-ChildItem -Path ..\ -Directory -Filter "JeuxDonneesErabliereAPI" | Select-Object -expand FullName
 if ($null -ne $jeuxDonneesErabliereAPI) {
     Set-Location $jeuxDonneesErabliereAPI\JeuxDonneesErabliereAPI
     Start-Process dotnet -ArgumentList "watch", "run", "$PWD\JeuxDonneesErabliereAPI.csproj", " --no-hot-reload"
