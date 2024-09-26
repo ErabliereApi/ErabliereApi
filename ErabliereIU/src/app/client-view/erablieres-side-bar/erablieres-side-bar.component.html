@@ -31,7 +31,7 @@
         </a>
         }
         @if (displaySearch) {
-            <li class="list-group-item list-group-item-action">
+            <a class="list-group-item list-group-item-action">
                 <div class="d-flex w-100 justify-content-between">
                     <input
                         type="text"
@@ -39,7 +39,7 @@
                         placeholder="Rechercher une erablière" 
                         (keyup)="searchChanged($event)" />
                 </div>
-            </li>
+            </a>
         }
         @if (loggedIn) {
         <button

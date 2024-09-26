@@ -6,7 +6,8 @@
                id="gros"
                autocomplete="off"
                [checked]="tailleGraphiques === 12"
-               (click)="changerDimension(12)">
+               (click)="changerDimension(12)"
+               (keyup)="keyUpChangerDimension($event, 12)">
         <label class="btn btn-secondary" for="gros">Gros</label>
 
         <input type="radio"
@@ -15,7 +16,8 @@
                id="normal"
                autocomplete="off"
                [checked]="tailleGraphiques === 6"
-               (click)="changerDimension(6)">
+               (click)="changerDimension(6)"
+               (keyup)="keyUpChangerDimension($event, 6)">
         <label class="btn btn-secondary" for="normal">Normal</label>
 
         <input type="radio"
@@ -24,7 +26,8 @@
                id="petit"
                autocomplete="off"
                [checked]="tailleGraphiques === 3"
-               (click)="changerDimension(3)">
+               (click)="changerDimension(3)"
+               (keyup)="keyUpChangerDimension($event, 3)">
         <label class="btn btn-secondary" for="petit">Petit</label>
     </div>
 </div>

@@ -35,7 +35,7 @@ public static class Swagger
                 {
                     Name = config["SWAGGER_CONTACT_NAME"] ?? string.Empty,
                     Email = config["SWAGGER_CONTACT_EMAIL"] ?? string.Empty,
-                    Url = new Uri(config["SWAGGER_CONTACT_URL"] ?? string.Empty) ?? new Uri(""),
+                    Url = new Uri(config["SWAGGER_CONTACT_URL"] ?? string.Empty),
                 },
                 License = new OpenApiLicense
                 {

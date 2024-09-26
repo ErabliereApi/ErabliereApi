@@ -51,4 +51,10 @@ export class CapteurPannelsComponent implements OnChanges {
             this._api.putCapteurs(this.erabliere?.id, this.capteurs);
         }
     }
+
+    keyUpChangerDimension(event: KeyboardEvent, taille: number) {
+        if (event.key == "Enter") {
+            this.changerDimension(taille);
+        }
+    }
 }

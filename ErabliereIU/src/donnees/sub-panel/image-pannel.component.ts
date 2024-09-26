@@ -206,6 +206,12 @@ export class ImagePanelComponent implements OnInit {
         this.modalTitle = image.name ?? "Image";
     }
 
+    imgOnKeyUp(event: KeyboardEvent, image: GetImageInfo, localSkip: number) {
+        if (event.key == "Enter") {
+            this.selectImage(image, localSkip);
+        }
+    }
+
     searchFromInput(event: any) {
         console.log("searchFromInput", event);
         const search = event.target.value;
