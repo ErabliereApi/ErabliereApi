@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace ErabliereApi.Donnees.Interfaces;
 
-namespace ErabliereApi.Donnees.Interfaces;
+/// <summary>
+/// Interface pour les objets qui peuvent être public
+/// </summary>
 public interface IIsPublic
 {
     /// <summary>

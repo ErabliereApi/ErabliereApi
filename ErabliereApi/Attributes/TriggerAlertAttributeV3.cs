@@ -16,13 +16,13 @@ namespace ErabliereApi.Attributes;
 /// Classe qui permet de rechercher et lancer les alertes relier à une action.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-public class TriggerAlertV2Attribute : ActionFilterAttribute
+public class TriggerAlertV3Attribute : ActionFilterAttribute
 {
     /// <summary>
     /// Contructeur par initialisation.
     /// </summary>
     /// <param name="order">Ordre d'exectuion des action filter</param>
-    public TriggerAlertV2Attribute(int order = int.MinValue)
+    public TriggerAlertV3Attribute(int order = int.MinValue)
     {
         Order = order;
     }
@@ -42,7 +42,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
 
         try
         {
-            var _donnee = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonneeCapteur)) as PostDonneeCapteur;
+            var _donnee = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonneeCapteurV2)) as PostDonneeCapteurV2;
 
             context.HttpContext.Items.Add("TriggerAlertV2Attribute", (_idCapteur, _donnee));
         }
@@ -79,7 +79,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
                     throw new InvalidOperationException("Les informations de l'attribue 'TriggerAlertV2' n'ont pas été trouvé dans le contexte.");
                 }
 
-                var (_idCapteur, _donnee) = ((Guid, PostDonneeCapteur?))contextTupple;
+                var (_idCapteur, _donnee) = ((Guid, PostDonneeCapteurV2?))contextTupple;
 
                 var alertes = await depot.AlerteCapteurs.AsNoTracking()
                                                         .Where(a => a.IdCapteur == _idCapteur && a.IsEnable)
@@ -115,7 +115,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         IEmailService emailService, 
         SMSConfig smsConfig, 
         ISmsService smsService,
-        PostDonneeCapteur? _donnee)
+        PostDonneeCapteurV2? _donnee)
     {
         if (_donnee == null)
         {
@@ -162,7 +162,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         ILogger<TriggerAlertV2Attribute> logger, 
         EmailConfig emailConfig, 
         IEmailService emailService,
-        PostDonneeCapteur? _donnee)
+        PostDonneeCapteurV2? _donnee)
     {
         if (!emailConfig.IsConfigured)
         {
@@ -201,7 +201,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         ILogger<TriggerAlertV2Attribute> logger, 
         SMSConfig smsConfig, 
         ISmsService smsService,
-        PostDonneeCapteur? _donnee)
+        PostDonneeCapteurV2? _donnee)
     {
         if (!smsConfig.IsConfigured)
         {
@@ -228,7 +228,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         }
     }
 
-    private static string FormatTextMessage(AlerteCapteur alerte, PostDonneeCapteur? donnee)
+    private static string FormatTextMessage(AlerteCapteur alerte, PostDonneeCapteurV2? donnee)
     {
         var sb = new StringBuilder();
 

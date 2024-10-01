@@ -317,8 +317,8 @@ public class Startup
         });
 
         // SMS
-        services.AddTransient<TwilioSMSService>();
-        services.AddTransient<ISMSService, TwilioSMSService>();
+        services.AddTransient<TwilioSmsService>();
+        services.AddTransient<ISmsService, TwilioSmsService>();
         services.Configure<SMSConfig>(o =>
         {
             var path = Configuration["SMS_CONFIG_PATH"];

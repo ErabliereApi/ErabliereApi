@@ -15,6 +15,7 @@ namespace ErabliereApi.Attributes;
 /// <summary>
 /// Classe qui permet de rechercher et lancer les alertes relier à une action.
 /// </summary>
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 public class TriggerAlertAttribute : ActionFilterAttribute
 {
     private Guid? _idErabliere;
@@ -49,17 +50,11 @@ public class TriggerAlertAttribute : ActionFilterAttribute
             try
             {
                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertAttribute>>();
-
                 var depot = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
-
                 var emailConfig = context.HttpContext.RequestServices.GetRequiredService<IOptions<EmailConfig>>();
-
                 var emailService = context.HttpContext.RequestServices.GetRequiredService<IEmailService>();
-
                 var smsConfig = context.HttpContext.RequestServices.GetRequiredService<IOptions<SMSConfig>>();
-
-                var smsService = context.HttpContext.RequestServices.GetRequiredService<ISMSService>();
-
+                var smsService = context.HttpContext.RequestServices.GetRequiredService<ISmsService>();
                 var alertes = await depot.Alertes.AsNoTracking().Where(a => a.IdErabliere == _idErabliere && a.IsEnable).ToArrayAsync();
 
                 for (int i = 0; i < alertes.Length; i++)
@@ -83,7 +78,7 @@ public class TriggerAlertAttribute : ActionFilterAttribute
         IOptions<EmailConfig> emailConfig, 
         IEmailService emailService,
         IOptions<SMSConfig> smsConfig,
-        ISMSService smsService)
+        ISmsService smsService)
     {
         if (_donnee == null)
         {
@@ -194,7 +189,7 @@ public class TriggerAlertAttribute : ActionFilterAttribute
         }
     }
 
-    private async void TriggerAlerteSMS(Alerte alerte, ILogger<TriggerAlertAttribute> logger, SMSConfig smsConfig, ISMSService smsService)
+    private async void TriggerAlerteSMS(Alerte alerte, ILogger<TriggerAlertAttribute> logger, SMSConfig smsConfig, ISmsService smsService)
     {
         if (!smsConfig.IsConfigured)
         {

@@ -20,3 +20,9 @@ type Story = StoryObj<ErabliereComponent>;
 export const Primary: Story = {
 
 };
+
+export const Secondary: Story = {
+  args: {
+    displayCapteurs: true
+  }
+};

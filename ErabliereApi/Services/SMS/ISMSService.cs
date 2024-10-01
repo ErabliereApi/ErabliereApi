@@ -1,11 +1,9 @@
-﻿using MimeKit;
-
-namespace ErabliereApi.Services;
+﻿namespace ErabliereApi.Services;
 
 /// <summary>
 /// Interface permettant d'abstraire l'envoie des SMS
 /// </summary>
-public interface ISMSService
+public interface ISmsService
 {
     /// <summary>
     /// Envoie un SMS

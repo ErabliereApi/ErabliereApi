@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, ReactiveFormsModule } from "@angular/forms";
-import { convertTenthToNormale } from "src/core/calculator.service";
 import { ErabliereApi } from "src/core/erabliereapi.service";
-import { Capteur } from "src/model/capteur";
 import { PostDonneeCapteur } from "src/model/donneeCapteur";
 import { EinputComponent } from "../formsComponents/einput.component";
 import { NgIf } from "@angular/common";
@@ -53,14 +51,18 @@ export class AjouterDonneeCapteurComponent implements OnInit {
 
     @Output() needToUpdate = new EventEmitter();
 
-    constructor(private api: ErabliereApi, private fb: UntypedFormBuilder) {
+    constructor(private readonly api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.donneeCapteurForm = this.fb.group({});
      }
 
     ngOnInit(): void {
+        const offset = new Date().getTimezoneOffset();
+        const offsetMs = offset * 60000;
+        const nowMs = new Date().getTime();
+        const nowLocal = new Date(nowMs - offsetMs).toISOString().slice(0, 16);
         this.donneeCapteurForm = this.fb.group({
             valeur: '',
-            date: ''
+            date: nowLocal
         });
     }
 
@@ -70,14 +72,14 @@ export class AjouterDonneeCapteurComponent implements OnInit {
 
     ajouterDonnee() {
         this.generalErrorMessage = null;
-        var donneeCapteur = new PostDonneeCapteur();
-        var validationError = false;
+        let donneeCapteur = new PostDonneeCapteur();
+        let validationError = false;
         try {
-            donneeCapteur.v = parseInt(convertTenthToNormale(this.donneeCapteurForm.controls['valeur'].value));
+            donneeCapteur.v = parseFloat(this.donneeCapteurForm.controls['valeur'].value);
         } catch (error) {
             this.donneeCapteurForm.controls['valeur'].setErrors({
                 'incorrect': true,
-                'message': 'Impossible de convertir la valeur en entier'
+                'message': 'Impossible de convertir la valeur en nombre décimal'
             })
             validationError = true;
         }
@@ -91,7 +93,7 @@ export class AjouterDonneeCapteurComponent implements OnInit {
             validationError = true;
         }
 
-        if (validationError == false) {
+        if (!validationError) {
             donneeCapteur.idCapteur = this.idCapteur;
 
             this.api.postDonneeCapteur(this.idCapteur, donneeCapteur).then(() => {

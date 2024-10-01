@@ -122,9 +122,9 @@ public class DonneesCapteurV2Controller : ControllerBase
     /// <response code="200">Le capteur a été correctement ajouté.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à ajouter.</response>
     [HttpPost]
-    [TriggerAlertV2]
+    [TriggerAlertV3]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Ajouter(Guid id, PostDonneeCapteurV2 donneeCapteur, CancellationToken token)
+    public async Task<IActionResult> Ajouter(Guid id, [FromBody] PostDonneeCapteurV2 donneeCapteur, CancellationToken token)
     {
         if (id != donneeCapteur.IdCapteur)
         {
@@ -136,7 +136,9 @@ public class DonneesCapteurV2Controller : ControllerBase
             donneeCapteur.D = DateTimeOffset.Now;
         }
 
-        await _depot.DonneesCapteur.AddAsync(_mapper.Map<DonneeCapteur>(donneeCapteur), token);
+        var newDonnee = _mapper.Map<DonneeCapteur>(donneeCapteur);
+
+        await _depot.DonneesCapteur.AddAsync(newDonnee, token);
 
         await _depot.SaveChangesAsync(token);
 

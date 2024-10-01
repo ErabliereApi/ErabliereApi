@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ErabliereApi.Donnees.Action.Post
 {
+    /// <summary>
+    /// Message pour ajouter un rappel
+    /// </summary>
     public class PostRappel
     {
         /// <summary>

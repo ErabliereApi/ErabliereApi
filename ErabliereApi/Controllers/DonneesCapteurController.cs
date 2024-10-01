@@ -47,6 +47,7 @@ public class DonneesCapteurController : ControllerBase
     [ValiderOwnership("id", typeof(Capteur))]
     [AllowAnonymous]
     [Obsolete("Utiliser l'action /Capteurs/{id}/DonneesCapteurV2")]
+    [LogObsoleteUsage]
     public async Task<IEnumerable<GetDonneesCapteur>> Lister(Guid id,
                                                              [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
                                                              DateTimeOffset? dd,
@@ -92,6 +93,7 @@ public class DonneesCapteurController : ControllerBase
     [ValiderOwnership("id")]
     [ProducesResponseType(typeof(IEnumerable<Pair<Guid, IEnumerable<GetDonneesCapteur>>>), 200)]
     [Obsolete("Utiliser l'action /Capteurs/{id}/DonneesCapteurV2/Grape")]
+    [LogObsoleteUsage]
     public async Task<IActionResult> ListerPlusieurs(
                                                 [FromQuery] string ids,
                                                 [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
@@ -127,6 +129,7 @@ public class DonneesCapteurController : ControllerBase
     [TriggerAlertV2]
     [ValiderOwnership("id", typeof(Capteur))]
     [Obsolete("Utiliser l'action /Capteurs/{id}/DonneesCapteurV2")]
+    [LogObsoleteUsage]
     public async Task<IActionResult> Ajouter(Guid id, PostDonneeCapteur donneeCapteur, CancellationToken token)
     {
         if (id != donneeCapteur.IdCapteur)
@@ -139,7 +142,11 @@ public class DonneesCapteurController : ControllerBase
             donneeCapteur.D = DateTimeOffset.Now;
         }
 
-        await _depot.DonneesCapteur.AddAsync(_mapper.Map<DonneeCapteur>(donneeCapteur), token);
+        var newCapteur = _mapper.Map<DonneeCapteur>(donneeCapteur);
+
+        newCapteur.Valeur = newCapteur.Valeur / 10m;
+
+        await _depot.DonneesCapteur.AddAsync(newCapteur, token);
 
         await _depot.SaveChangesAsync(token);
 

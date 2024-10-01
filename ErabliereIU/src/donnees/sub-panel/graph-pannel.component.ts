@@ -128,7 +128,8 @@ export class GraphPannelComponent implements OnInit {
 
             let donnees: Array<ChartDataset> = [
                 {
-                    data: json.map(donneeCapteur => donneeCapteur.valeur != null ? donneeCapteur.valeur / 10 : null), label: this.titre,
+                    data: json.map(donneeCapteur => donneeCapteur.valeur != null ? donneeCapteur.valeur : null), 
+                    label: this.titre,
                     fill: true,
                     pointBackgroundColor: 'rgba(255,255,0,0.8)',
                     pointBorderColor: 'black',
@@ -141,7 +142,7 @@ export class GraphPannelComponent implements OnInit {
             if (json.length > 0) {
                 let actualData = json[json.length - 1];
                 let tva = actualData.valeur;
-                this.valeurActuel = tva != null ? (tva / 10).toFixed(1) : null;
+                this.valeurActuel = tva;
                 this.textActuel = actualData.text;
             }
 

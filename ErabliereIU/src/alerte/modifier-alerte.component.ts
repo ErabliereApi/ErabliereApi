@@ -60,8 +60,8 @@ export class ModifierAlerteComponent implements OnInit {
                 nom: alerteCapteur.nom,
                 destinataireCourriel: alerteCapteur.envoyerA,
                 destinataireSMS: alerteCapteur.texterA,
-                min: divideNByTen(alerteCapteur.minVaue),
-                max: divideNByTen(alerteCapteur.maxValue)
+                min: alerteCapteur.minVaue,
+                max: alerteCapteur.maxValue
             });
         }
     }
@@ -124,17 +124,17 @@ export class ModifierAlerteComponent implements OnInit {
         alerte.envoyerA = this.alerteCapteurForm.controls['destinataireCourriel'].value;
         alerte.texterA = this.alerteCapteurForm.controls['destinataireSMS'].value;
         alerte.isEnable = this.alerteCapteur?.isEnable;
-        var minInForm = this.alerteCapteurForm.controls['min'].value;
+        let minInForm = this.alerteCapteurForm.controls['min'].value;
         if (minInForm != null && (minInForm !== "" || minInForm === 0)) {
             console.log('parseMin')
-            alerte.minVaue = parseInt(convertTenthToNormale(minInForm.toString()));
+            alerte.minVaue = parseFloat(minInForm.toString());
         } else {
             console.log('min to undefined')
             alerte.minVaue = undefined;
         }
-        var maxInForm = this.alerteCapteurForm.controls['max'].value;
+        let maxInForm = this.alerteCapteurForm.controls['max'].value;
         if (maxInForm != null && (maxInForm !== "" || maxInForm === 0)) {
-            alerte.maxValue = parseInt(convertTenthToNormale(maxInForm.toString()));
+            alerte.maxValue = parseFloat(maxInForm.toString());
         } else {
             alerte.maxValue = undefined;
         }

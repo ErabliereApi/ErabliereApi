@@ -6,21 +6,21 @@ using Twilio.Types;
 namespace ErabliereApi.Services.SMS;
 
 /// <summary>
-/// Implementation of <see cref="ISMSService" /> using Twilio
+/// Implementation of <see cref="ISmsService" /> using Twilio
 /// </summary>
-public class TwilioSMSService : ISMSService
+public class TwilioSmsService : ISmsService
 {
     private readonly SMSConfig _smsConfig;
-    private readonly ILogger<TwilioSMSService> _logger;
+    private readonly ILogger<TwilioSmsService> _logger;
 
     /// <summary>
     /// Constructeur par défaut
     /// </summary>
     /// <param name="smsConfig"></param>
     /// <param name="logger"></param>
-    public TwilioSMSService(
+    public TwilioSmsService(
         IOptions<SMSConfig> smsConfig,
-        ILogger<TwilioSMSService> logger)
+        ILogger<TwilioSmsService> logger)
     {
         _smsConfig = smsConfig.Value;
         _logger = logger;
@@ -39,7 +39,7 @@ public class TwilioSMSService : ISMSService
 
             TwilioClient.Init(accountSid, authToken);
 
-            MessageResource.Create(
+            await MessageResource.CreateAsync(
                 body: message,
                 from: new PhoneNumber(numero),
                 to: new PhoneNumber(destinataire)

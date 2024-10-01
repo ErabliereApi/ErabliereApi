@@ -37,11 +37,16 @@ export class ErabliereApi {
         this._authService = authFactoryService.getAuthorisationService();
     }
 
-    async getErabliere(idErabliereSelectionee: any): Promise<Erabliere> {
+    async getErabliere(idErabliereSelectionee: any, withoutCapteur: boolean = false): Promise<Erabliere> {
         const headers = await this.getHeaders();
-        const req = this._httpClient.get<Erabliere[]>(
-            this._environmentService.apiUrl + '/erablieres?$filter=id eq ' + idErabliereSelectionee + '&$expand=Capteurs($filter=afficherCapteurDashboard eq true;$orderby=indiceOrdre)',
-            { headers: headers });
+
+        let url = this._environmentService.apiUrl + '/erablieres?$filter=id eq ' + idErabliereSelectionee
+
+        if (!withoutCapteur) {
+            url += '&$expand=Capteurs($filter=afficherCapteurDashboard eq true;$orderby=indiceOrdre)';
+        }
+
+        const req = this._httpClient.get<Erabliere[]>(url, { headers: headers });
 
         const rtn = await firstValueFrom(req);
 
@@ -201,7 +206,7 @@ export class ErabliereApi {
         if (xddr != null) {
             headers = headers.set('x-ddr', xddr);
         }
-        var httpCall = this._httpClient.get<DonneeCapteur[]>(this._environmentService.apiUrl + '/capteurs/' + idCapteur + "/DonneesCapteur?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
+        var httpCall = this._httpClient.get<DonneeCapteur[]>(this._environmentService.apiUrl + '/capteurs/' + idCapteur + "/DonneesCapteurV2?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
         const rtn = await httpCall.toPromise();
         return rtn ?? new HttpResponse();
     }
@@ -301,7 +306,7 @@ export class ErabliereApi {
 
     async postDonneeCapteur(idCapteur: any, donneeCapteur: PostDonneeCapteur): Promise<DonneeCapteur> {
         const headers = await this.getHeaders();
-        const rtn = await this._httpClient.post<DonneeCapteur>(this._environmentService.apiUrl + '/Capteurs/' + idCapteur + "/DonneesCapteur", donneeCapteur, { headers: headers }).toPromise();
+        const rtn = await this._httpClient.post<DonneeCapteur>(this._environmentService.apiUrl + '/Capteurs/' + idCapteur + "/DonneesCapteurV2", donneeCapteur, { headers: headers }).toPromise();
         return rtn ?? new DonneeCapteur();
     }
 

@@ -105,6 +105,17 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     public bool AjouterDonneeDepuisInterface { get; set; }
 
     /// <summary>
+    /// Type d'affichage dans les grphiques. Ex: line, bar, table
+    /// </summary>
+    [MaxLength(50)]
+    public string? DisplayType { get; set; }
+
+    /// <summary>
+    /// Nombre de données à afficher dans les graphiques. Ex: 10, 20, 30
+    /// </summary>
+    public short? DisplayTop { get; set; }
+
+    /// <summary>
     /// Date de l'ajout du capteur
     /// </summary>
     public DateTimeOffset? DC { get; set; }

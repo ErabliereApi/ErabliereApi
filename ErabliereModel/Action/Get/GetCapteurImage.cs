@@ -12,21 +12,25 @@ namespace ErabliereApi.Donnees.Action.Get
     /// </summary>
     public class GetCapteurImage
     {
+        /// <summary>
+        /// L'identifiant du capteur
+        /// </summary>
         public Guid Id { get; set; }
+
         /// <summary>
         /// Le nom donné au capteur
         /// </summary>
-        public string Nom { get; set; }
+        public string? Nom { get; set; }
 
         /// <summary>
         /// L'url du capteur (au protocol rtsp)
         /// </summary>
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// Le port du capteur.
         /// </summary>
-        public string Port { get; set; }
+        public string? Port { get; set; }
 
         /// <summary>
         /// L'identifiant utilisé pour se connecter au flux d'image.

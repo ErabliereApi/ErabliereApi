@@ -111,6 +111,15 @@ namespace ErabliereApi.Depot.Sql
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ErabliereDbContext).Assembly);
         }
 
+        /// <inheritdoc />
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            base.ConfigureConventions(configurationBuilder);
+
+            configurationBuilder.Properties<decimal?>()
+                .HavePrecision(18, 6);
+        }
+
         /// <summary>
         /// Try to save changes to the database.
         /// If succeeded, it return the number of state entry modified and no exception.

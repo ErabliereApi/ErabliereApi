@@ -7,6 +7,7 @@ import { Capteur } from "src/model/capteur";
 import { convertTenthToNormale } from "src/core/calculator.service";
 import { EinputComponent } from "../formsComponents/einput.component";
 import { NgIf, NgFor } from "@angular/common";
+import { Erabliere } from "src/model/erabliere";
 
 @Component({
     selector: 'ajouter-alerte-modal',
@@ -34,6 +35,13 @@ export class AjouterAlerteComponent implements OnInit {
     
     ngOnInit(): void {
         this.initializeForms();
+        if (this.erabliere?.afficherTrioDonnees == false) {
+            this.typeAlerteSelectListForm.controls['state'].setValue(2);
+            this.typeAlerte = 2;
+        }
+        else {
+            this.typeAlerte = 1;
+        }
     }
 
     initializeForms() {
@@ -68,6 +76,7 @@ export class AjouterAlerteComponent implements OnInit {
     @Input() alertesCapteur?: Array<AlerteCapteur>;
 
     @Input() idErabliereSelectionee:any
+    @Input() erabliere?: Erabliere
     capteurs: Array<Capteur> = [];
 
     alerteForm: UntypedFormGroup;
@@ -128,12 +137,12 @@ export class AjouterAlerteComponent implements OnInit {
             this.alerteCapteur.envoyerA = this.alerteCapteurForm.controls['destinataireCourriel'].value;
             this.alerteCapteur.texterA = this.alerteCapteurForm.controls['destinataireSMS'].value;
             if (this.alerteCapteurForm.controls['min'].value != "") {
-                this.alerteCapteur.minVaue = parseInt(convertTenthToNormale(this.alerteCapteurForm.controls['min'].value));
+                this.alerteCapteur.minVaue = parseFloat(this.alerteCapteurForm.controls['min'].value);
             } else {
                 this.alerteCapteur.minVaue = undefined;
             }
             if (this.alerteCapteurForm.controls['max'].value != "") {
-                this.alerteCapteur.maxValue = parseInt(convertTenthToNormale(this.alerteCapteurForm.controls['max'].value));
+                this.alerteCapteur.maxValue = parseFloat(this.alerteCapteurForm.controls['max'].value);
             } else {
                 this.alerteCapteur.maxValue = undefined;
             }

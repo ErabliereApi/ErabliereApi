@@ -12,13 +12,7 @@ import { NgIf } from "@angular/common";
                 type="{{ type }}" 
                 formControlName="{{ name }}" 
                 name="{{ name }}"
-                placeholder="{{ placeholder }}"
-                [decimalMarker]="decimalMarker"
-                [mask]="textMask"
-                [patterns]="customPatterns"
-                [specialCharacters]="spChar"
-                [dropSpecialCharacters]="false"
-                [allowNegativeNumbers]="true">
+                placeholder="{{ placeholder }}">
             <div *ngIf="symbole" class="input-group-append">
                 <span class="input-group-text">{{ symbole }}</span>
             </div>
@@ -33,7 +27,7 @@ export class EinputComponent implements OnInit {
     @Input() name: string = ""
     @Input() formGroup: FormGroup<any> | any;
     @Input() placeholder = "0.0"
-    @Input() textMask?: string = "separator.1"
+    @Input() textMask?: string = "separator.6"
     @Input() decimalMarker: "." | "," | [".", ","] = ".";
     @Input() customPatterns: any
     @Input() spChar: string[] = []

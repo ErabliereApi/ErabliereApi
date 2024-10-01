@@ -53,12 +53,12 @@ public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnab
     /// <summary>
     /// La valeur minimal de ce capteur
     /// </summary>
-    public short? MinVaue { get; set; }
+    public decimal? MinVaue { get; set; }
 
     /// <summary>
     /// La valeur maximal de ce capteur
     /// </summary>
-    public short? MaxValue { get; set; }
+    public decimal? MaxValue { get; set; }
 
     /// <summary>
     /// Indique si l'alerte est activé

@@ -17,7 +17,7 @@ namespace ErabliereApi.Donnees.Action.Post
         /// </summary>
         [Required]
         [MaxLength(50)]
-        public string Nom { get; set; }
+        public string? Nom { get; set; }
 
         /// <summary>
         /// L'url du capteur (au protocol rtsp)
@@ -28,14 +28,14 @@ namespace ErabliereApi.Donnees.Action.Post
         [Required]
         [MaxLength(200)]
         [RegularExpression(@"^rtsp:\/\/[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}([-a-zA-Z0-9()@:%_+.~#?&/=]*)$")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// Le port du capteur.
         /// </summary>
         [Required]
         [MaxLength(5)]
-        public string Port { get; set; }
+        public string? Port { get; set; }
 
         /// <summary>
         /// L'identifiant utilisé pour se connecter au flux d'image.

@@ -16,7 +16,7 @@ public class MeteoMaticWeaterService : IWeaterService
 
         var response = await http.GetFromJsonAsync<MeteoMaticLocationResponse>($"https://geocoder.meteomatics.com/api/v1/geocoder/direct/?location={postalCode}&language=en&limit=8");
 
-        var geo = response?.result.FirstOrDefault()?.geometry;
+        var geo = response?.result?.FirstOrDefault()?.geometry;
 
         if (geo == null)
         {

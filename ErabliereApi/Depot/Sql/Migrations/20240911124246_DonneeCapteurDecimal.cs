@@ -29,7 +29,7 @@ namespace Depot.Sql.Migrations
                 type: "smallint",
                 nullable: true,
                 oldClrType: typeof(decimal),
-                oldType: "decimal(18,2)",
+                oldType: "decimal(18,6)",
                 oldNullable: true);
         }
     }

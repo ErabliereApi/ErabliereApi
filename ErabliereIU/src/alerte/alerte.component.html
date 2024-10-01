@@ -1,15 +1,19 @@
 <div>
     <h3>Alertes</h3>
 </div>
-<ajouter-alerte-modal *ngIf="!displayEditForm" [idErabliereSelectionee]="idErabliereSelectionee" [alertes]="alertes"
-    [alertesCapteur]="alertesCapteur">
-</ajouter-alerte-modal>
-<modifier-alerte-modal *ngIf="displayEditForm || displayEditAlerteCapteurForm"
-    [idErabliereSelectionee]="idErabliereSelectionee" [displayEditFormSubject]="displayEditFormSubject"
-    [alerteEditFormSubject]="alerteEditFormSubject" [alerte]="alerteEditForm"
-    [alerteCapteurEditFormSubject]="alerteCapteurEditFormSubject" [alerteCapteur]="alerteCapteurEditForm"
-    [editAlerte]="editAlerte" [editAlerteCapteur]="editAlerteCapteur">
-</modifier-alerte-modal>
+<div>
+    <ajouter-alerte-modal *ngIf="!displayEditForm" [idErabliereSelectionee]="idErabliereSelectionee" [alertes]="alertes"
+        [alertesCapteur]="alertesCapteur" [erabliere]="erabliere">
+    </ajouter-alerte-modal>
+</div>
+<div>
+    <modifier-alerte-modal *ngIf="displayEditForm || displayEditAlerteCapteurForm"
+        [idErabliereSelectionee]="idErabliereSelectionee" [displayEditFormSubject]="displayEditFormSubject"
+        [alerteEditFormSubject]="alerteEditFormSubject" [alerte]="alerteEditForm"
+        [alerteCapteurEditFormSubject]="alerteCapteurEditFormSubject" [alerteCapteur]="alerteCapteurEditForm"
+        [editAlerte]="editAlerte" [editAlerteCapteur]="editAlerteCapteur">
+    </modifier-alerte-modal>
+</div>
 <div>
     <p *ngIf="alertes != null && alertes.length == 0 && alertesCapteur != null && alertesCapteur.length == 0">
         Aucune alerte de configuré
@@ -68,10 +72,10 @@
                         <span *ngFor="let numero of alerte.numeros" class="feature_desc">{{numero}}</span>
                     </td>
                     <td>
-                        {{formatNumber(alerte.minVaue, alerte.capteur?.symbole)}}
+                        {{formatNumber(alerte.minVaue, alerte.capteur?.symbole, true)}}
                     </td>
                     <td>
-                        {{formatNumber(alerte.maxValue, alerte.capteur?.symbole)}}
+                        {{formatNumber(alerte.maxValue, alerte.capteur?.symbole, true)}}
                     </td>
                     <td>
                         {{alerte.capteur?.nom}}

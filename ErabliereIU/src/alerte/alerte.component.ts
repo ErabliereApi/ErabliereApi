@@ -7,6 +7,7 @@ import { ModifierAlerteComponent } from "./modifier-alerte.component";
 import { AjouterAlerteComponent } from "./ajouter-alerte.component";
 import { NgIf, NgFor } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
+import { Erabliere } from "src/model/erabliere";
 
 @Component({
     selector: 'alerte-page',
@@ -19,6 +20,7 @@ export class AlerteComponent implements OnInit {
   @Input() alertes?: Array<Alerte>;
   @Input() alertesCapteur?: Array<AlerteCapteur>;
   @Input() idErabliereSelectionee: any
+  erabliere?: Erabliere;
 
   displayEditFormSubject;
   displayEditFormObservable;
@@ -58,14 +60,18 @@ export class AlerteComponent implements OnInit {
     this.editAlerteCapteur = false;
   }
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+  async ngOnInit(): Promise<void> {
+    this.route.paramMap.subscribe(async params => {
       this.idErabliereSelectionee = params.get('idErabliereSelectionee');
 
       if (this.idErabliereSelectionee) {
+        this.erabliere = await this._api.getErabliere(this.idErabliereSelectionee);
         this.loadAlertes();
       }
     });
+    
+    this.erabliere = await this._api.getErabliere(this.idErabliereSelectionee);
+
     this.loadAlertes();
 
     this.displayEditFormSubject.subscribe(b => {
@@ -196,13 +202,17 @@ export class AlerteComponent implements OnInit {
     return (parseInt(str)) + " " + symbol;
   }
 
-  formatNumber(i?: number, symbol?: string) {
+  formatNumber(i?: number, symbol?: string, doNoDivide: boolean = false) {
     if (i == null) {
       return null;
     }
 
     // formt the number with one decimal place
-    var formatted = (i / 10).toFixed(1);
+    if (doNoDivide) {
+      return i.toFixed(1) + " " + symbol;
+    }
+
+    let formatted = (i / 10).toFixed(1);
 
     return formatted + " " + symbol;
   }
