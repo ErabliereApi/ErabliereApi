@@ -48,7 +48,7 @@ public class TriggerAlerteV2Test : IClassFixture<ErabliereApiApplicationFactory<
         var id = await CreateErabiere(client);
 
         // When only min is set
-        var capteurId = await CréerCapteurEtAlerte(client, id, 400, null);
+        var capteurId = await CréerCapteurEtAlerte(client, id, 40m, null);
         await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
@@ -74,7 +74,7 @@ public class TriggerAlerteV2Test : IClassFixture<ErabliereApiApplicationFactory<
         var id = await CreateErabiere(client);
 
         // When only max is set
-        var capteurId = await CréerCapteurEtAlerte(client, id, null, 400);
+        var capteurId = await CréerCapteurEtAlerte(client, id, null, 40m);
         await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
@@ -100,7 +100,7 @@ public class TriggerAlerteV2Test : IClassFixture<ErabliereApiApplicationFactory<
         var id = await CreateErabiere(client);
 
         // When both values are set on valid values are in between
-        var capteurId = await CréerCapteurEtAlerte(client, id, 400, 700);
+        var capteurId = await CréerCapteurEtAlerte(client, id, 40m, 70m);
         await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
@@ -139,7 +139,7 @@ public class TriggerAlerteV2Test : IClassFixture<ErabliereApiApplicationFactory<
         }
     }
 
-    private async Task<Guid> CréerCapteurEtAlerte(HttpClient client, Guid id, short? min, short? max)
+    private async Task<Guid> CréerCapteurEtAlerte(HttpClient client, Guid id, decimal? min, decimal? max)
     {
         var postCapteur = _fixture.Create<PostCapteur>();
         postCapteur.IdErabliere = id;
