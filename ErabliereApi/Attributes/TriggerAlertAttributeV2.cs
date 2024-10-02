@@ -52,7 +52,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
 
             logger.LogCritical(92837485, e, "typeof(PostDonneeCapteur) not found in {0}", Serialize(context.ActionArguments.Where(a => a.Value?.GetType() != typeof(CancellationToken))));
 
-            throw;
+            throw new InvalidOperationException("Le paramètre PostDonneeCapteur est requis dans la route pour utiliser l'attribue 'TriggerAlertV2'.");
         }
     }
 
@@ -122,6 +122,8 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
             throw new InvalidOperationException("La donnée membre '_donnee' doit être initialiser pour utiliser la fonction d'alertage.");
         }
 
+        var ajustedValue = _donnee.V / 10m;
+
         var validationCount = 0;
         var conditionMet = 0;
 
@@ -129,7 +131,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         {
             validationCount++;
 
-            if (_donnee.V <= alerte.MinVaue.Value)
+            if (ajustedValue <= alerte.MinVaue.Value)
             {
                 conditionMet++;
             }
@@ -139,7 +141,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         {
             validationCount++;
 
-            if (_donnee.V >= alerte.MaxValue.Value)
+            if (ajustedValue >= alerte.MaxValue.Value)
             {
                 conditionMet++;
             }
