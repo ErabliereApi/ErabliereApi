@@ -2,13 +2,10 @@
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using Microsoft.AspNetCore.Mvc.Filters;
-using MimeKit;
-using System.Text;
-using System.Text.Json;
-using static System.Text.Json.JsonSerializer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Services;
+using static ErabliereApi.Services.AlerteHelper;
 
 namespace ErabliereApi.Attributes;
 
@@ -150,88 +147,8 @@ public class TriggerAlertAttribute : ActionFilterAttribute
 
         if (validationCount > 0 && validationCount == conditionMet)
         {
-            TriggerAlerteCourriel(alerte, logger, emailConfig.Value, emailService);
-            TriggerAlerteSMS(alerte, logger, smsConfig.Value, smsService);
+            Task.Run(() => TriggerAlerteCourriel(alerte, logger, emailConfig.Value, emailService, _donnee));
+            Task.Run(() => TriggerAlerteSMS(alerte, logger, smsConfig.Value, smsService, _donnee));
         }
     }
-
-    private async void TriggerAlerteCourriel(Alerte alerte, ILogger<TriggerAlertAttribute> logger, EmailConfig emailConfig, IEmailService emailService)
-    {
-        if (!emailConfig.IsConfigured)
-        {
-            logger.LogWarning("Les configurations ne courriel ne sont pas initialisé, la fonctionnalité d'alerte ne peut pas fonctionner.");
-
-            return;
-        }
-
-        try
-        {
-            if (alerte.EnvoyerA != null)
-            {
-                var mailMessage = new MimeMessage();
-                mailMessage.From.Add(new MailboxAddress("ErabliereAPI - Alerte Service", emailConfig.Sender));
-                foreach (var destinataire in alerte.EnvoyerA.Split(';'))
-                {
-                    mailMessage.To.Add(MailboxAddress.Parse(destinataire));
-                }
-                mailMessage.Subject = $"Alerte ID : {alerte.Id}";
-                mailMessage.Body = new TextPart("plain")
-                {
-                    Text = FormatTextMessage(alerte, _donnee)
-                };
-
-                await emailService.SendEmailAsync(mailMessage, CancellationToken.None);
-            }
-        }
-        catch (Exception e)
-        {
-            logger.LogCritical(new EventId(92837486, "TriggerAlertAttribute.TriggerAlerte"), e, "Une erreur imprévue est survenu lors de l'envoie de l'alerte.");
-        }
-    }
-
-    private async void TriggerAlerteSMS(Alerte alerte, ILogger<TriggerAlertAttribute> logger, SMSConfig smsConfig, ISmsService smsService)
-    {
-        if (!smsConfig.IsConfigured)
-        {
-            logger.LogWarning("Les configurations de SMS ne sont pas initialisé, la fonctionnalité d'alerte ne peut pas fonctionner.");
-
-            return;
-        }
-
-        try
-        {
-            if (alerte.TexterA != null)
-            {
-                var message = FormatTextMessage(alerte, _donnee);
-
-                foreach (var destinataire in alerte.TexterA.Split(';'))
-                {
-                    await smsService.SendSMSAsync(message, destinataire, CancellationToken.None);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            logger.LogCritical(new EventId(92837486, "TriggerAlertAttribute.TriggerAlerte"), e, "Une erreur imprévue est survenu lors de l'envoie de l'alerte.");
-        }
-    }
-
-    private static string FormatTextMessage(Alerte alerte, PostDonnee? donnee)
-    {
-        var sb = new StringBuilder();
-
-        sb.Append(nameof(Alerte));
-        sb.AppendLine(" : ");
-        sb.AppendLine(Serialize(alerte, _mailSerializerSettings));
-        sb.AppendLine();
-        sb.Append(nameof(PostDonnee));
-        sb.AppendLine(" : ");
-        sb.AppendLine(Serialize(donnee, _mailSerializerSettings));
-        sb.AppendLine();
-        sb.AppendLine($"Date : {DateTimeOffset.UtcNow}");
-
-        return sb.ToString();
-    }
-
-    private readonly static JsonSerializerOptions _mailSerializerSettings = new() { WriteIndented = true };
 }
