@@ -3,7 +3,7 @@ import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
 
 @Component({
-    selector: 'bar-pannel',
+    selector: 'bar-panel',
     template: `
         <div>
             <h3>{{ titre }} {{ valeurActuel }} {{ symbole }}</h3>
@@ -40,7 +40,7 @@ import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
     standalone: true,
     imports: [NgChartsModule]
 })
-export class BarPannelComponent {
+export class BarPanelComponent {
     @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
     @Input() datasets: ChartDataset[]

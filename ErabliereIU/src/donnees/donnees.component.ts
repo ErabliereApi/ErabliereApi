@@ -3,26 +3,26 @@ import { ChartDataset, ChartType } from 'chart.js';
 import { Subject } from 'rxjs';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Erabliere } from 'src/model/erabliere';
-import { GraphPannelComponent } from './sub-panel/graph-pannel.component';
-import { BarPannelComponent } from './sub-panel/bar-pannel.component';
-import { VacciumGraphPannelComponent } from './sub-panel/vaccium-graph-pannel.component';
+import { BarPanelComponent } from './sub-panel/bar-panel.component';
+import { VacuumGraphPanelComponent } from './sub-panel/vacuum-graph-panel.component';
 import { calculerMoyenne } from './util';
+import { GraphPanelComponent } from './sub-panel/graph-panel.component';
 
 @Component({
   selector: 'donnees-panel',
   templateUrl: './donnees.component.html',
   standalone: true,
   imports: [
-    GraphPannelComponent,
-    VacciumGraphPannelComponent,
-    BarPannelComponent,
+    GraphPanelComponent,
+    VacuumGraphPanelComponent,
+    BarPanelComponent,
   ]
 })
 export class DonneesComponent implements OnInit {
-  @ViewChild('temperatureGraphPannel') temperatureGraphPannel?: GraphPannelComponent
-  @ViewChild('vacciumGraphPannel') vacciumGraphPannel?: GraphPannelComponent
-  @ViewChild('niveaubassinGraphPannel') niveaubassinGraphPannel?: GraphPannelComponent
-  @ViewChild('dompeuxGraphPannel') dompeuxGraphPannel?: GraphPannelComponent
+  @ViewChild('temperatureGraphPannel') temperatureGraphPannel?: GraphPanelComponent
+  @ViewChild('vacciumGraphPannel') vacciumGraphPannel?: GraphPanelComponent
+  @ViewChild('niveaubassinGraphPannel') niveaubassinGraphPannel?: GraphPanelComponent
+  @ViewChild('dompeuxGraphPannel') dompeuxGraphPannel?: GraphPanelComponent
 
   intervalRequetes?: any
 
@@ -67,7 +67,7 @@ export class DonneesComponent implements OnInit {
   erabliereAfficherSectionDompeux: boolean | undefined;
   erabliereId: any;
 
-  constructor(private _erabliereApi: ErabliereApi) { }
+  constructor(private readonly _erabliereApi: ErabliereApi) { }
 
   ngOnInit() {
     this.erabliereSubject.subscribe(response => {
@@ -99,20 +99,20 @@ export class DonneesComponent implements OnInit {
   }
 
   fetchDataAndBuildGraph() {
-    if (this.erabliereAfficherTrioDonnees == true) {
+    if (this.erabliereAfficherTrioDonnees) {
       this.doHttpCall();
     }
-    if (this.erabliereAfficherSectionDompeux == true) {
+    if (this.erabliereAfficherSectionDompeux) {
       this.doHttpCallDompeux();
     }
 
     this.intervalRequetes = setInterval(() => {
-      if (this.fixRange == false) {
-        if (this.erabliereAfficherTrioDonnees == true) {
+      if (!this.fixRange) {
+        if (this.erabliereAfficherTrioDonnees) {
           this.doHttpCall();
         }
       }
-      if (this.erabliereAfficherSectionDompeux == true) {
+      if (this.erabliereAfficherSectionDompeux) {
         this.doHttpCallDompeux();
       }
     }, 1000 * 60);
@@ -126,7 +126,7 @@ export class DonneesComponent implements OnInit {
     let debutFiltre = this.obtenirDebutFiltre().toISOString();
     let finFiltre = new Date().toISOString();
 
-    var xddr = null;
+    let xddr = null;
     if (this.dernierDompeuxRecu != undefined) {
       xddr = this.dernierDompeuxRecu.toString();
     }
@@ -138,7 +138,7 @@ export class DonneesComponent implements OnInit {
         this.dernierDompeuxRecu = h.get("x-dde")?.valueOf();
         this.ddrDompeux = h.get("x-ddr")?.valueOf();
 
-        var e = resp.body;
+        let e = resp.body;
 
         if (e == null) {
           return;
@@ -194,19 +194,19 @@ export class DonneesComponent implements OnInit {
       }
     }
 
-    var xddr = null;
+    let xddr = null;
     if (this.derniereDonneeRecu != undefined) {
       xddr = this.derniereDonneeRecu.toString();
     }
 
     this._erabliereApi.getDonnees(this.erabliereId, debutFiltre, finFiltre, xddr)
       .then(reponse => {
-        var h = reponse.headers;
+        let h = reponse.headers;
 
         this.derniereDonneeRecu = h.get("x-dde")?.valueOf();
         this.ddr = h.get("x-ddr")?.valueOf();
 
-        var e = reponse.body;
+        let e = reponse.body;
 
         if (e == null) {
           return;
@@ -248,8 +248,8 @@ export class DonneesComponent implements OnInit {
         let timeaxes = e.map(ee => ee.d);
 
         if (e.length > 0) {
-          var tva = e[e.length - 1].t;
-          var vva = e[e.length - 1].v;
+          let tva = e[e.length - 1].t;
+          let vva = e[e.length - 1].v;
           this.temperatureValueActuel = tva != null ? (tva / 10).toFixed(1) : null;
           this.vacciumValueActuel = vva != null ? (vva / 10).toFixed(1) : null;
           this.niveauBassinValueActuel = e[e.length - 1].nb?.toString();
@@ -323,7 +323,7 @@ export class DonneesComponent implements OnInit {
   debutEnHeure: number = 12;
 
   obtenirDebutFiltre(): Date {
-    var twelve_hour = 1000 * 60 * 60 * this.debutEnHeure;
+    let twelve_hour = 1000 * 60 * 60 * this.debutEnHeure;
 
     return new Date(Date.now() - twelve_hour);
   }

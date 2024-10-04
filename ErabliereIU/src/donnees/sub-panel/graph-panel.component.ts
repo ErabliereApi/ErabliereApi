@@ -3,27 +3,27 @@ import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
-import { NgIf } from '@angular/common';
 import { DateTimeSelectorComponent } from './userinput/date-time-selector.component';
 import { calculerMoyenne } from '../util';
+import { PanelHeaderComponent } from './header/panel-header.component';
 
 @Component({
-    selector: 'vaccium-graph-pannel',
-    templateUrl: './graph-pannel.component.html',
+    selector: 'graph-panel',
+    templateUrl: './graph-panel.component.html',
     standalone: true,
     imports: [
+        PanelHeaderComponent,
         DateTimeSelectorComponent,
-        NgIf,
         AjouterDonneeCapteurComponent,
         NgChartsModule,
     ],
 })
-export class VacciumGraphPannelComponent implements OnInit {
+export class GraphPanelComponent implements OnInit {
     @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
     @Input() datasets: ChartDataset[] = [];
     @Input() timeaxes: string[] = [];
     @Input() lineChartType = 'line' as ChartType;
-    @Input() lineScaleType = 'time' as const
+    @Input() lineScaleType: 'time' | 'timeseries' = 'time'
     lineChartOptions: ChartOptions = {
         maintainAspectRatio: false,
         aspectRatio: 1.7,
@@ -44,15 +44,8 @@ export class VacciumGraphPannelComponent implements OnInit {
                     maxTicksLimit: 6,
                 }
             },
-            y: {
-                min: 0,
-                max: 30
-            } 
         }
     };
-
-    col12: string = "col-12";
-    col10: string = "col-10";
 
     lineChartLegend = true;
     lineChartPlugins = [];
@@ -67,7 +60,12 @@ export class VacciumGraphPannelComponent implements OnInit {
 
     errorMessage: any;
 
-    constructor(private _api: ErabliereApi) { this.chart = undefined; }
+    col12: string = "col-12";
+    col10: string = "col-10";
+
+    constructor(private _api: ErabliereApi) {
+        this.chart = undefined;
+    }
 
     @Input() idCapteur?: any;
 
@@ -113,6 +111,8 @@ export class VacciumGraphPannelComponent implements OnInit {
             xddr = this.dernierDonneeRecu.toString();
         }
 
+        this.errorMessage = undefined;
+
         this._api.getDonneesCapteur(this.idCapteur, debutFiltre, finFiltre, xddr).then(resp => {
             const h = resp.headers;
 
@@ -129,13 +129,13 @@ export class VacciumGraphPannelComponent implements OnInit {
             let ids = json.map(ee => ee.id);
 
             let donnees: Array<ChartDataset> = [
-                { 
-                    data: json.map(donneeCapteur => donneeCapteur.valeur != null ? donneeCapteur.valeur / 10 : null), 
+                {
+                    data: json.map(donneeCapteur => donneeCapteur.valeur != null ? donneeCapteur.valeur : null), 
                     label: this.titre,
                     fill: true,
                     pointBackgroundColor: 'rgba(255,255,0,0.8)',
                     pointBorderColor: 'black',
-                    tension: 0.5
+                    tension: 0.5,
                 }
             ];
 
@@ -144,7 +144,7 @@ export class VacciumGraphPannelComponent implements OnInit {
             if (json.length > 0) {
                 let actualData = json[json.length - 1];
                 let tva = actualData.valeur;
-                this.valeurActuel = tva != null ? (tva / 10).toFixed(1) : null;
+                this.valeurActuel = tva;
                 this.textActuel = actualData.text;
             }
 
@@ -175,14 +175,17 @@ export class VacciumGraphPannelComponent implements OnInit {
                 this.ids = ids;
             }
 
+            this.chart?.update();
+
             if (this.fixRange) {
-                this.mean = " Moyenne: " + calculerMoyenne(this.datasets[0]) + " " + this.symbole;
+                this.mean = " Moyenne: " + calculerMoyenne(this.datasets[0]) + this.symbole;
             }
             else {
                 this.mean = undefined;
             }
-
-            this.chart?.update();
+        }).catch(err => {
+            console.error(err);
+            this.errorMessage = err?.message;
         });
     }
 
@@ -190,7 +193,7 @@ export class VacciumGraphPannelComponent implements OnInit {
     debutEnHeure: number = 12;
 
     obtenirDebutFiltre(): Date {
-        let twelve_hour = 1000 * 60 * 60 * this.debutEnHeure;
+        const twelve_hour = 1000 * 60 * 60 * this.debutEnHeure;
 
         return new Date(Date.now() - twelve_hour);
     }
@@ -234,6 +237,7 @@ export class VacciumGraphPannelComponent implements OnInit {
     }
 
     fixRange: boolean = false;
+
     @Input() mean?: string = undefined;
 
     updateGraphUsingFixRange() {

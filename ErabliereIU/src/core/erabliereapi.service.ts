@@ -196,8 +196,8 @@ export class ErabliereApi {
         if (xddr != null) {
             headers = headers.set('x-ddr', xddr);
         }
-        var httpCall = this._httpClient.get<Donnee[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/donnees?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
-        const rtn = await httpCall.toPromise();
+        let httpCall = this._httpClient.get<Donnee[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/donnees?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
+        const rtn = await firstValueFrom(httpCall);
         return rtn ?? new HttpResponse();
     }
 
@@ -206,9 +206,15 @@ export class ErabliereApi {
         if (xddr != null) {
             headers = headers.set('x-ddr', xddr);
         }
-        var httpCall = this._httpClient.get<DonneeCapteur[]>(this._environmentService.apiUrl + '/capteurs/' + idCapteur + "/DonneesCapteurV2?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
-        const rtn = await httpCall.toPromise();
+        let httpCall = this._httpClient.get<DonneeCapteur[]>(this._environmentService.apiUrl + '/capteurs/' + idCapteur + "/DonneesCapteurV2?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
+        const rtn = await firstValueFrom(httpCall);
         return rtn ?? new HttpResponse();
+    }
+
+    async getDonneesCapteurTop(idCapteur: any, top: number): Promise<DonneeCapteur[]> {
+        let headers = await this.getHeaders();
+        let httpCall = this._httpClient.get<DonneeCapteur[]>(this._environmentService.apiUrl + '/capteurs/' + idCapteur + "/DonneesCapteurV2?order=desc&top=" + top, { headers: headers, observe: 'response' });
+        return firstValueFrom(httpCall).then(rtn => rtn.body ?? []);
     }
 
     async getDompeux(idErabliereSelectionnee: any, debutFiltre: string, finFiltre: string, xddr?: any): Promise<HttpResponse<Dompeux[]>> {
@@ -216,8 +222,8 @@ export class ErabliereApi {
         if (xddr != null) {
             headers = headers.set('x-ddr', xddr);
         }
-        var httpCall = this._httpClient.get<Dompeux[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/dompeux?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
-        const rtn = await httpCall.toPromise();
+        let httpCall = this._httpClient.get<Dompeux[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/dompeux?dd=" + debutFiltre + "&df=" + finFiltre, { headers: headers, observe: 'response' });
+        const rtn = await firstValueFrom(httpCall);
         return rtn ?? new HttpResponse();
     }
 

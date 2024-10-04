@@ -17,7 +17,7 @@ using Xunit;
 
 namespace ErabliereApi.Integration.Test;
 
-public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<Startup>>
+public class TriggerAlerteV2Test : IClassFixture<ErabliereApiApplicationFactory<Startup>>
 {
     private readonly ErabliereApiApplicationFactory<Startup> _factory;
     private readonly IFixture _fixture;
@@ -26,7 +26,7 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public TriggerAlerteV3Test(ErabliereApiApplicationFactory<Startup> factory)
+    public TriggerAlerteV2Test(ErabliereApiApplicationFactory<Startup> factory)
     {
         _factory = factory;
         _fixture = ErabliereFixture.CreerFixture();
@@ -46,15 +46,15 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
 
         // When only min is set
         var capteurId = await CréerCapteurEtAlerte(client, id, 40m, null);
-        await EnvoyerDonneesCapeur(client, new PostDonneeCapteurV2
+        await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
-            V = 10m
+            V = 100
         });
-        await EnvoyerDonneesCapeur(client, new PostDonneeCapteurV2
+        await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
-            V = 55m
+            V = 550
         }, noAlerte: true);
     }
 
@@ -72,15 +72,15 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
 
         // When only max is set
         var capteurId = await CréerCapteurEtAlerte(client, id, null, 40m);
-        await EnvoyerDonneesCapeur(client, new PostDonneeCapteurV2
+        await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
-            V = 10m
+            V = 100
         }, noAlerte: true);
-        await EnvoyerDonneesCapeur(client, new PostDonneeCapteurV2
+        await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
-            V = 55m
+            V = 550
         });
     }
 
@@ -98,26 +98,26 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
 
         // When both values are set on valid values are in between
         var capteurId = await CréerCapteurEtAlerte(client, id, 40m, 70m);
-        await EnvoyerDonneesCapeur(client, new PostDonneeCapteurV2
+        await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
-            V = 10m
+            V = 100
         });
-        await EnvoyerDonneesCapeur(client, new PostDonneeCapteurV2
+        await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
-            V = 90m
+            V = 900
         });
-        await EnvoyerDonneesCapeur(client, new PostDonneeCapteurV2
+        await EnvoyerDonneesCapeur(client, new PostDonneeCapteur
         {
             IdCapteur = capteurId,
-            V = 55m
+            V = 550
         }, noAlerte: true);
     }
 
-    private async Task EnvoyerDonneesCapeur(HttpClient client, PostDonneeCapteurV2 postDonneeCapteur, bool noAlerte = false)
+    private async Task EnvoyerDonneesCapeur(HttpClient client, PostDonneeCapteur postDonneeCapteur, bool noAlerte = false)
     {
-        var response = await client.PostAsJsonAsync($"Capteurs/{postDonneeCapteur.IdCapteur}/DonneesCapteurV2", postDonneeCapteur);
+        var response = await client.PostAsJsonAsync($"Capteurs/{postDonneeCapteur.IdCapteur}/DonneesCapteur", postDonneeCapteur);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

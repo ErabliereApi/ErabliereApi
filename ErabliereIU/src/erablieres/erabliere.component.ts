@@ -4,12 +4,12 @@ import { DonneesComponent } from 'src/donnees/donnees.component';
 import { BarilsComponent } from 'src/barils/barils.component';
 import { ActivatedRoute } from '@angular/router';
 import { Erabliere } from 'src/model/erabliere';
-import { CapteurPannelsComponent } from 'src/donnees/sub-panel/capteur-pannels.component';
 import { Subject } from 'rxjs';
-import { ImagePanelComponent } from 'src/donnees/sub-panel/image-pannel.component';
+import { ImagePanelComponent } from 'src/donnees/sub-panel/image-panel.component';
 import { RappelsComponent } from 'src/rappel/rappels.component';
 import { WeatherForecastComponent } from 'src/donnees/weather-forecast.component';
 import { HourlyWeatherForecastComponent } from 'src/donnees/hourly-weather-forecast';
+import { CapteurPanelsComponent } from 'src/donnees/sub-panel/capteur-panels.component';
 
 @Component({
     selector: 'erablieres',
@@ -17,7 +17,7 @@ import { HourlyWeatherForecastComponent } from 'src/donnees/hourly-weather-forec
     standalone: true,
     imports: [
       DonneesComponent,
-      CapteurPannelsComponent,
+      CapteurPanelsComponent,
       BarilsComponent,
       ImagePanelComponent,
       RappelsComponent,
@@ -33,7 +33,7 @@ export class ErabliereComponent implements OnInit {
   displayCapteurs: boolean = false;
   displayImages: boolean = false;
 
-  constructor(private _api: ErabliereApi, private route: ActivatedRoute) {
+  constructor(private readonly _api: ErabliereApi, private readonly route: ActivatedRoute) {
     this.route.paramMap.subscribe(params => {
       this.idErabliereSelectionee = params.get('idErabliereSelectionee');
       if (this.idErabliereSelectionee) {

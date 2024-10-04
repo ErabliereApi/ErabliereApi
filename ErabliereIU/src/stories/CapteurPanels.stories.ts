@@ -1,10 +1,10 @@
 import { type Meta, type StoryObj } from '@storybook/angular';
-import { CapteurPannelsComponent } from 'src/donnees/sub-panel/capteur-pannels.component';
+import { CapteurPanelsComponent } from 'src/donnees/sub-panel/capteur-panels.component';
 import { ModuleStoryHelper } from './moduleMetadata/moduleStoryHelper';
 
-const meta: Meta<CapteurPannelsComponent> = {
+const meta: Meta<CapteurPanelsComponent> = {
   title: 'CapteurPannelsComponent',
-  component: CapteurPannelsComponent,
+  component: CapteurPanelsComponent,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -15,7 +15,7 @@ const meta: Meta<CapteurPannelsComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<CapteurPannelsComponent>;
+type Story = StoryObj<CapteurPanelsComponent>;
 
 export const Primary: Story = {
   args: {

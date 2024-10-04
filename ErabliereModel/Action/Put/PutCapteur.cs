@@ -84,4 +84,14 @@ public class PutCapteur
     /// Fréquence de rapport
     /// </summary>
     public int? ReportFrequency { get; set; }
+
+    /// <summary>
+    /// Le type d'affichage du capteur
+    /// </summary>
+    public string? DisplayType { get; set; }
+
+    /// <summary>
+    /// Le nombre de données affiché par défaut
+    /// </summary>
+    public short? DisplayTop { get; set; }
 }

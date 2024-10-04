@@ -50,6 +50,12 @@ import { Capteur } from 'src/model/capteur';
 
                 <dt>Report Frequency</dt>
                 <dd>{{capteur.reportFrequency}}</dd>
+
+                <dt>Display Type</dt>
+                <dd>{{capteur.displayType}}</dd>
+
+                <dt>Display Top</dt>
+                <dd>{{capteur.displayTop}}</dd>
             </data>
         </div>
         `,

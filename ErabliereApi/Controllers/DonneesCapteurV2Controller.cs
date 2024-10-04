@@ -8,6 +8,7 @@ using ErabliereApi.Donnees.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
 namespace ErabliereApi.Controllers;
@@ -41,25 +42,42 @@ public class DonneesCapteurV2Controller : ControllerBase
     /// <param name="ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
     /// <param name="dd">Date de début</param>
     /// <param name="df">Date de fin</param>
+    /// <param name="order">Ordre de tri</param>
+    /// <param name="top">Nombre de données à retourner</param>
     /// <param name="token">Token d'annulation</param>
     /// <response code="200">Une liste de DonneesCapteur.</response>
     [HttpGet]
     [ValiderOwnership("id", typeof(Capteur))]
     [AllowAnonymous]
     public async Task<IEnumerable<GetDonneesCapteurV2>> Lister(Guid id,
-                                                             [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
-                                                             DateTimeOffset? dd,
-                                                             DateTimeOffset? df,
-                                                             CancellationToken token)
+                                                              [FromHeader(Name = "x-ddr")] DateTimeOffset? ddr,
+                                                              [FromQuery] DateTimeOffset? dd,
+                                                              [FromQuery] DateTimeOffset? df,
+                                                              [FromQuery][MaxLength(5)] string? order,
+                                                              [FromQuery]int? top,
+                                                              CancellationToken token)
     {
-        var donnees = await _depot.DonneesCapteur.AsNoTracking()
+        var donneesQuery = _depot.DonneesCapteur.AsNoTracking()
                             .Where(b => b.IdCapteur == id &&
                                         (ddr == null || b.D >= ddr) &&
                                         (dd == null || b.D >= dd) &&
-                                        (df == null || b.D <= df))
-                            .OrderBy(b => b.D)
-                            .ProjectTo<GetDonneesCapteurV2>(_mapper.ConfigurationProvider)
-                            .ToArrayAsync(token);
+                                        (df == null || b.D <= df));
+
+        if (order?.Trim().ToLower() == "desc")
+        {
+            donneesQuery = donneesQuery.OrderByDescending(b => b.D);
+        }
+        else
+        {
+            donneesQuery = donneesQuery.OrderBy(b => b.D);
+        }
+
+        if (top.HasValue)
+        {
+            donneesQuery = donneesQuery.Take(top.Value);
+        }
+
+        var donnees = await donneesQuery.ProjectTo<GetDonneesCapteurV2>(_mapper.ConfigurationProvider).ToArrayAsync(token);
 
         if (donnees.Length > 0)
         {
@@ -105,7 +123,7 @@ public class DonneesCapteurV2Controller : ControllerBase
         {
             var id = Guid.Parse(idstr);
 
-            var item = await Lister(id, ddr, dd, df, token);
+            var item = await Lister(id, ddr, dd, df, null, null, token);
 
             list.Add(new Pair<Guid, IEnumerable<GetDonneesCapteurV2>>(id, item));
         }

@@ -58,7 +58,7 @@ public class TriggerAlertAttribute : ActionFilterAttribute
                 {
                     var alerte = alertes[i];
 
-                    MaybeTriggerAlerte(alerte, logger, emailConfig, emailService, smsConfig, smsService);
+                    await MaybeTriggerAlerte(alerte, logger, emailConfig, emailService, smsConfig, smsService);
                 }
             }
             catch (Exception e)
@@ -70,7 +70,7 @@ public class TriggerAlertAttribute : ActionFilterAttribute
         }
     }
 
-    private void MaybeTriggerAlerte(Alerte alerte, 
+    private async Task MaybeTriggerAlerte(Alerte alerte, 
         ILogger<TriggerAlertAttribute> logger, 
         IOptions<EmailConfig> emailConfig, 
         IEmailService emailService,
@@ -147,8 +147,8 @@ public class TriggerAlertAttribute : ActionFilterAttribute
 
         if (validationCount > 0 && validationCount == conditionMet)
         {
-            Task.Run(() => TriggerAlerteCourriel(alerte, logger, emailConfig.Value, emailService, _donnee));
-            Task.Run(() => TriggerAlerteSMS(alerte, logger, smsConfig.Value, smsService, _donnee));
+            await TriggerAlerteCourriel(alerte, logger, emailConfig.Value, emailService, _donnee);
+            await TriggerAlerteSMS(alerte, logger, smsConfig.Value, smsService, _donnee);
         }
     }
 }

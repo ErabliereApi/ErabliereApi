@@ -154,7 +154,7 @@ public class CapteursController : ControllerBase
             {
                 capteur.IdErabliere = erabliere.Id;
 
-                var entity = await _depot.Capteurs.AddAsync(_mapper.Map<Capteur>(capteur), token);
+                await _depot.Capteurs.AddAsync(_mapper.Map<Capteur>(capteur), token);
             }
         }
 
@@ -359,6 +359,17 @@ public class CapteursController : ControllerBase
         {
             capteurEntity.LastMessageTime = capteur.LastMessageTime;
         }
+
+        if (capteur.DisplayType != null) 
+        {
+            capteurEntity.DisplayType = capteur.DisplayType;
+        }
+
+        if (capteur.DisplayTop.HasValue)
+        {
+            capteurEntity.DisplayTop = capteur.DisplayTop.Value;
+        }
+
 
         _depot.Update(capteurEntity);
 

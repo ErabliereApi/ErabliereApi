@@ -87,7 +87,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
                 {
                     var alerte = alertes[i];
 
-                    MaybeTriggerAlerte(
+                    await MaybeTriggerAlerte(
                         alerte, 
                         logger, 
                         emailConfig.Value, 
@@ -106,7 +106,7 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
         }
     }
 
-    private static void MaybeTriggerAlerte(
+    private static async Task MaybeTriggerAlerte(
         AlerteCapteur alerte, 
         ILogger<TriggerAlertV2Attribute> logger, 
         EmailConfig emailConfig, 
@@ -147,8 +147,8 @@ public class TriggerAlertV2Attribute : ActionFilterAttribute
 
         if (conditionMet > 0)
         {
-            Task.Run(() => TriggerAlerteCourriel(alerte, logger, emailConfig, emailService, _donnee));
-            Task.Run(() => TriggerAlerteSMS(alerte, logger, smsConfig, smsService, _donnee));
+            await TriggerAlerteCourriel(alerte, logger, emailConfig, emailService, _donnee);
+            await TriggerAlerteSMS(alerte, logger, smsConfig, smsService, _donnee);
         }
         else
         {

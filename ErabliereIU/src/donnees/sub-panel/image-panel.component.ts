@@ -6,7 +6,7 @@ import { GetImageInfo } from 'src/model/imageInfo';
 
 @Component({
     selector: 'image-panel',
-    templateUrl: "./image-pannel.component.html",
+    templateUrl: "./image-panel.component.html",
     styles: [`
         /* Style the Image Used to Trigger the Modal */
         .trigger-modal {
@@ -101,7 +101,7 @@ import { GetImageInfo } from 'src/model/imageInfo';
 })
 export class ImagePanelComponent implements OnInit {
   
-    constructor(private api: ErabliereApi, private route: ActivatedRoute) {
+    constructor(private readonly api: ErabliereApi, private readonly route: ActivatedRoute) {
 
     }
 

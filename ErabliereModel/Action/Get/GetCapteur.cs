@@ -83,5 +83,15 @@ namespace ErabliereApi.Donnees.Action.Get
         /// Fréquence de rapport
         /// </summary>
         public int? ReportFrequency { get; set; }
+
+        /// <summary>
+        /// Type d'affichage
+        /// </summary>
+        public string? DisplayType { get; set; }
+
+        /// <summary>
+        /// Nombre d'élément affiché par défaut
+        /// </summary>
+        public short? DisplayTop { get; set; }
     }
 }

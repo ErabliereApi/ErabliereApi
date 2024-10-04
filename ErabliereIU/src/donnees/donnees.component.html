@@ -1,7 +1,7 @@
 <div class="row border-top py-2">
     @if (initialErabliere?.afficherTrioDonnees) {
     <div class="col-md-4">
-        <graph-pannel [titre]="titre_temperature"
+        <graph-panel [titre]="titre_temperature"
                      [valeurActuel]="temperatureValueActuel"
                      [mean]="meanTemperature"
                      [symbole]="temperatureSymbole"
@@ -9,10 +9,10 @@
                      (updateGraphCallback)="updateGraph($event)"
                      (updateGraphUsingFixRangeCallback)="updateGraphUsingFixRangeCallback($event)"
                      [datasets]="temperature" #temperatureGraphPannel>
-        </graph-pannel>
+        </graph-panel>
     </div>
     <div class="col-md-4">
-        <vaccium-graph-pannel [titre]="titre_vaccium"
+        <vacuum-graph-panel [titre]="titre_vaccium"
                      [valeurActuel]="vacciumValueActuel"
                      [symbole]="vacciumSymbole"
                      [timeaxes]="timeaxes"
@@ -20,10 +20,10 @@
                      (updateGraphCallback)="updateGraph($event)"
                      (updateGraphUsingFixRangeCallback)="updateGraphUsingFixRangeCallback($event)"
                      [datasets]="vaccium" #vacciumGraphPannel>
-        </vaccium-graph-pannel>
+        </vacuum-graph-panel>
     </div>
     <div class="col-md-4">
-        <graph-pannel [titre]="titre_niveaubassin"
+        <graph-panel [titre]="titre_niveaubassin"
                      [valeurActuel]="niveauBassinValueActuel"
                      [symbole]="niveauBassinSymbole"
                      [timeaxes]="timeaxes"
@@ -31,16 +31,16 @@
                      (updateGraphCallback)="updateGraph($event)"
                      (updateGraphUsingFixRangeCallback)="updateGraphUsingFixRangeCallback($event)"
                      [datasets]="niveaubassin" #niveaubassinGraphPannel>
-        </graph-pannel>
+        </graph-panel>
     </div>
     }
     @if (initialErabliere?.afficherSectionDompeux) {
     <div class="col-md-6">
-        <bar-pannel [titre]="titre_dompeux"
+        <bar-panel [titre]="titre_dompeux"
                    [timeaxes]="timeaxes_dompeux"
                    [datasets]="dompeux"
                    [barChartType]="dompeux_line_type" #dompeuxGraphPannel>
-        </bar-pannel>
+        </bar-panel>
     </div>
     }
 </div>

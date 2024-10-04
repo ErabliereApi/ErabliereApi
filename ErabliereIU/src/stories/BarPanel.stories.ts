@@ -1,10 +1,10 @@
 import { type Meta, type StoryObj } from '@storybook/angular';
-import { BarPannelComponent } from 'src/donnees/sub-panel/bar-pannel.component';
+import { BarPanelComponent } from 'src/donnees/sub-panel/bar-panel.component';
 import { ModuleStoryHelper } from './moduleMetadata/moduleStoryHelper';
 
-const meta: Meta<BarPannelComponent> = {
+const meta: Meta<BarPanelComponent> = {
   title: 'BarPannelComponent',
-  component: BarPannelComponent,
+  component: BarPanelComponent,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -15,7 +15,7 @@ const meta: Meta<BarPannelComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<BarPannelComponent>;
+type Story = StoryObj<BarPanelComponent>;
 
 export const Primary: Story = {
   args: {

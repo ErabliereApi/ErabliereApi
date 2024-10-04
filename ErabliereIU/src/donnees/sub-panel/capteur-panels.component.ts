@@ -3,23 +3,24 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Capteur } from 'src/model/capteur';
 import { Erabliere } from 'src/model/erabliere';
-import { GraphPannelComponent } from './graph-pannel.component';
+import { GraphPanelComponent } from './graph-panel.component';
 import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
+import { TablePanelComponent } from './table-panel.component';
 
 @Component({
-    selector: 'capteur-pannels',
-    templateUrl: './capteur-pannels.component.html',
+    selector: 'capteur-panels',
+    templateUrl: './capteur-panels.component.html',
     standalone: true,
-    imports: [GraphPannelComponent, NgClass]
+    imports: [GraphPanelComponent, TablePanelComponent, NgClass]
 })
-export class CapteurPannelsComponent implements OnChanges {
+export class CapteurPanelsComponent implements OnChanges {
     @Input() capteurs?: Capteur[] = []
     @Input() erabliere?: Erabliere
     isLogged: boolean = false;
 
     public tailleGraphiques?: number = 6;
 
-    constructor(private _api: ErabliereApi, private _authService: AuthorisationFactoryService) {
+    constructor(private readonly _api: ErabliereApi, private readonly _authService: AuthorisationFactoryService) {
         if (this._authService.getAuthorisationService().type == "AuthDisabled") {
             this.isLogged = true;
         }

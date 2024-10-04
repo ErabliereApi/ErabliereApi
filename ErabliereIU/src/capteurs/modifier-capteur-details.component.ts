@@ -10,11 +10,19 @@ import { Capteur } from 'src/model/capteur';
         <div class="form-group">
             <div class="form-group">
                 <label for="type">Type</label>
-                <input type="text" class="form-control" id="type" name="type" (change)="updateType($event)">
+                <input type="text" class="form-control" id="type" name="type" [value]="editedCapteur.type" (change)="updateType($event)">
             </div>
             <div class="form-group">
                 <label for="externalId">Id de système externe</label>      
-                <input type="text" class="form-control" id="externalId" name="externalId" (change)="updateExernalId($event)">
+                <input type="text" class="form-control" id="externalId" name="externalId" [value]="editedCapteur.externalId" (change)="updateExernalId($event)">
+            </div>
+            <div class="form-group">
+                <label for="displayType">Type d'affichage</label>
+                <input type="text" class="form-control" id="displayType" name="displayType" [value]="editedCapteur.displayType" (change)="updateDisplayType($event)">
+            </div>
+            <div class="form-group">
+                <label for="displayTop">Quantité par défaut</label>
+                <input type="number" class="form-control" id="displayTop" name="displayTop" [value]="editedCapteur.displayTop" (change)="updateDisplayTop($event)">
             </div>
             <button type="button" class="btn btn-primary" (click)="saveChanges()">Enregistrer</button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button> 
@@ -30,7 +38,7 @@ export class ModifierCapteurDetailsComponent implements OnInit {
     @Output() needToUpdate = new EventEmitter();
     @Output() closeForm = new EventEmitter();
 
-    constructor(private api: ErabliereApi) {
+    constructor(private readonly api: ErabliereApi) {
         this.inputCapteur = new Capteur();
         this.capteur = new Capteur();
         this.editedCapteur = new Capteur();
@@ -47,6 +55,8 @@ export class ModifierCapteurDetailsComponent implements OnInit {
         putPayload.type = this.editedCapteur.type;
         putPayload.externalId = this.editedCapteur.externalId;
         putPayload.idErabliere = this.capteur.idErabliere;
+        putPayload.displayType = this.editedCapteur.displayType;
+        putPayload.displayTop = this.editedCapteur.displayTop;
         putPayload.ajouterDonneeDepuisInterface = this.capteur.ajouterDonneeDepuisInterface;
         this.api.putCapteur(putPayload);
         this.needToUpdate.emit();
@@ -64,5 +74,15 @@ export class ModifierCapteurDetailsComponent implements OnInit {
     updateType($event: Event) {
         let inputElement = $event.target as HTMLInputElement;
         this.editedCapteur.type = inputElement.value;
+    }
+
+    updateDisplayType($event: Event) {
+        let inputElement = $event.target as HTMLInputElement;
+        this.editedCapteur.displayType = inputElement.value;
+    }
+
+    updateDisplayTop($event: Event) {
+        let inputElement = $event.target as HTMLInputElement;
+        this.editedCapteur.displayTop = parseInt(inputElement.value);
     }
 }

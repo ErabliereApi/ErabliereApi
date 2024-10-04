@@ -1,10 +1,10 @@
 import { type Meta, type StoryObj } from '@storybook/angular';
-import { VacciumGraphPannelComponent } from 'src/donnees/sub-panel/vaccium-graph-pannel.component';
+import { VacuumGraphPanelComponent } from 'src/donnees/sub-panel/vacuum-graph-panel.component';
 import { ModuleStoryHelper } from './moduleMetadata/moduleStoryHelper';
 
-const meta: Meta<VacciumGraphPannelComponent> = {
+const meta: Meta<VacuumGraphPanelComponent> = {
   title: 'VacciumGraphPannelComponent',
-  component: VacciumGraphPannelComponent,
+  component: VacuumGraphPanelComponent,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -15,7 +15,7 @@ const meta: Meta<VacciumGraphPannelComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<VacciumGraphPannelComponent>;
+type Story = StoryObj<VacuumGraphPanelComponent>;
 
 export const Primary: Story = {
   args: {

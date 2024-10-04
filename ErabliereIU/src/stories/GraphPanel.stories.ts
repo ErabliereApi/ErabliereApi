@@ -1,10 +1,10 @@
 import { type Meta, type StoryObj } from '@storybook/angular';
-import { GraphPannelComponent } from 'src/donnees/sub-panel/graph-pannel.component';
+import { GraphPanelComponent } from 'src/donnees/sub-panel/graph-panel.component';
 import { ModuleStoryHelper } from './moduleMetadata/moduleStoryHelper';
 
-const meta: Meta<GraphPannelComponent> = {
+const meta: Meta<GraphPanelComponent> = {
   title: 'GraphPannelComponent',
-  component: GraphPannelComponent,
+  component: GraphPanelComponent,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -15,7 +15,7 @@ const meta: Meta<GraphPannelComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<GraphPannelComponent>;
+type Story = StoryObj<GraphPanelComponent>;
 
 export const Primary: Story = {
   args: {

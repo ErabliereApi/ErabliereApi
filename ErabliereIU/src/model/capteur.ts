@@ -17,4 +17,6 @@ export class Capteur {
     lastMessageTime?: string;
     online?: boolean;
     reportFrequency?: number;
+    displayType?: string;
+    displayTop?: number;
 }
