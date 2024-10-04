@@ -289,6 +289,37 @@ public class CapteursController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Permet à un administrateur de modifier plusieurs capteurs depuis leurs nom
+    /// </summary>
+    /// <param name="filtreNom">Modifier les capteurs avec le nom suivant</param>
+    /// <param name="putCapteur">Modification à apporter à chaque capteur</param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpPut("/Capteurs/ModifierDepuisFiltre")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> ModifierDepuisFiltre([FromQuery] string filtreNom, [FromBody] PutCapteur putCapteur, CancellationToken token)
+    {
+        var capteurs = await _depot.Capteurs.Where(c => c.Nom == filtreNom).ToArrayAsync(token);
+
+        foreach (var capteur in capteurs)
+        {
+            var result = UpdateCapteur(putCapteur, capteur);
+
+            if (result is not NoContentResult)
+            {
+                return result;
+            }
+        }
+
+        var modified = await _depot.SaveChangesAsync(token);
+
+        return Ok(new {
+            modified
+        });
+    }
+
     private IActionResult UpdateCapteur(PutCapteur capteur, Capteur capteurEntity)
     {
         if (capteur.AfficherCapteurDashboard.HasValue)
