@@ -109,6 +109,13 @@ public class ErablieresController : ControllerBase
             }
         }
 
+        query = await AddOrderAndPageInfo(orderby, filter, top, query, token);
+
+        return query;
+    }
+
+    private async Task<IQueryable<Erabliere>> AddOrderAndPageInfo(string? orderby, string? filter, int? top, IQueryable<Erabliere> query, CancellationToken token)
+    {
         HttpContext.Response.Headers.Append("X-ErabliereTotal", (await query.CountAsync(token)).ToString());
 
         if (string.IsNullOrWhiteSpace(orderby))
@@ -132,6 +139,40 @@ public class ErablieresController : ControllerBase
         }
 
         return query;
+    }
+
+    /// <summary>
+    /// Lister les érablières sous format GeoJson
+    /// </summary>
+    [HttpGet("GeoJson")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGeoJson(CancellationToken token)
+    {
+        var erablieres = await _context.Erabliere
+            .AsNoTracking()
+            .Where(e => e.IsPublic && e.Latitude != 0 && e.Longitude != 0)
+            .ToArrayAsync(token);
+
+        var geoJson = new
+        {
+            type = "FeatureCollection",
+            features = erablieres.Select(e => new 
+            {
+                type = "Feature",
+                geometry = new
+                {
+                    type = "Point",
+                    coordinates = new double[] { e.Longitude, e.Latitude }
+                },
+                properties = new
+                {
+                    name = e.Nom,
+                    id = e.Id
+                }
+            }).ToArray()
+        };
+
+        return Ok(geoJson);
     }
 
     /// <summary>
@@ -392,6 +433,16 @@ public class ErablieresController : ControllerBase
         if (erabliere.DimensionPanneauImage.HasValue)
         {
             entity.DimensionPanneauImage = (byte)erabliere.DimensionPanneauImage;
+        }
+
+        if (erabliere.Longitude.HasValue)
+        {
+            entity.Longitude = erabliere.Longitude.Value;
+        }
+
+        if (erabliere.Latitude.HasValue)
+        {
+            entity.Latitude = erabliere.Latitude.Value;
         }
     }
 

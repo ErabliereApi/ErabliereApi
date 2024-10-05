@@ -68,6 +68,9 @@
                 </li>
             </ul>
             <div class="d-flex gap-2">
+                @if (mapFeatureEnable) {
+                <button id="zone-carte-button" class="btn btn-primary" routerLink="/map">Carte</button>
+                }
                 @if (!useAuthentication || isAdminUser) {
                 <button id="zone-admin-button" class="btn btn-outline-primary" routerLink="/a">Érablière
                     Admin</button>

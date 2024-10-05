@@ -16,7 +16,7 @@ import {ConnectionButtonComponent} from "../../../authorisation/connection-butto
     imports: [RouterOutlet, RouterLink, RouterLinkActive, AgoraCallServiceComponent, ConnectionButtonComponent]
 })
 export class ClientNavBarComponent implements OnInit {
-  private _authService: IAuthorisationSerivce
+  private readonly _authService: IAuthorisationSerivce
 
   @Input() idErabliereSelectionee?: string;
   @Input() thereIsAtLeastOneErabliere: boolean;
@@ -27,12 +27,13 @@ export class ClientNavBarComponent implements OnInit {
   callFeatureEnableForUser: boolean = false;
   callFeatureEnable: boolean = false;
   isAdminUser: boolean = false;
+  mapFeatureEnable: boolean = false;
 
   constructor(
       authFactoryService: AuthorisationFactoryService,
-      private _environmentService: EnvironmentService,
-      private _api: ErabliereApi,
-      private _msalService: MsalService) {
+      private readonly _environmentService: EnvironmentService,
+      private readonly _api: ErabliereApi,
+      private readonly _msalService: MsalService) {
     this._authService = authFactoryService.getAuthorisationService()
     this.useAuthentication = this._environmentService.authEnable ?? false;
     this.thereIsAtLeastOneErabliere = false
@@ -49,6 +50,7 @@ export class ClientNavBarComponent implements OnInit {
     // look at the openapi spec to see if the call endpoint is enable
     this._api.getOpenApiSpec().then(spec => {
       this.callFeatureEnable = spec.paths['/Calls/GetAppId'] != null;
+      this.mapFeatureEnable = spec.paths['/api/Map/access-token/{provider}'] != null
     })
     .catch(err => {
         console.error(err);

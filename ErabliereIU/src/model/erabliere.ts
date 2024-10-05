@@ -16,6 +16,8 @@ export class Erabliere {
     afficherPredictionMeteoJour?: boolean;
     afficherPredictionMeteoHeure?: boolean;
     dimensionPanneauImage?: number;
+    longitude?: number;
+    latitude?: number;
 
     /* La date de création de l'érablière */
     dc?: string;

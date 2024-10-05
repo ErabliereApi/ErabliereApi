@@ -18,7 +18,7 @@ import {EnvironmentService} from "../../../environments/environment.service";
 export class AdminNavBarComponent {
     useAuthentication: boolean = false;
 
-    constructor(private environmentService: EnvironmentService) {
+    constructor(private readonly environmentService: EnvironmentService) {
         this.useAuthentication = this.environmentService.authEnable ?? false;
     }
 }

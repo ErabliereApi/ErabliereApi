@@ -37,6 +37,7 @@
     "chart.js": "^4.4.4",
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^4.1.0",
+    "mapbox-gl": "^3.7.0",
     "ng2-charts": "^5.0.4",
     "ngx-mask": "^17.0.8",
     "oidc-client": "^1.11.5",

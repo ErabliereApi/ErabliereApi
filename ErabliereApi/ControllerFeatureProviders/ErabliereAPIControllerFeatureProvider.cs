@@ -51,6 +51,13 @@ public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
             return enableImages;
         }
 
+        if (typeInfo.Name == nameof(MapController))
+        {
+            var enableMap = !string.IsNullOrWhiteSpace(_config["Mapbox_AccessToken"]);
+
+            return enableMap;
+        }
+
         return base.IsController(typeInfo);
     }
 }

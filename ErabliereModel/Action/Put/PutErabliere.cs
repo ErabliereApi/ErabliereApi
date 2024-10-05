@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using ErabliereApi.Donnees.Interfaces;
 
 namespace ErabliereApi.Donnees.Action.Put;
 
@@ -72,4 +73,14 @@ public class PutErabliere
     /// Indiuateur permettant une accès en lecture à l'érablière sans authentifications
     /// </summary>
     public bool? IsPublic { get; set; }
+
+    /// <summary>
+    /// Longitude
+    /// </summary>
+    public double? Longitude { get; set; }
+
+    /// <summary>
+    /// Latitude
+    /// </summary>
+    public double? Latitude { get; set; }
 }

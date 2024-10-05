@@ -14,6 +14,8 @@ import {ClientViewComponent} from "./client-view/client-view.component";
 import {GestionCapteursComponent} from "../capteurs/gestion-capteurs.component";
 import { ReportsComponent } from 'src/rapport/rapports.component';
 import { AdminAPIKeysComponent } from 'src/admin/admin-apikeys/admin-apikeys.component';
+import { MapViewComponent } from './map-view/map-view.component';
+import { ErablieresMapComponent } from 'src/map/erablieres-map.component';
 
 export const routes: Routes = [
     {
@@ -46,7 +48,16 @@ export const routes: Routes = [
                 component: Page404Component
             }
         ]
-
+    },
+    {
+        path: 'map',
+        component: MapViewComponent,
+        children: [
+            {
+                path: '',
+                component: ErablieresMapComponent
+            }
+        ]
     },
     {
         path: '',
