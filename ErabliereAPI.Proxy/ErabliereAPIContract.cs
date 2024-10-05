@@ -233,6 +233,36 @@ namespace ErabliereAPI.Proxy
         System.Threading.Tasks.Task AlertesDELETEAsync(System.Guid id, Alerte? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Permet de lister les clés d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ApiKey>> ApiKeyAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de lister les clés d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ApiKey>> ApiKeyAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Permet de créer une nouvelle clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiKeyPOSTAsync();
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de créer une nouvelle clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiKeyPOSTAsync(System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Liste les barils
         /// </summary>
         /// <param name="id">Identifiant de l'érablière</param>
@@ -307,36 +337,6 @@ namespace ErabliereAPI.Proxy
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task BarilDELETEAsync(System.Guid id, Baril? body, System.Threading.CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Get the appId use to initialize client
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetAppIdAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get the appId use to initialize client
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetAppIdAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Get an access token
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetAccessTokenAsync(int? uid, string? channel, string? role, string? tokenType);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get an access token
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetAccessTokenAsync(int? uid, string? channel, string? role, string? tokenType, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Liste les capteurs
@@ -658,6 +658,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste de DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteur>> DonneesCapteurAllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -670,6 +671,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste de DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteur>> DonneesCapteurAllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
@@ -679,6 +681,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="body">Le capteur a ajouter</param>
         /// <returns>Le capteur a été correctement ajouté.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         System.Threading.Tasks.Task DonneesCapteurPOSTAsync(System.Guid id, PostDonneeCapteur? body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -689,6 +692,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="body">Le capteur a ajouter</param>
         /// <returns>Le capteur a été correctement ajouté.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         System.Threading.Tasks.Task DonneesCapteurPOSTAsync(System.Guid id, PostDonneeCapteur? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
@@ -732,25 +736,96 @@ namespace ErabliereAPI.Proxy
         /// <summary>
         /// Liste les données de plusieurs capteurs capteurs
         /// </summary>
-        /// <param name="ids">Identifiant des capteurs</param>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
         /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
         /// <param name="dd">Date de début</param>
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df);
+        [System.Obsolete]
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Liste les données de plusieurs capteurs capteurs
         /// </summary>
-        /// <param name="ids">Identifiant des capteurs</param>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
         /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
         /// <param name="dd">Date de début</param>
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, System.Threading.CancellationToken cancellationToken);
+        [System.Obsolete]
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Liste les données d'un capteur
+        /// </summary>
+        /// <param name="id">Identifiant du capteur</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <param name="order">Ordre de tri</param>
+        /// <param name="top">Nombre de données à retourner</param>
+        /// <returns>Une liste de DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteurV2>> DonneesCapteurV2AllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string? order, int? top);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Liste les données d'un capteur
+        /// </summary>
+        /// <param name="id">Identifiant du capteur</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <param name="order">Ordre de tri</param>
+        /// <param name="top">Nombre de données à retourner</param>
+        /// <returns>Une liste de DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteurV2>> DonneesCapteurV2AllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string? order, int? top, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Ajouter une données d'un capteur
+        /// </summary>
+        /// <param name="id">L'identifiant du capteurs</param>
+        /// <param name="body">Le capteur a ajouter</param>
+        /// <returns>Le capteur a été correctement ajouté.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task DonneesCapteurV2Async(System.Guid id, PostDonneeCapteurV2? body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Ajouter une données d'un capteur
+        /// </summary>
+        /// <param name="id">L'identifiant du capteurs</param>
+        /// <param name="body">Le capteur a ajouter</param>
+        /// <returns>Le capteur a été correctement ajouté.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task DonneesCapteurV2Async(System.Guid id, PostDonneeCapteurV2? body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Liste les données de plusieurs capteurs capteurs
+        /// </summary>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurV2IEnumerablePair>> Grape2Async(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Liste les données de plusieurs capteurs capteurs
+        /// </summary>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurV2IEnumerablePair>> Grape2Async(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Lister les données
@@ -803,7 +878,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ConversationsGETAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -811,14 +886,14 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ConversationsGETAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Liste les messages
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Message>> MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -826,14 +901,14 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Message>> MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Liste les conversation en tant qu'administrteur
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ConversationsGET2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAll2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -841,26 +916,28 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ConversationsGET2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAll2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Liste les érablières
         /// </summary>
-        /// <param name="my">Indique si les érablière retourné seront ceux ayant un lien 
-        /// <br/>d'appartenance à l'usager authentifier.</param>
+        /// <param name="orderbyQuery">Ordre de tri</param>
+        /// <param name="filterQuery">Filtre</param>
+        /// <param name="topQuery">Nombre d'érablière à retourner</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(bool? my, string? select, string? filter, int? top, int? skip, string? expand, string? orderby);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(string? orderbyQuery, string? filterQuery, int? topQuery, string? select, int? skip, string? expand);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Liste les érablières
         /// </summary>
-        /// <param name="my">Indique si les érablière retourné seront ceux ayant un lien 
-        /// <br/>d'appartenance à l'usager authentifier.</param>
+        /// <param name="orderbyQuery">Ordre de tri</param>
+        /// <param name="filterQuery">Filtre</param>
+        /// <param name="topQuery">Nombre d'érablière à retourner</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(bool? my, string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(string? orderbyQuery, string? filterQuery, int? topQuery, string? select, int? skip, string? expand, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Créer une érablière
@@ -878,6 +955,21 @@ namespace ErabliereAPI.Proxy
         /// <returns>L'érablière a été correctement ajouté</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ErablieresPOSTAsync(PostErabliere? body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Lister les érablières sous format GeoJson
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task GeoJsonAsync();
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Lister les érablières sous format GeoJson
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task GeoJsonAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Obtenir les accès des utilisateurs à une érablière
@@ -1071,6 +1163,27 @@ namespace ErabliereAPI.Proxy
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<HourlyWeatherForecastResponse>> HourlyAsync(System.Guid id, string? lang, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Action pour ajouter une liste de capteurs à chaque erabliere d'un filtre
+        /// </summary>
+        /// <param name="nameLike">Permet de filtrer les érablières recherchées selon leur nom</param>
+        /// <param name="dcNull">Permet de filtrer les érablières qui n'ont pas de date de création</param>
+        /// <param name="body">La liste de capteurs à ajouter</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task AjouterListeAsync(string? nameLike, bool? dcNull, System.Collections.Generic.IEnumerable<PostCapteur>? body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Action pour ajouter une liste de capteurs à chaque erabliere d'un filtre
+        /// </summary>
+        /// <param name="nameLike">Permet de filtrer les érablières recherchées selon leur nom</param>
+        /// <param name="dcNull">Permet de filtrer les érablières qui n'ont pas de date de création</param>
+        /// <param name="body">La liste de capteurs à ajouter</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task AjouterListeAsync(string? nameLike, bool? dcNull, System.Collections.Generic.IEnumerable<PostCapteur>? body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Create a checkout session
         /// </summary>
         /// <returns>Success</returns>
@@ -1159,6 +1272,21 @@ namespace ErabliereAPI.Proxy
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ImagesAsync(PostImagesGenerationModel? body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Importer des érablières
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ImportAsync(System.Collections.Generic.IEnumerable<PostErabliere>? body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Importer des érablières
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ImportAsync(System.Collections.Generic.IEnumerable<PostErabliere>? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Action permettant de creer les droits d'accès d'un utilisateur 
@@ -1294,7 +1422,7 @@ namespace ErabliereAPI.Proxy
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="id">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
         /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
@@ -1311,7 +1439,7 @@ namespace ErabliereAPI.Proxy
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="id">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
         /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
@@ -1427,6 +1555,21 @@ namespace ErabliereAPI.Proxy
         System.Threading.Tasks.Task Desactiver2Async(System.Guid id, System.Guid idAlerte, Alerte? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Permet de révoquer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task RevokeAsync(System.Guid id);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de révoquer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task RevokeAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Modifier un capteur depuis son identifiant externe
         /// </summary>
         /// <param name="id">L'identifiant de l'érablière</param>
@@ -1446,6 +1589,25 @@ namespace ErabliereAPI.Proxy
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ExternalIdAsync(System.Guid id, string externalId, PutCapteur? body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Permet à un administrateur de modifier plusieurs capteurs depuis leurs nom
+        /// </summary>
+        /// <param name="filtreNom">Modifier les capteurs avec le nom suivant</param>
+        /// <param name="body">Modification à apporter à chaque capteur</param>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ModifierDepuisFiltreAsync(string? filtreNom, PutCapteur? body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet à un administrateur de modifier plusieurs capteurs depuis leurs nom
+        /// </summary>
+        /// <param name="filtreNom">Modifier les capteurs avec le nom suivant</param>
+        /// <param name="body">Modification à apporter à chaque capteur</param>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ModifierDepuisFiltreAsync(string? filtreNom, PutCapteur? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Modifier un capteur d'image
@@ -1684,7 +1846,7 @@ namespace ErabliereAPI.Proxy
         /// <br/>                3. Si le nom est modifié, il ne doit pas être pris par une autre érablière.</param>
         /// <returns>L'érablière a été correctement modifiée</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutErabliere? body);
+        System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutAdminErabliere? body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -1697,7 +1859,7 @@ namespace ErabliereAPI.Proxy
         /// <br/>                3. Si le nom est modifié, il ne doit pas être pris par une autre érablière.</param>
         /// <returns>L'érablière a été correctement modifiée</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutErabliere? body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutAdminErabliere? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Supprimer une érablière en tant qu'administrateur
@@ -1810,6 +1972,21 @@ namespace ErabliereAPI.Proxy
         System.Threading.Tasks.Task AlertesDELETE2Async(System.Guid id, System.Guid idAlerte, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Permet de supprimer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiKeyDELETEAsync(System.Guid id);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de supprimer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ApiKeyDELETEAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Point de terminaison pour la suppression d'un utilisateur
         /// </summary>
         /// <param name="id">Id de l'utilisateur</param>
@@ -1831,7 +2008,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ConversationsDELETEAsync(System.Guid id);
+        System.Threading.Tasks.Task ConversationsAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -1839,7 +2016,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ConversationsDELETEAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ConversationsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Permet à un administrateur de modifier le userId d'une conversation
@@ -1944,10 +2121,10 @@ namespace ErabliereAPI.Proxy
         public System.DateTimeOffset? Dc { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("minVaue")]
-        public int? MinVaue { get; set; } = default!;
+        public double? MinVaue { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("maxValue")]
-        public int? MaxValue { get; set; } = default!;
+        public double? MaxValue { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnable")]
         public bool? IsEnable { get; set; } = default!;
@@ -1990,6 +2167,39 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("subscriptionId")]
         public string? SubscriptionId { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Appareil
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string? Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("idErabliere")]
+        public System.Guid? IdErabliere { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("erabliere")]
+        public Erabliere? Erabliere { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("latitude")]
+        public double? Latitude { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("longitude")]
+        public double? Longitude { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("capteurs")]
+        public System.Collections.Generic.ICollection<Capteur>? Capteurs { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
 
     }
 
@@ -2079,6 +2289,13 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("ajouterDonneeDepuisInterface")]
         public bool? AjouterDonneeDepuisInterface { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("displayType")]
+        [System.ComponentModel.DataAnnotations.StringLength(50)]
+        public string? DisplayType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("displayTop")]
+        public int? DisplayTop { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("dc")]
         public System.DateTimeOffset? Dc { get; set; } = default!;
 
@@ -2087,6 +2304,12 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("longitude")]
         public double? Longitude { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("appareil")]
+        public Appareil? Appareil { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("appareilId")]
+        public System.Guid? AppareilId { get; set; } = default!;
 
     }
 
@@ -2136,6 +2359,9 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("longitude")]
         public double? Longitude { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
 
     }
 
@@ -2192,6 +2418,10 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("externalAccountUrl")]
         public string? ExternalAccountUrl { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("timeZone")]
+        [System.ComponentModel.DataAnnotations.StringLength(25)]
+        public string? TimeZone { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("creationTime")]
         public System.DateTimeOffset? CreationTime { get; set; } = default!;
 
@@ -2224,6 +2454,12 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("access")]
         public int? Access { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("indiceOrdre")]
+        public int? IndiceOrdre { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
 
     }
 
@@ -2309,6 +2545,24 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("file")]
         public byte[]? File { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("fileSize")]
+        public int? FileSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fileName")]
+        [System.ComponentModel.DataAnnotations.StringLength(200)]
+        public string? FileName { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("externalStorageType")]
+        [System.ComponentModel.DataAnnotations.StringLength(200)]
+        public string? ExternalStorageType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("externalStorageUrl")]
+        [System.ComponentModel.DataAnnotations.StringLength(2000)]
+        public string? ExternalStorageUrl { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isPublic")]
+        public bool? IsPublic { get; set; } = default!;
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -2379,7 +2633,7 @@ namespace ErabliereAPI.Proxy
         public System.Guid? Id { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("valeur")]
-        public int? Valeur { get; set; } = default!;
+        public double? Valeur { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("text")]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
@@ -2411,7 +2665,7 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("nom")]
         [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(50, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
         public string Nom { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("ipRule")]
@@ -2486,6 +2740,9 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("longitude")]
         public double? Longitude { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -2537,6 +2794,12 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("reportFrequency")]
         public int? ReportFrequency { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("displayType")]
+        public string? DisplayType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("displayTop")]
+        public int? DisplayTop { get; set; } = default!;
 
     }
 
@@ -2700,6 +2963,25 @@ namespace ErabliereAPI.Proxy
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GetDonneesCapteurV2
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("valeur")]
+        public double? Valeur { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("text")]
+        [System.ComponentModel.DataAnnotations.StringLength(50)]
+        public string? Text { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("d")]
+        public System.DateTimeOffset? D { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class GetImageInfo
     {
 
@@ -2758,6 +3040,18 @@ namespace ErabliereAPI.Proxy
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GuidGetDonneesCapteurV2IEnumerablePair
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("valeur")]
+        public System.Collections.Generic.ICollection<GetDonneesCapteurV2>? Valeur { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Headline
     {
 
@@ -2790,42 +3084,86 @@ namespace ErabliereAPI.Proxy
 
     }
 
+    /// <summary>
+    /// Hourly forecast temperature
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class HourlyForecastTemperature
     {
+        /// <summary>
+        /// Value of the temperature
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("value")]
         public double? Value { get; set; } = default!;
 
+        /// <summary>
+        /// Unit of the temperature
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("unit")]
         public string? Unit { get; set; } = default!;
+
+        /// <summary>
+        /// Unit type of the temperature
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("unitType")]
         public int? UnitType { get; set; } = default!;
 
     }
 
+    /// <summary>
+    /// Hourly weather forecast response
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class HourlyWeatherForecastResponse
     {
+        /// <summary>
+        /// Date and time of the forecast
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("dateTime")]
         public System.DateTimeOffset? DateTime { get; set; } = default!;
 
+        /// <summary>
+        /// Epoch date time
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("epochDateTime")]
         public int? EpochDateTime { get; set; } = default!;
+
+        /// <summary>
+        /// Weather icon
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("weatherIcon")]
         public int? WeatherIcon { get; set; } = default!;
 
+        /// <summary>
+        /// Icon phrase
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("iconPhrase")]
         public string? IconPhrase { get; set; } = default!;
+
+        /// <summary>
+        /// Has precipitation
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("hasPrecipitation")]
         public bool? HasPrecipitation { get; set; } = default!;
 
+        /// <summary>
+        /// Type of precipitation
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("precipitationType")]
         public string? PrecipitationType { get; set; } = default!;
+
+        /// <summary>
+        /// Intensity of precipitation
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("precipitationIntensity")]
         public string? PrecipitationIntensity { get; set; } = default!;
@@ -2833,8 +3171,16 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("temperature")]
         public HourlyForecastTemperature? Temperature { get; set; } = default!;
 
+        /// <summary>
+        /// Link for mobile devices
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("mobileLink")]
         public string? MobileLink { get; set; } = default!;
+
+        /// <summary>
+        /// Link for web devices
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("link")]
         public string? Link { get; set; } = default!;
@@ -2865,6 +3211,9 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("donnees")]
         public System.Collections.Generic.ICollection<InspectionDonnees>? Donnees { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
 
     }
 
@@ -2998,6 +3347,24 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("file")]
         public byte[]? File { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("fileSize")]
+        public int? FileSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fileName")]
+        [System.ComponentModel.DataAnnotations.StringLength(200)]
+        public string? FileName { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("externalStorageType")]
+        [System.ComponentModel.DataAnnotations.StringLength(200)]
+        public string? ExternalStorageType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("externalStorageUrl")]
+        [System.ComponentModel.DataAnnotations.StringLength(2000)]
+        public string? ExternalStorageUrl { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isPublic")]
+        public bool? IsPublic { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("created")]
         public System.DateTimeOffset? Created { get; set; } = default!;
 
@@ -3059,6 +3426,13 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("idErabliere")]
         public System.Guid? IdErabliere { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("type")]
+        [System.ComponentModel.DataAnnotations.StringLength(50)]
+        public string? Type { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("externalId")]
+        public string? ExternalId { get; set; } = default!;
 
     }
 
@@ -3164,6 +3538,25 @@ namespace ErabliereAPI.Proxy
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PostDonneeCapteurV2
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("v")]
+        public double? V { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("text")]
+        [System.ComponentModel.DataAnnotations.StringLength(50)]
+        public string? Text { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("d")]
+        public System.DateTimeOffset? D { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("idCapteur")]
+        public System.Guid? IdCapteur { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class PostErabliere
     {
 
@@ -3172,7 +3565,7 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("nom")]
         [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(50, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
         public string Nom { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("ipRules")]
@@ -3211,6 +3604,7 @@ namespace ErabliereAPI.Proxy
         public string? Prompt { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("size")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^(1024x1024|1792x1024|1024x1792)$")]
         public string? Size { get; set; } = default!;
 
     }
@@ -3420,6 +3814,56 @@ namespace ErabliereAPI.Proxy
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PutAdminErabliere
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.Guid Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("nom")]
+        [System.ComponentModel.DataAnnotations.StringLength(100)]
+        public string? Nom { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("ipRule")]
+        [System.ComponentModel.DataAnnotations.StringLength(50)]
+        public string? IpRule { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("indiceOrdre")]
+        public int? IndiceOrdre { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("codePostal")]
+        [System.ComponentModel.DataAnnotations.StringLength(30)]
+        public string? CodePostal { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("afficherPredictionMeteoJour")]
+        public bool? AfficherPredictionMeteoJour { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("afficherPredictionMeteoHeure")]
+        public bool? AfficherPredictionMeteoHeure { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("dimensionPanneauImage")]
+        [System.ComponentModel.DataAnnotations.Range(1, 12)]
+        public int? DimensionPanneauImage { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("afficherSectionBaril")]
+        public bool? AfficherSectionBaril { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("afficherTrioDonnees")]
+        public bool? AfficherTrioDonnees { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("afficherSectionDompeux")]
+        public bool? AfficherSectionDompeux { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isPublic")]
+        public bool? IsPublic { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class PutAlerteCapteur
     {
 
@@ -3504,6 +3948,12 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("reportFrequency")]
         public int? ReportFrequency { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("displayType")]
+        public string? DisplayType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("displayTop")]
+        public int? DisplayTop { get; set; } = default!;
 
     }
 
@@ -3600,7 +4050,7 @@ namespace ErabliereAPI.Proxy
         public System.Guid Id { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("nom")]
-        [System.ComponentModel.DataAnnotations.StringLength(50)]
+        [System.ComponentModel.DataAnnotations.StringLength(100)]
         public string? Nom { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("ipRule")]
@@ -3611,6 +4061,7 @@ namespace ErabliereAPI.Proxy
         public int? IndiceOrdre { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("codePostal")]
+        [System.ComponentModel.DataAnnotations.StringLength(30)]
         public string? CodePostal { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("afficherPredictionMeteoJour")]
@@ -3634,6 +4085,12 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("isPublic")]
         public bool? IsPublic { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("longitude")]
+        public double? Longitude { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("latitude")]
+        public double? Latitude { get; set; } = default!;
 
     }
 
@@ -3722,6 +4179,9 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("note")]
         public Note? Note { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -3743,11 +4203,11 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("requestParameters")]
         public string? RequestParameters { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("dateCreation")]
-        public System.DateTimeOffset? DateCreation { get; set; } = default!;
-
         [System.Text.Json.Serialization.JsonPropertyName("donnees")]
         public System.Collections.Generic.ICollection<RapportDonnees>? Donnees { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("dc")]
+        public System.DateTimeOffset? Dc { get; set; } = default!;
 
     }
 

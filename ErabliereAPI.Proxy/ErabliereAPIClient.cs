@@ -1146,6 +1146,219 @@ namespace ErabliereAPI.Proxy
         }
 
         /// <summary>
+        /// Permet de lister les clés d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ApiKey>> ApiKeyAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
+        {
+            return ApiKeyAllAsync(select, filter, top, skip, expand, orderby, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de lister les clés d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ApiKey>> ApiKeyAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "access/ApiKey"
+                    urlBuilder_.Append("access/ApiKey");
+                    urlBuilder_.Append('?');
+                    if (select != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$select")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(select, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (filter != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$filter")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(filter, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (top != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$top")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(top, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (skip != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$skip")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(skip, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (expand != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$expand")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(expand, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (orderby != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$orderby")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(orderby, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ApiKey>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Permet de créer une nouvelle clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task ApiKeyPOSTAsync()
+        {
+            return ApiKeyPOSTAsync(System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de créer une nouvelle clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ApiKeyPOSTAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "access/ApiKey"
+                    urlBuilder_.Append("access/ApiKey");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Liste les barils
         /// </summary>
         /// <param name="id">Identifiant de l'érablière</param>
@@ -1571,204 +1784,6 @@ namespace ErabliereAPI.Proxy
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("L\'id de la route ne concorde pas avec l\'id du baril \u00e0 supprimer.", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Get the appId use to initialize client
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetAppIdAsync()
-        {
-            return GetAppIdAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get the appId use to initialize client
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetAppIdAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "Calls/GetAppId"
-                    urlBuilder_.Append("Calls/GetAppId");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 403)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Get an access token
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetAccessTokenAsync(int? uid, string? channel, string? role, string? tokenType)
-        {
-            return GetAccessTokenAsync(uid, channel, role, tokenType, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get an access token
-        /// </summary>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetAccessTokenAsync(int? uid, string? channel, string? role, string? tokenType, System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "Calls/GetAccessToken"
-                    urlBuilder_.Append("Calls/GetAccessToken");
-                    urlBuilder_.Append('?');
-                    if (uid != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("uid")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(uid, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (channel != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("channel")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(channel, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (role != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("role")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(role, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (tokenType != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("tokenType")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(tokenType, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 403)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -3777,6 +3792,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste de DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteur>> DonneesCapteurAllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df)
         {
             return DonneesCapteurAllAsync(id, x_ddr, dd, df, System.Threading.CancellationToken.None);
@@ -3792,6 +3808,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste de DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteur>> DonneesCapteurAllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
@@ -3897,6 +3914,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="body">Le capteur a ajouter</param>
         /// <returns>Le capteur a été correctement ajouté.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         public virtual System.Threading.Tasks.Task DonneesCapteurPOSTAsync(System.Guid id, PostDonneeCapteur? body)
         {
             return DonneesCapteurPOSTAsync(id, body, System.Threading.CancellationToken.None);
@@ -3910,6 +3928,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="body">Le capteur a ajouter</param>
         /// <returns>Le capteur a été correctement ajouté.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        [System.Obsolete]
         public virtual async System.Threading.Tasks.Task DonneesCapteurPOSTAsync(System.Guid id, PostDonneeCapteur? body, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
@@ -4192,7 +4211,7 @@ namespace ErabliereAPI.Proxy
                             throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
-                        if (status_ == 202)
+                        if (status_ == 204)
                         {
                             return;
                         }
@@ -4225,29 +4244,34 @@ namespace ErabliereAPI.Proxy
         /// <summary>
         /// Liste les données de plusieurs capteurs capteurs
         /// </summary>
-        /// <param name="ids">Identifiant des capteurs</param>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
         /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
         /// <param name="dd">Date de début</param>
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df)
+        [System.Obsolete]
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id)
         {
-            return GrapeAsync(ids, x_ddr, dd, df, System.Threading.CancellationToken.None);
+            return GrapeAsync(ids, x_ddr, dd, df, id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Liste les données de plusieurs capteurs capteurs
         /// </summary>
-        /// <param name="ids">Identifiant des capteurs</param>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
         /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
         /// <param name="dd">Date de début</param>
         /// <param name="df">Date de fin</param>
         /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, System.Threading.CancellationToken cancellationToken)
+        [System.Obsolete]
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>> GrapeAsync(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id, System.Threading.CancellationToken cancellationToken)
         {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -4262,8 +4286,10 @@ namespace ErabliereAPI.Proxy
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "DonneesCapteur/Grape"
-                    urlBuilder_.Append("DonneesCapteur/Grape");
+                    // Operation Path: "Erablieres/{id}/Capteurs/DonneesCapteur/Grape"
+                    urlBuilder_.Append("Erablieres/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Capteurs/DonneesCapteur/Grape");
                     urlBuilder_.Append('?');
                     if (ids != null)
                     {
@@ -4305,6 +4331,375 @@ namespace ErabliereAPI.Proxy
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<GuidGetDonneesCapteurIEnumerablePair>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Liste les données d'un capteur
+        /// </summary>
+        /// <param name="id">Identifiant du capteur</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <param name="order">Ordre de tri</param>
+        /// <param name="top">Nombre de données à retourner</param>
+        /// <returns>Une liste de DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteurV2>> DonneesCapteurV2AllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string? order, int? top)
+        {
+            return DonneesCapteurV2AllAsync(id, x_ddr, dd, df, order, top, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Liste les données d'un capteur
+        /// </summary>
+        /// <param name="id">Identifiant du capteur</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <param name="order">Ordre de tri</param>
+        /// <param name="top">Nombre de données à retourner</param>
+        /// <returns>Une liste de DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetDonneesCapteurV2>> DonneesCapteurV2AllAsync(System.Guid id, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string? order, int? top, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+
+                    if (x_ddr != null)
+                        request_.Headers.TryAddWithoutValidation("x-ddr", ConvertToString(x_ddr.Value.ToString("s"), System.Globalization.CultureInfo.InvariantCulture));
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Capteurs/{id}/DonneesCapteurV2"
+                    urlBuilder_.Append("Capteurs/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/DonneesCapteurV2");
+                    urlBuilder_.Append('?');
+                    if (dd != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("dd")).Append('=').Append(System.Uri.EscapeDataString(dd.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (df != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("df")).Append('=').Append(System.Uri.EscapeDataString(df.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (order != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("order")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(order, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (top != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("top")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(top, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<GetDonneesCapteurV2>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Ajouter une données d'un capteur
+        /// </summary>
+        /// <param name="id">L'identifiant du capteurs</param>
+        /// <param name="body">Le capteur a ajouter</param>
+        /// <returns>Le capteur a été correctement ajouté.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task DonneesCapteurV2Async(System.Guid id, PostDonneeCapteurV2? body)
+        {
+            return DonneesCapteurV2Async(id, body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Ajouter une données d'un capteur
+        /// </summary>
+        /// <param name="id">L'identifiant du capteurs</param>
+        /// <param name="body">Le capteur a ajouter</param>
+        /// <returns>Le capteur a été correctement ajouté.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task DonneesCapteurV2Async(System.Guid id, PostDonneeCapteurV2? body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Capteurs/{id}/DonneesCapteurV2"
+                    urlBuilder_.Append("Capteurs/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/DonneesCapteurV2");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("L\'id de la route ne concorde pas avec l\'id du capteur \u00e0 ajouter.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Liste les données de plusieurs capteurs capteurs
+        /// </summary>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurV2IEnumerablePair>> Grape2Async(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id)
+        {
+            return Grape2Async(ids, x_ddr, dd, df, id, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Liste les données de plusieurs capteurs capteurs
+        /// </summary>
+        /// <param name="ids">Les identifiant des capteurs séparé par des ;</param>
+        /// <param name="x_ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
+        /// <param name="dd">Date de début</param>
+        /// <param name="df">Date de fin</param>
+        /// <returns>Une liste Tupple avec l'id du catpeur et la liste des DonneesCapteur.</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GuidGetDonneesCapteurV2IEnumerablePair>> Grape2Async(string? ids, System.DateTimeOffset? x_ddr, System.DateTimeOffset? dd, System.DateTimeOffset? df, string id, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+
+                    if (x_ddr != null)
+                        request_.Headers.TryAddWithoutValidation("x-ddr", ConvertToString(x_ddr.Value.ToString("s"), System.Globalization.CultureInfo.InvariantCulture));
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Erablieres/{id}/Capteurs/DonneesCapteurV2/Grape"
+                    urlBuilder_.Append("Erablieres/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Capteurs/DonneesCapteurV2/Grape");
+                    urlBuilder_.Append('?');
+                    if (ids != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("ids")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(ids, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (dd != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("dd")).Append('=').Append(System.Uri.EscapeDataString(dd.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (df != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("df")).Append('=').Append(System.Uri.EscapeDataString(df.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<GuidGetDonneesCapteurV2IEnumerablePair>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4591,9 +4986,9 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ConversationsGETAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
         {
-            return ConversationsGETAsync(select, filter, top, skip, expand, orderby, System.Threading.CancellationToken.None);
+            return ConversationsAllAsync(select, filter, top, skip, expand, orderby, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4602,7 +4997,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ConversationsGETAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAllAsync(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4611,6 +5006,7 @@ namespace ErabliereAPI.Proxy
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
@@ -4668,7 +5064,12 @@ namespace ErabliereAPI.Proxy
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<Conversation>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 401)
@@ -4707,7 +5108,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Message>> MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
         {
             return MessagesAsync(id, select, filter, top, skip, expand, orderby, System.Threading.CancellationToken.None);
         }
@@ -4718,7 +5119,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Message>> MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4730,6 +5131,7 @@ namespace ErabliereAPI.Proxy
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
@@ -4789,7 +5191,12 @@ namespace ErabliereAPI.Proxy
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<Message>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 401)
@@ -4828,9 +5235,9 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ConversationsGET2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAll2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
         {
-            return ConversationsGET2Async(select, filter, top, skip, expand, orderby, System.Threading.CancellationToken.None);
+            return ConversationsAll2Async(select, filter, top, skip, expand, orderby, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4839,7 +5246,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ConversationsGET2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Conversation>> ConversationsAll2Async(string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4848,6 +5255,7 @@ namespace ErabliereAPI.Proxy
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
@@ -4905,7 +5313,12 @@ namespace ErabliereAPI.Proxy
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<Conversation>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 401)
@@ -4942,24 +5355,26 @@ namespace ErabliereAPI.Proxy
         /// <summary>
         /// Liste les érablières
         /// </summary>
-        /// <param name="my">Indique si les érablière retourné seront ceux ayant un lien 
-        /// <br/>d'appartenance à l'usager authentifier.</param>
+        /// <param name="orderbyQuery">Ordre de tri</param>
+        /// <param name="filterQuery">Filtre</param>
+        /// <param name="topQuery">Nombre d'érablière à retourner</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(bool? my, string? select, string? filter, int? top, int? skip, string? expand, string? orderby)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(string? orderbyQuery, string? filterQuery, int? topQuery, string? select, int? skip, string? expand)
         {
-            return ErablieresAllAsync(my, select, filter, top, skip, expand, orderby, System.Threading.CancellationToken.None);
+            return ErablieresAllAsync(orderbyQuery, filterQuery, topQuery, select, skip, expand, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Liste les érablières
         /// </summary>
-        /// <param name="my">Indique si les érablière retourné seront ceux ayant un lien 
-        /// <br/>d'appartenance à l'usager authentifier.</param>
+        /// <param name="orderbyQuery">Ordre de tri</param>
+        /// <param name="filterQuery">Filtre</param>
+        /// <param name="topQuery">Nombre d'érablière à retourner</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(bool? my, string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Erabliere>> ErablieresAllAsync(string? orderbyQuery, string? filterQuery, int? topQuery, string? select, int? skip, string? expand, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4975,21 +5390,21 @@ namespace ErabliereAPI.Proxy
                     // Operation Path: "Erablieres"
                     urlBuilder_.Append("Erablieres");
                     urlBuilder_.Append('?');
-                    if (my != null)
+                    if (orderbyQuery != null)
                     {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("my")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(my, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$orderby")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(orderbyQuery, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (filterQuery != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$filter")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(filterQuery, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (topQuery != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("$top")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(topQuery, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     }
                     if (select != null)
                     {
                         urlBuilder_.Append(System.Uri.EscapeDataString("$select")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(select, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (filter != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("$filter")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(filter, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (top != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("$top")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(top, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     }
                     if (skip != null)
                     {
@@ -4998,10 +5413,6 @@ namespace ErabliereAPI.Proxy
                     if (expand != null)
                     {
                         urlBuilder_.Append(System.Uri.EscapeDataString("$expand")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(expand, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (orderby != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("$orderby")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(orderby, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     }
                     urlBuilder_.Length--;
 
@@ -5156,6 +5567,96 @@ namespace ErabliereAPI.Proxy
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("La cl\u00e9 primaire de l\'\u00e9rabli\u00e8re existe d\u00e9j\u00e0", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Lister les érablières sous format GeoJson
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task GeoJsonAsync()
+        {
+            return GeoJsonAsync(System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Lister les érablières sous format GeoJson
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task GeoJsonAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Erablieres/GeoJson"
+                    urlBuilder_.Append("Erablieres/GeoJson");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -6459,6 +6960,121 @@ namespace ErabliereAPI.Proxy
         }
 
         /// <summary>
+        /// Action pour ajouter une liste de capteurs à chaque erabliere d'un filtre
+        /// </summary>
+        /// <param name="nameLike">Permet de filtrer les érablières recherchées selon leur nom</param>
+        /// <param name="dcNull">Permet de filtrer les érablières qui n'ont pas de date de création</param>
+        /// <param name="body">La liste de capteurs à ajouter</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task AjouterListeAsync(string? nameLike, bool? dcNull, System.Collections.Generic.IEnumerable<PostCapteur>? body)
+        {
+            return AjouterListeAsync(nameLike, dcNull, body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Action pour ajouter une liste de capteurs à chaque erabliere d'un filtre
+        /// </summary>
+        /// <param name="nameLike">Permet de filtrer les érablières recherchées selon leur nom</param>
+        /// <param name="dcNull">Permet de filtrer les érablières qui n'ont pas de date de création</param>
+        /// <param name="body">La liste de capteurs à ajouter</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task AjouterListeAsync(string? nameLike, bool? dcNull, System.Collections.Generic.IEnumerable<PostCapteur>? body, System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Capteurs/AjouterListe"
+                    urlBuilder_.Append("Capteurs/AjouterListe");
+                    urlBuilder_.Append('?');
+                    if (nameLike != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("nameLike")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(nameLike, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (dcNull != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("dcNull")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(dcNull, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 204)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Create a checkout session
         /// </summary>
         /// <returns>Success</returns>
@@ -6959,6 +7575,100 @@ namespace ErabliereAPI.Proxy
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
                     // Operation Path: "ErabliereAI/Images"
                     urlBuilder_.Append("ErabliereAI/Images");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Importer des érablières
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task ImportAsync(System.Collections.Generic.IEnumerable<PostErabliere>? body)
+        {
+            return ImportAsync(body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Importer des érablières
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ImportAsync(System.Collections.Generic.IEnumerable<PostErabliere>? body, System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Erablieres/Import"
+                    urlBuilder_.Append("Erablieres/Import");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -7767,7 +8477,7 @@ namespace ErabliereAPI.Proxy
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="id">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
         /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
@@ -7779,7 +8489,7 @@ namespace ErabliereAPI.Proxy
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? idNote, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate)
         {
-            return MultipartAsync(id, idNote, idErabliere, title, text, file, fileExtension, created, noteDate, System.Threading.CancellationToken.None);
+            return MultipartAsync(id, id, idErabliere, title, text, file, fileExtension, created, noteDate, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -7787,7 +8497,7 @@ namespace ErabliereAPI.Proxy
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="id">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
         /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
@@ -8508,6 +9218,102 @@ namespace ErabliereAPI.Proxy
         }
 
         /// <summary>
+        /// Permet de révoquer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task RevokeAsync(System.Guid id)
+        {
+            return RevokeAsync(id, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de révoquer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task RevokeAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "access/ApiKey/{id}/revoke"
+                    urlBuilder_.Append("access/ApiKey/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/revoke");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Modifier un capteur depuis son identifiant externe
         /// </summary>
         /// <param name="id">L'identifiant de l'érablière</param>
@@ -8612,6 +9418,110 @@ namespace ErabliereAPI.Proxy
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("Le capteur n\'existe pas.", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Permet à un administrateur de modifier plusieurs capteurs depuis leurs nom
+        /// </summary>
+        /// <param name="filtreNom">Modifier les capteurs avec le nom suivant</param>
+        /// <param name="body">Modification à apporter à chaque capteur</param>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task ModifierDepuisFiltreAsync(string? filtreNom, PutCapteur? body)
+        {
+            return ModifierDepuisFiltreAsync(filtreNom, body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet à un administrateur de modifier plusieurs capteurs depuis leurs nom
+        /// </summary>
+        /// <param name="filtreNom">Modifier les capteurs avec le nom suivant</param>
+        /// <param name="body">Modification à apporter à chaque capteur</param>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ModifierDepuisFiltreAsync(string? filtreNom, PutCapteur? body, System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json;odata.metadata=minimal;odata.streaming=true");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Capteurs/ModifierDepuisFiltre"
+                    urlBuilder_.Append("Capteurs/ModifierDepuisFiltre");
+                    urlBuilder_.Append('?');
+                    if (filtreNom != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("filtreNom")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(filtreNom, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 204)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -9906,7 +10816,7 @@ namespace ErabliereAPI.Proxy
         /// <br/>                3. Si le nom est modifié, il ne doit pas être pris par une autre érablière.</param>
         /// <returns>L'érablière a été correctement modifiée</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutErabliere? body)
+        public virtual System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutAdminErabliere? body)
         {
             return ErablieresPUT2Async(id, body, System.Threading.CancellationToken.None);
         }
@@ -9922,7 +10832,7 @@ namespace ErabliereAPI.Proxy
         /// <br/>                3. Si le nom est modifié, il ne doit pas être pris par une autre érablière.</param>
         /// <returns>L'érablière a été correctement modifiée</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutErabliere? body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ErablieresPUT2Async(System.Guid id, PutAdminErabliere? body, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -10685,6 +11595,100 @@ namespace ErabliereAPI.Proxy
         }
 
         /// <summary>
+        /// Permet de supprimer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task ApiKeyDELETEAsync(System.Guid id)
+        {
+            return ApiKeyDELETEAsync(id, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet de supprimer une clé d'API.
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ApiKeyDELETEAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "access/ApiKey/{id}"
+                    urlBuilder_.Append("access/ApiKey/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Point de terminaison pour la suppression d'un utilisateur
         /// </summary>
         /// <param name="id">Id de l'utilisateur</param>
@@ -10785,9 +11789,9 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ConversationsDELETEAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task ConversationsAsync(System.Guid id)
         {
-            return ConversationsDELETEAsync(id, System.Threading.CancellationToken.None);
+            return ConversationsAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -10796,7 +11800,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ConversationsDELETEAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ConversationsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
