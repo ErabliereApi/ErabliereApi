@@ -131,7 +131,7 @@ export class ErablieresMapComponent implements OnInit {
 
     publicFilter: string = 'yes';
     myErablieresFilter: string = 'yes';
-    sensorFilter: string = 'Essences';
+    sensorFilter: string = '';
     maxSensors: number | null = null;
 
     selectSensorOption(option: string) {
