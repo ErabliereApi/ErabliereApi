@@ -146,12 +146,56 @@ public class ErablieresController : ControllerBase
     /// </summary>
     [HttpGet("GeoJson")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetGeoJson(CancellationToken token)
+    public async Task<IActionResult> GetGeoJson(
+        [FromQuery] bool? isPublic,
+        [FromQuery] bool? my,
+        [FromQuery(Name = "capteur")] string? nomCapteurs,
+        [FromQuery(Name = "topCapteur")] int? topCapteurs,
+        CancellationToken token)
     {
-        var erablieres = await _context.Erabliere
+        var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
+
+        var erablieresQuery = _context.Erabliere
             .AsNoTracking()
-            .Where(e => e.IsPublic && e.Latitude != 0 && e.Longitude != 0)
-            .ToArrayAsync(token);
+            .Where(e => e.Latitude != 0 && e.Longitude != 0);
+
+        if (!isAuthenticate && isPublic.HasValue && (!my.HasValue || !my.Value))
+        {
+            erablieresQuery = erablieresQuery.Where(e => e.IsPublic);
+        }
+
+        if (my.HasValue && my.Value)
+        {
+            if (isAuthenticate && customer != null)
+            {
+                Guid?[] erablieresOwned
+                    = await _context.CustomerErablieres
+                    .AsNoTracking()
+                    .Where(c => c.IdCustomer == customer.Id)
+                    .Select(c => c.IdErabliere)
+                    .ToArrayAsync(token);
+
+                erablieresQuery = erablieresQuery.Where(e => erablieresOwned.Contains(e.Id) ||
+                                                             isPublic.HasValue && e.IsPublic);
+            }
+            else if (isAuthenticate && customer == null)
+            {
+                throw new InvalidOperationException("The user is authenticated, but there is no customer...");
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(nomCapteurs))
+        {
+#nullable disable
+            erablieresQuery = erablieresQuery.Where(e => e.Capteurs.Any(c => c.Nom == nomCapteurs));
+
+            erablieresQuery = erablieresQuery.Include(e => e.Capteurs.Where(c => c.Nom == nomCapteurs).OrderBy(c => c.IndiceOrdre).Take(topCapteurs ?? 1))
+                                             .ThenInclude(c => c.DonneesCapteur.OrderByDescending(c => c.D).Take(1))
+                                             .AsSingleQuery();
+#nullable enable
+        }
+        
+        var erablieres = await erablieresQuery.ToArrayAsync(token);
 
         var geoJson = new
         {
@@ -167,7 +211,13 @@ public class ErablieresController : ControllerBase
                 properties = new
                 {
                     name = e.Nom,
-                    id = e.Id
+                    id = e.Id,
+                    capteur = e.Capteurs?.Select(c => new
+                    {
+                        c.Nom,
+                        c.DonneesCapteur.OrderByDescending(d => d.D).FirstOrDefault()?.Valeur,
+                        c.Symbole
+                    }).ToArray()
                 }
             }).ToArray()
         };

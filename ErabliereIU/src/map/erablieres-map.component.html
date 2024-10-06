@@ -1,0 +1,39 @@
+<div class="container-fluid" style="height: max-content;">
+    <div class="row">
+        <div class="col-12">
+            <form class="row g-3 mb-2">
+                <div class="col-md-2">
+                    <label for="publicFilter" class="form-label">Publique:</label>
+                    <select class="form-select" id="publicFilter" (change)="updatePublicFilter($event)" name="publicFilter">
+                        <option value="yes">Oui</option>
+                        <option value="no">Non</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
+                    <select class="form-select" id="myErablieresFilter" (change)="updateMyFilter($event)" name="myErablieresFilter">
+                        <option value="yes">Oui</option>
+                        <option value="no">Non</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="sensorFilter" class="form-label">Filtre capteurs:</label>
+                    <input type="text" class="form-control" id="sensorFilter" [(ngModel)]="sensorFilter"
+                        name="sensorFilter">
+                </div>
+                <div class="col-md-2">
+                    <label for="maxSensors" class="form-label">Max capteurs:</label>
+                    <input type="number" class="form-control" id="maxSensors" [(ngModel)]="maxSensors"
+                        name="maxSensors">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100" (click)="applyFilters()">Appliquer les
+                        filtres</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="map" class="match-parent"></div>
+</div>

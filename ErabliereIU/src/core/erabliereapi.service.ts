@@ -590,8 +590,28 @@ export class ErabliereApi {
         return await firstValueFrom(this._httpClient.get<GetMapAccessToken>(this._environmentService.apiUrl + '/api/Map/Access-Token/' + provider));
     }
 
-    async getErablieresGeoJson(): Promise<GeoJSON.GeoJSON> {
-        return await firstValueFrom(this._httpClient.get<GeoJSON.GeoJSON>(this._environmentService.apiUrl + '/Erablieres/GeoJson'));
+    async getErablieresGeoJson(isPublic?: boolean, my?: boolean, capteur?: string, maxCapteur?: number | null): Promise<any> {
+        const header = await this.getHeaders();
+        
+        let url = this._environmentService.apiUrl + '/Erablieres/GeoJson?';
+
+        if (isPublic != null) {
+            url += 'isPublic=true';
+        }
+
+        if (my != null) {
+            url += '&my=' + my;
+        }
+
+        if (capteur) {
+            url += '&capteur=' + capteur;
+        }
+
+        if (maxCapteur) {
+            url += '&topCapteur=' + maxCapteur;
+        }
+
+        return await firstValueFrom(this._httpClient.get<GeoJSON.GeoJSON>(url, { headers: header }));
     }
 }
 
