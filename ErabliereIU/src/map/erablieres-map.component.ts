@@ -51,6 +51,7 @@ export class ErablieresMapComponent implements OnInit {
     loadingInProgress = true;
     nombreElements = 0;
     duration = 0;
+    error?: string | null | undefined = null;
 
     isAuthenticated = false;
 
@@ -66,20 +67,13 @@ export class ErablieresMapComponent implements OnInit {
     async reInitMap() {
         this.loadingInProgress = true;
         this.nombreElements = 0;
-        this.duration = Date.now();
+        this.duration = 0;
+        let dur = Date.now();
         const accessToken = await this._api.getMapAccessToken("mapbox");
 
         if (this.map != null) {
             this.map.remove();
         }
-
-        this.map = new mapboxgl.Map({
-            accessToken: accessToken.accessToken,
-            container: 'map',
-            style: this.style,
-            zoom: 7,
-            center: [this.lng, this.lat]
-        });
 
         let erabliereGeoJson: any = null;
 
@@ -91,18 +85,28 @@ export class ErablieresMapComponent implements OnInit {
                 this.sensorFilter, 
                 this.maxSensors);
 
+            this.error = null;
             this.nombreElements = erabliereGeoJson.features.length;
         }
         catch (e) {
+            this.error = "Erreur lors de la récupération des érablières";
             console.error("Error while fetching erablieres", e);
             this.nombreElements = 0;
         }
         
         this.loadingInProgress = false;
         
-        this.duration = Date.now() - this.duration;
+        this.duration = Date.now() - dur;
 
         this.duration = this.duration / 1000;
+
+        this.map = new mapboxgl.Map({
+            accessToken: accessToken.accessToken,
+            container: 'map',
+            style: this.style,
+            zoom: 7,
+            center: [this.lng, this.lat]
+        });
 
         this.map.on('load', () => {
             if (this.map == null) {
