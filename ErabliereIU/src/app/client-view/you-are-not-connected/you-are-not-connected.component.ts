@@ -13,12 +13,12 @@ export class YouAreNotConnectedComponent implements OnInit {
   isLoggedIn: boolean;
   tenantId?: string;
 
-  private _authService: IAuthorisationSerivce
+  private readonly _authService: IAuthorisationSerivce
 
   constructor(
       authFactoryService: AuthorisationFactoryService,
-      private environmentService: EnvironmentService,
-      private cdr: ChangeDetectorRef) {
+      private readonly environmentService: EnvironmentService,
+      private readonly cdr: ChangeDetectorRef) {
     this._authService = authFactoryService.getAuthorisationService()
     this.useAuthentication = environmentService.authEnable ?? false
     this.isLoggedIn = false

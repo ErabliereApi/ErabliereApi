@@ -3,6 +3,8 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 import * as mapboxgl from 'mapbox-gl';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
+import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
 
 @Component({
     selector: 'app-erablieres-map',
@@ -30,14 +32,41 @@ import { FormsModule } from '@angular/forms';
 })
 export class ErablieresMapComponent implements OnInit {
 
-    constructor(private readonly _api: ErabliereApi) { }
+    private readonly _authService: IAuthorisationSerivce
+
+    constructor(authFactoryService: AuthorisationFactoryService, private readonly _api: ErabliereApi) { 
+        this._authService = authFactoryService.getAuthorisationService();
+
+        this._authService.loginChanged.subscribe(isLoggedIn => {
+            this.isAuthenticated = isLoggedIn;
+            this.myErablieresFilter = isLoggedIn ? 'yes' : 'no';
+        });
+    }
 
     map: mapboxgl.Map | undefined;
     style = 'mapbox://styles/mapbox/streets-v11';
     lat: number = 46.829853;
     lng: number = -71.254028;
 
+    loadingInProgress = true;
+    nombreElements = 0;
+    duration = 0;
+
+    isAuthenticated = false;
+
     async ngOnInit(): Promise<void> {
+        this._authService.isLoggedIn().then(isLoggedIn => {
+            this.isAuthenticated = isLoggedIn;
+            this.myErablieresFilter = isLoggedIn ? 'yes' : 'no';
+        });
+
+        await this.reInitMap();
+    }
+
+    async reInitMap() {
+        this.loadingInProgress = true;
+        this.nombreElements = 0;
+        this.duration = Date.now();
         const accessToken = await this._api.getMapAccessToken("mapbox");
 
         if (this.map != null) {
@@ -52,7 +81,28 @@ export class ErablieresMapComponent implements OnInit {
             center: [this.lng, this.lat]
         });
 
-        const erabliereGeoJson = await this._api.getErablieresGeoJson(this.publicFilter == "yes", this.myErablieresFilter == "yes", this.sensorFilter, this.maxSensors);
+        let erabliereGeoJson: any = null;
+
+        try {
+            console.log(this.publicFilter);
+            erabliereGeoJson = await this._api.getErablieresGeoJson(
+                 this.publicFilter == "yes", 
+                this.myErablieresFilter == "yes", 
+                this.sensorFilter, 
+                this.maxSensors);
+
+            this.nombreElements = erabliereGeoJson.features.length;
+        }
+        catch (e) {
+            console.error("Error while fetching erablieres", e);
+            this.nombreElements = 0;
+        }
+        
+        this.loadingInProgress = false;
+        
+        this.duration = Date.now() - this.duration;
+
+        this.duration = this.duration / 1000;
 
         this.map.on('load', () => {
             if (this.map == null) {
@@ -102,21 +152,18 @@ export class ErablieresMapComponent implements OnInit {
                 let description = '';
                 if (e.features != null && e.features.length > 0) {
                     let props = e.features[0]?.properties;
-
-                    console.log(props);
-
-                    console.log(props?.capteur);
                     
                     let caps = JSON.parse(props?.capteur);
 
-                    console.log(caps);
+                    let captsText = '';
 
-                    let captText = caps != null && caps.length > 0 ?
-                    `<p>${caps[0].nom}: ${caps[0].valeur} ${caps[0].symbole}</p>` : '';
+                    for (let cap of caps) {
+                        captsText += `<p>${cap.nom}: ${cap.valeur} ${cap.symbole}</p>`;
+                    }
 
                     description = `<div>
                         <h3>${props?.name}</h3>
-                        ${captText}
+                        ${captsText}
                         </div>
                     `;
                 }
@@ -139,14 +186,15 @@ export class ErablieresMapComponent implements OnInit {
     }
 
     async applyFilters() {
-        console.log("Applying filters", this.publicFilter, this.myErablieresFilter, this.sensorFilter, this.maxSensors);
-        await this.ngOnInit();
+        await this.reInitMap();
     }
 
     updatePublicFilter(event: any) {
         let element = event.target as HTMLSelectElement;
 
         this.publicFilter = element.value;
+
+        console.log(this.publicFilter);
     }
 
     updateMyFilter(event: any) {

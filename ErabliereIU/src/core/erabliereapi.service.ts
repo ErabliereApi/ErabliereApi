@@ -583,7 +583,10 @@ export class ErabliereApi {
 
     async getHeaders(): Promise<HttpHeaders> {
         const token = await this._authService.getAccessToken();
-        return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+        if (token) {
+            return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+        }
+        return new HttpHeaders();
     }
 
     async getMapAccessToken(provider: string): Promise<GetMapAccessToken> {
@@ -596,7 +599,7 @@ export class ErabliereApi {
         let url = this._environmentService.apiUrl + '/Erablieres/GeoJson?';
 
         if (isPublic != null) {
-            url += 'isPublic=true';
+            url += 'isPublic=' + isPublic;
         }
 
         if (my != null) {

@@ -33,6 +33,7 @@ public class ErablieresController : ControllerBase
     private readonly IDistributedCache _cache;
     private readonly IServiceProvider _serviceProvider;
     private readonly IStringLocalizer<ErablieresController> _localizer;
+    private readonly ILogger<ErablieresController> _logger;
 
     const string ACCESS_NOT_EMPTY = "AccessCannotBeEmpty";
     const string ACCESS_MUST_BE_IN_0_TO_5 = "AccessMustBeIn0To5";
@@ -46,13 +47,15 @@ public class ErablieresController : ControllerBase
     /// <param name="cache">Cache distribué</param>
     /// <param name="serviceProvider">Service scope</param>
     /// <param name="localizer">Localisateur de ressource</param>
+    /// <param name="logger"></param>
     public ErablieresController(
-        ErabliereDbContext context, 
-        IMapper mapper, 
-        IConfiguration config, 
+        ErabliereDbContext context,
+        IMapper mapper,
+        IConfiguration config,
         IDistributedCache cache,
         IServiceProvider serviceProvider,
-        IStringLocalizer<ErablieresController> localizer)
+        IStringLocalizer<ErablieresController> localizer,
+        ILogger<ErablieresController> logger)
     {
         _context = context;
         _mapper = mapper;
@@ -60,6 +63,7 @@ public class ErablieresController : ControllerBase
         _cache = cache;
         _serviceProvider = serviceProvider;
         _localizer = localizer;
+        _logger = logger;
     }
 
     private const int TakeErabliereNbMax = 20;
@@ -155,13 +159,29 @@ public class ErablieresController : ControllerBase
     {
         var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
 
+        if (!isAuthenticate && my.HasValue && my.Value)
+        {
+            ModelState.AddModelError("my", "Vous devez être connecté pour accéder à vos érablières.");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
+
+        if (my == null && isPublic == null)
+        {
+            isPublic = true;
+        }
+
         var erablieresQuery = _context.Erabliere
             .AsNoTracking()
             .Where(e => e.Latitude != 0 && e.Longitude != 0);
 
-        if (!isAuthenticate && isPublic.HasValue && (!my.HasValue || !my.Value))
+        if (isPublic.HasValue && (!my.HasValue || !my.Value))
         {
             erablieresQuery = erablieresQuery.Where(e => e.IsPublic);
+        }
+        else if (isPublic == false)
+        {
+            erablieresQuery = erablieresQuery.Where(e => !e.IsPublic);
         }
 
         if (my.HasValue && my.Value)
@@ -176,7 +196,7 @@ public class ErablieresController : ControllerBase
                     .ToArrayAsync(token);
 
                 erablieresQuery = erablieresQuery.Where(e => erablieresOwned.Contains(e.Id) ||
-                                                             isPublic.HasValue && e.IsPublic);
+                                                             (isPublic.HasValue && isPublic.Value && e.IsPublic));
             }
             else if (isAuthenticate && customer == null)
             {
@@ -187,20 +207,65 @@ public class ErablieresController : ControllerBase
         if (!string.IsNullOrWhiteSpace(nomCapteurs))
         {
 #nullable disable
-            erablieresQuery = erablieresQuery.Where(e => e.Capteurs.Any(c => c.Nom == nomCapteurs));
+            erablieresQuery = erablieresQuery
+                .Where(e => e.Capteurs.Any(c => EF.Functions.Like(c.Nom, nomCapteurs)));
 
-            erablieresQuery = erablieresQuery.Include(e => e.Capteurs.Where(c => c.Nom == nomCapteurs).OrderBy(c => c.IndiceOrdre).Take(topCapteurs ?? 1))
-                                             .ThenInclude(c => c.DonneesCapteur.OrderByDescending(c => c.D).Take(1))
-                                             .AsSingleQuery();
+            erablieresQuery = erablieresQuery
+                .Select(e => new Erabliere
+                {
+                    Id = e.Id,
+                    Nom = e.Nom,
+                    Longitude = e.Longitude,
+                    Latitude = e.Latitude,
+                    IsPublic = e.IsPublic,
+                    Capteurs = e.Capteurs
+                        .Where(c => EF.Functions.Like(c.Nom, nomCapteurs))
+                        .OrderBy(c => c.IndiceOrdre)
+                        .Take(topCapteurs ?? 1)
+                        .Select(c => new Capteur
+                        {
+                            Id = c.Id,
+                            Nom = c.Nom,
+                            Symbole = c.Symbole,
+                            DonneesCapteur = c.DonneesCapteur
+                                .OrderByDescending(dc => dc.D)
+                                .Take(1)
+                                .Select(dc => new DonneeCapteur
+                                {
+                                    D = dc.D,
+                                    Valeur = dc.Valeur
+                                })
+                                .ToList()
+                        })
+                        .ToList()
+                });
 #nullable enable
+
+            if (string.Equals(_config["GeoJson_FromSingleQuery"]?.Trim(), "true", StringComparison.OrdinalIgnoreCase))
+            {
+                erablieresQuery = erablieresQuery.AsSingleQuery();
+            }
+            else 
+            {
+                erablieresQuery = erablieresQuery.AsSplitQuery();
+            }
         }
-        
-        var erablieres = await erablieresQuery.ToArrayAsync(token);
+
+        var erablieres = new Erabliere[0];
+
+        if (isPublic == false && my == false)
+        {
+            erablieres = new Erabliere[0];
+        }
+        else
+        {
+            erablieres = await erablieresQuery.ToArrayAsync(token);
+        }
 
         var geoJson = new
         {
             type = "FeatureCollection",
-            features = erablieres.Select(e => new 
+            features = erablieres.Select(e => new
             {
                 type = "Feature",
                 geometry = new
@@ -217,7 +282,8 @@ public class ErablieresController : ControllerBase
                         c.Nom,
                         c.DonneesCapteur.OrderByDescending(d => d.D).FirstOrDefault()?.Valeur,
                         c.Symbole
-                    }).ToArray()
+                    }).ToArray(),
+                    isPublic = e.IsPublic
                 }
             }).ToArray()
         };
@@ -294,7 +360,8 @@ public class ErablieresController : ControllerBase
 
         var count = await _context.SaveChangesAsync(token);
 
-        return Ok(new {
+        return Ok(new
+        {
             count
         });
     }
@@ -317,7 +384,7 @@ public class ErablieresController : ControllerBase
         else
         {
             erabliere.IsPublic = true;
-            
+
             if (postErabliere.IsPublic != erabliere.IsPublic)
             {
                 ModelState.AddModelError("IsPublic", _localizer["EnforceIsPublic"]);
@@ -649,12 +716,12 @@ public class ErablieresController : ControllerBase
 
 
         var entity = await _context.CustomerErablieres.FindAsync([idCustomer, id], token);
-         
+
         if (entity == null)
         {
             return NotFound();
         }
-        
+
         entity.Access = access.Access.Value;
         _context.CustomerErablieres.Update(entity);
 
@@ -687,7 +754,7 @@ public class ErablieresController : ControllerBase
                 // Get the unique name of the user to delete
                 var userToDelete = await _context.Customers.FindAsync([entity.IdCustomer], token);
 
-                if (userToDelete != null) 
+                if (userToDelete != null)
                 {
                     await _cache.RemoveAsync($"CustomerWithAccess_{userToDelete.UniqueName}_{id}", token);
                 }
@@ -696,7 +763,7 @@ public class ErablieresController : ControllerBase
 
                 await _context.SaveChangesAsync(token);
             }
-            else 
+            else
             {
                 return BadRequest("Vous ne pouvez pas supprimer votre propre droit d'accès.");
             }
@@ -751,7 +818,7 @@ public class ErablieresController : ControllerBase
             return NotFound($"L'érablière que vous tentez de modifier n'existe pas.");
         }
 
-        if (!string.IsNullOrWhiteSpace(erabliere.Nom) && await _context.Erabliere.AnyAsync(e => e.Id != id && e.Nom == erabliere.Nom, token) )
+        if (!string.IsNullOrWhiteSpace(erabliere.Nom) && await _context.Erabliere.AnyAsync(e => e.Id != id && e.Nom == erabliere.Nom, token))
         {
             return BadRequest($"L'érablière avec le nom {erabliere.Nom}");
         }

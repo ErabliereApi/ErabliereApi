@@ -9,13 +9,23 @@
                         <option value="no">Non</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
-                    <select class="form-select" id="myErablieresFilter" (change)="updateMyFilter($event)" name="myErablieresFilter">
-                        <option value="yes">Oui</option>
-                        <option value="no">Non</option>
-                    </select>
-                </div>
+                @if (isAuthenticated) {
+                    <div class="col-md-2">
+                        <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
+                        <select class="form-select" id="myErablieresFilter" (change)="updateMyFilter($event)" name="myErablieresFilter">
+                            <option value="yes">Oui</option>
+                            <option value="no">Non</option>
+                        </select>
+                    </div>
+                }
+                @else {
+                    <div class="col-md-2">
+                        <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
+                        <select class="form-select" id="myErablieresFilter" name="myErablieresFilter" disabled>
+                            <option value="no">Non</option>
+                        </select>
+                    </div>
+                }
                 <div class="col-md-4">
                     <label for="sensorFilter" class="form-label">Filtre capteurs:</label>
                     <input type="text" class="form-control" id="sensorFilter" [(ngModel)]="sensorFilter"
@@ -27,13 +37,19 @@
                         name="maxSensors">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100" (click)="applyFilters()">Appliquer les
-                        filtres</button>
+                    <button type="submit" class="btn btn-primary w-100" (click)="applyFilters()">Appliquer les filtres
+                        @if (loadingInProgress) { 
+                            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        }
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-
+    <div class="row mb-2">
+        <div class="col-md-2">Nombre d'éléments: {{nombreElements}}</div>
+        <div class="col-md-2">Durée: {{duration}} secondes</div>
+    </div>
 
     <div id="map" class="match-parent"></div>
 </div>
