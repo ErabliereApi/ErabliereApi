@@ -255,7 +255,7 @@ public class ErablieresController : ControllerBase
 
         if (isPublic == false && my == false)
         {
-            erablieres = new Erabliere[0];
+            _logger.LogInformation("User query geojson with isPubic and my = to false.");
         }
         else
         {

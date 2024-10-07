@@ -12,6 +12,9 @@ public class ErabliereEntityConfiguration : IEntityTypeConfiguration<Erabliere>
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<Erabliere> erabliere)
     {
+        erabliere.HasIndex(e => e.IsPublic)
+                 .IsUnique(false);
+
         erabliere.HasMany(c => c.Capteurs)
                  .WithOne(c => c.Erabliere)
                  .HasForeignKey(e => e.IdErabliere)
