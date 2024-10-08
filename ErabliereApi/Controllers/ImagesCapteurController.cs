@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Attributes;
+﻿using System.Net;
+using ErabliereApi.Attributes;
 using ErabliereApi.Donnees.Action.Get;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -60,10 +61,21 @@ public class ImagesCapteurController : ControllerBase
             route += $"&search={search}";
         }
 
-        var response = await client.GetAsync(route, token);
+        try
+        {
+            var response = await client.GetAsync(route, token);
 
-        var obj = await response.Content.ReadFromJsonAsync<List<GetImageInfo>>(token);
+            var obj = await response.Content.ReadFromJsonAsync<List<GetImageInfo>>(token);
 
-        return Ok(obj);
+            return Ok(obj);
+        }
+        catch (HttpRequestException e) 
+        {
+            return StatusCode((int)(e.StatusCode ?? HttpStatusCode.InternalServerError), e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

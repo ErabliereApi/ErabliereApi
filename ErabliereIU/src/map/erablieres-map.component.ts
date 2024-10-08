@@ -80,7 +80,7 @@ export class ErablieresMapComponent implements OnInit {
         try {
             console.log(this.publicFilter);
             erabliereGeoJson = await this._api.getErablieresGeoJson(
-                 this.publicFilter == "yes", 
+                this.publicFilter == "yes", 
                 this.myErablieresFilter == "yes", 
                 this.sensorFilter, 
                 this.maxSensors);
