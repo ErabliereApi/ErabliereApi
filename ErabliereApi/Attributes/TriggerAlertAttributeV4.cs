@@ -14,13 +14,13 @@ namespace ErabliereApi.Attributes;
 /// Classe qui permet de rechercher et lancer les alertes relier à une action.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-public class TriggerAlertV3Attribute : ActionFilterAttribute
+public class TriggerAlertV4Attribute : ActionFilterAttribute
 {
     /// <summary>
     /// Contructeur par initialisation.
     /// </summary>
     /// <param name="order">Ordre d'exectuion des action filter</param>
-    public TriggerAlertV3Attribute(int order = int.MinValue)
+    public TriggerAlertV4Attribute(int order = int.MinValue)
     {
         Order = order;
     }
@@ -33,24 +33,24 @@ public class TriggerAlertV3Attribute : ActionFilterAttribute
 
     private static void GetIdAndPostInfo(ActionExecutingContext context)
     {
-        string id = context.ActionArguments["id"]?.ToString() ?? 
-            throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlertV3'.");
+        string id = context.ActionArguments["id"]?.ToString() ??
+            throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlertV4'.");
 
-        var _idCapteur = Guid.Parse(id);
+        var _idErabliere = Guid.Parse(id);
 
         try
         {
-            var _donnee = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonneeCapteurV2)) as PostDonneeCapteurV2;
+            var _donnee = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonneeCapteurV2[])) as PostDonneeCapteurV2;
 
-            context.HttpContext.Items.Add("TriggerAlertV3Attribute", (_idCapteur, _donnee));
+            context.HttpContext.Items.Add("TriggerAlertV4Attribute", (_idErabliere, _donnee));
         }
         catch (InvalidOperationException e)
         {
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV2Attribute>>();
 
-            logger.LogCritical(92837485, e, "typeof(PostDonneeCapteurV2) not found in {0}", Serialize(context.ActionArguments.Where(a => a.Value?.GetType() != typeof(CancellationToken))));
+            logger.LogCritical(92837485, e, "typeof(PostDonneeCapteurV2[]) not found in {0}", Serialize(context.ActionArguments.Where(a => a.Value?.GetType() != typeof(CancellationToken))));
 
-            throw new InvalidOperationException("Le paramètre PostDonneeCapteur est requis dans la route pour utiliser l'attribue 'TriggerAlertV3'.", e);
+            throw new InvalidOperationException("Le paramètre PostDonneeCapteur[] est requis dans la route pour utiliser l'attribue 'TriggerAlertV4'.", e);
         }
     }
 
@@ -63,38 +63,48 @@ public class TriggerAlertV3Attribute : ActionFilterAttribute
         {
             try
             {
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV3Attribute>>();
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV4Attribute>>();
                 var depot = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
                 var emailConfig = context.HttpContext.RequestServices.GetRequiredService<IOptions<EmailConfig>>();
                 var emailService = context.HttpContext.RequestServices.GetRequiredService<IEmailService>();
                 var smsConfig = context.HttpContext.RequestServices.GetRequiredService<IOptions<SMSConfig>>();
-                var smsService = context.HttpContext.RequestServices.GetRequiredService<ISmsService>();                
+                var smsService = context.HttpContext.RequestServices.GetRequiredService<ISmsService>();
 
-                var contextTupple = context.HttpContext.Items["TriggerAlertV3Attribute"];
+                var contextTupple = context.HttpContext.Items["TriggerAlertV4Attribute"];
 
                 if (contextTupple == null)
                 {
                     throw new InvalidOperationException("Les informations de l'attribue 'TriggerAlertV3' n'ont pas été trouvé dans le contexte.");
                 }
 
-                var (_idCapteur, _donnee) = ((Guid, PostDonneeCapteurV2?))contextTupple;
+                var (_idErabliere, _donnees) = ((Guid, PostDonneeCapteurV2[]?))contextTupple;
 
-                var alertes = await depot.AlerteCapteurs.AsNoTracking()
-                                                        .Where(a => a.IdCapteur == _idCapteur && a.IsEnable)
-                                                        .ToArrayAsync();
-
-                for (int i = 0; i < alertes.Length; i++)
+                if (_donnees == null)
                 {
-                    var alerte = alertes[i];
+                    throw new InvalidOperationException("Le paramètre '_donnees' doit être initialisé pour utiliser la fonction d'alertage.");
+                }
 
-                    await MaybeTriggerAlerte(
-                        alerte, 
-                        logger, 
-                        emailConfig.Value, 
-                        emailService, 
-                        smsConfig.Value, 
-                        smsService,
-                        _donnee);
+                foreach (var donnee in _donnees)
+                {
+                    var alertes = await depot.AlerteCapteurs.AsNoTracking()
+                        .Where(a => a.OwnerId == _idErabliere &&
+                                    a.IdCapteur == donnee.IdCapteur && 
+                                    a.IsEnable)
+                        .ToArrayAsync();
+
+                    for (int i = 0; i < alertes.Length; i++)
+                    {
+                        var alerte = alertes[i];
+
+                        await MaybeTriggerAlerte(
+                            alerte,
+                            logger,
+                            emailConfig.Value,
+                            emailService,
+                            smsConfig.Value,
+                            smsService,
+                            donnee);
+                    }
                 }
             }
             catch (Exception e)
@@ -107,11 +117,11 @@ public class TriggerAlertV3Attribute : ActionFilterAttribute
     }
 
     private static async Task MaybeTriggerAlerte(
-        AlerteCapteur alerte, 
-        ILogger<TriggerAlertV3Attribute> logger, 
-        EmailConfig emailConfig, 
-        IEmailService emailService, 
-        SMSConfig smsConfig, 
+        AlerteCapteur alerte,
+        ILogger<TriggerAlertV4Attribute> logger,
+        EmailConfig emailConfig,
+        IEmailService emailService,
+        SMSConfig smsConfig,
         ISmsService smsService,
         PostDonneeCapteurV2? _donnee)
     {

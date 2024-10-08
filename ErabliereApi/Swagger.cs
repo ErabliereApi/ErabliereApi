@@ -105,10 +105,9 @@ public static class Swagger
             }
 
             c.OperationFilter<AuthorizeCheckOperationFilter>(config);
-
             c.OperationFilter<ValiderIPRulesOperationFilter>();
             c.OperationFilter<ODataOperationFilter>();
-
+            c.OperationFilter<MediaTypeOperationFilter>();
             c.OrderActionsBy(description => GetSortKey(description));
 
             // Set the comments path for the Swagger JSON and UI.

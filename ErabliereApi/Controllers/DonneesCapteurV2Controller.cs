@@ -162,4 +162,44 @@ public class DonneesCapteurV2Controller : ControllerBase
 
         return Ok();
     }
+
+    /// <summary>
+    /// Action permetant de créer plusieurs données capteurs
+    /// </summary>
+    [HttpPost("/Erablieres/{id}/Capteurs/[controller]/PostMany")]
+    [TriggerAlertV4]
+    [ValiderOwnership("id")]
+    public async Task<IActionResult> PostMany(
+        [FromRoute] Guid id, [FromBody] PostDonneeCapteurV2[] donnees, CancellationToken token)
+    {
+        var d = DateTimeOffset.Now;
+
+        foreach (var donnee in donnees)
+        {
+            if (donnee.D == null)
+            {
+                donnee.D = d;
+            }
+
+            var any = await _depot.Capteurs.AsNoTracking().AnyAsync(c => c.IdErabliere == id &&
+                                                                         c.Id == donnee.IdCapteur, token);
+
+            if (any) {
+                var newDonnee = _mapper.Map<DonneeCapteur>(donnee);
+
+                await _depot.DonneesCapteur.AddAsync(newDonnee, token);
+            }
+            else {
+                return new NotFoundObjectResult(new {
+                    message = $"Le capteur {donnee.IdCapteur} n'existe pas dans l'erablière {id}"
+                });
+            }
+        }
+
+        var count = await _depot.SaveChangesAsync(token);
+
+        return Ok(new {
+            count
+        });
+    }
 }
