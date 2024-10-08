@@ -961,7 +961,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GeoJsonAsync();
+        System.Threading.Tasks.Task GeoJsonAsync(bool? isPublic, bool? my, string? capteur, int? topCapteur);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -969,7 +969,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GeoJsonAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task GeoJsonAsync(bool? isPublic, bool? my, string? capteur, int? topCapteur, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Obtenir les accès des utilisateurs à une érablière
@@ -1038,6 +1038,21 @@ namespace ErabliereAPI.Proxy
         /// <returns>Une liste de DonneesCapteur.</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetImageInfo>> ImagesCapteurAsync(System.Guid id, int? take, int? skip, string? search, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Get access token for a map service
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<GetMapAccessToken> AccessTokenAsync(string provider);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get access token for a map service
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<GetMapAccessToken> AccessTokenAsync(string provider, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Lister les notes avec les fonctionnalité de OData
@@ -1212,6 +1227,21 @@ namespace ErabliereAPI.Proxy
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task WebhookAsync(System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Action permetant de créer plusieurs données capteurs
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task PostManyAsync(System.Guid id, System.Collections.Generic.IEnumerable<PostDonneeCapteurV2>? body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Action permetant de créer plusieurs données capteurs
+        /// </summary>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task PostManyAsync(System.Guid id, System.Collections.Generic.IEnumerable<PostDonneeCapteurV2>? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Action permettant d'importer une liste de données
@@ -3015,6 +3045,15 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("externalOwner")]
         public System.Guid? ExternalOwner { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GetMapAccessToken
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("accessToken")]
+        public string? AccessToken { get; set; } = default!;
 
     }
 
