@@ -53,7 +53,7 @@ export class AjouterDonneeCapteurComponent implements OnInit {
 
     constructor(private readonly api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.donneeCapteurForm = this.fb.group({});
-     }
+    }
 
     ngOnInit(): void {
         const offset = new Date().getTimezoneOffset();

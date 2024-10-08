@@ -22,6 +22,6 @@ export const Button: Story = {
 
 export const Form: Story = {
   args: {
-    display: true
+    display: true,
   }
 };

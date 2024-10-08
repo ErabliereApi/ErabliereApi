@@ -51,7 +51,7 @@ export class ErablieresMapComponent implements OnInit {
     loadingInProgress = true;
     nombreElements = 0;
     duration = 0;
-    error?: string | null | undefined = null;
+    error?: string;
 
     isAuthenticated = false;
 
@@ -85,7 +85,7 @@ export class ErablieresMapComponent implements OnInit {
                 this.sensorFilter, 
                 this.maxSensors);
 
-            this.error = null;
+            this.error = undefined;
             this.nombreElements = erabliereGeoJson.features.length;
         }
         catch (e) {
