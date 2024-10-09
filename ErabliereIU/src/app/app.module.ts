@@ -11,6 +11,7 @@ import { provideNgxMask } from 'ngx-mask';
 import { BrowserModule } from '@angular/platform-browser';
 import 'chartjs-adapter-date-fns';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { ErabliereApi } from 'src/core/erabliereapi.service';
 
 declare global {
   interface Window {
@@ -102,7 +103,11 @@ export function MSALInstanceFactory(appConfig: EnvironmentService): IPublicClien
         MsalService,
         provideNgxMask(),
         provideRouter(routes, withComponentInputBinding()),
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withInterceptorsFromDi()),
+        {
+          provide: 'IErabliereApi',
+          useClass: ErabliereApi
+        }
     ] })
 export class AppModule implements DoBootstrap {
   constructor() {}

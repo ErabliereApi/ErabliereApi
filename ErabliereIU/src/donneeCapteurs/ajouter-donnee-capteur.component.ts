@@ -45,6 +45,7 @@ import { NgIf } from "@angular/common";
 export class AjouterDonneeCapteurComponent implements OnInit {
     @Input() idCapteur: any;
     @Input() symbole?: string
+    @Input() noAutomaticDate?: boolean;
     donneeCapteurForm: UntypedFormGroup;
     display: boolean = false;
     generalErrorMessage: string | null = null;
@@ -56,10 +57,13 @@ export class AjouterDonneeCapteurComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const offset = new Date().getTimezoneOffset();
-        const offsetMs = offset * 60000;
-        const nowMs = new Date().getTime();
-        const nowLocal = new Date(nowMs - offsetMs).toISOString().slice(0, 16);
+        let nowLocal = '';
+        if (!this.noAutomaticDate) {
+            const offset = new Date().getTimezoneOffset();
+            const offsetMs = offset * 60000;
+            const nowMs = new Date().getTime();
+            nowLocal = new Date(nowMs - offsetMs).toISOString().slice(0, 16);
+        }
         this.donneeCapteurForm = this.fb.group({
             valeur: '',
             date: nowLocal

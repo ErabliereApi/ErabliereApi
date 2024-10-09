@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { OAuthConfig } from "src/model/oauthConfig";
 import { UrlModel } from "../model/urlModel";
+import { firstValueFrom } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class EnvironmentService {
@@ -15,14 +16,14 @@ export class EnvironmentService {
   additionnalUrls?: UrlModel[]
   checkoutEnabled: boolean | undefined;
 
-  constructor(private _httpClient: HttpClient) {
+  constructor(private readonly _httpClient: HttpClient) {
 
   }
 
   loadConfig() {
     this.getAdditionnalUrls();
 
-    return this._httpClient.get<OAuthConfig>("/assets/config/oauth-oidc.json").toPromise().then(c => {
+    return firstValueFrom(this._httpClient.get<OAuthConfig>("/assets/config/oauth-oidc.json")).then(c => {
       if (c == null) {
         return;
       }
@@ -41,7 +42,7 @@ export class EnvironmentService {
   }
 
   getAdditionnalUrls() {
-    return this._httpClient.get<UrlModel[]>("/assets/config/additionnalUrls.json").toPromise().then(c => {
+    return firstValueFrom(this._httpClient.get<UrlModel[]>("/assets/config/additionnalUrls.json")).then(c => {
       this.additionnalUrls = c;
     })
       .catch((err: any) => {

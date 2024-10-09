@@ -19,9 +19,12 @@ type Story = StoryObj<CapteurPanelsComponent>;
 
 export const Primary: Story = {
   args: {
+    erabliere: {
+      id: "erabliere-guid",
+    },
     capteurs: [
       {
-        id: "some-guid",
+        id: "capteur-guid",
         nom: "Temperature",
         symbole: "°C",
         afficherCapteurDashboard: true,

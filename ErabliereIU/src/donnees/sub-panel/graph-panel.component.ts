@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
-import { ErabliereApi } from 'src/core/erabliereapi.service';
+import { IErabliereApi } from 'src/core/erabliereapi.interface';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
 import { DateTimeSelectorComponent } from './userinput/date-time-selector.component';
 import { calculerMoyenne } from '../util';
@@ -16,7 +16,7 @@ import { PanelHeaderComponent } from './header/panel-header.component';
         DateTimeSelectorComponent,
         AjouterDonneeCapteurComponent,
         NgChartsModule,
-    ],
+    ]
 })
 export class GraphPanelComponent implements OnInit {
     @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
@@ -63,7 +63,7 @@ export class GraphPanelComponent implements OnInit {
     col12: string = "col-12";
     col10: string = "col-10";
 
-    constructor(private _api: ErabliereApi) {
+    constructor(@Inject('IErabliereApi') private readonly _api: IErabliereApi) {
         this.chart = undefined;
     }
 
@@ -130,7 +130,7 @@ export class GraphPanelComponent implements OnInit {
 
             let donnees: Array<ChartDataset> = [
                 {
-                    data: json.map(donneeCapteur => donneeCapteur.valeur != null ? donneeCapteur.valeur : null), 
+                    data: json.map(donneeCapteur => donneeCapteur.valeur ?? null), 
                     label: this.titre,
                     fill: true,
                     pointBackgroundColor: 'rgba(255,255,0,0.8)',

@@ -23,5 +23,6 @@ export const Button: Story = {
 export const Form: Story = {
   args: {
     display: true,
+    noAutomaticDate: true,
   }
 };
