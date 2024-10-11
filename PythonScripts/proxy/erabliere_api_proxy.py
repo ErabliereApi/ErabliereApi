@@ -40,14 +40,13 @@ class ErabliereApiProxy:
     return self.post_request(self.path_e + str(id_erabliere) + "/capteurs", capteur)
 
   def get_request(self, action) -> requests.Response:
-    token = self.get_token()
-    h = {"Authorization": "Bearer " + str(token)}
+    h = self.get_headers()
     r = requests.get(self.base_url + action, headers = h, timeout = self.timeout, verify = self.verify_ssl)
     return r
 
   def post_request(self, action, body) -> requests.Response:
-    token = self.get_token()
-    h = {"Authorization": "Bearer " + str(token), "Content-Type":"Application/json"}
+    h = self.get_headers()
+    h["Content-Type"] = "Application/json"
     r = requests.post(self.base_url + action, json = body, headers = h, timeout = self.timeout, verify = self.verify_ssl)
     return r
 
