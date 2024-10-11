@@ -1,4 +1,4 @@
-from erabliere_api_proxy import ErabliereApiProxy
+from proxy.erabliere_api_proxy import ErabliereApiProxy
 import requests
 import os
 import sys

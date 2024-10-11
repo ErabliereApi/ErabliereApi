@@ -3,7 +3,7 @@ import datetime
 import json
 import math
 import sys
-from erabliere_api_proxy import ErabliereApiProxy
+from proxy.erabliere_api_proxy import ErabliereApiProxy
 
 #parse required argument idErabliere and urlBase
 idErabliere = sys.argv[1]
@@ -28,7 +28,7 @@ def getNiveauBassin():
   niveauBassin = 0
   return niveauBassin
 
-proxy = ErabliereApiProxy(urlBase, None, verifySsl=False)
+proxy = ErabliereApiProxy(urlBase, None, veryfy_ssl=False)
 
 print("Érablière :", idErabliere)
 t = temperature(datetime.datetime.utcnow())

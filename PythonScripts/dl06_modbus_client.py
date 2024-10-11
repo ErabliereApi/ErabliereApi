@@ -61,7 +61,7 @@ class Koyo:
 
 
 import sys
-from erabliere_api_proxy import ErabliereApiProxy
+from proxy.erabliere_api_proxy import ErabliereApiProxy
 
 if __name__ == '__main__':
     dl_06 = Koyo('192.168.0.155')  # ip address goes here

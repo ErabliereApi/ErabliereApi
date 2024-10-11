@@ -33,7 +33,7 @@ print(t)
 if len(sys.argv) == 1:
   exit()
 
-from erabliere_api_proxy import ErabliereApiProxy
+from proxy.erabliere_api_proxy import ErabliereApiProxy
 
 authType = None
 

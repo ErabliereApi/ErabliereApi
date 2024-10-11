@@ -16,7 +16,7 @@
 # the location is C:\Users\<USER>\AppData\Local\Tesseract-OCR\
 
 from datetime import datetime as dt
-from erabliere_api_proxy import ErabliereApiProxy
+from proxy.erabliere_api_proxy import ErabliereApiProxy
 import requests
 import os
 import sys
@@ -97,7 +97,7 @@ for url in urls.split(","):
       url = url.replace('[noSslVerify]', '')
       sslVerify = False
     
-    proxy = ErabliereApiProxy(url, "AzureAD", verifySsl=sslVerify)
+    proxy = ErabliereApiProxy(url, "ApiKey", veryfy_ssl=sslVerify)
     temperature = int(float(r_temperature[0].replace("°C", "")) * 10)
     
     if temperature == 77:
