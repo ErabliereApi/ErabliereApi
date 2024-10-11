@@ -99,6 +99,11 @@ public class StripeUsageReccordTaskHost : IHost
 
         while (context.Usages.TryDequeue(out var usageReccorded))
         {
+            if (usageReccorded.SubscriptionId == null)
+            {
+                continue;
+            }
+
             if (usageSummary.TryGetValue(usageReccorded.SubscriptionId, out var usage))
             {
                 usage.Quantity += usageReccorded.Quantite;

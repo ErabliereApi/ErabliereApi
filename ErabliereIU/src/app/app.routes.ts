@@ -16,11 +16,14 @@ import { ReportsComponent } from 'src/rapport/rapports.component';
 import { AdminAPIKeysComponent } from 'src/admin/admin-apikeys/admin-apikeys.component';
 import { MapViewComponent } from './map-view/map-view.component';
 import { ErablieresMapComponent } from 'src/map/erablieres-map.component';
+import { AdminGuard } from './admin-view/auth/admin.guard';
+import { Page401Component } from './page401/page401.component';
 
 export const routes: Routes = [
     {
         path: 'a',
         component: AdminViewComponent,
+        canActivate: [AdminGuard],
         children: [
             {
                 path: '',
@@ -48,6 +51,10 @@ export const routes: Routes = [
                 component: Page404Component
             }
         ]
+    },
+    {
+        path: 'page401',
+        component: Page401Component
     },
     {
         path: 'map',

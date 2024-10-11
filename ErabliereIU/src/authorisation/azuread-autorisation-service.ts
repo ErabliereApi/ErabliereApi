@@ -8,20 +8,20 @@ import { IAuthorisationSerivce } from './iauthorisation-service';
 
 export class AzureADAuthorisationService implements IAuthorisationSerivce {
   private _isLoggedIn: boolean = false;
-  private _loginChangedSubject = new Subject<boolean>();
+  private readonly _loginChangedSubject = new Subject<boolean>();
   loginChanged = this._loginChangedSubject.asObservable();
   type: string = "AzureAD";
   initialize: boolean = false;
 
-  constructor(private _msalInstance: MsalService, private _environmentService: EnvironmentService) {
-    
+  constructor(private readonly _msalInstance: MsalService, private readonly _environmentService: EnvironmentService) {
+
   }
 
   async login() {
     console.log("login");
-    if (this.initialize == false) {
+    if (!this.initialize) {
       console.log("Initilize MSAL Instance");
-      await this._msalInstance.initialize().toPromise();
+      await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
     }
     else {
@@ -31,7 +31,7 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
       scopes: this._environmentService.scopes?.split(' ') ?? [],
       prompt: "select_account"
     }
-    var appUser = await this._msalInstance.loginPopup(popupParam).toPromise().then(response => {
+    const appUser = await firstValueFrom(this._msalInstance.loginPopup(popupParam)).then(response => {
       return this.completeLogin();
     });
     console.log("AppUser", appUser);
@@ -39,15 +39,15 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
 
   async isLoggedIn(): Promise<boolean> {
     console.log("isLoggedIn");
-    if (this.initialize == false) {
+    if (!this.initialize) {
       console.log("Initilize MSAL Instance");
-      await this._msalInstance.initialize().toPromise();
+      await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
     }
     else {
       console.log("MSAL already initialize at isLoggedIn");
     }
-    
+
     let user = this.getUser();
 
     this._isLoggedIn = user != null;
@@ -57,7 +57,7 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
 
   async completeLogin(): Promise<AppUser> {
     console.log("completeLogin")
-    if (this.initialize == false) {
+    if (!this.initialize) {
       console.log("Initilize MSAL Instance");
       await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
@@ -65,7 +65,7 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     else {
       console.log("MSAL already initialize at completeLogin");
     }
-    
+
     const user = this.getUser();
     if (user != null) {
       this._isLoggedIn = true;
@@ -95,9 +95,9 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     })
   }
 
-  async getAccessToken(): Promise<String | null> {
+  async getAccessToken(): Promise<string | null> {
     console.log("getAccessToken");
-    if (this.initialize == false) {
+    if (!this.initialize) {
       console.log("Initilize MSAL Instance");
       await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
@@ -105,8 +105,8 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     else {
       console.log("MSAL already initialize at getAccessToken");
     }
-    
-    var user = this.getUser();
+
+    const user = this.getUser();
     this._msalInstance.instance.setActiveAccount(user);
 
     const requestObj: SilentRequest = {
@@ -116,8 +116,8 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
       forceRefresh: false
     };
 
-    return this._msalInstance.acquireTokenSilent(requestObj).toPromise().then(authResult => {
-      if (this._isLoggedIn == false) {
+    return firstValueFrom(this._msalInstance.acquireTokenSilent(requestObj)).then(authResult => {
+      if (!this._isLoggedIn) {
         this.completeLogin();
       }
       return authResult?.accessToken ?? null;
@@ -131,10 +131,25 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   }
 
   getUser(): AccountInfo | null {
-    var user = null;
+    let user = null;
     if (this._msalInstance.instance.getAllAccounts().length > 0) {
       user = this._msalInstance.instance.getAllAccounts()[0];
     }
     return user;
+  }
+
+  async userIsInRole(role: string): Promise<boolean> {
+    if (this._isLoggedIn) {
+      const user = this.getUser();
+      if (user != null) {
+        const roles = user.idTokenClaims?.roles;
+        console.log(roles);
+        if (roles?.includes(role)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }

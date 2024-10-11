@@ -28,6 +28,7 @@ import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/m
 import { firstValueFrom } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
 import { IErabliereApi } from './erabliereapi.interface';
+import { ApiKey } from 'src/model/apikey';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi implements IErabliereApi {
@@ -617,6 +618,15 @@ export class ErabliereApi implements IErabliereApi {
 
         return await firstValueFrom(this._httpClient.get<GeoJSON.GeoJSON>(url, { headers: header }));
     }
+
+    async getApiKeys(): Promise<ApiKey[]> {
+        const header = await this.getHeaders();
+
+        return await firstValueFrom(
+            this._httpClient.get<ApiKey[]>(
+                this._environmentService.apiUrl + '/access/ApiKey?$expand=customer', { headers: header }));
+    }
+
 }
 
 function isNotNullOrWhitespace(search: string | undefined) {

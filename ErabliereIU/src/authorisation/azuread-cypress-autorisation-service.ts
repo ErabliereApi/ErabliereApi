@@ -5,18 +5,18 @@ import { IAuthorisationSerivce } from './iauthorisation-service';
 
 export class AzureADCypressAuthorisationService implements IAuthorisationSerivce {
   private _isLoggingIn = false;
-  private _loginChangedSubject = new Subject<boolean>();
+  private readonly _loginChangedSubject = new Subject<boolean>();
   type: string = "AzureADCypress";
   loginChanged = this._loginChangedSubject.asObservable();
 
   async login() {
-    var appUser = await this.completeLogin();
+    const appUser = await this.completeLogin();
     console.log(appUser);
   }
 
   isLoggedIn(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      if (this.getAccessToken() != null && this._isLoggingIn == false) {
+      if (this.getAccessToken() != null && !this._isLoggingIn) {
         this._isLoggingIn = true;
         this._loginChangedSubject.next(true);
       }
@@ -27,7 +27,7 @@ export class AzureADCypressAuthorisationService implements IAuthorisationSerivce
 
   completeLogin() {
     return new Promise<AppUser>((resolve, reject) => {
-      if (this._isLoggingIn == false) {
+      if (!this._isLoggingIn) {
         this._isLoggingIn = true;
         this._loginChangedSubject.next(true);
       }
@@ -47,18 +47,24 @@ export class AzureADCypressAuthorisationService implements IAuthorisationSerivce
     });
   }
 
-  getAccessToken(): Promise<String | null> {
-    return new Promise<String | null>((resolve, reject) => {
-        var token = localStorage.getItem("adal.idtoken");
+  getAccessToken(): Promise<string | null> {
+    return new Promise<string | null>((resolve, reject) => {
+        const token = localStorage.getItem("adal.idtoken");
 
         console.log(token);
 
-        if (token != null && this._isLoggingIn == false) {
+        if (token != null && !this._isLoggingIn) {
           this._isLoggingIn = true;
           this._loginChangedSubject.next(true);
         }
 
         return resolve(token);
+    });
+  }
+
+  userIsInRole(role: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      return resolve(true);
     });
   }
 }

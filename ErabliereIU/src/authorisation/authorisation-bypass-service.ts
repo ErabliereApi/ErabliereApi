@@ -8,23 +8,24 @@ export class AuthorisationBypassService implements IAuthorisationSerivce {
     type: string = "AuthDisabled";
 
     login(): Promise<void> {
-        return new Promise<void>((resolve, reject) => { return resolve(); });
+        return Promise.resolve();
     }
     isLoggedIn(): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => resolve(true));
+        return Promise.resolve(true);
     }
     completeLogin(): Promise<AppUser> {
-        return new Promise<AppUser>((resolve, reject) => resolve(new AppUser()));
+        return Promise.resolve(new AppUser());
     }
     logout(): void {
-        
+        // Do nothing
     }
     completeLogout(): Promise<AuthResponse> {
-        return new Promise<AuthResponse>((resolve, reject) => resolve(new AuthResponse()));
+        return Promise.resolve(new AuthResponse());
     }
-    getAccessToken(): Promise<String | null> {
-        return new Promise((resolve, reject) => {
-            return resolve(null);
-        });
+    getAccessToken(): Promise<string | null> {
+        return Promise.resolve(null);
+    }
+    userIsInRole(role: string): Promise<boolean> {
+        return Promise.resolve(false);
     }
 }

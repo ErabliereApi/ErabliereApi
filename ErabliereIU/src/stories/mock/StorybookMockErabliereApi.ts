@@ -1,8 +1,12 @@
 import { DonneeCapteur } from "src/model/donneeCapteur";
 import { IErabliereApi } from "src/core/erabliereapi.interface";
 import { HttpHeaders, HttpResponse } from "@angular/common/http";
+import { ApiKey } from "src/model/apikey";
 
 export class StorybookMockErabliereApi implements IErabliereApi {
+    getApiKeys(): Promise<ApiKey[]> {
+        throw new Error("Method not implemented.");
+    }
     async getDonneesCapteur(idCapteur: any, debutFiltre: string, finFiltre: string, xddr?: any): Promise<HttpResponse<DonneeCapteur[]>> {
         await new Promise(resolve => setTimeout(resolve, 1));
         return {

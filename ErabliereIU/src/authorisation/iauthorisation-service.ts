@@ -10,5 +10,6 @@ export interface IAuthorisationSerivce {
     completeLogin(): Promise<AppUser>
     logout(): void
     completeLogout(): Promise<AuthResponse>
-    getAccessToken() : Promise<String | null>
+    getAccessToken() : Promise<string | null>
+    userIsInRole(role: string): Promise<boolean>
 }

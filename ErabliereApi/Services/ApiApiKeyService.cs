@@ -18,7 +18,6 @@ public class ApiApiKeyService : IApiKeyService
     private readonly IEmailService _emailService;
     private readonly EmailConfig _emailConfig;
     private readonly ILogger<ApiApiKeyService> _logger;
-    private readonly IConfiguration _config;
 
     /// <summary>
     /// Constructeur par initlaisation
@@ -27,23 +26,20 @@ public class ApiApiKeyService : IApiKeyService
     /// <param name="emailService"></param>
     /// <param name="emailConfig"></param>
     /// <param name="logger"></param>
-    /// <param name="config"></param>
     public ApiApiKeyService(
         IServiceScopeFactory scopeFactory, 
         IEmailService emailService, 
         IOptions<EmailConfig> emailConfig,
-        ILogger<ApiApiKeyService> logger,
-        IConfiguration config)
+        ILogger<ApiApiKeyService> logger)
     {
         _scopeFactory = scopeFactory;
         _emailService = emailService;
         _emailConfig = emailConfig.Value;
         _logger = logger;
-        _config = config;
     }
 
     /// <inheritdoc />
-    public async Task<ApiKey> CreateApiKeyAsync(Donnees.Customer customer, CancellationToken token)
+    public async Task<(ApiKey, string)> CreateApiKeyAsync(Donnees.Customer customer, CancellationToken token)
     {
         if (customer == null)
         {
@@ -60,8 +56,11 @@ public class ApiApiKeyService : IApiKeyService
         var apiKeyObj = new ApiKey
         {
             Key = HashApiKey(apiKeyBytes),
-            CustomerId = customer.Id.Value
+            CustomerId = customer.Id.Value,
+            CreationTime = DateTimeOffset.Now
         };
+
+        var originalKey = Convert.ToBase64String(apiKeyBytes);
 
         using (var scope = _scopeFactory.CreateScope())
         {
@@ -72,9 +71,9 @@ public class ApiApiKeyService : IApiKeyService
             await context.SaveChangesAsync(token);
         }        
 
-        await SendEmailAsync(customer.Email, Convert.ToBase64String(apiKeyBytes), token);
+        await SendEmailAsync(customer.Email, originalKey, token);
 
-        return apiKeyObj;
+        return (apiKeyObj, originalKey);
     }
 
     private async Task SendEmailAsync(string email, string originalKey, CancellationToken token)
@@ -142,7 +141,7 @@ public class ApiApiKeyService : IApiKeyService
         {
             var context = scope.ServiceProvider.GetRequiredService<ErabliereDbContext>();
 
-            var entity = context.Update(apiKey);
+            context.Update(apiKey);
 
             await context.SaveChangesAsync(token);
         }
@@ -162,9 +161,9 @@ public class ApiApiKeyService : IApiKeyService
 
             return apikey;
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException e)
         {
-            _logger.LogWarning($"Customer was not found in the database");
+            _logger.LogWarning(e, "Customer was not found in the database");
         }
 
         return null;
@@ -179,7 +178,9 @@ public class ApiApiKeyService : IApiKeyService
 
             return true;
         }
-        catch { }
+        catch { 
+            // Do nothing
+        }
 
         hashApiKey = null;
 

@@ -1,4 +1,6 @@
 using ErabliereApi.Depot.Sql;
+using ErabliereApi.Donnees;
+using ErabliereApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -15,14 +17,17 @@ namespace ErabliereApi.Controllers;
 public class ApiKeyController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
+    private readonly IApiKeyService _apiApiKeyService;
 
     /// <summary>
     /// Constructeur
     /// </summary>
     /// <param name="context"></param>
-    public ApiKeyController(ErabliereDbContext context)
+    /// <param name="apiKeyService"></param>
+    public ApiKeyController(ErabliereDbContext context, IApiKeyService apiKeyService)
     {
         _context = context;
+        _apiApiKeyService = apiKeyService;
     }
 
     /// <summary>
@@ -32,27 +37,48 @@ public class ApiKeyController : ControllerBase
     [EnableQuery]
     public IEnumerable<Donnees.ApiKey> GetApiKeys()
     {
-        return _context.ApiKeys;
+        return _context.ApiKeys.Select(k => new Donnees.ApiKey
+        {
+            Id = k.Id,
+            CreationTime = k.CreationTime,
+            CustomerId = k.CustomerId,
+            DeletionTime = k.DeletionTime,
+            RevocationTime = k.RevocationTime,
+            SubscriptionId = k.SubscriptionId,
+            Key = "***"
+        });
     }
 
     /// <summary>
     /// Permet de créer une nouvelle clé d'API.
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> CreateApiKey(CancellationToken token)
+    public async Task<IActionResult> CreateApiKey([FromBody] PostApiKey postApiKey, CancellationToken token)
     {
-        var newApiKey = new Donnees.ApiKey
+        if (postApiKey.CustomerId == null)
         {
-            Id = Guid.NewGuid(),
-            Key = Guid.NewGuid().ToString(),
-            CreationTime = DateTime.Now
-        };
+            ModelState.AddModelError("CustomerId", "CustomerId is required.");
 
-        await _context.ApiKeys.AddAsync(newApiKey, token);
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
 
-        await _context.SaveChangesAsync(token);
+        var cust = await _context.Customers.FirstOrDefaultAsync(c => c.Id == postApiKey.CustomerId, token);
 
-        return Ok(newApiKey);
+        if (cust == null)
+        {
+            ModelState.AddModelError("CustomerId", "Customer not found.");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
+
+        var (apikey, originalKey) = await _apiApiKeyService.CreateApiKeyAsync(cust, token);
+
+        return Ok(new ApiKey {
+            Id = apikey.Id,
+            Key = originalKey,
+            CreationTime = apikey.CreationTime,
+            CustomerId = apikey.CustomerId
+        });
     }
 
     /// <summary>

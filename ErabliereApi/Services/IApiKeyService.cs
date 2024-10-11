@@ -13,7 +13,7 @@ public interface IApiKeyService
     /// <param name="customer"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    Task<ApiKey> CreateApiKeyAsync(Customer customer, CancellationToken token);
+    Task<(ApiKey, string)> CreateApiKeyAsync(Customer customer, CancellationToken token);
 
     /// <summary>
     /// Hash an api key from a string
@@ -23,19 +23,19 @@ public interface IApiKeyService
     string HashApiKey(string key);
 
     /// <summary>
+    /// Hash an api key from a byte array
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    string HashApiKey(byte[] key);
+
+    /// <summary>
     /// Try hash a given key
     /// </summary>
     /// <param name="key"></param>
     /// <param name="hashApiKey"></param>
     /// <returns></returns>
     bool TryHashApiKey(string key, out string? hashApiKey);
-
-    /// <summary>
-    /// Hash an api key from a byte array
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    string HashApiKey(byte[] key);
 
     /// <summary>
     /// Set the subscription key for a customer

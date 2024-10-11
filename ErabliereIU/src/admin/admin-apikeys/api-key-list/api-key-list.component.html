@@ -1,0 +1,26 @@
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Utilisateur</th>
+                <th>Date création</th>
+                <th>Révoqué</th>
+                <th>Date révocation</th>
+                <th class="min"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (apikey of apiKeys; track apikey.id) {
+            <tr>
+                <td>{{apikey.id}}</td>
+                <td>{{apikey?.customer?.name}}</td>
+                <td>{{apikey.creationTime}}</td>
+                <td>{{apikey.revocationTime != null}}</td>
+                <td>{{apikey.revocationTime}}</td>
+                <td class="min"></td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

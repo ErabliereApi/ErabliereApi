@@ -12,5 +12,5 @@ import {AdminNavBarComponent} from "./admin-nav-bar/admin-nav-bar.component";
   templateUrl: './admin-view.component.html'
 })
 export class AdminViewComponent {
-
+  
 }

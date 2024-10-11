@@ -40,7 +40,7 @@ public class CustomersController : ControllerBase
     [HttpGet]
     [EnableQuery(MaxExpansionDepth = 0)]
     [ProducesResponseType(200, Type = typeof(List<GetCustomer>))]
-    public async Task<List<GetCustomer>> GetCustomers(CancellationToken token)
+    public async Task<IActionResult> GetCustomers(CancellationToken token)
     {
         var customers = await _context.Customers.ProjectTo<GetCustomer>(_mapper.ConfigurationProvider)
                                                 .ToListAsync(token);
@@ -64,26 +64,7 @@ public class CustomersController : ControllerBase
             customer.Email = $"{nameStart}{new string('*', nameEnd.Length)}@{domain}";
         }
 
-        // Masquer avec des * certains caractères des noms unique
-        foreach (var customer in customers.Where(c => !string.IsNullOrEmpty(c.UniqueName) && c.UniqueName.Contains('@')))
-        {
-            if (customer.UniqueName == null) {
-                continue;
-            }
-
-            var email = customer.UniqueName.Split('@');
-            var name = email[0];
-            var domain = email[1];
-
-            var nameLength = name.Length;
-            var nameToHide = nameLength / 2;
-            var nameStart = name.Substring(0, nameToHide);
-            var nameEnd = name.Substring(nameToHide, nameLength - nameToHide);
-
-            customer.UniqueName = $"{nameStart}{new string('*', nameEnd.Length)}@{domain}";
-        }
-
-        return customers;
+        return Ok(customers);
     }
 
     /// <summary>

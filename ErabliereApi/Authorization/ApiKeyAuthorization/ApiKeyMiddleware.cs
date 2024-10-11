@@ -34,7 +34,11 @@ public class ApiKeyMiddleware : IMiddleware
 
             var now = DateTimeOffset.Now;
 
-            if (apiKeyEntity != null &&
+            if (apiKeyEntity != null && apiKeyEntity.SubscriptionId == null) {
+                var _logger = context.RequestServices.GetRequiredService<ILogger<ApiKeyMiddleware>>();
+                _logger.LogDebug("User use an api key {ApiKeyId} without subscriptionId", apiKeyEntity.Id);
+            }
+            else if (apiKeyEntity != null &&
                 (apiKeyEntity.RevocationTime == null || now < apiKeyEntity.RevocationTime) &&
                 (apiKeyEntity.DeletionTime == null || now < apiKeyEntity.CreationTime) &&
                 apiKeyEntity.DeletionTime == null)

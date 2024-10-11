@@ -1,4 +1,4 @@
-import { UserManager, User, UserManagerSettings, SignoutResponse } from 'oidc-client'
+import { UserManager, User, UserManagerSettings } from 'oidc-client'
 import { Subject } from 'rxjs';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { AppUser } from 'src/model/appuser';
@@ -6,9 +6,9 @@ import { AuthResponse } from 'src/model/authresponse';
 import { IAuthorisationSerivce } from './iauthorisation-service';
 
 export class AuthorisationService implements IAuthorisationSerivce {
-    private _userManager: UserManager;
+    private readonly _userManager: UserManager;
     private _user?: User | null;
-    private _loginChangedSubject = new Subject<boolean>();
+    private readonly _loginChangedSubject = new Subject<boolean>();
     type: string = "IdentityServer";
     loginChanged = this._loginChangedSubject.asObservable();
 
@@ -53,18 +53,28 @@ export class AuthorisationService implements IAuthorisationSerivce {
     completeLogout(): Promise<AuthResponse> {
         return new Promise<AuthResponse>(() => {
             this._user = null;
-            const signoutResponse = this._userManager.signoutRedirectCallback();
+            this._userManager.signoutRedirectCallback();
             return new AuthResponse();
         });
     }
 
-    async getAccessToken() : Promise<String | null> {
+    async getAccessToken() : Promise<string | null> {
         const user = await this._userManager.getUser();
         if (!!user && !user.expired) {
             return user.access_token;
         }
         else {
             return null;
+        }
+    }
+
+    async userIsInRole(role: string): Promise<boolean> {
+        const user = await this._userManager.getUser();
+        if (!!user && !user.expired) {
+            return user.profile.role === role;
+        }
+        else {
+            return false;
         }
     }
 }

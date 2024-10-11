@@ -17,7 +17,7 @@ export class AdminCustomersComponent implements OnInit {
   customers: Customer[] = [];
   customerAModifier: Customer | null = null;
 
-  constructor(private _api: ErabliereApi) { }
+  constructor(private readonly _api: ErabliereApi) { }
 
   ngOnInit() {
     this.chargerCustomers();
