@@ -70,7 +70,7 @@ class ErabliereApiProxy:
       return None
     if (self.auth_provider == "ApiKey"):
       self.init_auth_config()
-      return "ApiKey " + self.auth_config["ApiKey"]
+      return self.auth_config["ApiKey"]
     if (self.auth_provider == "Identity"):
       return getAccessTokenIdentity("https://192.168.0.103:5005/connect/token", "raspberrylocal", "secret", verifySsl = False)
     if (self.auth_provider == "AzureAD"):
