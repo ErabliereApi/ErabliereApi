@@ -1,4 +1,5 @@
 ﻿using ErabliereApi.Depot.Sql;
+using ErabliereApi.Donnees;
 using ErabliereApi.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -32,26 +33,17 @@ public class ApiKeyMiddleware : IMiddleware
 
             var apiKeyEntity = await dbContext.ApiKeys.AsNoTracking().FirstOrDefaultAsync(k => k.Key == hashkey);
 
-            var now = DateTimeOffset.Now;
-
-            if (apiKeyEntity != null && apiKeyEntity.SubscriptionId == null) {
-                var _logger = context.RequestServices.GetRequiredService<ILogger<ApiKeyMiddleware>>();
-                _logger.LogDebug("User use an api key {ApiKeyId} without subscriptionId", apiKeyEntity.Id);
-            }
-            else if (apiKeyEntity != null &&
-                (apiKeyEntity.RevocationTime == null || now < apiKeyEntity.RevocationTime) &&
-                (apiKeyEntity.DeletionTime == null || now < apiKeyEntity.CreationTime) &&
-                apiKeyEntity.DeletionTime == null)
+            if (apiKeyEntity != null && apiKeyEntity.IsActive())
             {
-                var checkoutService = context.RequestServices.GetRequiredService<ICheckoutService>();
+                // SubscriptionId is null when the key is not linked to a subscription, o need to record usage in checkoutservice
+                if (apiKeyEntity.SubscriptionId != null)
+                {
+                    var checkoutService = context.RequestServices.GetRequiredService<ICheckoutService>();
 
-                await checkoutService.ReccordUsageAsync(apiKeyEntity);
+                    await checkoutService.ReccordUsageAsync(apiKeyEntity);
+                }
 
-                var apiKeyAuthContext = context.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
-
-                apiKeyAuthContext.Authorize = true;
-                apiKeyAuthContext.Customer = await dbContext.Customers.FindAsync([apiKeyEntity.CustomerId], cancellationToken: context.RequestAborted);
-                apiKeyAuthContext.ApiKey = apiKeyEntity;
+                await AuthorizeRequestAsync(context, dbContext, apiKeyEntity);
             }
             else
             {
@@ -68,5 +60,14 @@ public class ApiKeyMiddleware : IMiddleware
             context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
             context.Response.Headers.Append("X-ErabliereApi-ApiKey-Reason", "Something is wrong with the token");
         }
+    }
+
+    private static async Task AuthorizeRequestAsync(HttpContext context, ErabliereDbContext dbContext, ApiKey apiKeyEntity)
+    {
+        var apiKeyAuthContext = context.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
+
+        apiKeyAuthContext.Authorize = true;
+        apiKeyAuthContext.Customer = await dbContext.Customers.FindAsync([apiKeyEntity.CustomerId], cancellationToken: context.RequestAborted);
+        apiKeyAuthContext.ApiKey = apiKeyEntity;
     }
 }

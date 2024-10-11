@@ -46,4 +46,17 @@ public class ApiKey
     /// The stripe subscription id related to the api key
     /// </summary>
     public string? SubscriptionId { get; set; }
+
+    /// <summary>
+    /// Tel if the api key is active
+    /// </summary>
+    /// <returns></returns>
+    public bool IsActive()
+    {
+        var now = DateTimeOffset.Now;
+
+        return (RevocationTime == null || now < RevocationTime) &&
+                (DeletionTime == null || now < CreationTime) &&
+                DeletionTime == null;
+    }
 }
