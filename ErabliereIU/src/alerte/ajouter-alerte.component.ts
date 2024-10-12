@@ -8,6 +8,7 @@ import { convertTenthToNormale } from "src/core/calculator.service";
 import { EinputComponent } from "../formsComponents/einput.component";
 import { NgIf, NgFor } from "@angular/common";
 import { Erabliere } from "src/model/erabliere";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
     selector: 'ajouter-alerte-modal',
@@ -22,7 +23,10 @@ export class AjouterAlerteComponent implements OnInit {
     display:boolean
     generalError?: string
     
-    constructor(private _api: ErabliereApi, private fb: UntypedFormBuilder) {
+    constructor(
+        private readonly _api: ErabliereApi, 
+        private readonly fb: UntypedFormBuilder,
+        private readonly route: ActivatedRoute) {
         this.alerte = new Alerte();
         this.alerteCapteur = new AlerteCapteur();
         this.typeAlerteSelectListForm = new UntypedFormGroup({
@@ -33,9 +37,21 @@ export class AjouterAlerteComponent implements OnInit {
         this.alerteCapteurForm = this.fb.group({});
     }
     
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
+        this.route.params.subscribe(params => {
+            this.idErabliereSelectionee = params['idErabliereSelectionee'];
+            this.updateState();
+        });
+    }
+
+    async updateState() {
+        if (this.erabliere == undefined || this.erabliere.id != this.idErabliereSelectionee) {
+            const r = await this._api.getErabliere(this.idErabliereSelectionee, true);
+            this.erabliere = r;
+        }
         this.initializeForms();
-        if (this.erabliere?.afficherTrioDonnees == false) {
+        console.log(this.erabliere);
+        if (!this.erabliere?.afficherTrioDonnees) {
             this.typeAlerteSelectListForm.controls['state'].setValue(2);
             this.typeAlerte = 2;
         }
