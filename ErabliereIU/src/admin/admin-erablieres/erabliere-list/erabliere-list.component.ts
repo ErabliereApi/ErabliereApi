@@ -5,13 +5,11 @@ import { CustomerAccess } from "../../../model/customerAccess";
 
 @Component({
     selector: 'erabliere-list',
-    standalone: true,
     imports: [
         AdminErabliereAccessListComponent
     ],
     templateUrl: './erabliere-list.component.html',
-    styleUrl: './erabliere-list.component.css',
-
+    styleUrl: './erabliere-list.component.css'
 })
 export class ErabliereListComponent {
     @Input() erablieres: Erabliere[] = [];

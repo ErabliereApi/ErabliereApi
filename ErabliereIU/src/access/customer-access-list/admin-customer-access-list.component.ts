@@ -6,15 +6,14 @@ import {EditCustomerAccessRowComponent} from "./edit-customer-access-row/edit-cu
 import {AddCustomerAccessRowComponent} from "./add-customer-access-row/add-customer-access-row.component";
 
 @Component({
-  selector: 'admin-customer-access-list',
-  standalone: true,
+    selector: 'admin-customer-access-list',
     imports: [
         ViewCustomerAccessRowComponent,
         EditCustomerAccessRowComponent,
         AddCustomerAccessRowComponent
     ],
-  templateUrl: './customer-access-list.component.html',
-  styleUrl: './customer-access-list.component.css',
+    templateUrl: './customer-access-list.component.html',
+    styleUrl: './customer-access-list.component.css'
 })
 export class AdminCustomerAccessListComponent {
     @Input() idCustomer?: string;

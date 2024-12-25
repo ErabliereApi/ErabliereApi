@@ -13,13 +13,12 @@ import {CapteurImage} from "../../model/capteurImage";
 import {PutCapteurImage} from "../../model/putCapteurImage";
 
 @Component({
-  selector: 'app-capteur-image-list',
-  standalone: true,
+    selector: 'app-capteur-image-list',
     imports: [
         ReactiveFormsModule
     ],
-  templateUrl: './capteur-image-list.component.html',
-  styleUrl: './capteur-image-list.component.css'
+    templateUrl: './capteur-image-list.component.html',
+    styleUrl: './capteur-image-list.component.css'
 })
 export class CapteurImageListComponent implements OnChanges {
     @Input() idErabliere?: string;

@@ -14,7 +14,6 @@ import { ApiKey } from 'src/model/apikey';
             </div>
         </div>
     `,
-    standalone: true,
     imports: [ApiKeyListComponent]
 })
 export class AdminAPIKeysComponent implements OnInit {

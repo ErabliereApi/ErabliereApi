@@ -1,24 +1,21 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Note } from 'src/model/note';
 import { NoteComponent } from './note.component';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { AjouterNoteComponent } from './ajouter-note.component';
 import { ModifierNoteComponent } from './modifier-note.component';
 import { Subject } from 'rxjs';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ActivatedRoute } from '@angular/router';
 import { PaginationComponent } from "../pagination/pagination.component";
-import { ca } from 'date-fns/locale';
 
 @Component({
     selector: 'notes',
     templateUrl: "./notes.component.html",
-    standalone: true,
     imports: [
         AjouterNoteComponent,
         ModifierNoteComponent,
         NgIf,
-        NgFor,
         NoteComponent,
         PaginationComponent
     ]

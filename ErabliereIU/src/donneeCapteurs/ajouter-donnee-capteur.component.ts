@@ -39,7 +39,6 @@ import { NgIf } from "@angular/common";
             border-top: 1px solid #ccc;
         }
     `],
-    standalone: true,
     imports: [NgIf, ReactiveFormsModule, EinputComponent]
 })
 export class AjouterDonneeCapteurComponent implements OnInit {

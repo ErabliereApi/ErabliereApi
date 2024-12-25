@@ -5,14 +5,11 @@ import { IErabliereApi } from 'src/core/erabliereapi.interface';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
 import { DateTimeSelectorComponent } from './userinput/date-time-selector.component';
 import { calculerMoyenne } from '../util';
-import { PanelHeaderComponent } from './header/panel-header.component';
 
 @Component({
     selector: 'graph-panel',
     templateUrl: './graph-panel.component.html',
-    standalone: true,
     imports: [
-        PanelHeaderComponent,
         DateTimeSelectorComponent,
         AjouterDonneeCapteurComponent,
         NgChartsModule,

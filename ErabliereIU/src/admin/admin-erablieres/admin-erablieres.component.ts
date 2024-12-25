@@ -3,17 +3,14 @@ import { Erabliere } from "../../model/erabliere";
 import { ErabliereApi } from "../../core/erabliereapi.service";
 import { ErabliereListComponent } from "./erabliere-list/erabliere-list.component";
 import {ModifierErabliereComponent} from "./modifier-erabliere/modifier-erabliere.component";
-import { PaginationComponent } from "../../pagination/pagination.component";
 
 @Component({
-  selector: 'admin-erablieres',
-  standalone: true,
+    selector: 'admin-erablieres',
     imports: [
         ErabliereListComponent,
-        ModifierErabliereComponent,
-        PaginationComponent
+        ModifierErabliereComponent
     ],
-  templateUrl: './admin-erablieres.component.html'
+    templateUrl: './admin-erablieres.component.html'
 })
 export class AdminErablieresComponent implements OnInit {
     erablieres: Erabliere[] = [];
@@ -23,7 +20,7 @@ export class AdminErablieresComponent implements OnInit {
     skip: number = 0;
     totalErabliere: number = 0;
 
-    constructor(private _api: ErabliereApi) { }
+    constructor(private readonly _api: ErabliereApi) { }
 
     ngOnInit() {
         this.chargerErablieres();

@@ -2,10 +2,9 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CustomerAccess} from "../../../model/customerAccess";
 
 @Component({
-  selector: 'tr[view-customer-access-row]',
-  standalone: true,
-  imports: [],
-  templateUrl: './view-customer-access-row.component.html'
+    selector: 'tr[view-customer-access-row]',
+    imports: [],
+    templateUrl: './view-customer-access-row.component.html'
 })
 export class ViewCustomerAccessRowComponent implements OnInit {
     @Input() acces?: CustomerAccess;

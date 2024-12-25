@@ -14,7 +14,6 @@ import {
 @Component({
     selector: 'ajouter-capteur',
     templateUrl: 'ajouter-capteur.component.html',
-    standalone: true,
     imports: [ReactiveFormsModule, FormsModule, InputErrorComponent]
 })
 export class AjouterCapteurComponent {

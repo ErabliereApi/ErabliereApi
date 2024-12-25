@@ -10,7 +10,6 @@ import {CapteurImageListComponent} from "./images/capteur-image-list.component";
 @Component({
     selector: 'gestion-capteurs',
     templateUrl: 'gestion-capteurs.component.html',
-    standalone: true,
     imports: [AjouterCapteurComponent, CapteurListComponent, AjouterCapteurImageComponent, CapteurImageListComponent]
 })
 export class GestionCapteursComponent implements OnChanges {

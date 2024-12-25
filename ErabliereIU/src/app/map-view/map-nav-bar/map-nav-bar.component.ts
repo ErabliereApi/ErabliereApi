@@ -34,7 +34,6 @@ import { EnvironmentService } from 'src/environments/environment.service';
     </div>
 </nav>
     `,
-    standalone: true,
     imports: [
         ConnectionButtonComponent,
         RouterLink,

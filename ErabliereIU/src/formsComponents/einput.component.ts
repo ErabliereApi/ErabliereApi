@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { FormGroup, ReactiveFormsModule } from "@angular/forms";
-import { NgxMaskDirective } from "ngx-mask";
 import { NgIf } from "@angular/common";
 
 @Component({
@@ -18,10 +17,9 @@ import { NgIf } from "@angular/common";
             </div>
         </div>
     `,
-    standalone: true,
-    imports: [ReactiveFormsModule, NgxMaskDirective, NgIf]
+    imports: [ReactiveFormsModule, NgIf]
 })
-export class EinputComponent implements OnInit {
+export class EinputComponent {
     @Input() arialabel?: string
     @Input() symbole?: string
     @Input() name: string = ""
@@ -35,9 +33,5 @@ export class EinputComponent implements OnInit {
 
     constructor() {
 
-    }
-
-    ngOnInit(): void {
-        
     }
 }

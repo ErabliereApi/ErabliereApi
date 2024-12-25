@@ -6,7 +6,6 @@ import {Erabliere} from "../model/erabliere";
 @Component({
     selector: 'admin-select-erabliere',
     templateUrl: 'select-erabliere.component.html',
-    standalone: true,
     imports: [ReactiveFormsModule]
 })
 

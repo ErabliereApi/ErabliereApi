@@ -6,14 +6,13 @@ import { RappelComponent } from './rappel.component';
 import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
 
 @Component({
-  selector: 'app-rappels',
-  standalone: true,
-  imports: [
-    NgFor,
-    RappelComponent
-  ],
-  styleUrls: ['./rappels.component.css'],
-  templateUrl: './rappels.component.html'
+    selector: 'app-rappels',
+    imports: [
+        NgFor,
+        RappelComponent
+    ],
+    styleUrls: ['./rappels.component.css'],
+    templateUrl: './rappels.component.html'
 })
 export class RappelsComponent implements OnChanges {
   @Input() idErabliereSelectionnee: any;

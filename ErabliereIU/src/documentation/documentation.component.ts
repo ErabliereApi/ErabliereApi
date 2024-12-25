@@ -13,7 +13,6 @@ import { PaginationComponent } from "../pagination/pagination.component";
 @Component({
     selector: 'documentation',
     templateUrl: "./documentation.component.html",
-    standalone: true,
     imports: [
         AjouterDocumentationComponent,
         ModifierDocumentationComponent,

@@ -9,14 +9,13 @@ import { calculerMoyenne } from './util';
 import { GraphPanelComponent } from './sub-panel/graph-panel.component';
 
 @Component({
-  selector: 'donnees-panel',
-  templateUrl: './donnees.component.html',
-  standalone: true,
-  imports: [
-    GraphPanelComponent,
-    VacuumGraphPanelComponent,
-    BarPanelComponent,
-  ]
+    selector: 'donnees-panel',
+    templateUrl: './donnees.component.html',
+    imports: [
+        GraphPanelComponent,
+        VacuumGraphPanelComponent,
+        BarPanelComponent,
+    ]
 })
 export class DonneesComponent implements OnInit {
   @ViewChild('temperatureGraphPannel') temperatureGraphPannel?: GraphPanelComponent

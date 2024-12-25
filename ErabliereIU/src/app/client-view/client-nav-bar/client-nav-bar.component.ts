@@ -3,7 +3,7 @@ import { AuthorisationFactoryService } from 'src/authorisation/authorisation-fac
 import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
 import { EnvironmentService } from '../../../environments/environment.service';
 import { UrlModel } from '../../../model/urlModel';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AgoraCallServiceComponent } from '../agora-call-service/agora-call-service.component';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { MsalService } from '@azure/msal-angular';
@@ -12,8 +12,7 @@ import {ConnectionButtonComponent} from "../../../authorisation/connection-butto
 @Component({
     selector: 'client-nav-bar',
     templateUrl: 'client-nav-bar.component.html',
-    standalone: true,
-    imports: [RouterOutlet, RouterLink, RouterLinkActive, AgoraCallServiceComponent, ConnectionButtonComponent]
+    imports: [RouterLink, RouterLinkActive, AgoraCallServiceComponent, ConnectionButtonComponent]
 })
 export class ClientNavBarComponent implements OnInit {
   private readonly _authService: IAuthorisationSerivce

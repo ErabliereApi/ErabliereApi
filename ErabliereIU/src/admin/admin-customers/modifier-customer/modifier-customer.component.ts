@@ -6,12 +6,11 @@ import {InputErrorComponent} from "../../../formsComponents/input-error.componen
 
 @Component({
     selector: 'modifier-customer-modal',
-    standalone: true,
     imports: [
         InputErrorComponent,
         ReactiveFormsModule
     ],
-    templateUrl: './modifier-customer.component.html',
+    templateUrl: './modifier-customer.component.html'
 })
 export class ModifierCustomerComponent implements OnInit {
     @Input() customer: Customer | null = null;

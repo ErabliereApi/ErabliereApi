@@ -11,7 +11,6 @@ import { NgIf, NgFor } from "@angular/common";
             <span class="invalid-feedback" *ngFor="let error of errorObj.error.errors['$.' + this.controlName]">{{error}}</span>
         </div>
     `,
-    standalone: true,
     imports: [NgIf, NgFor]
 })
 export class InputErrorComponent {

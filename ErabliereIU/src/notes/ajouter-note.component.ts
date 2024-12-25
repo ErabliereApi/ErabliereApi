@@ -13,10 +13,9 @@ import { Rappel } from "../model/Rappel";
 import { reminderValidator } from "./note.custom-validators";
 
 @Component({
-  selector: 'ajouter-note',
-  templateUrl: 'ajouter-note.component.html',
-  standalone: true,
-  imports: [ReactiveFormsModule, InputErrorComponent]
+    selector: 'ajouter-note',
+    templateUrl: 'ajouter-note.component.html',
+    imports: [ReactiveFormsModule, InputErrorComponent]
 })
 export class AjouterNoteComponent implements OnInit {
   @Input() notes?: Note[];

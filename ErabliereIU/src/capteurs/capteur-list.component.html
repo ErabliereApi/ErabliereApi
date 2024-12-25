@@ -41,7 +41,7 @@
                     </div>
                     }
                     } @else {
-                    <span>{{this.capteur.indiceOrdre}}</span>
+                    <span>{{capteur.indiceOrdre}}</span>
                     }
                 </td>
                 <td [class.was-validated]="getNom(capteur.id ?? '')?.touched">
@@ -59,7 +59,7 @@
                     } @else {
                     <span style="text-decoration: underline; cursor: pointer;"
                         (click)="openTooltip(capteur, $event)"
-                        (keyup)="keyUpTooltip(capteur, $event)">{{this.capteur.nom}}</span>
+                        (keyup)="keyUpTooltip(capteur, $event)">{{capteur.nom}}</span>
                     }
                 </td>
                 <td [class.was-validated]="getSymbole(capteur.id ?? '')?.touched">
@@ -69,7 +69,7 @@
                         Le symbole peut avoir maximum 5 caractères
                     </div>
                     } @else {
-                    <span>{{this.capteur.symbole}}</span>
+                    <span>{{capteur.symbole}}</span>
                     }
                 </td>
                 <td class="text-center align-middle">

@@ -5,15 +5,14 @@ import {ClientNavBarComponent} from "./client-nav-bar/client-nav-bar.component";
 import {YouAreNotConnectedComponent} from "./you-are-not-connected/you-are-not-connected.component";
 
 @Component({
-  selector: 'client-view',
-  standalone: true,
+    selector: 'client-view',
     imports: [
         ErabliereSideBarComponent,
         RouterOutlet,
         ClientNavBarComponent,
         YouAreNotConnectedComponent
     ],
-  templateUrl: './client-view.component.html'
+    templateUrl: './client-view.component.html'
 })
 export class ClientViewComponent implements OnInit {
     private _pagesSansMenu = ["apropos"];

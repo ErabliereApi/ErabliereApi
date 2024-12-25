@@ -8,10 +8,9 @@ import {IAuthorisationSerivce} from "../iauthorisation-service";
 import {AuthorisationFactoryService} from "../authorisation-factory-service";
 
 @Component({
-  selector: 'connection-button',
-  standalone: true,
-  imports: [],
-  templateUrl: './connection-button.component.html'
+    selector: 'connection-button',
+    imports: [],
+    templateUrl: './connection-button.component.html'
 })
 export class ConnectionButtonComponent implements OnInit {
     private _authService: IAuthorisationSerivce;

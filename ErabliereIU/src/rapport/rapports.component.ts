@@ -6,10 +6,8 @@ import { NgIf } from '@angular/common';
     selector: 'app-reports',
     templateUrl: './rapports.component.html',
     styleUrls: ['./rapports.component.css'],
-    standalone: true,
     imports: [
-        RapportDegreJourComponent,
-        NgIf
+        RapportDegreJourComponent
     ]
 })
 export class ReportsComponent implements OnInit {

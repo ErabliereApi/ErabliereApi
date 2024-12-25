@@ -11,7 +11,6 @@ import { NgIf } from "@angular/common";
 @Component({
     selector: 'modifier-alerte-modal',
     templateUrl: 'modifier-alerte.component.html',
-    standalone: true,
     imports: [NgIf, ReactiveFormsModule, EinputComponent]
 })
 export class ModifierAlerteComponent implements OnInit {

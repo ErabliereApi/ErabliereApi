@@ -10,7 +10,6 @@ import {reminderValidator} from "./note.custom-validators";
 @Component({
     selector: 'modifier-note',
     templateUrl: 'modifier-note.component.html',
-    standalone: true,
     imports: [ReactiveFormsModule, InputErrorComponent]
 })
 export class ModifierNoteComponent implements OnInit {

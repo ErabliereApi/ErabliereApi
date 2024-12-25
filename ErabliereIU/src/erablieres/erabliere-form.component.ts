@@ -9,13 +9,12 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 @Component({
     selector: 'erabliere-form',
     templateUrl: './erabliere-form.component.html',
-    standalone: true,
     imports: [
         ReactiveFormsModule,
         FormsModule,
         InputErrorComponent,
         NgClass,
-    ],
+    ]
 })
 export class ErabliereFormComponent implements OnInit {
     getDefaultErabliere() {

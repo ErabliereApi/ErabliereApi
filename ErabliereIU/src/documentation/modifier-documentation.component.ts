@@ -9,7 +9,6 @@ import { ErabliereApiDocument } from "src/model/erabliereApiDocument";
 @Component({
     selector: 'modifier-documentation',
     templateUrl: 'modifier-documentation.component.html',
-    standalone: true,
     imports: [
         NgIf,
         ReactiveFormsModule,

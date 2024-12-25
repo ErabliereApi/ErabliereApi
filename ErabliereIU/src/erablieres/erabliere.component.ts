@@ -14,15 +14,14 @@ import { CapteurPanelsComponent } from 'src/donnees/sub-panel/capteur-panels.com
 @Component({
     selector: 'erablieres',
     templateUrl: 'erabliere.component.html',
-    standalone: true,
     imports: [
-      DonneesComponent,
-      CapteurPanelsComponent,
-      BarilsComponent,
-      ImagePanelComponent,
-      RappelsComponent,
-      WeatherForecastComponent,
-      HourlyWeatherForecastComponent
+        DonneesComponent,
+        CapteurPanelsComponent,
+        BarilsComponent,
+        ImagePanelComponent,
+        RappelsComponent,
+        WeatherForecastComponent,
+        HourlyWeatherForecastComponent
     ]
 })
 export class ErabliereComponent implements OnInit {

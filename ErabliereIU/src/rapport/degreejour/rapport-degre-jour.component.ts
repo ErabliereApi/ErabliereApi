@@ -4,20 +4,17 @@ import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Capteur } from 'src/model/capteur';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
-import { EinputComponent } from "../../formsComponents/einput.component";
 import { InputErrorComponent } from "../../formsComponents/input-error.component";
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-rapport-degre-jour',
     templateUrl: './rapport-degre-jour.component.html',
     styleUrls: ['./rapport-degre-jour.component.css'],
-    standalone: true,
     imports: [
         NgFor,
         FormsModule,
         ReactiveFormsModule,
-        EinputComponent,
         InputErrorComponent
     ]
 })
@@ -29,7 +26,7 @@ export class RapportDegreJourComponent implements OnInit {
     errorObj: any;
     generalError?: string;
 
-    constructor(private api: ErabliereApi, private route: ActivatedRoute) {
+    constructor(private readonly api: ErabliereApi, private readonly route: ActivatedRoute) {
 
     }
 

@@ -15,8 +15,7 @@ import { MapNavBarComponent } from './map-nav-bar/map-nav-bar.component';
     imports: [
         RouterOutlet,
         MapNavBarComponent
-    ],
-    standalone: true
+    ]
 })
 export class MapViewComponent implements OnInit {
 

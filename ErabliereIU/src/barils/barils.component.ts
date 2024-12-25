@@ -46,7 +46,6 @@ import { NgFor, NgIf } from '@angular/common';
             </table>
         </div>
     `,
-    standalone: true,
     imports: [NgFor, NgIf]
 })
 export class BarilsComponent implements OnInit, OnChanges {

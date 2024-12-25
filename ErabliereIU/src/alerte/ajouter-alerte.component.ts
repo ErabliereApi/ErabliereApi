@@ -13,7 +13,6 @@ import { ActivatedRoute } from "@angular/router";
 @Component({
     selector: 'ajouter-alerte-modal',
     templateUrl: 'ajouter-alerte.component.html',
-    standalone: true,
     imports: [NgIf, ReactiveFormsModule, EinputComponent, NgFor]
 })
 export class AjouterAlerteComponent implements OnInit {

@@ -8,12 +8,11 @@ import { NgIf } from "@angular/common";
 @Component({
     selector: 'app-ajouter-documentation',
     templateUrl: 'ajouter-documentation.component.html',
-    standalone: true,
     imports: [
         NgIf,
         ReactiveFormsModule,
         InputErrorComponent,
-    ],
+    ]
 })
 export class AjouterDocumentationComponent implements OnInit {
     display:boolean = false;

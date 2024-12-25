@@ -17,7 +17,6 @@ import { ModifierCapteurDetailsComponent } from "./modifier-capteur-details.comp
     selector: 'capteur-list',
     templateUrl: 'capteur-list.component.html',
     styleUrl: 'capteur-list.component.css',
-    standalone: true,
     imports: [ReactiveFormsModule, CapteurDetailTooltipComponent, ModifierCapteurDetailsComponent]
 })
 export class CapteurListComponent implements OnChanges {

@@ -5,7 +5,6 @@ import { ModalRappelComponent} from "./modal-rappel/modal-rappel.component";
 
 @Component({
     selector: 'app-rappel',
-    standalone: true,
     imports: [
         ModalRappelComponent
     ],

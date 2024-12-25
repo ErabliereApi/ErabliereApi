@@ -7,7 +7,6 @@ import { Subject } from 'rxjs';
 @Component({
     selector: 'note',
     templateUrl: 'note.component.html',
-    standalone: true,
     imports: [NgIf, DatePipe]
 })
 
@@ -16,7 +15,7 @@ export class NoteComponent {
     @Input() noteToModifySubject?: Subject<Note | null>;
     @Output() needToUpdate = new EventEmitter();
 
-    constructor(private _api: ErabliereApi) {
+    constructor(private readonly _api: ErabliereApi) {
         this.note = new Note();
     }
 

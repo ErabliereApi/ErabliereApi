@@ -11,11 +11,10 @@ import { Note } from 'src/model/note';
 //import { Modal } from "bootstrap";
 
 @Component({
-  selector: 'app-modal-rappel',
-  standalone: true,
-  imports: [],
-  templateUrl: './modal-rappel.component.html',
-  styleUrl: './modal-rappel.component.css'
+    selector: 'app-modal-rappel',
+    imports: [],
+    templateUrl: './modal-rappel.component.html',
+    styleUrl: './modal-rappel.component.css'
 })
 export class ModalRappelComponent implements AfterContentChecked {
     @Input() note: Note;

@@ -10,7 +10,6 @@ import { TablePanelComponent } from './table-panel.component';
 @Component({
     selector: 'capteur-panels',
     templateUrl: './capteur-panels.component.html',
-    standalone: true,
     imports: [GraphPanelComponent, TablePanelComponent, NgClass]
 })
 export class CapteurPanelsComponent implements OnChanges {

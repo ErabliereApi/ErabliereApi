@@ -8,14 +8,13 @@ import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service'
 import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: 'app.component.html',
-  standalone: true,
-  imports: [
-    RouterOutlet,
-    EntraRedirectComponent,
-    ErabliereAIComponent
-  ]
+    selector: 'app-root',
+    templateUrl: 'app.component.html',
+    imports: [
+        RouterOutlet,
+        EntraRedirectComponent,
+        ErabliereAIComponent
+    ]
 })
 export class AppComponent implements OnInit {
   erabliereAIEnable: boolean = false;

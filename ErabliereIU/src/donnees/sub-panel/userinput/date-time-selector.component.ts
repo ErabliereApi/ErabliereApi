@@ -7,7 +7,6 @@ import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
         <span>{{titre}}</span>
         <input class="form-control" type="date" [formControl]="dateControl"/>
     `,
-    standalone: true,
     imports: [ReactiveFormsModule]
 })
 export class DateTimeSelectorComponent implements OnInit {

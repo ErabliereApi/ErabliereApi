@@ -51,8 +51,7 @@ import { AjouterDonneeCapteurComponent } from 'src/donneeCapteurs/ajouter-donnee
         NgFor,
         DatePipe,
         AjouterDonneeCapteurComponent
-    ],
-    standalone: true
+    ]
 })
 export class TablePanelComponent implements OnInit {
     @Input() titre?: string;

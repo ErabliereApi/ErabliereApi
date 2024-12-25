@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import * as mapboxgl from 'mapbox-gl';
-import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
 import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
@@ -9,11 +8,8 @@ import { AuthorisationFactoryService } from 'src/authorisation/authorisation-fac
 @Component({
     selector: 'app-erablieres-map',
     templateUrl: './erablieres-map.component.html',
-    standalone: true,
     imports: [
-        NgIf,
-        FormsModule,
-        NgFor
+        FormsModule
     ],
     styles: [
         `.match-parent {

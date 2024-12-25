@@ -6,15 +6,14 @@ import { EditErabliereAccessRowComponent } from "./edit-erabliere-access-row/edi
 import { AddErabliereAccessRowComponent } from "./add-erabliere-access-row/add-erabliere-access-row.component";
 
 @Component({
-  selector: 'admin-erabliere-access-list',
-  standalone: true,
-  imports: [
-      ViewErabliereAccessRowComponent,
-      EditErabliereAccessRowComponent,
-      AddErabliereAccessRowComponent
-  ],
-  templateUrl: 'erabliere-access-list.component.html',
-  styleUrl: 'erabliere-access-list.component.css'
+    selector: 'admin-erabliere-access-list',
+    imports: [
+        ViewErabliereAccessRowComponent,
+        EditErabliereAccessRowComponent,
+        AddErabliereAccessRowComponent
+    ],
+    templateUrl: 'erabliere-access-list.component.html',
+    styleUrl: 'erabliere-access-list.component.css'
 })
 export class AdminErabliereAccessListComponent implements OnInit {
     @Input() idErabliere?: string;

@@ -35,7 +35,6 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
             </tbody>
         </table>
     `,
-    standalone: true,
     imports: [
         NgFor
     ]

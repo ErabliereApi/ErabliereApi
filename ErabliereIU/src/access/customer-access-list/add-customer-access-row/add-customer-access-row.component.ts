@@ -5,13 +5,12 @@ import {Erabliere} from "../../../model/erabliere";
 import {AdminSelectErabliereComponent} from "../../../erablieres/admin-select-erabliere.component";
 
 @Component({
-  selector: 'tr[add-customer-access-row]',
-  standalone: true,
+    selector: 'tr[add-customer-access-row]',
     imports: [
         AdminSelectErabliereComponent,
         ReactiveFormsModule
     ],
-  templateUrl: './add-customer-access-row.component.html'
+    templateUrl: './add-customer-access-row.component.html'
 })
 export class AddCustomerAccessRowComponent implements OnInit {
     @Input() idCustomer?: string;

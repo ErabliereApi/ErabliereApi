@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule, DoBootstrap, ApplicationRef } from '@angular/core';
+import { NgModule, DoBootstrap, ApplicationRef, inject, provideAppInitializer } from '@angular/core';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -89,12 +89,10 @@ export function MSALInstanceFactory(appConfig: EnvironmentService): IPublicClien
 }
 
 @NgModule({ imports: [BrowserModule], providers: [
-        {
-            provide: APP_INITIALIZER,
-            useFactory: initConfig,
-            deps: [EnvironmentService],
-            multi: true,
-        },
+        provideAppInitializer(() => {
+        const initializerFn = (initConfig)(inject(EnvironmentService));
+        return initializerFn();
+      }),
         {
             provide: MSAL_INSTANCE,
             useFactory: MSALInstanceFactory,

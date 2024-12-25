@@ -5,13 +5,12 @@ import {Customer} from "../../model/customer";
 import {ModifierCustomerComponent} from "./modifier-customer/modifier-customer.component";
 
 @Component({
-  selector: 'admin-customers',
-  standalone: true,
-  imports: [
-    CustomerListComponent,
-    ModifierCustomerComponent
-  ],
-  templateUrl: './admin-customers.component.html',
+    selector: 'admin-customers',
+    imports: [
+        CustomerListComponent,
+        ModifierCustomerComponent
+    ],
+    templateUrl: './admin-customers.component.html'
 })
 export class AdminCustomersComponent implements OnInit {
   customers: Customer[] = [];

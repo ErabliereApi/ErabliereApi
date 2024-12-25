@@ -13,7 +13,6 @@ import { Erabliere } from "src/model/erabliere";
     selector: 'alerte-page',
     templateUrl: './alerte.component.html',
     styleUrls: ['./alerte.component.css'],
-    standalone: true,
     imports: [NgIf, AjouterAlerteComponent, ModifierAlerteComponent, NgFor]
 })
 export class AlerteComponent implements OnInit {

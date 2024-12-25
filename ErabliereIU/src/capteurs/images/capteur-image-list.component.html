@@ -45,7 +45,7 @@
                                 </div>
                             }
                         } @else {
-                            <span>{{this.capteur.nom}}</span>
+                            <span>{{capteur.nom}}</span>
                         }
                     </td>
                     <td [class.was-validated]="getUrl(capteur.id)!.touched">
@@ -71,7 +71,7 @@
                                 </div>
                             }
                         } @else {
-                            <span>{{this.capteur.url}}</span>
+                            <span>{{capteur.url}}</span>
                         }
                     </td>
                     <td [class.was-validated]="getPort(capteur.id)!.touched">
@@ -92,7 +92,7 @@
                                 </div>
                             }
                         } @else {
-                            <span>{{this.capteur.port}}</span>
+                            <span>{{capteur.port}}</span>
                         }
                     </td>
                     <td [class.was-validated]="getNomDUtilisateur(capteur.id)!.touched">
@@ -109,7 +109,7 @@
                                 </div>
                             }
                         } @else {
-                            <span>{{this.capteur.identifiant}}</span>
+                            <span>{{capteur.identifiant}}</span>
                         }
                     </td>
                     <td [class.was-validated]="getMotDePasse(capteur.id)!.touched">

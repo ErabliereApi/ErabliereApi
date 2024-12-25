@@ -6,8 +6,7 @@ import { ErabliereFormComponent as ErabliereFormComponent_1 } from './erabliere-
 @Component({
     selector: 'ajouter-erabliere',
     templateUrl: './ajouter-erabliere.component.html',
-    standalone: true,
-    imports: [ErabliereFormComponent_1],
+    imports: [ErabliereFormComponent_1]
 })
 export class AjouterErabliereComponent {
     @ViewChild(ErabliereFormComponent) erabliereForm?: ErabliereFormComponent

@@ -6,7 +6,6 @@ import { NgIf } from "@angular/common";
 @Component({
     selector: 'apropos',
     templateUrl: "./apropos.component.html",
-    standalone: true,
     imports: [NgIf]
 })
 export class AproposComponent {

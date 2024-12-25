@@ -3,20 +3,17 @@ import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
-import { NgIf } from '@angular/common';
 import { DateTimeSelectorComponent } from './userinput/date-time-selector.component';
 import { calculerMoyenne } from '../util';
 
 @Component({
     selector: 'vacuum-graph-panel',
     templateUrl: './graph-panel.component.html',
-    standalone: true,
     imports: [
         DateTimeSelectorComponent,
-        NgIf,
         AjouterDonneeCapteurComponent,
         NgChartsModule,
-    ],
+    ]
 })
 export class VacuumGraphPanelComponent implements OnInit {
     @ViewChild(BaseChartDirective) chart?: BaseChartDirective;

@@ -8,11 +8,10 @@ import { Erabliere } from "../model/erabliere";
 @Component({
     selector: 'modifier-erabliere',
     templateUrl: './modifier-erabliere.component.html',
-    standalone: true,
     imports: [
         ErabliereFormComponent,
         ErabliereAccessListComponent,
-    ],
+    ]
 })
 export class ModifierErabliereComponent implements OnInit, OnChanges {
     @ViewChild(ErabliereFormComponent) erabliereForm?: ErabliereFormComponent;

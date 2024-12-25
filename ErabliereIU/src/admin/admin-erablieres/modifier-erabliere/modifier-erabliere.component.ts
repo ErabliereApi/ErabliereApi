@@ -12,14 +12,13 @@ import {Erabliere} from "../../../model/erabliere";
 import {InputErrorComponent} from "../../../formsComponents/input-error.component";
 
 @Component({
-  selector: 'modifier-erabliere-modal',
-  standalone: true,
+    selector: 'modifier-erabliere-modal',
     imports: [
         FormsModule,
         InputErrorComponent,
         ReactiveFormsModule
     ],
-  templateUrl: './modifier-erabliere.component.html'
+    templateUrl: './modifier-erabliere.component.html'
 })
 export class ModifierErabliereComponent implements OnInit {
     @Input() erabliere: Erabliere | null = null;

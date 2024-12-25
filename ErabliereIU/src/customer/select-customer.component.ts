@@ -6,7 +6,6 @@ import {FormBuilder, FormControl, ReactiveFormsModule, UntypedFormGroup, Validat
 @Component({
     selector: 'select-customer',
     templateUrl: 'select-customer.component.html',
-    standalone: true,
     imports: [ReactiveFormsModule]
 })
 

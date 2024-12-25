@@ -10,7 +10,6 @@ import { ModifierErabliereComponent } from 'src/erablieres/modifier-erabliere.co
 @Component({
     selector: 'erablieres-side-bar',
     templateUrl: 'erablieres-side-bar.component.html',
-    standalone: true,
     imports: [AjouterErabliereComponent, ModifierErabliereComponent]
 })
 export class ErabliereSideBarComponent implements OnInit {

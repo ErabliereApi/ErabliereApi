@@ -1,5 +1,9 @@
-Write-Host "Running npx storybook@latest upgrade --yes"
-"\n" | npx storybook@latest upgrade
+param(
+    [string]$storybookVersion = "latest"
+)
+
+Write-Host "Running npx storybook@$storybookVersion upgrade --yes"
+"\n" | npx storybook@$storybookVersion upgrade
 
 Write-Host "Running npm dedupe"
 npm dedupe

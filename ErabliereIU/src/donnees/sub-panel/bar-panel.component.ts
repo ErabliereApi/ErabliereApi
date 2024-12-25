@@ -37,7 +37,6 @@ import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
             </div>
         </div>
     `,
-    standalone: true,
     imports: [NgChartsModule]
 })
 export class BarPanelComponent {

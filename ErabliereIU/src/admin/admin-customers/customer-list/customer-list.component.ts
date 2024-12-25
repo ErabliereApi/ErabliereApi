@@ -3,9 +3,6 @@ import {Customer} from "../../../model/customer";
 import {CustomerAccess} from "../../../model/customerAccess";
 import {Erabliere} from "../../../model/erabliere";
 import {
-    AdminErabliereAccessListComponent
-} from "../../../access/erabliere-access-list/admin-erabliere-access-list.component";
-import {
     AdminCustomerAccessListComponent
 } from "../../../access/customer-access-list/admin-customer-access-list.component";
 import { DatePipe } from '@angular/common';
@@ -14,10 +11,8 @@ import { fr } from 'date-fns/locale';
 
 @Component({
     selector: 'customer-list',
-    standalone: true,
     templateUrl: './customer-list.component.html',
     imports: [
-        AdminErabliereAccessListComponent,
         AdminCustomerAccessListComponent,
         DatePipe
     ],

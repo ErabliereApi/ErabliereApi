@@ -10,8 +10,7 @@ import { PromptResponse } from 'src/model/conversation';
     selector: 'app-chat-widget',
     templateUrl: './erabliereai-chat.component.html',
     styleUrls: ['./erabliereai-chat.component.css'],
-    imports: [FormsModule, NgIf, NgFor],
-    standalone: true
+    imports: [FormsModule, NgIf, NgFor]
 })
 export class ErabliereAIComponent {
     chatOpen = false;

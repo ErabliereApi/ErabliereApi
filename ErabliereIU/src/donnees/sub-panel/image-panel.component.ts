@@ -96,7 +96,6 @@ import { GetImageInfo } from 'src/model/imageInfo';
             }
         }
     `],
-    standalone: true,
     imports: [NgFor, NgIf]
 })
 export class ImagePanelComponent implements OnInit {

@@ -6,14 +6,13 @@ import {PostCapteurImage} from "../../model/postCapteurImage";
 import {ErabliereApi} from "../../core/erabliereapi.service";
 
 @Component({
-  selector: 'ajouter-capteur-image',
-  standalone: true,
+    selector: 'ajouter-capteur-image',
     imports: [
         InputErrorComponent,
         ReactiveFormsModule,
         OnlyDigitsDirective
     ],
-  templateUrl: './ajouter-capteur-image.component.html'
+    templateUrl: './ajouter-capteur-image.component.html'
 })
 export class AjouterCapteurImageComponent {
     ajouterImageCapteurForm: UntypedFormGroup;

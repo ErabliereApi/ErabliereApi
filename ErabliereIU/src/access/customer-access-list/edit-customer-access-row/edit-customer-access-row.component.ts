@@ -3,12 +3,11 @@ import {CustomerAccess} from "../../../model/customerAccess";
 import {FormBuilder, FormControl, ReactiveFormsModule, UntypedFormGroup} from "@angular/forms";
 
 @Component({
-  selector: 'tr[edit-customer-access-row]',
-  standalone: true,
+    selector: 'tr[edit-customer-access-row]',
     imports: [
         ReactiveFormsModule
     ],
-  templateUrl: './edit-customer-access-row.component.html'
+    templateUrl: './edit-customer-access-row.component.html'
 })
 export class EditCustomerAccessRowComponent implements OnInit {
     @Input() acces?: CustomerAccess;
