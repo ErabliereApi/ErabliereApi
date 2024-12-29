@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ErabliereApi.Controllers
 {
@@ -112,15 +111,15 @@ namespace ErabliereApi.Controllers
                 return NotFound("Le capteur d'images à modifier n'existe pas");
             }
 
-            if (capteur.Nom.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(capteur.Nom))
             {
                 errors.Add("nom", "Le nom est vide");
             }
-            if (capteur.Url.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(capteur.Url))
             {
                 errors.Add("url", "L'url est vide");
             }
-            if (capteur.Port.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(capteur.Port))
             {
                 errors.Add("port", "Le port est vide");
             }
