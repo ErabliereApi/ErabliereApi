@@ -28,7 +28,7 @@ export class AjouterCapteurComponent {
     generalError: string | undefined;
 
     constructor(private readonly erabliereApi: ErabliereApi,
-                private formBuilder: UntypedFormBuilder) {
+                private readonly formBuilder: UntypedFormBuilder) {
         this.ajoutCapteurForm = this.formBuilder.group({
             nom: new FormControl(
                 '',
@@ -40,7 +40,7 @@ export class AjouterCapteurComponent {
             symbole: new FormControl(
                 '',
                 {
-                    validators: [Validators.maxLength(5)],
+                    validators: [Validators.maxLength(7)],
                     updateOn: 'blur'
                 }
             ),

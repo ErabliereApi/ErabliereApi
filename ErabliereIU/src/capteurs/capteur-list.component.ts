@@ -37,7 +37,7 @@ export class CapteurListComponent implements OnChanges {
     displayEditDetailsForm: boolean = false;
     editDetailsCapteurSelected?: Capteur;
 
-    constructor(private readonly erabliereApi: ErabliereApi, private fb: UntypedFormBuilder) {
+    constructor(private readonly erabliereApi: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.form = this.fb.group({
             capteurs: new FormArray([])
         });
@@ -72,7 +72,7 @@ export class CapteurListComponent implements OnChanges {
                         capteur.symbole,
                         {
                             validators: [
-                                Validators.maxLength(5)
+                                Validators.maxLength(7)
                             ],
                             updateOn: 'blur'
                         }
@@ -131,6 +131,7 @@ export class CapteurListComponent implements OnChanges {
                 this.editedCapteurs[capteur.id].afficherCapteurDashboard = formCapteur.controls['estGraphiqueAffiche'].value;
                 this.editedCapteurs[capteur.id].ajouterDonneeDepuisInterface = formCapteur.controls['estSaisieManuelle'].value;
                 this.editedCapteurs[capteur.id].dc = capteur.dc;
+                this.editedCapteurs[capteur.id].taille = capteur.taille;
                 const putCapteur = this.editedCapteurs[capteur.id];
 
                 this.erabliereApi.putCapteur(putCapteur).then(() => {

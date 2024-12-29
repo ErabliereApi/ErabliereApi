@@ -23,7 +23,7 @@ namespace ErabliereApi.Donnees.Action.Post
         /// <summary>
         /// Le symbole utilisé pour l'affichage des valeurs
         /// </summary>
-        [MaxLength(5)]
+        [MaxLength(7)]
         public string? Symbole { get; set; }
 
         /// <summary>

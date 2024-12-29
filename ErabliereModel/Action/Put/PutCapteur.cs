@@ -21,6 +21,7 @@ public class PutCapteur
     /// <summary>
     /// Le symbole du capteur
     /// </summary>
+    [MaxLength(7)]
     public string? Symbole { get; set; }
 
     /// <summary>

@@ -54,7 +54,7 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     /// <example>
     /// "°c" pour représenter la temperature en celcius
     /// </example>
-    [MaxLength(5)]
+    [MaxLength(7)]
     public string? Symbole { get; set; }
 
     /// <summary>

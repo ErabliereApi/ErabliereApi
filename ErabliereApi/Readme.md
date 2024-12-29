@@ -2,7 +2,7 @@
 
 ## Executer
 
-Demande .net 8.0 SKD
+Demande .net 9.0 SKD
 
 ## Faire confiance au certificat de dev
 

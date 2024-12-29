@@ -64,9 +64,9 @@
                 </td>
                 <td [class.was-validated]="getSymbole(capteur.id ?? '')?.touched">
                     @if(isDisplayEditForm(capteur.id)) {
-                    <input formControlName="symbole" type="text" class="form-control" maxlength="5" />
+                    <input formControlName="symbole" type="text" class="form-control" maxlength="7" />
                     <div class="invalid-feedback">
-                        Le symbole peut avoir maximum 5 caractères
+                        Le symbole peut avoir maximum 7 caractères
                     </div>
                     } @else {
                     <span>{{capteur.symbole}}</span>
