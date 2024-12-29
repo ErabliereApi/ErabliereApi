@@ -15,11 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Connect to Azure Kubernetes
-      - name: Azure Kubernetes set context
-        uses: Azure/aks-set-context@v1
+      - uses: azure/login@v2
         with:
-          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: azure/aks-set-context@v4
+        with:
           resource-group: 'erabliereapiv3'
           cluster-name: 'kerabliereapiv3'
 
