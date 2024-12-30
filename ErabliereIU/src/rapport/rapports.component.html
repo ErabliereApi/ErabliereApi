@@ -1,3 +1,22 @@
 <h3>Rapports</h3>
 
-<app-rapport-degre-jour></app-rapport-degre-jour>
+<div class="form-group">
+    <label for="typeRapport">Type de rapport</label>
+    <select class="form-control" id="typeRapport" (change)="typeRapportChanged($event)">
+        <option value="degreJour">Degré-jour</option>
+        <option value="moyenne">Moyennes</option>
+    </select>
+</div>
+
+@switch (typeRapport) {
+    @case ("degreJour") {
+        <app-rapport-degre-jour></app-rapport-degre-jour>
+    }
+    @case ("moyenne") {
+        <app-rapport-moyenne></app-rapport-moyenne>
+    }
+    @default {
+        <span>Rapport inconnu</span>
+    }
+}
+

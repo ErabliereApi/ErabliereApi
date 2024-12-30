@@ -1,21 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RapportDegreJourComponent } from './degreejour/rapport-degre-jour.component';
-import { NgIf } from '@angular/common';
+import { RapportMoyenneComponent } from './moyenne/rapport-moyenne.component';
 
 @Component({
     selector: 'app-reports',
     templateUrl: './rapports.component.html',
     styleUrls: ['./rapports.component.css'],
     imports: [
-        RapportDegreJourComponent
+        RapportDegreJourComponent,
+        RapportMoyenneComponent
     ]
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent {
+
+    typeRapport: string = 'degreJour';
 
     constructor() { }
 
-    ngOnInit(): void {
-        console.log('ReportsComponent onInit');
+    typeRapportChanged($event: Event) {
+        console.log("Type rapport changed", $event);
+        this.typeRapport = ($event.target as HTMLSelectElement).value;
+        console.log("Type rapport", this.typeRapport);
     }
 
 }
