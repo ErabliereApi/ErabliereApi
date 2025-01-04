@@ -35,7 +35,7 @@ public class ApiKeyController : ControllerBase
     /// </summary>
     [HttpGet]
     [EnableQuery]
-    public IEnumerable<Donnees.ApiKey> GetApiKeys()
+    public IQueryable<Donnees.ApiKey> GetApiKeys()
     {
         return _context.ApiKeys.Select(k => new Donnees.ApiKey
         {
@@ -45,7 +45,8 @@ public class ApiKeyController : ControllerBase
             DeletionTime = k.DeletionTime,
             RevocationTime = k.RevocationTime,
             SubscriptionId = k.SubscriptionId,
-            Key = "***"
+            Key = "***",
+            Customer = k.Customer
         });
     }
 
