@@ -47,4 +47,12 @@ public static class StringExtensions
             return false;
         }
     }
+
+    /// <summary>
+    /// Sanatize a string by removing \n and \r
+    /// </summary>
+    public static string? Sanatize(this string? value)
+    {
+        return value?.Replace("\n", "")?.Replace("\r", "");
+    }
 }

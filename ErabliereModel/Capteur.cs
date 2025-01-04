@@ -136,6 +136,16 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     /// </summary>
     public Guid? AppareilId { get; set; }
 
+    /// <summary>
+    /// Affichage minimal lors de l'affichage des données dans les graphiques
+    /// </summary>
+    public double? DisplayMin { get; set; }
+
+    /// <summary>
+    /// Affichage maximal lors de l'affichage des données dans les graphiques
+    /// </summary>
+    public double? DisplayMax { get; set; }
+
     /// <inheritdoc />
     public int CompareTo(Capteur? other)
     {

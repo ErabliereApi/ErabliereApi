@@ -1,61 +1,70 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ErabliereApi.Donnees.Action.Post
+namespace ErabliereApi.Donnees.Action.Post;
+
+/// <summary>
+/// Modèle de création d'un capteur
+/// </summary>
+public class PostCapteur
 {
     /// <summary>
-    /// Modèle de création d'un capteur
+    /// L'id guid si le client désire initialiser l'id
     /// </summary>
-    public class PostCapteur
-    {
-        /// <summary>
-        /// L'id guid si le client désire initialiser l'id
-        /// </summary>
-        public Guid? Id { get; set; }
+    public Guid? Id { get; set; }
 
-        /// <summary>
-        /// Le nom du capteur
-        /// </summary>
-        [Required]
-        [MaxLength(50)]
-        public string? Nom { get; set; }
+    /// <summary>
+    /// Le nom du capteur
+    /// </summary>
+    [Required]
+    [MaxLength(50)]
+    public string? Nom { get; set; }
 
-        /// <summary>
-        /// Le symbole utilisé pour l'affichage des valeurs
-        /// </summary>
-        [MaxLength(7)]
-        public string? Symbole { get; set; }
+    /// <summary>
+    /// Le symbole utilisé pour l'affichage des valeurs
+    /// </summary>
+    [MaxLength(7)]
+    public string? Symbole { get; set; }
 
-        /// <summary>
-        /// La date de création de l'entité.
-        /// </summary>
-        public DateTimeOffset? DC { get; set; }
+    /// <summary>
+    /// La date de création de l'entité.
+    /// </summary>
+    public DateTimeOffset? DC { get; set; }
 
-        /// <summary>
-        /// Indicateur permettant d'afficher ou non le graphique relié au capteur.
-        /// </summary>
-        public bool? AfficherCapteurDashboard { get; set; }
+    /// <summary>
+    /// Indicateur permettant d'afficher ou non le graphique relié au capteur.
+    /// </summary>
+    public bool? AfficherCapteurDashboard { get; set; }
 
-        /// <summary>
-        /// Indicateur peremettant d'afficher un formulaire quand les données
-        /// peuvent être saisit depuis un interface utilisateur.
-        /// </summary>
-        public bool? AjouterDonneeDepuisInterface { get; set; }
+    /// <summary>
+    /// Indicateur peremettant d'afficher un formulaire quand les données
+    /// peuvent être saisit depuis un interface utilisateur.
+    /// </summary>
+    public bool? AjouterDonneeDepuisInterface { get; set; }
 
-        /// <summary>
-        /// L'id de l'érablière
-        /// </summary>
-        public Guid? IdErabliere { get; set; }
+    /// <summary>
+    /// L'id de l'érablière
+    /// </summary>
+    public Guid? IdErabliere { get; set; }
 
-        /// <summary>
-        /// Type du capteur
-        /// </summary>
-        [MaxLength(50)]
-        public string? Type { get; set; }
+    /// <summary>
+    /// Type du capteur
+    /// </summary>
+    [MaxLength(50)]
+    public string? Type { get; set; }
 
-        /// <summary>
-        /// Id du capteur externe. Représente l'id du capteur dans le système externe.
-        /// </summary>
-        public string? ExternalId { get; set; }
-    }
+    /// <summary>
+    /// Id du capteur externe. Représente l'id du capteur dans le système externe.
+    /// </summary>
+    public string? ExternalId { get; set; }
+
+    /// <summary>
+    /// Affichage minimal lors de l'affichage des données dans les graphiques
+    /// </summary>
+    public double? DisplayMin { get; set; }
+
+    /// <summary>
+    /// Affichage maximal lors de l'affichage des données dans les graphiques
+    /// </summary>
+    public double? DisplayMax { get; set; }
 }

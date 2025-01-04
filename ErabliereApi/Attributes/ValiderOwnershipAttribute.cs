@@ -2,12 +2,10 @@
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Ownable;
 using ErabliereApi.Extensions;
-using ErabliereApi.Services;
 using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Identity.Web;
 
 namespace ErabliereApi.Attributes;
 
@@ -15,6 +13,7 @@ namespace ErabliereApi.Attributes;
 /// Vérifier si l'utilisateur à les droits d'accès sur la ressource qu'il tente d'accéder ou de modifier
 /// en vérifiant le verbe http et les droits dans la table CustomerErablieres
 /// </summary>
+[AttributeUsage(AttributeTargets.Method)]
 public class ValiderOwnershipAttribute : ActionFilterAttribute
 {
     private readonly string _idParamName;
@@ -47,15 +46,10 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
     /// <exception cref="InvalidOperationException"></exception>
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var allowAccess = true;
-
-        var strId = context.HttpContext.Request.RouteValues[_idParamName]?.ToString();
-
-        if (strId == null)
-        {
+        var strId = (context.HttpContext.Request.RouteValues[_idParamName]?.ToString()) ?? 
             throw new InvalidOperationException($"Route value {_idParamName} does not exist");
-        }
-
+        
+        var allowAccess = true;
         var config = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
 
         if (config.IsAuthEnabled())
@@ -77,7 +71,10 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
                 _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
             }
             using var scope = context.HttpContext.RequestServices.CreateScope();
-            _logger.LogWarning("Access Denied for {Method} {Path} for user {User}", context.HttpContext.Request.Method, context.HttpContext.Request.Path, UsersUtils.GetUniqueName(scope, context.HttpContext.User));
+            _logger.LogWarning("Access Denied for {Method} {Path} for user {User}", 
+                context.HttpContext.Request.Method.Sanatize(), 
+                context.HttpContext.Request.Path.Value.Sanatize(),
+                UsersUtils.GetUniqueName(scope, context.HttpContext.User));
         }
     }
 
@@ -97,62 +94,69 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
         }
         else if (!(erabliere.IsPublic && context.HttpContext.Request.Method == "GET"))
         {
-            var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+            allowAccess = await InnerCheck(context, allowAccess, erabliere);
+        }
 
-            var customer = await userService.GetCurrentUserWithAccessAsync(erabliere, context.HttpContext.RequestAborted);
+        return allowAccess;
+    }
 
-            if (customer == null)
+    private async Task<bool> InnerCheck(ActionExecutingContext context, bool allowAccess, Erabliere erabliere)
+    {
+        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+
+        var customer = await userService.GetCurrentUserWithAccessAsync(erabliere, context.HttpContext.RequestAborted);
+
+        if (customer == null)
+        {
+            throw new InvalidOperationException("Customer should exist at this point...");
+        }
+
+        if (customer.CustomerErablieres == null || customer.CustomerErablieres.Count == 0)
+        {
+            allowAccess = false;
+            if (_logger == null)
             {
-                throw new InvalidOperationException("Customer should exist at this point...");
+                _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+            }
+            if (customer.CustomerErablieres == null)
+            {
+                _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres == null", customer.Id);
+            }
+            else
+            {
+                _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres.Count == 0", customer.Id);
+            }
+        }
+        else
+        {
+            var type = context.HttpContext.Request.Method switch
+            {
+                "GET" => 1,
+                "POST" => 2,
+                "PUT" => 4,
+                "DELETE" => 8,
+                _ => throw new InvalidOperationException($"Ownership not implement for HTTP Verb {context.HttpContext.Request.Method}"),
+            };
+
+            for (int i = 0; i < customer.CustomerErablieres.Count && allowAccess; i++)
+            {
+                if (customer.CustomerErablieres[i].IdErabliere != erabliere.Id)
+                {
+                    continue;
+                }
+
+                var access = customer.CustomerErablieres[i].Access;
+
+                allowAccess = (access & type) > 0;
             }
 
-            if (customer.CustomerErablieres == null || customer.CustomerErablieres.Count == 0)
+            if (!allowAccess)
             {
-                allowAccess = false;
                 if (_logger == null)
                 {
                     _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
                 }
-                if (customer.CustomerErablieres == null) 
-                {
-                    _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres == null", customer.Id);
-                }
-                else 
-                {
-                    _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres.Count == 0", customer.Id);
-                }
-            }
-            else
-            {
-                var type = context.HttpContext.Request.Method switch
-                {
-                    "GET" => 1,
-                    "POST" => 2,
-                    "PUT" => 4,
-                    "DELETE" => 8,
-                    _ => throw new InvalidOperationException($"Ownership not implement for HTTP Verb {context.HttpContext.Request.Method}"),
-                };
-
-                for (int i = 0; i < customer.CustomerErablieres.Count && allowAccess; i++)
-                {
-                    if (customer.CustomerErablieres[i].IdErabliere != erabliere.Id)
-                    {
-                        continue;
-                    }
-
-                    var access = customer.CustomerErablieres[i].Access;
-
-                    allowAccess = (access & type) > 0;
-                }
-
-                if (!allowAccess) 
-                {
-                    if (_logger == null)
-                    {
-                        _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
-                    }
-                    _logger.LogWarning("Customer {CustomerId} has no access to erabliere {ErabliereId} for {Method}", customer.Id, erabliere.Id, context.HttpContext.Request.Method);
-                }
+                _logger.LogWarning("Customer {CustomerId} has no access to erabliere {ErabliereId} for {Method}", customer.Id, erabliere.Id, context.HttpContext.Request.Method.Sanatize());
             }
         }
 

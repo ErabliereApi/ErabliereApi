@@ -95,4 +95,14 @@ public class PutCapteur
     /// Le nombre de données affiché par défaut
     /// </summary>
     public short? DisplayTop { get; set; }
+
+    /// <summary>
+    /// Affichage minimal lors de l'affichage des données dans les graphiques
+    /// </summary>
+    public double? DisplayMin { get; set; }
+
+    /// <summary>
+    /// Affichage maximal lors de l'affichage des données dans les graphiques
+    /// </summary>
+    public double? DisplayMax { get; set; }
 }
