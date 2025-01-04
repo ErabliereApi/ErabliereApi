@@ -19,4 +19,6 @@ export class Capteur {
     reportFrequency?: number;
     displayType?: string;
     displayTop?: number;
+    displayMin?: number;
+    displayMax?: number;
 }

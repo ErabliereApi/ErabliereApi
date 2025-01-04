@@ -130,9 +130,15 @@ export class CapteurListComponent implements OnChanges {
                 this.editedCapteurs[capteur.id].symbole = formCapteur.controls['symbole'].value;
                 this.editedCapteurs[capteur.id].afficherCapteurDashboard = formCapteur.controls['estGraphiqueAffiche'].value;
                 this.editedCapteurs[capteur.id].ajouterDonneeDepuisInterface = formCapteur.controls['estSaisieManuelle'].value;
-                this.editedCapteurs[capteur.id].dc = capteur.dc;
-                this.editedCapteurs[capteur.id].taille = capteur.taille;
-                const putCapteur = this.editedCapteurs[capteur.id];
+                
+                const putCapteur = new Capteur();
+                putCapteur.id = capteur.id;
+                putCapteur.idErabliere = capteur.idErabliere;
+                putCapteur.indiceOrdre = this.editedCapteurs[capteur.id].indiceOrdre;
+                putCapteur.nom = this.editedCapteurs[capteur.id].nom;
+                putCapteur.symbole = this.editedCapteurs[capteur.id].symbole;
+                putCapteur.afficherCapteurDashboard = this.editedCapteurs[capteur.id].afficherCapteurDashboard;
+                putCapteur.ajouterDonneeDepuisInterface = this.editedCapteurs[capteur.id].ajouterDonneeDepuisInterface;
 
                 this.erabliereApi.putCapteur(putCapteur).then(() => {
                     this.shouldRefreshCapteurs.emit();

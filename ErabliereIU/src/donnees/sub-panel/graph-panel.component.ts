@@ -21,28 +21,9 @@ export class GraphPanelComponent implements OnInit {
     @Input() timeaxes: string[] = [];
     @Input() lineChartType = 'line' as ChartType;
     @Input() lineScaleType: 'time' | 'timeseries' = 'time'
-    lineChartOptions: ChartOptions = {
-        maintainAspectRatio: false,
-        aspectRatio: 1.7,
-        backgroundColor: 'rgba(255,255,0,0.28)',
-        color: 'black',
-        borderColor: 'black',
-        scales: {
-            x: {
-                type: this.lineScaleType,
-                time: {
-                    tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
-                    displayFormats: {
-                        minute: 'dd MMM HH:mm'
-                    },
-                },
-                ticks: {
-                    autoSkip: true,
-                    maxTicksLimit: 6,
-                }
-            },
-        }
-    };
+    @Input() displayMin: number | undefined = undefined;
+    @Input() displayMax: number | undefined = undefined;
+    lineChartOptions?: ChartOptions;
 
     lineChartLegend = true;
     lineChartPlugins = [];
@@ -69,6 +50,35 @@ export class GraphPanelComponent implements OnInit {
     interval?: any
 
     ngOnInit(): void {
+        console.log("GraphPanelComponent ngOnInit", this.titre, this.displayMin, this.displayMax);
+
+        this.lineChartOptions = {
+            maintainAspectRatio: false,
+            aspectRatio: 1.7,
+            backgroundColor: 'rgba(255,255,0,0.28)',
+            color: 'black',
+            borderColor: 'black',
+            scales: {
+                x: {
+                    type: this.lineScaleType,
+                    time: {
+                        tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+                        displayFormats: {
+                            minute: 'dd MMM HH:mm'
+                        },
+                    },
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 6,
+                    }
+                },
+                y: {
+                    min: this.displayMin,
+                    max: this.displayMax,
+                }
+            }
+        };
+
         if (this.idCapteur != null) {
             this.doHttpCall();
 

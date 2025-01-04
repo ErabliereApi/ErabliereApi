@@ -77,14 +77,16 @@
         </div>
     </div>
 
-    <div class="chart-wrapper">
-        <canvas baseChart class="chart"
-            [datasets]="datasets"
-            [labels]="timeaxes"
-            [options]="lineChartOptions"
-            [legend]="lineChartLegend"
-            [plugins]="lineChartPlugins"
-            [type]="lineChartType">
-        </canvas>
-    </div>
+    @if (lineChartOptions) {
+        <div class="chart-wrapper">
+            <canvas baseChart class="chart"
+                [datasets]="datasets"
+                [labels]="timeaxes"
+                [options]="lineChartOptions"
+                [legend]="lineChartLegend"
+                [plugins]="lineChartPlugins"
+                [type]="lineChartType">
+            </canvas>
+        </div>
+    }
 </div>

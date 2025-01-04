@@ -401,6 +401,15 @@ public class CapteursController : ControllerBase
             capteurEntity.DisplayTop = capteur.DisplayTop.Value;
         }
 
+        if (capteur.DisplayMin.HasValue)
+        {
+            capteurEntity.DisplayMin = capteur.DisplayMin.Value;
+        }
+
+        if (capteur.DisplayMax.HasValue)
+        {
+            capteurEntity.DisplayMax = capteur.DisplayMax.Value;
+        }
 
         _depot.Update(capteurEntity);
 

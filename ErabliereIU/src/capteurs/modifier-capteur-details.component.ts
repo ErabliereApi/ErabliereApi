@@ -24,6 +24,14 @@ import { Capteur } from 'src/model/capteur';
                 <label for="displayTop">Quantité par défaut</label>
                 <input type="number" class="form-control" id="displayTop" name="displayTop" [value]="editedCapteur.displayTop" (change)="updateDisplayTop($event)">
             </div>
+            <div class="form-group">
+                <label for="displayMin">Échel y minimum</label>
+                <input type="number" class="form-control" id="displayMin" name="displayMin" [value]="editedCapteur.displayMin" (change)="updateDisplayMin($event)">
+            </div>
+            <div class="form-group">
+                <label for="displayMax">Échel y maximum</label>
+                <input type="number" class="form-control" id="displayMax" name="displayMax" [value]="editedCapteur.displayMax" (change)="updateDisplayMax($event)">
+            </div>
             <button type="button" class="btn btn-primary" (click)="saveChanges()">Enregistrer</button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button> 
         </div>
@@ -58,6 +66,8 @@ export class ModifierCapteurDetailsComponent implements OnInit {
         putPayload.displayType = this.editedCapteur.displayType;
         putPayload.displayTop = this.editedCapteur.displayTop;
         putPayload.ajouterDonneeDepuisInterface = this.capteur.ajouterDonneeDepuisInterface;
+        putPayload.displayMin = this.editedCapteur.displayMin;
+        putPayload.displayMax = this.editedCapteur.displayMax;
         this.api.putCapteur(putPayload);
         this.needToUpdate.emit();
     }
@@ -84,5 +94,15 @@ export class ModifierCapteurDetailsComponent implements OnInit {
     updateDisplayTop($event: Event) {
         let inputElement = $event.target as HTMLInputElement;
         this.editedCapteur.displayTop = parseInt(inputElement.value);
+    }
+
+    updateDisplayMin($event: Event) {
+        let inputElement = $event.target as HTMLInputElement;
+        this.editedCapteur.displayMin = parseInt(inputElement.value);
+    }
+
+    updateDisplayMax($event: Event) {
+        let inputElement = $event.target as HTMLInputElement;
+        this.editedCapteur.displayMax = parseInt(inputElement.value);
     }
 }

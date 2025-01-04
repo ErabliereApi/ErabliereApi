@@ -36,7 +36,7 @@
     {
         @if (capteur.displayType?.trim()?.toLowerCase() == 'tableau' || capteur.displayType?.trim()?.toLowerCase() == 'table')
         {
-            <div [ngClass]="'col-md-' + (capteur.taille ? capteur.taille : tailleGraphiques)">
+            <div [ngClass]="'col-md-' + (capteur.taille ?? tailleGraphiques)">
                 <table-panel [titre]="capteur.nom"
                              [symbole]="capteur.symbole"
                              [idCapteur]="capteur.id"
@@ -47,12 +47,14 @@
             </div>
         }
         @else {
-            <div [ngClass]="'col-md-' + (capteur.taille ? capteur.taille : tailleGraphiques)">
+            <div [ngClass]="'col-md-' + (capteur.taille ?? tailleGraphiques)">
                 <graph-panel [titre]="capteur.nom"
                              [symbole]="capteur.symbole"
                              [idCapteur]="capteur.id"
                              [batteryLevel]="capteur.batteryLevel"
                              [online]="capteur.online"
+                             [displayMin]="capteur.displayMin"
+                             [displayMax]="capteur.displayMax"
                              [ajouterDonneeDepuisInterface]="isLogged && capteur.ajouterDonneeDepuisInterface"></graph-panel>
             </div>
         }
