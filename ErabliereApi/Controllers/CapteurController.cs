@@ -315,7 +315,8 @@ public class CapteursController : ControllerBase
 
         var modified = await _depot.SaveChangesAsync(token);
 
-        return Ok(new {
+        return Ok(new
+        {
             modified
         });
     }
@@ -342,7 +343,7 @@ public class CapteursController : ControllerBase
             capteurEntity.Nom = capteur.Nom;
         }
 
-        if (!string.IsNullOrWhiteSpace(capteur.Symbole)) 
+        if (!string.IsNullOrWhiteSpace(capteur.Symbole))
         {
             capteurEntity.Symbole = capteur.Symbole;
         }
@@ -391,7 +392,7 @@ public class CapteursController : ControllerBase
             capteurEntity.LastMessageTime = capteur.LastMessageTime;
         }
 
-        if (capteur.DisplayType != null) 
+        if (capteur.DisplayType != null)
         {
             capteurEntity.DisplayType = capteur.DisplayType;
         }
@@ -412,6 +413,64 @@ public class CapteursController : ControllerBase
         }
 
         _depot.Update(capteurEntity);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Modifier le style d'un capteur
+    /// </summary>
+    /// <param name="id">L'identifiant de l'érablière</param>
+    /// <param name="idCapteur">L'identifiant du capteur à modifier</param>
+    /// <param name="style">Le style à appliquer au capteur</param>
+    /// <param name="token">Le jeton d'annulation</param>
+    /// <response code="204">Le style a été correctement modifié.</response>
+    /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à modifier.</response>
+    /// <response code="404">Le capteur n'existe pas.</response>
+    /// <response code="400">Le style est invalide.</response>
+    [HttpPut("{idCapteur}/Style")]
+    [ValiderOwnership("id")]
+    public async Task<IActionResult> ModifierStyle(Guid id, Guid idCapteur, PutCapteurStyle style, CancellationToken token)
+    {
+        var capteurStyle = await _depot.CapteurStyles.Include(cs => cs.Capteur).FirstOrDefaultAsync(x => x.IdCapteur == idCapteur, token);
+
+        if (capteurStyle != null)
+        {
+            if (capteurStyle?.Capteur?.IdErabliere != id)
+            {
+                return BadRequest("L'id de l'érablière dans la route ne concorde pas avec l'id de l'érablière possédant le capteur à modifier.");
+            }
+
+            if (capteurStyle.IdCapteur != idCapteur)
+            {
+                return BadRequest("L'id du capteur dans la route ne concorde pas avec l'id du capteur à modifier.");
+            }
+        }
+
+        capteurStyle ??= new CapteurStyle
+        {
+            IdCapteur = idCapteur
+        };
+
+        capteurStyle.BackgroundColor = style.BackgroundColor;
+        capteurStyle.Color = style.Color;
+        capteurStyle.BorderColor = style.BorderColor;
+        capteurStyle.Fill = style.Fill;
+        capteurStyle.PointBackgroundColor = style.PointBackgroundColor;
+        capteurStyle.PointBorderColor = style.PointBorderColor;
+        capteurStyle.Tension = style.Tension;
+        capteurStyle.DSetBorderColor = style.DSetBorderColor;
+        capteurStyle.UseGradient = style.UseGradient;
+        capteurStyle.G1Stop = style.G1Stop;
+        capteurStyle.G2Stop = style.G2Stop;
+        capteurStyle.G3Stop = style.G3Stop;
+        capteurStyle.G1Color = style.G1Color;
+        capteurStyle.G2Color = style.G2Color;
+        capteurStyle.G3Color = style.G3Color;
+
+        _depot.Update(capteurStyle);
+
+        await _depot.SaveChangesAsync(token);
 
         return NoContent();
     }

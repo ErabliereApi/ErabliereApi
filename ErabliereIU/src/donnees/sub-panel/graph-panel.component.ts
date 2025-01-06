@@ -47,7 +47,21 @@ export class GraphPanelComponent implements OnInit {
 
     @Input() idCapteur?: any;
 
-    interval?: any
+    interval?: any;
+
+    getGradient(ctx: any, chartArea: any) {
+        let width, height, gradient;
+        const chartWidth = chartArea.right - chartArea.left;
+        const chartHeight = chartArea.bottom - chartArea.top;
+        if (!gradient || width !== chartWidth || height !== chartHeight) {
+            gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop(0, 'blue');
+            gradient.addColorStop(0.5, 'yellow');
+            gradient.addColorStop(1, 'red');
+        }
+
+        return gradient;
+    }
 
     ngOnInit(): void {
         console.log("GraphPanelComponent ngOnInit", this.titre, this.displayMin, this.displayMax);
@@ -143,6 +157,7 @@ export class GraphPanelComponent implements OnInit {
                     pointBackgroundColor: 'rgba(255,255,0,0.8)',
                     pointBorderColor: 'black',
                     tension: 0.5,
+                    borderColor: this.getGradient(this.chart?.ctx, this.chart?.chart?.chartArea),
                 }
             ];
 

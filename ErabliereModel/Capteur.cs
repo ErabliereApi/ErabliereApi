@@ -146,6 +146,11 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     /// </summary>
     public double? DisplayMax { get; set; }
 
+    /// <summary>
+    /// Style du capteur
+    /// </summary>
+    public CapteurStyle? CapteurStyle { get; set; }
+
     /// <inheritdoc />
     public int CompareTo(Capteur? other)
     {

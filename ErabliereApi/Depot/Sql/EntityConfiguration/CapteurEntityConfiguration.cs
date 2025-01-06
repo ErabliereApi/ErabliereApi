@@ -21,5 +21,10 @@ public class CapteurEntityConfiguration : IEntityTypeConfiguration<Capteur>
                .WithOne(dc => dc.Capteur)
                .HasForeignKey(dc => dc.IdCapteur)
                .OnDelete(DeleteBehavior.Cascade);
+
+        capteur.HasOne(c => c.CapteurStyle)
+               .WithOne(cs => cs.Capteur)
+               .HasForeignKey<CapteurStyle>(cs => cs.IdCapteur)
+               .IsRequired(false);
     }
 }

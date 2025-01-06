@@ -56,6 +56,11 @@ namespace ErabliereApi.Depot.Sql
         public DbSet<Capteur> Capteurs { get; private set; }
 
         /// <summary>
+        /// Table des styles de capteurs
+        /// </summary>
+        public DbSet<CapteurStyle> CapteurStyles { get; private set; }
+
+        /// <summary>
         /// Table des capteurs d'images
         /// </summary>
         public DbSet<CapteurImage> CapteurImage { get; private set; }
@@ -83,27 +88,27 @@ namespace ErabliereApi.Depot.Sql
         /// <summary>
         /// Table des utilisateurs
         /// </summary>
-        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Customer> Customers { get; private set; }
 
         /// <summary>
         /// Table des clé d'api
         /// </summary>
-        public DbSet<ApiKey> ApiKeys { get; set; }
+        public DbSet<ApiKey> ApiKeys { get; private set; }
 
         /// <summary>
         /// Table de jonction entre les érablières et les utilisateurs
         /// </summary>
-        public DbSet<CustomerErabliere> CustomerErablieres { get; set; }
+        public DbSet<CustomerErabliere> CustomerErablieres { get; private set; }
 
         /// <summary>
         /// Table des conversations
         /// </summary>
-        public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<Conversation> Conversations { get; private set; }
 
         /// <summary>
         /// Table des messages
         /// </summary>
-        public DbSet<Message> Messages { get; set; }
+        public DbSet<Message> Messages { get; private set; }
 
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
