@@ -154,10 +154,10 @@ export class GraphPanelComponent implements OnInit {
                     data: json.map(donneeCapteur => donneeCapteur.valeur ?? null), 
                     label: this.titre,
                     fill: true,
+                    //borderColor: this.getGradient(this.chart?.ctx, this.chart?.chart?.chartArea),
                     pointBackgroundColor: 'rgba(255,255,0,0.8)',
                     pointBorderColor: 'black',
                     tension: 0.5,
-                    borderColor: this.getGradient(this.chart?.ctx, this.chart?.chart?.chartArea),
                 }
             ];
 
