@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { PromptResponse } from 'src/model/conversation';
+import { Message, PromptResponse } from 'src/model/conversation';
 
 @Component({
     selector: 'app-chat-widget',
@@ -21,7 +21,7 @@ export class ErabliereAIComponent {
     search = '';
     lastSearch = '';
 
-    constructor(private api: ErabliereApi) {
+    constructor(private readonly api: ErabliereApi) {
         this.conversations = [];
         this.messages = [];
         this.typePrompt = 'Chat';
@@ -37,7 +37,7 @@ export class ErabliereAIComponent {
 
     conversations: any[];
     currentConversation: any;
-    messages: any[];
+    messages: Message[];
     typePrompt: string;
 
     fetchConversations() {
@@ -110,7 +110,8 @@ export class ErabliereAIComponent {
             }
         }).catch((error) => {
             this.aiIsThinking = false;
-            alert('Error sending message ' + error);
+            console.error(error);
+            alert('Error sending message ' + JSON.stringify(error));
         });
     }
 
@@ -152,7 +153,10 @@ export class ErabliereAIComponent {
         console.log(this.typePrompt);
     }
 
-    formatMessageDate(date: Date | string) {
+    formatMessageDate(date?: Date | string) {
+        if (!date) {
+            return '';
+        }
         return formatDistanceToNow(new Date(date), { addSuffix: true, locale: fr });
     }
 
@@ -163,7 +167,10 @@ export class ErabliereAIComponent {
         }
     }
 
-    traduire(message: string, index: number) {
+    traduire(message: string | undefined, index: number) {
+        if (!message) {
+            return;
+        }
         this.api.traduire(message).then((response: any) => {
             this.messages[index].content = response[0].translations[0].text;
         }).catch((error: any) => {

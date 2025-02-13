@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
-import { Capteur } from "src/model/capteur";
+import { Capteur, CapteurStyle } from "src/model/capteur";
 import {
     AbstractControl,
     FormArray,
@@ -12,12 +12,18 @@ import {
 } from "@angular/forms";
 import { CapteurDetailTooltipComponent } from "./capteur-detail-tooltip.component";
 import { ModifierCapteurDetailsComponent } from "./modifier-capteur-details.component";
+import { ModifierCapteurStyleComponent } from "./modifier-capteur-style.component";
 
 @Component({
     selector: 'capteur-list',
     templateUrl: 'capteur-list.component.html',
     styleUrl: 'capteur-list.component.css',
-    imports: [ReactiveFormsModule, CapteurDetailTooltipComponent, ModifierCapteurDetailsComponent]
+    imports: [
+        ReactiveFormsModule, 
+        CapteurDetailTooltipComponent, 
+        ModifierCapteurDetailsComponent,
+        ModifierCapteurStyleComponent
+    ]
 })
 export class CapteurListComponent implements OnChanges {
     @Input() idErabliere?: string;
@@ -28,6 +34,7 @@ export class CapteurListComponent implements OnChanges {
     formArrayIdToKey: Map<string, number> = new Map<string, number>();
     form: FormGroup;
     displayEdits: { [id: string]: boolean } = {};
+    displayStyleEdits: { [id: string]: boolean } = {};
     editedCapteurs: { [id: string]: Capteur } = {};
     capteurTT: Capteur;
     displayTooltip: boolean = false;
@@ -36,6 +43,9 @@ export class CapteurListComponent implements OnChanges {
 
     displayEditDetailsForm: boolean = false;
     editDetailsCapteurSelected?: Capteur;
+
+    displayEditStyleForm: boolean = false;
+    editStyleSelected?: Capteur;
 
     constructor(private readonly erabliereApi: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.form = this.fb.group({
@@ -174,6 +184,7 @@ export class CapteurListComponent implements OnChanges {
         }
         return date.toLocaleDateString("fr-CA");
     }
+
     getCapteurs() {
         return this.form.get('capteurs') as FormArray;
     }
@@ -220,6 +231,13 @@ export class CapteurListComponent implements OnChanges {
     showModifierCapteurDetails(_t17: Capteur) {
         this.displayEditDetailsForm = true;
         this.editDetailsCapteurSelected = _t17;
+    }
+
+    showModifierCapteurStyle(capteur: Capteur) {
+        if (capteur.id) {
+            this.displayEditStyleForm = true;
+            this.editStyleSelected = capteur;
+        }
     }
 
     openTooltip(_t19: Capteur, e: MouseEvent) {

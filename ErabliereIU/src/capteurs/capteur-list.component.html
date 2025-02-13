@@ -8,6 +8,10 @@
 <modifier-capteur-details [inputCapteur]="editDetailsCapteurSelected" (needToUpdate)="editDetailsNeedToUdate($event)" (closeForm)="closeEditDetailsForm($event)"></modifier-capteur-details>
 }
 
+@if (this.displayEditStyleForm && this.editStyleSelected) {
+<app-modifier-capteur-style
+ [inputCapteur]="editStyleSelected"></app-modifier-capteur-style>
+}
 <form class="table-responsive" novalidate>
     <table class="table table-striped mb-5">
         <thead>
@@ -127,6 +131,12 @@
                                         Modifier les détails
                                     </button>
                                 </li>
+                                <!-- <li>
+                                    <button class="dropdown-item" type="button"
+                                        (click)="showModifierCapteurStyle(capteur)">
+                                        Modifier le style
+                                    </button> 
+                                </li> -->
                             </ul>
                         </div>
                     </div>

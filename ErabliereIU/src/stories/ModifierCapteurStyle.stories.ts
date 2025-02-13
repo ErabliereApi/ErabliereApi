@@ -19,7 +19,7 @@ type Story = StoryObj<ModifierCapteurStyleComponent>;
 
 export const Primary: Story = {
     args: {
-        capteur: {
+        inputCapteur: {
             ajouterDonneeDepuisInterface: false,
             id: "1",
             idErabliere: "1",
@@ -43,6 +43,6 @@ export const Primary: Story = {
                 tension: 0,
                 useGradient: false
             }
-        }
+        }   
     }
 };

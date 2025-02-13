@@ -5,6 +5,7 @@ import { IErabliereApi } from 'src/core/erabliereapi.interface';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
 import { DateTimeSelectorComponent } from './userinput/date-time-selector.component';
 import { calculerMoyenne } from '../util';
+import { CapteurStyle } from 'src/model/capteur';
 
 @Component({
     selector: 'graph-panel',
@@ -35,6 +36,7 @@ export class GraphPanelComponent implements OnInit {
     @Input() ajouterDonneeDepuisInterface: boolean = false;
     @Input() batteryLevel: number | undefined;
     @Input() online: boolean | undefined;
+    @Input() capteurStyle?: CapteurStyle;
 
     errorMessage: any;
 
@@ -69,9 +71,9 @@ export class GraphPanelComponent implements OnInit {
         this.lineChartOptions = {
             maintainAspectRatio: false,
             aspectRatio: 1.7,
-            backgroundColor: 'rgba(255,255,0,0.28)',
-            color: 'black',
-            borderColor: 'black',
+            backgroundColor: this.capteurStyle?.backgroundColor ?? 'rgba(255,255,0,0.28)',
+            color: this.capteurStyle?.color ?? 'black',
+            borderColor: this.capteurStyle?.borderColor ?? 'black',
             scales: {
                 x: {
                     type: this.lineScaleType,
@@ -153,11 +155,11 @@ export class GraphPanelComponent implements OnInit {
                 {
                     data: json.map(donneeCapteur => donneeCapteur.valeur ?? null), 
                     label: this.titre,
-                    fill: true,
-                    //borderColor: this.getGradient(this.chart?.ctx, this.chart?.chart?.chartArea),
-                    pointBackgroundColor: 'rgba(255,255,0,0.8)',
-                    pointBorderColor: 'black',
-                    tension: 0.5,
+                    fill: this.capteurStyle?.fill ?? true,
+                    borderColor: this.capteurStyle?.useGradient ? this.getGradient(this.chart?.ctx, this.chart?.chart?.chartArea) : null,
+                    pointBackgroundColor: this.capteurStyle?.pointBackgroundColor ?? 'rgba(255,255,0,0.8)',
+                    pointBorderColor: this.capteurStyle?.pointBackgroundColor ?? 'black',
+                    tension: this.capteurStyle?.tension ?? 0.5,
                 }
             ];
 
