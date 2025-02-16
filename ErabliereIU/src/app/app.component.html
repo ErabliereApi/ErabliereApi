@@ -1,5 +1,16 @@
 <div class="d-flex flex-column min-vh-100">
-  <router-outlet></router-outlet>
+  @if (msalEncryptionInitialize) {
+    <router-outlet></router-outlet> 
+  }
+  @else {
+    <div>
+      <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="spinner-border text-success">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+    </div>
+  }
   <entra-redirect></entra-redirect>
   <footer class="footer mt-auto py-3 border-top">
     <div class="container-fluid">

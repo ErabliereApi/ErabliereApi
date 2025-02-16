@@ -18,7 +18,7 @@ declare global {
     appRef: ApplicationRef,
     Cypress: any,
     authorisationFactoryService: AuthorisationFactoryService
-   }
+  }
 }
 
 export function initConfig(appConfig: EnvironmentService) {
@@ -88,27 +88,29 @@ export function MSALInstanceFactory(appConfig: EnvironmentService): IPublicClien
   return pca;
 }
 
-@NgModule({ imports: [BrowserModule], providers: [
-        provideAppInitializer(() => {
-        const initializerFn = (initConfig)(inject(EnvironmentService));
-        return initializerFn();
-      }),
-        {
-            provide: MSAL_INSTANCE,
-            useFactory: MSALInstanceFactory,
-            deps: [EnvironmentService]
-        },
-        MsalService,
-        provideNgxMask(),
-        provideRouter(routes, withComponentInputBinding()),
-        provideHttpClient(withInterceptorsFromDi()),
-        {
-          provide: 'IErabliereApi',
-          useClass: ErabliereApi
-        }
-    ] })
+@NgModule({
+  imports: [BrowserModule], providers: [
+    provideAppInitializer(() => {
+      const initializerFn = (initConfig)(inject(EnvironmentService));
+      return initializerFn();
+    }),
+    {
+      provide: MSAL_INSTANCE,
+      useFactory: MSALInstanceFactory,
+      deps: [EnvironmentService]
+    },
+    MsalService,
+    provideNgxMask(),
+    provideRouter(routes, withComponentInputBinding()),
+    provideHttpClient(withInterceptorsFromDi()),
+    {
+      provide: 'IErabliereApi',
+      useClass: ErabliereApi
+    }
+  ]
+})
 export class AppModule implements DoBootstrap {
-  constructor() {}
+  constructor() { }
 
   ngDoBootstrap(appRef: ApplicationRef): void {
     appRef.bootstrap(AppComponent);

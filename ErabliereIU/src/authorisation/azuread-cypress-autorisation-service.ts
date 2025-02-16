@@ -63,8 +63,10 @@ export class AzureADCypressAuthorisationService implements IAuthorisationSerivce
   }
 
   userIsInRole(role: string): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      return resolve(true);
-    });
+    return Promise.resolve(true);
+  }
+
+  init(): Promise<void> {
+    return Promise.resolve();
   }
 }

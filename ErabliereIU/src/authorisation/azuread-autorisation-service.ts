@@ -13,16 +13,16 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   type: string = "AzureAD";
   initialize: boolean = false;
 
-  constructor(private readonly _msalInstance: MsalService, private readonly _environmentService: EnvironmentService) {
+  constructor(
+    private readonly _msalInstance: MsalService, 
+    private readonly _environmentService: EnvironmentService) {
 
   }
 
   async login() {
     console.log("login");
     if (!this.initialize) {
-      console.log("Initilize MSAL Instance");
-      await firstValueFrom(this._msalInstance.initialize());
-      this.initialize = true;
+      await this.init();
     }
     else {
       console.log("MSAL already initialize at login");
@@ -40,9 +40,7 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   async isLoggedIn(): Promise<boolean> {
     console.log("isLoggedIn");
     if (!this.initialize) {
-      console.log("Initilize MSAL Instance");
-      await firstValueFrom(this._msalInstance.initialize());
-      this.initialize = true;
+      await this.init();
     }
     else {
       console.log("MSAL already initialize at isLoggedIn");
@@ -58,9 +56,7 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   async completeLogin(): Promise<AppUser> {
     console.log("completeLogin")
     if (!this.initialize) {
-      console.log("Initilize MSAL Instance");
-      await firstValueFrom(this._msalInstance.initialize());
-      this.initialize = true;
+      await this.init();
     }
     else {
       console.log("MSAL already initialize at completeLogin");
@@ -98,15 +94,19 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   async getAccessToken(): Promise<string | null> {
     console.log("getAccessToken");
     if (!this.initialize) {
-      console.log("Initilize MSAL Instance");
-      await firstValueFrom(this._msalInstance.initialize());
-      this.initialize = true;
+      await this.init();
     }
     else {
       console.log("MSAL already initialize at getAccessToken");
     }
 
     const user = this.getUser();
+
+    if (user == null) {
+      console.log("No user found when getting access token, exiting the function");
+      return null
+    }
+
     this._msalInstance.instance.setActiveAccount(user);
 
     const requestObj: SilentRequest = {
@@ -131,9 +131,13 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   }
 
   getUser(): AccountInfo | null {
+    if (!this.initialize) {
+      return null;
+    }
     let user = null;
-    if (this._msalInstance.instance.getAllAccounts().length > 0) {
-      user = this._msalInstance.instance.getAllAccounts()[0];
+    const accounts = this._msalInstance.instance.getAllAccounts();
+    if (accounts.length > 0) {
+      user = accounts[0];
     }
     return user;
   }
@@ -151,5 +155,13 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     }
 
     return false;
+  }
+
+  async init(): Promise<void> {
+    if (!this.initialize) {
+      console.log("Initilize MSAL Instance");
+      await firstValueFrom(this._msalInstance.initialize());
+      this.initialize = true;
+    }
   }
 }

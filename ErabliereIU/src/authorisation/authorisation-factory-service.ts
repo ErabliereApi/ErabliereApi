@@ -10,8 +10,9 @@ import { IAuthorisationSerivce } from "./iauthorisation-service";
 
 @Injectable({ providedIn: 'root' })
 export class AuthorisationFactoryService {
-    constructor(private readonly _environment: EnvironmentService, private readonly _msalService: MsalService) {
-
+    constructor(
+        private readonly _environment: EnvironmentService, 
+        private readonly _msalService: MsalService) {
     }
 
     private _cache?: IAuthorisationSerivce

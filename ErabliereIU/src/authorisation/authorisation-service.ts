@@ -77,4 +77,8 @@ export class AuthorisationService implements IAuthorisationSerivce {
             return false;
         }
     }
+
+    async init(): Promise<void> {
+        return Promise.resolve();
+    }
 }

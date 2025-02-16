@@ -9,7 +9,7 @@ import { MsalService } from "@azure/msal-angular";
 })
 export class EntraRedirectComponent implements OnInit {
   
-  constructor(private authService: MsalService) { }
+  constructor(private readonly authService: MsalService) { }
   
   ngOnInit(): void {    
       this.authService.handleRedirectObservable().subscribe();

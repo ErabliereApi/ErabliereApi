@@ -28,4 +28,7 @@ export class AuthorisationBypassService implements IAuthorisationSerivce {
     userIsInRole(role: string): Promise<boolean> {
         return Promise.resolve(false);
     }
+    init(): Promise<void> {
+        return Promise.resolve();
+    }
 }
