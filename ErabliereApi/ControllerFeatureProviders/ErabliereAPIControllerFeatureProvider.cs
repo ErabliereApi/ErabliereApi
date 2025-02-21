@@ -58,6 +58,12 @@ public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
             return enableMap;
         }
 
+        if (typeInfo.Name == nameof(QuantumController))
+        {
+            var enableQuantum = !string.IsNullOrWhiteSpace(_config["IQP_API_TOKEN"]);
+            return enableQuantum;
+        }
+
         return base.IsController(typeInfo);
     }
 }
