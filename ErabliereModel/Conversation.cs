@@ -25,6 +25,11 @@ public class Conversation : IIdentifiable<Guid?, Conversation>
     public string? Name { get; set; }
 
     /// <summary>
+    /// Prase système utilisé pour la conversation
+    /// </summary>
+    public string? SystemMessage { get; set; }
+
+    /// <summary>
     /// La date de création de la conversation.
     /// </summary>
     public DateTimeOffset? CreatedOn { get; set; }

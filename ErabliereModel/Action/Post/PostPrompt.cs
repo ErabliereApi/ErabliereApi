@@ -8,6 +8,11 @@ namespace ErabliereModel.Action.Post
     public class PostPrompt
     {
         /// <summary>
+        /// Phrase système utilisé lors de Prompt de type Chat
+        /// </summary>
+        public string? SystemMessage { get; set; }
+
+        /// <summary>
         /// Le prompt
         /// </summary>
         public string? Prompt { get; set; }

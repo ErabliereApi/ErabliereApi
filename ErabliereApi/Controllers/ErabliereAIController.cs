@@ -78,6 +78,7 @@ public class ErabliereAIController : ControllerBase
     [ProducesResponseType(200, Type = typeof(PostPromptResponse))]
     public async Task<IActionResult> EnvoyerPrompt([FromBody] PostPrompt prompt, CancellationToken cancellationToken)
     {
+        string defaultSystemPhrase = "Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique.";
         // Premièrement ont obtient la conversation
         // if the convesation id is null, create a new conversation
         Conversation? conversation = null;
@@ -90,7 +91,8 @@ public class ErabliereAIController : ControllerBase
                 UserId = UsersUtils.GetUniqueName(scope, HttpContext.User),
                 CreatedOn = DateTime.Now,
                 LastMessageDate = DateTime.Now,
-                Name = prompt.Prompt
+                Name = prompt.Prompt,
+                SystemMessage = !string.IsNullOrWhiteSpace(prompt.SystemMessage) ? prompt.SystemMessage : defaultSystemPhrase,
             };
             _depot.Conversations.Add(conversation);
             await _depot.SaveChangesAsync(cancellationToken);
@@ -112,7 +114,7 @@ public class ErabliereAIController : ControllerBase
             new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? "")
         );
 
-        string aiResponse = "No response";
+        string aiResponse = "Aucune réponse";
 
         switch (prompt.PromptType)
         {
@@ -133,7 +135,11 @@ public class ErabliereAIController : ControllerBase
                     PresencePenalty = 0
                 };
 
-                chatCompletionsOptions.Messages.Add(new ChatRequestSystemMessage("Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique."));
+                chatCompletionsOptions.Messages.Add(
+                    new ChatRequestSystemMessage(
+                        !string.IsNullOrWhiteSpace(conversation?.SystemMessage) ?
+                            conversation.SystemMessage :
+                            defaultSystemPhrase));
 
                 foreach (var message in messages)
                 {
@@ -150,7 +156,7 @@ public class ErabliereAIController : ControllerBase
                 );
 
                 ChatCompletions responseChat = responseWithoutStream.Value;
-                aiResponse = responseChat?.Choices?.FirstOrDefault()?.Message?.Content ?? "No response";
+                aiResponse = responseChat?.Choices?.FirstOrDefault()?.Message?.Content ?? "Aucune réponse";
                 break;
             default:
                 var completionResponse = await client.GetCompletionsAsync(
@@ -158,11 +164,11 @@ public class ErabliereAIController : ControllerBase
                     {
                         DeploymentName = _configuration["AzureOpenAIDeploymentModelName"],
                         Prompts = { prompt.Prompt },
-                        Temperature = (float)1,
+                        Temperature = 1,
                         MaxTokens = 800,
-                        NucleusSamplingFactor = (float)0.5,
-                        FrequencyPenalty = (float)0,
-                        PresencePenalty = (float)0,
+                        NucleusSamplingFactor = 0.5f,
+                        FrequencyPenalty = 0,
+                        PresencePenalty = 0,
                         GenerationSampleCount = 1,
                     },
                     cancellationToken
@@ -199,6 +205,7 @@ public class ErabliereAIController : ControllerBase
 
         return Ok(new PostPromptResponse 
         {
+            
             Prompt = prompt,
             Conversation = conversation,
             Response = response,

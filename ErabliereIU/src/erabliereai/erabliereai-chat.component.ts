@@ -94,7 +94,8 @@ export class ErabliereAIComponent {
         const prompt = {
             Prompt: this.newMessage,
             ConversationId: this.currentConversation?.id,
-            PromptType: this.typePrompt
+            PromptType: this.typePrompt,
+            SystemMessage: this.currentConversation?.systemMessage ?? this.currentSystemPhrase
         };
         this.aiIsThinking = true;
         this.api.postPrompt(prompt).then((response: PromptResponse) => {
@@ -118,6 +119,7 @@ export class ErabliereAIComponent {
     async selectConversation(conversation: any) {
         this.currentConversation = conversation;
         if (this.currentConversation) {
+            this.currentSystemPhrase = this.currentConversation.systemMessage ?? this.currentSystemPhrase;
             const currentMessages = await this.api.getMessages(this.currentConversation.id);
             if (currentMessages) {
                 this.messages = currentMessages;
@@ -150,7 +152,6 @@ export class ErabliereAIComponent {
 
     updateMessageType($event: Event) {
         this.typePrompt = ($event.target as HTMLInputElement).value;
-        console.log(this.typePrompt);
     }
 
     formatMessageDate(date?: Date | string) {
@@ -207,5 +208,21 @@ export class ErabliereAIComponent {
         else {
             return text;
         }
+    }
+
+    updateChatConfig($event: Event) {
+        this.currentSystemPhrase = ($event.target as HTMLInputElement).value;
+    }
+
+    defaultSystemPhrase = "Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique.";
+    currentSystemPhrase?: string = this.defaultSystemPhrase;
+    chatConfig: boolean = false;
+
+    toggleChatConfig() {
+        this.chatConfig = !this.chatConfig;
+    }
+
+    resetChatConfig() {
+        this.currentSystemPhrase = this.defaultSystemPhrase
     }
 }
