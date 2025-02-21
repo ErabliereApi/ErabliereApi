@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 ### Authentification
 
-Trois mode d'authentification sont supporté (Aucune authentification, IdentityServer4 et AzureAD). La documentation suivante se concentrera sur l'installation des scripts avec AzureAD.
+Deux mode d'authentification sont supporté (Aucune authentification et AzureAD). La documentation suivante se concentrera sur l'installation des scripts avec AzureAD.
 
 Les configurations d'authentification en mode 'client credentials' devront se trouvé dans
 

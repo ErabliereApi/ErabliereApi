@@ -27,7 +27,6 @@ Le suivit du projet est effectué dans AzureDevOps : https://dev.azure.com/fredd
 - ErabliereApi.Proxy : Proxy pour le web API disponible soous forme de nuget
 - Infrastructure : Fichier relié à la configuration de l'infrastructure	kubernetes ou autres
 - PythonScripts : Script python pour alimenter l'API
-- IdentityServer/ErabliereApi.ServeurIdentite : Server de jeton OIDC
 
 ## Modèles de données
 Les informations enregistré peuvent être :
@@ -103,7 +102,7 @@ kubectl logs --since=24h pods/my-nginx-deployment-5977f4fdff-p7t5r | grep erabli
 
 Prerequis: Powershell core : https://learn.microsoft.com/fr-fr/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package
 
-Avec powershell core en tant qu'administrateur executer le script ```.\deploiement-local.ps1``` puis ensuite ```docker compose up -d```. Pour mettre à jour un déploiement docker compose, executez ```docker compose up -d --force-recreate```. Si vous voulez télécharger les images plus récente, lancer ```docker compose pull``` avant d'executer la commande --force-recreate.
+Avec powershell core en tant qu'administrateur executer le script ```.\deploiement-local-aad.ps1``` puis ensuite ```docker compose up -d```. Pour mettre à jour un déploiement docker compose, executez ```docker compose up -d --force-recreate```. Si vous voulez télécharger les images plus récente, lancer ```docker compose pull``` avant d'executer la commande --force-recreate.
 
 ### Intégration Stripe
 

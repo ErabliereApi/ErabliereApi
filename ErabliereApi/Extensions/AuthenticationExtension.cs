@@ -3,7 +3,6 @@ using ErabliereApi.Authorization.Customers;
 using ErabliereApi.Authorization.Policies.Handlers;
 using ErabliereApi.Authorization.Policies.Requirements;
 using ErabliereApi.Services.Users;
-using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web;
 
@@ -44,13 +43,7 @@ public static class AuthenticationExtension
             }
             else
             {
-                services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-                        .AddIdentityServerAuthentication(options =>
-                        {
-                            options.Authority = configuration["OIDC_AUTHORITY"];
-
-                            options.ApiName = "erabliereapi";
-                        });
+                throw new NotImplementedException($"Authentification method not implemented. You must disable auth or use AzureAD by initializing client id. Use this configuration key:  AzureAD:ClientId");
             }
 
             services.AddTransient<EnsureCustomerExist>();

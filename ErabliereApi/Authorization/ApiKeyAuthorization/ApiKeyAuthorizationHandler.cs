@@ -1,4 +1,3 @@
-using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 
 namespace ErabliereApi.Authorization;

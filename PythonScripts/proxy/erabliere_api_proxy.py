@@ -2,7 +2,6 @@ import json
 import requests
 import os
 from urllib.parse import urlparse
-from auth.getAccessToken import getAccessToken as getAccessTokenIdentity
 from auth.getAccessTokenAAD import AzureADAccessTokenProvider
 
 class ErabliereApiProxy:
@@ -70,8 +69,6 @@ class ErabliereApiProxy:
     if (self.auth_provider == "ApiKey"):
       self.init_auth_config()
       return self.auth_config["ApiKey"]
-    if (self.auth_provider == "Identity"):
-      return getAccessTokenIdentity("https://192.168.0.103:5005/connect/token", "raspberrylocal", "secret", verifySsl = False)
     if (self.auth_provider == "AzureAD"):
       if self.auth_config == None:
         self.init_auth_config();

@@ -1,6 +1,6 @@
 {
   "name": "erabliere-iu",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -40,7 +40,6 @@
     "mapbox-gl": "^3.10.0",
     "ng2-charts": "^5.0.4",
     "ngx-mask": "^17.0.8",
-    "oidc-client": "^1.11.5",
     "rxjs": "^7.8.1",
     "tslib": "^2.7.0"
   },

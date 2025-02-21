@@ -3,7 +3,6 @@ import { MsalService } from "@azure/msal-angular";
 import { environment } from "src/environments/environment";
 import { EnvironmentService } from "src/environments/environment.service";
 import { AuthorisationBypassService } from "./authorisation-bypass-service";
-import { AuthorisationService } from "./authorisation-service";
 import { AzureADAuthorisationService } from "./azuread-autorisation-service";
 import { AzureADCypressAuthorisationService } from "./azuread-cypress-autorisation-service";
 import { IAuthorisationSerivce } from "./iauthorisation-service";
@@ -29,7 +28,7 @@ export class AuthorisationFactoryService {
                     }
                 }
                 else {
-                    this._cache = new AuthorisationService(this._environment);
+                    throw new Error("TenantId is not set in the environment file");
                 }
             }
             else {
