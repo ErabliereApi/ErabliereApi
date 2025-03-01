@@ -49,7 +49,7 @@ export class NotesComponent implements OnInit {
     noteToModify?: Subject<Note | null> = new Subject<Note | null>();
     error?: string | null;
 
-    constructor(private _api: ErabliereApi, private _route: ActivatedRoute) { }
+    constructor(private readonly _api: ErabliereApi, private readonly _route: ActivatedRoute) { }
 
     ngOnInit(): void {
         this._route.paramMap.subscribe(params => {

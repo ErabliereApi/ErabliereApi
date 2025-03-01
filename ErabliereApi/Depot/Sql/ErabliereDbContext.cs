@@ -20,6 +20,7 @@ namespace ErabliereApi.Depot.Sql
 
         }
 
+#pragma warning disable S1144 // Unused private types or members should be removed
         /// <summary>
         /// Table des alertes
         /// </summary>
@@ -109,6 +110,17 @@ namespace ErabliereApi.Depot.Sql
         /// Table des messages
         /// </summary>
         public DbSet<Message> Messages { get; private set; }
+
+        /// <summary>
+        /// Table des rapports
+        /// </summary>
+        public DbSet<Rapport> Rapports { get; private set; }
+
+        /// <summary>
+        /// Table des données de rapports
+        /// </summary>
+        public DbSet<RapportDonnees> DonneesRapports { get; private set; }
+#pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)

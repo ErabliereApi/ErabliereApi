@@ -1,8 +1,12 @@
+using System.Globalization;
+using System.Text.Json;
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
+using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 
 namespace ErabliereApi.Controllers;
@@ -13,16 +17,34 @@ namespace ErabliereApi.Controllers;
 [ApiController]
 [Route("Erablieres/{id}/[controller]")]
 [Authorize]
-public class RapportController : ControllerBase
+public class RapportsController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
+    private readonly ILogger<RapportsController> _logger;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
-    public RapportController(ErabliereDbContext context)
+    public RapportsController(ErabliereDbContext context, ILogger<RapportsController> logger)
     {
         _context = context;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Retourne la liste des rapports sauvegardés
+    /// </summary>
+    /// <param name="id"></param>
+    [EnableQuery]
+    [HttpGet]
+    [ValiderOwnership("id")]
+    [ProducesResponseType(200, Type = typeof(List<Rapport>))]
+    public IActionResult GetSaveReports([FromRoute] Guid id)
+    {
+        var query = _context.Rapports
+            .Where(r => r.IdErabliere == id);
+
+        return Ok(query);
     }
 
     /// <summary>
@@ -32,6 +54,7 @@ public class RapportController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <param name="rapportDegreeJour"></param>
+    /// <param name="sauvegarder"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPost("[action]")]
@@ -39,6 +62,7 @@ public class RapportController : ControllerBase
     [ProducesResponseType(200, Type = typeof(PostRapportDegreeJourResponse))]
     public async Task<IActionResult> RapportDegreeJour([FromRoute] Guid? id,
                                                        [FromBody] PostRapportDegreeJourRequest rapportDegreeJour,
+                                                       [FromQuery] bool? sauvegarder,
                                                        CancellationToken token)
     {
         if (id != rapportDegreeJour.IdErabliere)
@@ -124,6 +148,28 @@ public class RapportController : ControllerBase
 
                 rapport.Rapport.Add(rapportJour);
             }
+        }
+
+        if (sauvegarder == true)
+        {
+            var rapportDonnees = new Rapport
+            {
+                IdErabliere = id,
+                Type = "Degré jour",
+                RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
+                Donnees = [.. rapport.Rapport.Select(r => new RapportDonnees
+                {
+                    Date = DateTime.Parse(r.Date, CultureInfo.InvariantCulture),
+                    Moyenne = r.Temperature,
+                    Somme = r.DegreJour,
+                    OwnerId = id
+                })],
+                DC = DateTimeOffset.Now
+            };
+
+            await _context.Rapports.AddAsync(rapportDonnees, token);
+
+            await _context.TrySaveChangesAsync(token, _logger);
         }
 
         return Ok(rapport);

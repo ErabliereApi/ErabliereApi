@@ -38,7 +38,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.api.getOpenApiSpec().then(spec => {
         this.erabliereAIEnable = spec.paths['/ErabliereAI/Conversations'] !== undefined;
     })

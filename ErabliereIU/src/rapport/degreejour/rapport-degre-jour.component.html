@@ -34,7 +34,8 @@
         <input-error [errorObj]="errorObj" [controlName]="'seuil'"></input-error>
     </div>
     <div class="form-group">
-        <span class="btn btn-primary" (click)="onSubmit()" (keypress)="onKeyPress($event)">Générer</span>
+        <button class="btn btn-primary m-1" (click)="onGenererRapport(false)" (keypress)="onKeyPress($event)">Générer</button>
+        <button class="btn btn-success m-1" (click)="onGenererRapport(true)">Générer & Sauvegarder</button>
     </div>
 </form>
 

@@ -29,6 +29,7 @@ import { firstValueFrom } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
 import { IErabliereApi } from './erabliereapi.interface';
 import { ApiKey } from 'src/model/apikey';
+import { Rapport } from 'src/model/rapport';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi implements IErabliereApi {
@@ -578,9 +579,19 @@ export class ErabliereApi implements IErabliereApi {
             { headers: headers }));
     }
 
-    async getDegresJours(idErabliere: any, form: PostDegresJoursRepportRequest) {
+    async getRapports(idErabliereSelectionee: string) {
         const headers = await this.getHeaders();
-        return await firstValueFrom(this._httpClient.post<ResponseRapportDegreeJours>(this._environmentService.apiUrl + '/Erablieres/' + idErabliere + '/Rapport/RapportDegreeJour', form, { headers: headers }));
+        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports';
+        return await firstValueFrom(this._httpClient.get<Rapport[]>(url, { headers: headers }));
+    }
+
+    async postDegresJours(idErabliere: any, form: PostDegresJoursRepportRequest, save?: boolean) {
+        const headers = await this.getHeaders();
+        let url = this._environmentService.apiUrl + '/Erablieres/' + idErabliere + '/Rapports/RapportDegreeJour';
+        if (save) {
+            url += '?sauvegarder=true';
+        }
+        return await firstValueFrom(this._httpClient.post<ResponseRapportDegreeJours>(url, form, { headers: headers }));
     }
 
     async getHeaders(): Promise<HttpHeaders> {

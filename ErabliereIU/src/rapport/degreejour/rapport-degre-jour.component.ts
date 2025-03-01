@@ -40,11 +40,11 @@ export class RapportDegreJourComponent implements OnInit {
         });
     }
 
-    async onSubmit() {
+    async onGenererRapport(save?: boolean) {
         console.log('RapportDegreJourComponent onSubmit');
         try {
             this.form.idErabliere = this.idErabliere;
-            const rapport = await this.api.getDegresJours(this.idErabliere, this.form);
+            const rapport = await this.api.postDegresJours(this.idErabliere, this.form, save);
             this.degresJours = rapport;
         }
         catch (error: any) {
