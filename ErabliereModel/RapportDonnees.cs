@@ -43,6 +43,18 @@ public class RapportDonnees : IIdentifiable<Guid?, RapportDonnees>, ILevelTwoOwn
     public decimal Somme { get; set; }
 
     /// <summary>
+    /// La valeur minimale de la donnée
+    /// </summary>
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Min { get; set; }
+
+    /// <summary>
+    /// La valeur maximale de la donnée
+    /// </summary>
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Max { get; set; }
+
+    /// <summary>
     /// Compare les données de rapport par date
     /// </summary>
     /// <param name="other"></param>

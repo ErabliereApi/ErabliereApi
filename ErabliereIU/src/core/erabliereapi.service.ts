@@ -538,7 +538,8 @@ export class ErabliereApi implements IErabliereApi {
 
     async deleteConversation(id: any) {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.delete<any>(this._environmentService.apiUrl + "/ErabliereAI/Conversations/" + id, { headers: headers }));
+        const url = this._environmentService.apiUrl + "/ErabliereAI/Conversations/" + id;
+        return firstValueFrom(this._httpClient.delete<any>(url, { headers: headers }));
     }
 
     async getOpenApiSpec(): Promise<any> {
@@ -592,6 +593,12 @@ export class ErabliereApi implements IErabliereApi {
             url += '?sauvegarder=true';
         }
         return await firstValueFrom(this._httpClient.post<ResponseRapportDegreeJours>(url, form, { headers: headers }));
+    }
+
+    async deleteRapport(idErabliereSelectionee?: any, id?: any) {
+        const headers = await this.getHeaders();
+        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/' + id;
+        return firstValueFrom(this._httpClient.delete<any>(url, { headers: headers }));
     }
 
     async getHeaders(): Promise<HttpHeaders> {

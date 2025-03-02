@@ -34,6 +34,12 @@
         <input-error [errorObj]="errorObj" [controlName]="'seuil'"></input-error>
     </div>
     <div class="form-group">
+        <input name="afficherRapportDashboard" type="checkbox" class="form-check-input" id="afficherRapportDashboard"
+        [(ngModel)]="form.afficherDansDashboard" />
+        <input-error [errorObj]="errorObj" [controlName]="'afficherRapportDashboard'"></input-error>
+        <label for="afficherRapportDashboard">Afficher dans le dashboard</label>
+    </div>
+    <div class="form-group">
         <button class="btn btn-primary m-1" (click)="onGenererRapport(false)" (keypress)="onKeyPress($event)">Générer</button>
         <button class="btn btn-success m-1" (click)="onGenererRapport(true)">Générer & Sauvegarder</button>
     </div>
@@ -50,10 +56,10 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let degreJour of degresJours?.rapport">
+            <tr *ngFor="let degreJour of degresJours?.donnees">
                 <td>{{degreJour.date}}</td>
-                <td>{{degreJour.temperature}}</td>
-                <td>{{degreJour.degreJour}}</td>
+                <td>{{degreJour.moyenne}}</td>
+                <td>{{degreJour.somme}}</td>
             </tr>
         </tbody>
     </table>

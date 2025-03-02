@@ -1,40 +1,54 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Query;
 using System.Net.Http.Headers;
-using static Microsoft.Graph.CoreConstants;
 
 namespace ErabliereApi.Controllers;
 
+/// <summary>
+/// Controlleur pour les requêtes vers le service IBM Quantum.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 [Authorize]
 public class QuantumController : ControllerBase
 {
     private readonly IConfiguration _config;
+    private readonly string _baseUrl;
 
+    /// <summary>
+    /// Constructeur.
+    /// </summary>
     public QuantumController(IConfiguration config)
     {
         _config = config;
+        _baseUrl = "https://api.quantum-computing.ibm.com";
     }
 
+    /// <summary>
+    /// Retourne les jobs.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
     [HttpGet("[action]")]
     public async Task<IActionResult> GetJobs(CancellationToken token)
     {
-        string url = "https://api.quantum-computing.ibm.com/runtime/jobs?limit=10&offset=0&exclude_params=true";
+        string path = "/runtime/jobs?limit=10&offset=0&exclude_params=true";
 
-        return await IbmQuantumQuery(url, token);
+        return await IbmQuantumQuery(path, token);
     }
 
+    /// <summary>
+    /// Retourne les backends.
+    /// </summary>
     [HttpGet("[action]")]
     public async Task<IActionResult> GetBackends(CancellationToken token)
     {
-        string url = "https://api.quantum-computing.ibm.com/runtime/backends";
+        string path = "/runtime/backends";
 
-        return await IbmQuantumQuery(url, token);
+        return await IbmQuantumQuery(path, token);
     }
 
-    private async Task<IActionResult> IbmQuantumQuery(string url, CancellationToken token)
+    private async Task<IActionResult> IbmQuantumQuery(string path, CancellationToken token)
     {
         HttpClient client = new HttpClient();
 
@@ -42,7 +56,7 @@ public class QuantumController : ControllerBase
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _config["IQP_API_TOKEN"]);
 
-        HttpResponseMessage response = await client.GetAsync(url, token);
+        HttpResponseMessage response = await client.GetAsync($"{_baseUrl}{path}", token);
 
         if (response.IsSuccessStatusCode)
         {

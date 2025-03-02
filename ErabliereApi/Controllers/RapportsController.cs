@@ -59,7 +59,7 @@ public class RapportsController : ControllerBase
     /// <returns></returns>
     [HttpPost("[action]")]
     [ValiderOwnership("id")]
-    [ProducesResponseType(200, Type = typeof(PostRapportDegreeJourResponse))]
+    [ProducesResponseType(200, Type = typeof(Rapport))]
     public async Task<IActionResult> RapportDegreeJour([FromRoute] Guid? id,
                                                        [FromBody] PostRapportDegreeJourRequest rapportDegreeJour,
                                                        [FromQuery] bool? sauvegarder,
@@ -70,10 +70,27 @@ public class RapportsController : ControllerBase
             return BadRequest($"L'id de la route '{id}' ne concorde pas avec l'id de l'érablière du rapport demandé '{rapportDegreeJour.IdErabliere}'.");
         }
 
-        var rapport = new PostRapportDegreeJourResponse
+        Rapport rapport;
+
+        if (rapportDegreeJour.IdRapport.HasValue)
         {
-            Requete = rapportDegreeJour
-        };
+            throw new NotImplementedException("La mise à jour de rapport n'est pas implémentée.");
+        }
+        else
+        {
+            rapport = new Rapport
+            {
+                Type = "Degré jour",
+                DateDebut = rapportDegreeJour.DateDebut,
+                DateFin = rapportDegreeJour.DateFin,
+                SeuilTemperature = rapportDegreeJour.SeuilTemperature,
+                UtiliserTemperatureTrioDonnee = rapportDegreeJour.UtiliserTemperatureTrioDonnee,
+                RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
+                DC = DateTimeOffset.Now,
+                IdErabliere = id
+            };
+        }
+
 
         if (rapportDegreeJour.UtiliserTemperatureTrioDonnee)
         {
@@ -89,22 +106,29 @@ public class RapportsController : ControllerBase
             // Ajouter les données au rapport
             foreach (var donneesJour in triodonnees.GroupBy(d => d.D?.Date))
             {
+                if (donneesJour.Key == DateTime.Today.Date) 
+                {
+                    continue;
+                }
+
                 // Code pour le rapport
                 // Pour chaque jour, calculer la température moyenne et le degré jour
                 // Ajouter les données au rapport
-                var rapportJour = new PostRapportDegreeJourResponse.RapportDegreeJour
+                var rapportJour = new RapportDonnees
                 {
-                    Date = donneesJour.Key?.ToString("yyyy-MM-dd") ?? "date inconnue",
-                    Temperature = (decimal)donneesJour.Average(d => d.T.GetValueOrDefault() / 10.0)
+                    Date = donneesJour.Key ?? DateTime.MinValue,
+                    Moyenne = (decimal)donneesJour.Average(d => d.T.GetValueOrDefault() / 10.0),
+                    Min = (decimal)donneesJour.Min(d => d.T.GetValueOrDefault() / 10.0),
+                    Max = (decimal)donneesJour.Max(d => d.T.GetValueOrDefault() / 10.0)
                 };
 
-                var degreeJour = Math.Max(0, rapportJour.Temperature - rapportDegreeJour.SeuilTemperature);
+                var degreeJour = Math.Max(0, rapportJour.Moyenne - rapportDegreeJour.SeuilTemperature);
 
                 memoireDegreeJour += degreeJour;
 
-                rapportJour.DegreJour = memoireDegreeJour;
+                rapportJour.Somme = memoireDegreeJour;
 
-                rapport.Rapport.Add(rapportJour);
+                rapport.Donnees.Add(rapportJour);
             }
         }
         else
@@ -115,7 +139,7 @@ public class RapportsController : ControllerBase
             if (capteur == null)
             {
                 ModelState.AddModelError(nameof(rapportDegreeJour.IdCapteur), "Le capteur n'existe pas ou n'appartient pas à l'érablière.");
-                
+
                 return BadRequest(new ValidationProblemDetails(ModelState));
             }
 
@@ -131,47 +155,75 @@ public class RapportsController : ControllerBase
             // Ajouter les données au rapport
             foreach (var donneesJour in donnees.GroupBy(d => d.D?.Date))
             {
+                if (donneesJour.Key == DateTime.Today.Date) 
+                {
+                    continue;
+                }
+
                 // Code pour le rapport
                 // Pour chaque jour, calculer la température moyenne et le degré jour
                 // Ajouter les données au rapport
-                var rapportJour = new PostRapportDegreeJourResponse.RapportDegreeJour
+                var rapportJour = new RapportDonnees
                 {
-                    Date = donneesJour.Key?.ToString("yyyy-MM-dd") ?? "date inconnue",
-                    Temperature = donneesJour.Average(d => d.Valeur.GetValueOrDefault())
+                    Date = donneesJour.Key ?? DateTime.MinValue,
+                    Moyenne = donneesJour.Average(d => d.Valeur.GetValueOrDefault()),
+                    Min = donneesJour.Min(d => d.Valeur.GetValueOrDefault()),
+                    Max = donneesJour.Max(d => d.Valeur.GetValueOrDefault())
                 };
 
-                var degreeJour = Math.Max(0, rapportJour.Temperature - rapportDegreeJour.SeuilTemperature);
+                var degreeJour = Math.Max(0, rapportJour.Moyenne - rapportDegreeJour.SeuilTemperature);
 
                 memoireDegreeJour += degreeJour;
 
-                rapportJour.DegreJour = memoireDegreeJour;
+                rapportJour.Somme = memoireDegreeJour;
 
-                rapport.Rapport.Add(rapportJour);
+                rapport.Donnees.Add(rapportJour);
             }
         }
 
+        rapport.Max = rapport.Donnees.Max(d => d.Max);
+        rapport.Min = rapport.Donnees.Min(d => d.Min);
+        rapport.Moyenne = rapport.Donnees.Average(d => d.Moyenne);
+        rapport.Somme = rapport.Donnees.LastOrDefault()?.Somme ?? 0;
+
         if (sauvegarder == true)
         {
-            var rapportDonnees = new Rapport
-            {
-                IdErabliere = id,
-                Type = "Degré jour",
-                RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
-                Donnees = [.. rapport.Rapport.Select(r => new RapportDonnees
-                {
-                    Date = DateTime.Parse(r.Date, CultureInfo.InvariantCulture),
-                    Moyenne = r.Temperature,
-                    Somme = r.DegreJour,
-                    OwnerId = id
-                })],
-                DC = DateTimeOffset.Now
-            };
-
-            await _context.Rapports.AddAsync(rapportDonnees, token);
+            await _context.Rapports.AddAsync(rapport, token);
 
             await _context.TrySaveChangesAsync(token, _logger);
         }
 
         return Ok(rapport);
+    }
+
+    /// <summary>
+    /// Supprimer un rapport
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="idRapport"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpDelete("{idRapport}")]
+    [ValiderOwnership("id")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> DeleteRapport([FromRoute] Guid id, [FromRoute] Guid idRapport, CancellationToken token)
+    {
+        var rapport = await _context.Rapports.Include(r => r.Donnees).FirstOrDefaultAsync(r => r.Id == idRapport, token);
+
+        if (rapport == null)
+        {
+            return NotFound();
+        }
+
+        if (id != rapport?.IdErabliere)
+        {
+            return BadRequest($"L'id de la route '{id}' ne concorde pas avec l'id de l'érablière du rapport demandé '{rapport?.IdErabliere}'.");
+        }
+
+        _context.Rapports.Remove(rapport);
+
+        await _context.SaveChangesAsync(token);
+
+        return NoContent();
     }
 }

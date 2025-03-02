@@ -13,6 +13,11 @@ namespace ErabliereApi.Donnees.Action.Post
         public Guid IdErabliere { get; set; }
 
         /// <summary>
+        /// Identifiant du rapport
+        /// </summary>
+        public Guid? IdRapport { get; set; }
+
+        /// <summary>
         /// Identifiant du capteur
         /// </summary>
         public Guid? IdCapteur { get; set; }
@@ -36,5 +41,10 @@ namespace ErabliereApi.Donnees.Action.Post
         /// Le seuil de température
         /// </summary>
         public decimal SeuilTemperature { get; set; }
+
+        /// <summary>
+        /// Afficher le rapport dans la page principale
+        /// </summary>
+        public bool AfficherDansDashboard { get; set; }
     }
 }

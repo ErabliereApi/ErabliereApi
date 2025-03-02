@@ -2,6 +2,7 @@
 using ErabliereApi.Donnees.Ownable;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ErabliereApi.Donnees;
 
@@ -28,10 +29,61 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesI
     /// </summary>
     public string Type { get; set; } = string.Empty;
 
+
+    /// <summary>
+    /// Utilisation du trio de donnée au lieu des données d'un capteur
+    /// </summary>
+    public bool UtiliserTemperatureTrioDonnee { get; set; }
+
+    /// <summary>
+    /// Date de début
+    /// </summary>
+    public DateTime DateDebut { get; set; }
+
+    /// <summary>
+    /// Date de fin
+    /// </summary>
+    public DateTime DateFin { get; set; }
+
+    /// <summary>
+    /// Le seuil de température
+    /// </summary>
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal SeuilTemperature { get; set; }
+
+    /// <summary>
+    /// Afficher le rapport dans la page principale
+    /// </summary>
+    public bool AfficherDansDashboard { get; set; }
+
     /// <summary>
     /// Objet JSON des paramètres de la requête pour générer le rapport
     /// </summary>
     public string RequestParameters { get; set; } = string.Empty;
+
+    /// <summary>
+    /// La moyenne de la donnée
+    /// </summary>
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Moyenne { get; set; }
+
+    /// <summary>
+    /// La somme de la donnée
+    /// </summary>
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Somme { get; set; }
+
+    /// <summary>
+    /// La valeur minimale de la donnée
+    /// </summary>
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Min { get; set; }
+
+    /// <summary>
+    /// La valeur maximale de la donnée
+    /// </summary>
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Max { get; set; }
 
     /// <summary>
     /// Données du rapport

@@ -4,6 +4,7 @@ using ErabliereApi.Depot.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Depot.Sql.Migrations
 {
     [DbContext(typeof(ErabliereDbContext))]
-    partial class ErabliereDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250302131117_AmeliorationRapports")]
+    partial class AmeliorationRapports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -923,7 +926,7 @@ namespace Depot.Sql.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("SeuilTemperature")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Somme")
                         .HasColumnType("decimal(18, 2)");

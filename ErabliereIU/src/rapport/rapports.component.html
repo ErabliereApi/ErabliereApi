@@ -6,16 +6,12 @@
             <label for="typeRapport">Type de rapport</label>
             <select class="form-control" id="typeRapport" (change)="typeRapportChanged($event)">
                 <option value="degreJour">Degré-jour</option>
-                <option value="moyenne">Moyennes</option>
             </select>
         </div>
 
         @switch (typeRapport) {
         @case ("degreJour") {
         <app-rapport-degre-jour></app-rapport-degre-jour>
-        }
-        @case ("moyenne") {
-        <app-rapport-moyenne></app-rapport-moyenne>
         }
         @default {
         <span>Rapport inconnu</span>
@@ -27,10 +23,13 @@
         <!-- Liste des rapports enregistré -->
         <div>
             <h4>Rapports enregistrés</h4>
-            <ul>
+            <ul class="list-group">
                 @for (rapport of rapportsSaved; track rapport) {
-                <li>
-                    <a href="#" (click)="rapportSelected(rapport)">{{rapport.nom}}</a>
+                <li class="list-group-item">
+                    <a class="m-1" (click)="rapportSelected(rapport)">{{rapport.type}} - {{ formatDate(rapport.dateDebut) }} - {{ formatDate(rapport.dateFin) }}</a>
+                    <span class="float-right m-1">
+                        <button class="btn btn-sm btn-danger" (click)="deleteRapport(rapport)">Supprimer</button>
+                    </span>
                 </li>
                 }
             </ul>

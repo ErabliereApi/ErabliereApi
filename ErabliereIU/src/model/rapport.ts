@@ -1,6 +1,7 @@
 export class Rapport {
     id?: string;
     idErabliere?: string;
-    date?: Date;
+    dateDebut?: Date;
+    dateFin?: Date;
     type?: string;
 }
