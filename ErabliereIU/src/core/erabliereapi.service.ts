@@ -580,9 +580,12 @@ export class ErabliereApi implements IErabliereApi {
             { headers: headers }));
     }
 
-    async getRapports(idErabliereSelectionee: string) {
+    async getRapports(idErabliereSelectionee: string, filter?: string) {
         const headers = await this.getHeaders();
-        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports';
+        let url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports';
+        if (filter) {
+            url += '?$filter=' + filter;
+        }
         return await firstValueFrom(this._httpClient.get<Rapport[]>(url, { headers: headers }));
     }
 

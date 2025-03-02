@@ -86,6 +86,7 @@ public class RapportsController : ControllerBase
                 SeuilTemperature = rapportDegreeJour.SeuilTemperature,
                 UtiliserTemperatureTrioDonnee = rapportDegreeJour.UtiliserTemperatureTrioDonnee,
                 RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
+                AfficherDansDashboard = rapportDegreeJour.AfficherDansDashboard,
                 DC = DateTimeOffset.Now,
                 IdErabliere = id
             };
@@ -181,10 +182,10 @@ public class RapportsController : ControllerBase
             }
         }
 
-        rapport.Max = rapport.Donnees.Max(d => d.Max);
-        rapport.Min = rapport.Donnees.Min(d => d.Min);
-        rapport.Moyenne = rapport.Donnees.Average(d => d.Moyenne);
-        rapport.Somme = rapport.Donnees.LastOrDefault()?.Somme ?? 0;
+        rapport.Max = Math.Round(rapport.Donnees.Max(d => d.Max));
+        rapport.Min = Math.Round(rapport.Donnees.Min(d => d.Min));
+        rapport.Moyenne = Math.Round(rapport.Donnees.Average(d => d.Moyenne));
+        rapport.Somme = Math.Round(rapport.Donnees.LastOrDefault()?.Somme ?? 0);
 
         if (sauvegarder == true)
         {

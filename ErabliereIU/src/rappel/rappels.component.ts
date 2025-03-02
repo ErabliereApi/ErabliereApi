@@ -19,7 +19,7 @@ export class RappelsComponent implements OnChanges {
   todayReminders: Note[] = [];
   isLogged: boolean = false;
 
-  constructor(private erabliereapiService: ErabliereApi, private _authService: AuthorisationFactoryService) {
+  constructor(private readonly erabliereapiService: ErabliereApi, private readonly _authService: AuthorisationFactoryService) {
     if (this._authService.getAuthorisationService().type == "AuthDisabled") {
       this.isLogged = true;
     }

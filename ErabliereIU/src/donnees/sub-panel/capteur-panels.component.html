@@ -32,6 +32,12 @@
     </div>
 </div>
 <div class="row pb-2">
+    @for (rapport of rapports; track rapport.id)
+    {
+        <div [ngClass]="'col-md-' + tailleGraphiques">
+            <rapport-panel [rapport]="rapport"></rapport-panel>
+        </div>
+    }
     @for (capteur of capteurs; track capteur.id)
     {
         @if (capteur.displayType?.trim()?.toLowerCase() == 'tableau' || capteur.displayType?.trim()?.toLowerCase() == 'table')
