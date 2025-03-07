@@ -9,4 +9,7 @@ if (environment.production) {
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+  .catch(err => {
+    console.error(err);
+    alert('Une erreur est survenue lors du chargement de l\'application. Veuillez réessayer plus tard.');
+  });
