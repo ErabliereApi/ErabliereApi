@@ -141,7 +141,7 @@ public class RapportsController : ControllerBase
             await _context.SaveChangesAsync(token);
         }
 
-        return result;
+        return NoContent();
     }
 
     /// <summary>
