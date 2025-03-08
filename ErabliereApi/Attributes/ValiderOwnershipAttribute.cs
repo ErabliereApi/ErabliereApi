@@ -134,6 +134,7 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
                 "GET" => 1,
                 "POST" => 2,
                 "PUT" => 4,
+                "PATCH" => 4,
                 "DELETE" => 8,
                 _ => throw new InvalidOperationException($"Ownership not implement for HTTP Verb {context.HttpContext.Request.Method}"),
             };
