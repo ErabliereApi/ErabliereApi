@@ -23,17 +23,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # install dotnet 9 sdk
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
 
+    # When the dotnet version changes, the dotnet version used by CodeQL must be changed in the repos root folder inside global.json
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
 
