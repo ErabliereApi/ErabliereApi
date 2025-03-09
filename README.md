@@ -164,4 +164,31 @@ Ubuntu effectue des mises à jour de sécurité en arrière plan et peut avoir u
 ```
 sudo systemctl disable apt-daily.timer
 sudo systemctl disable apt-daily-upgrade.timer
+sudo systemctl disable dpkg-db-backup.timer
+sudo systemctl disable man-db.timer
+sudo systemctl disable update-notifier-download.service
+```
+
+> Pour arrêter le service immédiatement sans faire de redémarrage, aussi effectuer ```sudo systemctl stop <service-name>```.
+
+Pour lister les processus
+```
+systemctl list-timers
+```
+
+Exemple de output:
+```
+NEXT                            LEFT LAST                              PASSED UNIT                           ACTIVATES
+Sun 2025-03-09 09:10:00 EDT 2min 51s Sun 2025-03-09 09:00:01 EDT     7min ago sysstat-collect.timer          sysstat-collect.service
+Sun 2025-03-09 09:44:13 EDT    37min Sun 2025-03-09 08:53:02 EDT    14min ago fwupd-refresh.timer            fwupd-refresh.service
+Sun 2025-03-09 22:07:07 EDT      12h Sun 2025-03-09 07:13:02 EDT 1h 54min ago motd-news.timer                motd-news.service
+Sun 2025-03-09 22:20:01 EDT      13h Sat 2025-03-08 21:20:01 EST      10h ago update-notifier-download.timer update-notifier-download.service
+Sun 2025-03-09 22:30:10 EDT      13h Sat 2025-03-08 21:30:10 EST      10h ago systemd-tmpfiles-clean.timer   systemd-tmpfiles-clean.service
+Mon 2025-03-10 00:00:00 EDT      14h Sun 2025-03-09 00:00:01 EST       8h ago dpkg-db-backup.timer           dpkg-db-backup.service
+Mon 2025-03-10 00:00:00 EDT      14h Sun 2025-03-09 00:00:01 EST       8h ago logrotate.timer                logrotate.service
+Mon 2025-03-10 00:07:00 EDT      14h Sun 2025-03-09 00:07:02 EST       8h ago sysstat-summary.timer          sysstat-summary.service
+Mon 2025-03-10 00:40:03 EDT      15h Mon 2025-03-03 01:11:50 EST   6 days ago fstrim.timer                   fstrim.service
+Mon 2025-03-10 03:52:07 EDT      18h Sun 2025-03-09 08:46:50 EDT    20min ago man-db.timer                   man-db.service
+Thu 2025-03-13 16:33:12 EDT   4 days Wed 2025-03-05 21:01:50 EST   3 days ago update-notifier-motd.timer     update-notifier-motd.service
+Sun 2025-03-16 03:10:39 EDT   6 days Sun 2025-03-09 03:10:20 EDT 5h 56min ago e2scrub_all.timer              e2scrub_all.service
 ```
