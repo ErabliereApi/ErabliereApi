@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
-import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
     selector: 'bar-panel',
@@ -37,7 +37,7 @@ import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
             </div>
         </div>
     `,
-    imports: [NgChartsModule]
+    imports: [BaseChartDirective]
 })
 export class BarPanelComponent {
     @ViewChild(BaseChartDirective) chart?: BaseChartDirective;

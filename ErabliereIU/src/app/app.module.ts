@@ -12,6 +12,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import 'chartjs-adapter-date-fns';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 declare global {
   interface Window {
@@ -103,6 +104,7 @@ export function MSALInstanceFactory(appConfig: EnvironmentService): IPublicClien
     provideNgxMask(),
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptorsFromDi()),
+    provideCharts(withDefaultRegisterables()),
     {
       provide: 'IErabliereApi',
       useClass: ErabliereApi

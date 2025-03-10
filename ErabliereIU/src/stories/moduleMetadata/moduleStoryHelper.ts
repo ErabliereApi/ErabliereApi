@@ -6,6 +6,7 @@ import { provideNgxMask } from "ngx-mask";
 import { MSALInstanceFactory } from "src/app/app.module";
 import { EnvironmentService } from "src/environments/environment.service";
 import { StorybookMockErabliereApi } from "../mock/StorybookMockErabliereApi";
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export class ModuleStoryHelper{
     static getErabliereApiStoriesApplicationConfig() {
@@ -14,6 +15,7 @@ export class ModuleStoryHelper{
                 provideRouter([]),
                 provideHttpClient(), 
                 provideNgxMask(),
+                provideCharts(withDefaultRegisterables()),
                 MsalService,
                 {
                   provide: MSAL_INSTANCE,

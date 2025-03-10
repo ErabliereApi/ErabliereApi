@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
-import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { IErabliereApi } from 'src/core/erabliereapi.interface';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
 import { DateTimeSelectorComponent } from './userinput/date-time-selector.component';
@@ -13,7 +13,7 @@ import { CapteurStyle } from 'src/model/capteur';
     imports: [
         DateTimeSelectorComponent,
         AjouterDonneeCapteurComponent,
-        NgChartsModule,
+        BaseChartDirective,
     ]
 })
 export class GraphPanelComponent implements OnInit {
