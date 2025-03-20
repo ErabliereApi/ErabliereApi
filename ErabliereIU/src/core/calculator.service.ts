@@ -17,7 +17,7 @@ export const convertTenthToNormale = (value?: string) => {
         return value.replace(".", "");
     }
 
-    var rtn = (parseInt(value) * 10).toString();
+    const rtn = (parseInt(value) * 10).toString();
 
     if (rtn == NaN.toString()) {
         return "";

@@ -37,13 +37,6 @@ public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
             return aiEnable;
         }
 
-        if (typeInfo.Name == nameof(CallsController))
-        {
-            var enableCalls = !string.IsNullOrWhiteSpace(_config["agora.localbackend"]);
-
-            return enableCalls;
-        }
-
         if (typeInfo.Name == nameof(ImagesCapteurController))
         {
             var enableImages = !string.IsNullOrWhiteSpace(_config["EmailImageObserverUrl"]);
@@ -62,6 +55,12 @@ public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
         {
             var enableQuantum = !string.IsNullOrWhiteSpace(_config["IQP_API_TOKEN"]);
             return enableQuantum;
+        }
+
+        if (typeInfo.Name == nameof(HologramController))
+        {
+            var enableHologram = !string.IsNullOrWhiteSpace(_config["Hologram_Token"]);
+            return enableHologram;
         }
 
         return base.IsController(typeInfo);

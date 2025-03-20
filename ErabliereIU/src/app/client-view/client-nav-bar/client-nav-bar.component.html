@@ -68,9 +68,6 @@
                 </li>
             </ul>
             <div class="d-flex gap-2">
-                @if (useAuthentication && callFeatureEnable && callFeatureEnableForUser) {
-                <agora-call-service></agora-call-service>
-                }
                 @if (mapFeatureEnable) {
                 <button id="zone-carte-button" class="btn btn-primary" routerLink="/map"><span>🗺️ </span>Carte</button>
                 }

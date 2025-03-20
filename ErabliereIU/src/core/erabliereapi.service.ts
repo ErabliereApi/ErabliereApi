@@ -33,6 +33,7 @@ import { Rapport } from 'src/model/rapport';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi implements IErabliereApi {
+    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -546,16 +547,6 @@ export class ErabliereApi implements IErabliereApi {
         return await firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + "/api/v1/swagger.json", {}));
     }
 
-    async getCallAccessToken(uid: number, channel: string) {
-        const headers = await this.getHeaders();
-        return await firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + `/Calls/GetAccessToken?uid=${uid}&channel=${channel}`, { headers: headers }));
-    }
-
-    async getCallAppId(): Promise<any> {
-        const headers = await this.getHeaders();
-        return await firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + "/Calls/GetAppId", { headers: headers }));
-    }
-
     async getImages(idErabliereSelectionnee: any, take: number, skip: number = 0, search?: string): Promise<GetImageInfo[]> {
         const headers = await this.getHeaders();
         let url = this._environmentService.apiUrl +
@@ -596,6 +587,12 @@ export class ErabliereApi implements IErabliereApi {
             url += '?sauvegarder=true';
         }
         return await firstValueFrom(this._httpClient.post<ResponseRapportDegreeJours>(url, form, { headers: headers }));
+    }
+
+    async refreshRapport(idErabliereSelectionee: string | null | undefined, id: string | undefined) {
+        const headers = await this.getHeaders();
+        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/' + id + '/Refresh';
+        return await firstValueFrom(this._httpClient.post<any>(url, {}, { headers: headers }));
     }
 
     async deleteRapport(idErabliereSelectionee?: any, id?: any) {

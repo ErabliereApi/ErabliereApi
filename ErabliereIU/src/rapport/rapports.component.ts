@@ -52,6 +52,13 @@ export class ReportsComponent implements OnInit {
         console.log("Rapport selected", _t17);
     }
 
+    refreshRapport(_t15: Rapport) {
+        this._api.refreshRapport(this.idErabliereSelectionee, _t15.id).catch(err => {
+            this.rapportSavedError = 'Erreur lors de la mise à jour du rapport. ' + JSON.stringify(err);
+            console.error(err);
+        });
+    }
+
     deleteRapport(rapport: Rapport) {
         this._api.deleteRapport(this.idErabliereSelectionee, rapport.id).then(() => {
             this.rapportsSaved = this.rapportsSaved.filter(r => r.id !== rapport.id);

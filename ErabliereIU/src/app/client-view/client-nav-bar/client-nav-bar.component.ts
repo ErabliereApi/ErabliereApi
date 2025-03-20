@@ -4,7 +4,6 @@ import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service'
 import { EnvironmentService } from '../../../environments/environment.service';
 import { UrlModel } from '../../../model/urlModel';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AgoraCallServiceComponent } from '../agora-call-service/agora-call-service.component';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { MsalService } from '@azure/msal-angular';
 import {ConnectionButtonComponent} from "../../../authorisation/connection-button/connection-button.component";
@@ -12,7 +11,7 @@ import {ConnectionButtonComponent} from "../../../authorisation/connection-butto
 @Component({
     selector: 'client-nav-bar',
     templateUrl: 'client-nav-bar.component.html',
-    imports: [RouterLink, RouterLinkActive, AgoraCallServiceComponent, ConnectionButtonComponent]
+    imports: [RouterLink, RouterLinkActive, ConnectionButtonComponent]
 })
 export class ClientNavBarComponent implements OnInit {
   private readonly _authService: IAuthorisationSerivce
@@ -22,9 +21,7 @@ export class ClientNavBarComponent implements OnInit {
 
   useAuthentication: boolean = false;
   isLoggedIn: boolean;
-  urls?: UrlModel[]
-  callFeatureEnableForUser: boolean = false;
-  callFeatureEnable: boolean = false;
+  urls?: UrlModel[];
   isAdminUser: boolean = false;
   mapFeatureEnable: boolean = false;
 
@@ -41,47 +38,18 @@ export class ClientNavBarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.checkApiCallFeatureEnable();
+    this.checkApiFeaturesEnable();
     this.checkRoleAdmin();
   }
 
-  checkApiCallFeatureEnable() {
+  checkApiFeaturesEnable() {
     // look at the openapi spec to see if the call endpoint is enable
     this._api.getOpenApiSpec().then(spec => {
-      this.callFeatureEnable = spec.paths['/Calls/GetAppId'] != null;
       this.mapFeatureEnable = spec.paths['/api/Map/access-token/{provider}'] != null
     })
     .catch(err => {
         console.error(err);
     });
-
-    this.checkUserRollForFeatureCall();
-  }
-
-  checkUserRollForFeatureCall() {
-    // look at the user roll to see if the call feature is enable
-    if (this._authService.type == "AzureAD") {
-      this.checkRoleErabliereCalls();
-      this._authService.loginChanged.subscribe((val) => {
-        this.checkRoleErabliereCalls();
-      });
-    }
-  }
-
-  private checkRoleErabliereCalls() {
-    const account = this._msalService.instance.getActiveAccount();
-    if (account?.idTokenClaims) {
-      const roles = account?.idTokenClaims['roles'];
-      if (roles != null) {
-        this.callFeatureEnableForUser = roles.includes("ErabliereCalls");
-      }
-      else {
-        this.callFeatureEnableForUser = false;
-      }
-    }
-    else {
-      this.callFeatureEnableForUser = false;
-    }
   }
 
   private checkRoleAdmin() {
@@ -98,6 +66,5 @@ export class ClientNavBarComponent implements OnInit {
   onLoginChange(loginState: boolean) {
       this.isLoggedIn = loginState;
       this.checkRoleAdmin();
-      this.checkRoleErabliereCalls();
   }
 }

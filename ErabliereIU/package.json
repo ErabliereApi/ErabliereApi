@@ -29,7 +29,6 @@
     "@azure/msal-browser": "^4.5.1",
     "@babel/core": "^7.26.9",
     "@popperjs/core": "^2.11.8",
-    "agora-rtc-sdk-ng": "^4.23.2",
     "ansi-regex": "^6.1.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",

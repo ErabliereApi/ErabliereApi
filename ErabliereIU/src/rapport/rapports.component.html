@@ -28,6 +28,7 @@
                 <li class="list-group-item">
                     <a class="m-1" (click)="rapportSelected(rapport)">{{rapport.type}} - {{ formatDate(rapport.dateDebut) }} - {{ formatDate(rapport.dateFin) }}</a>
                     <span class="float-right m-1">
+                        <button class="btn btn-sm btn-info" (click)="refreshRapport(rapport)">Rafraichir</button>
                         <button class="btn btn-sm btn-danger" (click)="deleteRapport(rapport)">Supprimer</button>
                     </span>
                 </li>
