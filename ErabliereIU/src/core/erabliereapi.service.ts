@@ -33,7 +33,6 @@ import { Rapport } from 'src/model/rapport';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi implements IErabliereApi {
-    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -591,8 +590,8 @@ export class ErabliereApi implements IErabliereApi {
 
     async refreshRapport(idErabliereSelectionee: string | null | undefined, id: string | undefined) {
         const headers = await this.getHeaders();
-        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/' + id + '/Refresh';
-        return await firstValueFrom(this._httpClient.post<any>(url, {}, { headers: headers }));
+        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/Refresh' + id + '/Refresh';
+        return await firstValueFrom(this._httpClient.patch<any>(url, {}, { headers: headers }));
     }
 
     async deleteRapport(idErabliereSelectionee?: any, id?: any) {
@@ -645,6 +644,21 @@ export class ErabliereApi implements IErabliereApi {
                 this._environmentService.apiUrl + '/access/ApiKey?$expand=customer', { headers: header }));
     }
 
+    async getTunnelKeys() {
+        const header = await this.getHeaders();
+
+        return await firstValueFrom(
+            this._httpClient.get<any[]>(
+                this._environmentService.apiUrl + '/api/Hologram/GetTunnelKeys', { headers: header }));
+    }
+
+    async disableTunnelKeys(deviceid: any) {
+        const header = await this.getHeaders();
+
+        return await firstValueFrom(
+            this._httpClient.put<any>(
+                this._environmentService.apiUrl + '/api/Hologram/' + deviceid + '/Disable', {}, { headers: header }));
+    }
 }
 
 function isNotNullOrWhitespace(search: string | undefined) {

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
-import { Capteur, CapteurStyle } from "src/model/capteur";
+import { Capteur } from "src/model/capteur";
 import {
     AbstractControl,
     FormArray,

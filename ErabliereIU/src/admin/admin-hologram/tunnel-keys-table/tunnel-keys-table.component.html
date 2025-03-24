@@ -1,0 +1,28 @@
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Device ID</th>
+                <th>User ID</th>
+                <th>Disabled</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let key of tunnelKeys">
+                <td>{{ key.id }}</td>
+                <td>{{ key.userid }}</td>
+                <td>{{ key.disabled }}</td>
+                <td>
+                    <button class="btn btn-primary" (click)="copyPublicKey(key)">
+                        Copier la clé publique
+                    </button>
+                    <button *ngIf="key.disabled == 1" class="btn btn-secondary"
+                        (click)="enabletunnelkeys.emit(key)">Enable</button>
+                    <button *ngIf="key.disabled == 0" class="btn btn-danger"
+                        (click)="disabletunnelkeys.emit(key)">Disable</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

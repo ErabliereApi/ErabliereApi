@@ -18,6 +18,7 @@ import { MapViewComponent } from './map-view/map-view.component';
 import { ErablieresMapComponent } from 'src/map/erablieres-map.component';
 import { AdminGuard } from './admin-view/auth/admin.guard';
 import { Page401Component } from './page401/page401.component';
+import { AdminHologramComponent } from 'src/admin/admin-hologram/admin-hologram.component';
 
 export const routes: Routes = [
     {
@@ -44,6 +45,11 @@ export const routes: Routes = [
                 path: 'apikeys',
                 title: 'Érablière Admin - API Keys',
                 component: AdminAPIKeysComponent,
+            },
+            {
+                path: 'hologram',
+                title: 'Érablière Admin - Hologram',
+                component: AdminHologramComponent
             },
             {
                 path: '**',

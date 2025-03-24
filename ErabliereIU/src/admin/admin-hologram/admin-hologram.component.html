@@ -1,0 +1,12 @@
+<div class="m-3">
+    <h3>Hologram Tunnel Keys</h3>
+    <hr />
+
+    <div class="container-fluid">
+        <tunnel-keys-table
+            [tunnelKeys]="keys"
+            (enabletunnelkeys)="enabletunnelkeys($event)"
+            (disabletunnelkeys)="disabletunnelkeys($event)"
+        ></tunnel-keys-table>
+    </div>
+</div>
