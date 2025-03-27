@@ -183,13 +183,9 @@ public class DocumentationController : ControllerBase
     [ValiderOwnership("id")]
     public async Task<IActionResult> Supprimer(Guid id, Guid idDocumentation, CancellationToken token)
     {
-        var documentation = await _depot.Documentation.FindAsync([idDocumentation], token);
+        var documentation = new Documentation { Id = idDocumentation, IdErabliere = id };
 
-        if (documentation == null)
-        {
-            return NotFound();
-        }
-
+        _depot.Documentation.Attach(documentation);
         _depot.Documentation.Remove(documentation);
 
         await _depot.SaveChangesAsync(token);
