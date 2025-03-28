@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Message, PromptResponse } from 'src/model/conversation';
+import { Conversation, Message, PromptResponse } from 'src/model/conversation';
 
 @Component({
     selector: 'app-chat-widget',
@@ -43,37 +43,7 @@ export class ErabliereAIComponent {
     fetchConversations() {
         this.api.getConversations(this.search, this.top, this.skip).then(async (conversations) => {
             if (conversations) {
-                if (this.currentConversation == null || this.search != this.lastSearch) {
-                    this.conversations = conversations;
-                    if (this.conversations.length > 0) {
-                        this.currentConversation = this.conversations[0];
-                        const currentMessages = await this.api.getMessages(this.currentConversation.id);
-                        if (currentMessages) {
-                            this.messages = currentMessages;
-                        }
-                        else {
-                            this.messages = [];
-                        }
-                    }
-                }
-                else {
-                    let newConversations = conversations.find((c) => {
-                        return c.id === this.currentConversation.id;
-                    });
-                    if (newConversations) {
-                        this.currentConversation = newConversations;
-                        const currentMessages = await this.api.getMessages(this.currentConversation.id);
-                        if (currentMessages) {
-                            this.messages = currentMessages;
-                        }
-                        else {
-                            this.messages = [];
-                        }
-                    }
-                    else {
-                        this.conversations = conversations;
-                    }
-                }
+                await this.handleFetchConcersationsResult(conversations);
             }
             else {
                 this.conversations = [];
@@ -85,6 +55,40 @@ export class ErabliereAIComponent {
     }
 
     newMessage = '';
+
+    private async handleFetchConcersationsResult(conversations: Conversation[]) {
+        if (this.currentConversation == null || this.search != this.lastSearch) {
+            this.conversations = conversations;
+            if (this.conversations.length > 0) {
+                this.currentConversation = this.conversations[0];
+                const currentMessages = await this.api.getMessages(this.currentConversation.id);
+                if (currentMessages) {
+                    this.messages = currentMessages;
+                }
+                else {
+                    this.messages = [];
+                }
+            }
+        }
+        else {
+            let newConversations = conversations.find((c) => {
+                return c.id === this.currentConversation.id;
+            });
+            if (newConversations) {
+                this.currentConversation = newConversations;
+                const currentMessages = await this.api.getMessages(this.currentConversation.id);
+                if (currentMessages) {
+                    this.messages = currentMessages;
+                }
+                else {
+                    this.messages = [];
+                }
+            }
+            else {
+                this.conversations = conversations;
+            }
+        }
+    }
 
     updateNewMessage($event: Event) {
         this.newMessage = ($event.target as HTMLInputElement).value;
@@ -130,6 +134,12 @@ export class ErabliereAIComponent {
         }
         else {
             this.messages = [];
+        }
+    }
+
+    keyDownNewConversation($event: KeyboardEvent) {
+        if ($event.key === 'Enter') {
+            this.selectConversation(null);
         }
     }
 
@@ -194,6 +204,12 @@ export class ErabliereAIComponent {
         }
     }
 
+    keyDownHideDisplaySearch($event: KeyboardEvent) {
+        if ($event.key === 'Enter') {
+            this.hideDisplaySearch();
+        }
+    }
+
     loadMore() {
         this.skip += this.top;
         this.api.getConversations(this.search, this.top, this.skip).then((conversations) => {
@@ -203,7 +219,7 @@ export class ErabliereAIComponent {
 
     elispseText(text: string, nbChar: number) {
         if (text.length > nbChar) {
-            return text.substr(0, nbChar) + '...';
+            return text.slice(0, nbChar) + '...';
         }
         else {
             return text;
@@ -220,6 +236,12 @@ export class ErabliereAIComponent {
 
     toggleChatConfig() {
         this.chatConfig = !this.chatConfig;
+    }
+
+    handleKeydown(event: KeyboardEvent) {
+        if (event.key === 'Enter' && event.ctrlKey) {
+            this.toggleChat();
+        }
     }
 
     resetChatConfig() {
