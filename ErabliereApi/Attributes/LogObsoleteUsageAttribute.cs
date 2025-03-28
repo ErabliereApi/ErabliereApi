@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using ErabliereApi.Extensions;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ErabliereApi.Attributes;
 
@@ -19,7 +20,7 @@ public class LogObsoleteUsageAttribute : ActionFilterAttribute
         {
             var user = context.HttpContext.User.Identity?.Name ?? "Anonymous";
             var ipAddress = context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown IP";
-            var userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString();
+            var userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString().Sanatize() ?? "Unknown User-Agent";
 
             logger.LogWarning("Obsolete usage of {DisplayName} by user {User} from IP {IPAddress} with User-Agent {UserAgent}",
                 context.ActionDescriptor.DisplayName, user, ipAddress, userAgent);
