@@ -9,17 +9,19 @@ import { ModifierDocumentationComponent } from './modifier-documentation.compone
 import { Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { PaginationComponent } from "../pagination/pagination.component";
+import { DownloadButtonComponent } from "./download-button.component";
 
 @Component({
     selector: 'documentation',
     templateUrl: "./documentation.component.html",
     imports: [
-        AjouterDocumentationComponent,
-        ModifierDocumentationComponent,
-        PaginationComponent,
-        NgIf,
-        NgFor
-    ]
+    AjouterDocumentationComponent,
+    ModifierDocumentationComponent,
+    PaginationComponent,
+    NgIf,
+    NgFor,
+    DownloadButtonComponent
+]
 })
 export class DocumentationComponent implements OnInit {
     @Input() idErabliereSelectionee:any
@@ -52,9 +54,9 @@ export class DocumentationComponent implements OnInit {
 
     editDocumentationSubject = new Subject<ErabliereApiDocument | undefined>();
 
-    constructor (private _api: ErabliereApi,
-        private _env: EnvironmentService,
-        private route: ActivatedRoute) {
+    constructor (private readonly _api: ErabliereApi,
+        private readonly _env: EnvironmentService,
+        private readonly route: ActivatedRoute) {
     }
 
     ngOnInit(): void {
@@ -81,44 +83,6 @@ export class DocumentationComponent implements OnInit {
 
     getApiRoot() {
         return this._env.apiUrl;
-    }
-
-    /**
-     * Download a file from the server and add the bearer token to the request
-     *
-     * @param doc The document to download
-     */
-    async downloadFile(doc: ErabliereApiDocument) {
-        // Get the file from the server from base64 string
-        let file = await this._api.getDocumentationBase64(doc.idErabliere, doc.id);
-
-        // Create a blob from the base64 string
-        let byteCharacters = atob(file[0].file ?? "");
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray]);
-
-        // Create a link to download the file
-        let link = document.createElement('a');
-
-        link.href = window.URL.createObjectURL(blob);
-
-        link.download = doc.title + '.' + doc.fileExtension;
-
-        // Append the link to the body
-        document.body.appendChild(link);
-
-        // Dispatch click event to download
-        link.click();
-
-        // Remove the link from the body
-        document.body.removeChild(link);
-
-        // Remove the blob from memory
-        window.URL.revokeObjectURL(link.href);
     }
 
     modifierDocumentation(documentation: Documentation) {

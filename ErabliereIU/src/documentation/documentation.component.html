@@ -14,14 +14,11 @@
         <h4 class="card-header">{{ documentation.title }}</h4>
         <div class="card-body">
             <p class="card-text">{{ documentation.text }}</p>
-            <p class="card-text"><span>Extension: </span>{{ documentation.fileExtension }}</p>
+            <p *ngIf="documentation.fileExtension" class="card-text"><span>Extension: </span>{{ documentation.fileExtension }}</p>
             <p class="card-text"><small class="text-muted"><span>Date ajout: </span>{{ documentation.created }}</small></p>
 
-            <div *ngIf="documentation.file != ''" class="btn-group">
-                <button (click)="downloadFile(documentation)"
-                    class="btn btn-secondary btn-sm">
-                    Télécharger
-                </button>
+            <div *ngIf="documentation.fileExtension" class="btn-group">
+                <app-download-button [documentation]="documentation"></app-download-button>
             </div>
             <div class="btn-group ms-2">
                 <button class="btn btn-info btn-sm"

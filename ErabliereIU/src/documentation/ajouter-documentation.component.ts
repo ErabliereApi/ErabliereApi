@@ -23,8 +23,9 @@ export class AjouterDocumentationComponent implements OnInit {
     document: ErabliereApiDocument = new ErabliereApiDocument();
     @Input() idErabliereSelectionee:any
     @Output() needToUpdate = new EventEmitter();
+    createDocumentLoading: boolean = false;
 
-    constructor(private _api: ErabliereApi, private fb: UntypedFormBuilder) {
+    constructor(private readonly _api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.documentForm = this.fb.group({});
     }
 
@@ -55,7 +56,12 @@ export class AjouterDocumentationComponent implements OnInit {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            this.documentForm.controls['fileBase64'].setValue(reader.result?.toString().split(',')[1]);
+            if (typeof reader.result === 'string') {
+                this.documentForm.controls['fileBase64'].setValue(reader.result.split(',')[1]);
+            }
+            else {
+                this.documentForm.controls['fileBase64'].setValue(reader.result);
+            }
             this.documentForm.controls['fileExtension'].setValue(file.name.split('.').pop());
         };
     }
@@ -68,6 +74,7 @@ export class AjouterDocumentationComponent implements OnInit {
             this.document.text = this.documentForm.controls['text'].value;
             this.document.file = this.documentForm.controls['fileBase64'].value;
             this.document.fileExtension = this.documentForm.controls['fileExtension'].value;
+            this.createDocumentLoading = true;
             this._api.postDocument(this.idErabliereSelectionee, this.document)
                      .then(r => {
                         this.errorObj = undefined;
@@ -75,6 +82,7 @@ export class AjouterDocumentationComponent implements OnInit {
                         this.generalError = undefined;
                         this.documentForm.reset();
                         this.needToUpdate.emit();
+                        this.createDocumentLoading = false;
                       })
                       .catch(e => {
                         if (e.status == 400) {
@@ -92,6 +100,7 @@ export class AjouterDocumentationComponent implements OnInit {
                             this.fileToLargeErrorMessage = undefined;
                             this.generalError = "Une erreur est survenue."
                         }
+                        this.createDocumentLoading = false;
                       });
         }
         else {
