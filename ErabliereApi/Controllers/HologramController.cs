@@ -15,14 +15,14 @@ namespace ErabliereApi.Controllers;
 [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
 public class HologramController : ControllerBase
 {
-    private readonly IConfiguration _config;
+    private readonly IHttpClientFactory _factory;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    public HologramController(IConfiguration config)
+    public HologramController(IConfiguration config, IHttpClientFactory httpClientFactory)
     {
-        _config = config;
+        _factory = httpClientFactory;
     }
 
     /// <summary>
@@ -32,11 +32,9 @@ public class HologramController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetTunnelKeys(CancellationToken token)
     {
-        var hologramConfig = _config.GetValue<string>("Hologram_Token");
+        var client = _factory.CreateClient("HologramClient");
 
-        using var client = new HttpClient();
-
-        var response = await client.GetAsync($"https://dashboard.hologram.io/api/1/tunnelkeys?apikey={hologramConfig}", token);
+        var response = await client.GetAsync("/api/1/tunnelkeys", token);
 
         var obj = await response.Content.ReadFromJsonAsync<object?>();
 
@@ -48,13 +46,11 @@ public class HologramController : ControllerBase
     /// </summary>
     [HttpPut("{id}/[action]")]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> Enable(string id, CancellationToken token)
+    public async Task<IActionResult> Enable(int id, CancellationToken token)
     {
-        var hologramConfig = _config.GetValue<string>("Hologram_Token");
+        var client = _factory.CreateClient("HologramClient");
 
-        using var client = new HttpClient();
-
-        var response = await client.PostAsync($"https://dashboard.hologram.io/api/1/tunnelkeys/{id}/enable?apikey={hologramConfig}", null, token);
+        var response = await client.PostAsync($"/api/1/tunnelkeys/{id}/enable", null, token);
 
         response.EnsureSuccessStatusCode();
 
@@ -68,13 +64,11 @@ public class HologramController : ControllerBase
     /// </summary>
     [HttpPut("{id}/[action]")]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> Disable(string id, CancellationToken token)
+    public async Task<IActionResult> Disable(int id, CancellationToken token)
     {
-        var hologramConfig = _config.GetValue<string>("Hologram_Token");
+        var client = _factory.CreateClient("HologramClient");
 
-        using var client = new HttpClient();
-
-        var response = await client.PostAsync($"https://dashboard.hologram.io/api/1/tunnelkeys/{id}/disable?apikey={hologramConfig}", null, token);
+        var response = await client.PostAsync($"/api/1/tunnelkeys/{id}/disable", null, token);
 
         response.EnsureSuccessStatusCode();
 

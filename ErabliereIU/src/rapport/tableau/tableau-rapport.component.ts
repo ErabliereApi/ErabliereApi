@@ -1,6 +1,5 @@
 import { NgFor } from '@angular/common';
-import { Component, Inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { c } from '@angular/core/event_dispatcher.d-pVP0-wST';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Rapport } from 'src/model/rapport';
 
@@ -13,6 +12,31 @@ import { Rapport } from 'src/model/rapport';
                     {{ erreur }}
                 </div>
             }
+            <div class="card mb-3 mt-3">
+                <div class="card-header">
+                    <h5 class="card-title">{{rapport?.type}} - {{ formatDate(rapport?.dateDebut) }} - {{ formatDate(rapport?.dateFin) }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Moyenne:</strong>
+                            {{ formatNumber(rapportData?.moyenne) }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Somme:</strong>
+                            {{ formatNumber(rapportData?.somme) }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Min:</strong>
+                            {{ formatNumber(rapportData?.min) }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Max:</strong>
+                            {{ formatNumber(rapportData?.max) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
             <table class="table table-striped table-responsive">
                 <thead>
                     <tr>

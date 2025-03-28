@@ -12,16 +12,14 @@ namespace ErabliereApi.Controllers;
 [Authorize]
 public class QuantumController : ControllerBase
 {
-    private readonly IConfiguration _config;
-    private readonly string _baseUrl;
+    private readonly IHttpClientFactory _factory;
 
     /// <summary>
     /// Constructeur.
     /// </summary>
-    public QuantumController(IConfiguration config)
+    public QuantumController(IHttpClientFactory httpClientFactory)
     {
-        _config = config;
-        _baseUrl = "https://api.quantum-computing.ibm.com";
+        _factory = httpClientFactory;
     }
 
     /// <summary>
@@ -50,13 +48,9 @@ public class QuantumController : ControllerBase
 
     private async Task<IActionResult> IbmQuantumQuery(string path, CancellationToken token)
     {
-        HttpClient client = new HttpClient();
+        var client = _factory.CreateClient("IbmQuantumClient");
 
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _config["IQP_API_TOKEN"]);
-
-        HttpResponseMessage response = await client.GetAsync($"{_baseUrl}{path}", token);
+        HttpResponseMessage response = await client.GetAsync(path, token);
 
         if (response.IsSuccessStatusCode)
         {

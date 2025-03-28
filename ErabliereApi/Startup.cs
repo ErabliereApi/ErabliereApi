@@ -33,6 +33,7 @@ using ErabliereApi.ControllerFeatureProviders;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using MQTTnet.AspNetCore;
+using System.Text;
 
 namespace ErabliereApi;
 
@@ -158,6 +159,27 @@ public class Startup
             services.AddHttpClient("EmailImageObserver", c =>
             {
                 c.BaseAddress = new Uri(emailImageObserverBaseUrl);
+            });
+        }
+
+        var hologramApiKey = Configuration["Hologram_Token"];
+        if (!string.IsNullOrWhiteSpace(hologramApiKey)) 
+        {
+            services.AddHttpClient("HologramClient", c =>
+            {
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("HologramBaseUrl") ?? throw new InvalidOperationException("La variable d'environnement 'HologramBaseUrl' à une valeur null."));
+                var bearerValue = Convert.ToBase64String(Encoding.UTF8.GetBytes($"apikey:{hologramApiKey}"));
+                c.DefaultRequestHeaders.Add("Authorization", $"Basic {bearerValue}");
+            });
+        }
+
+        var ibmQuantum = Configuration["IQP_API_TOKEN"];
+        if (!string.IsNullOrWhiteSpace(ibmQuantum)) 
+        {
+            services.AddHttpClient("IbmQuantumClient", c =>
+            {
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("IbmQuantumBaseUrl") ?? throw new InvalidOperationException("La variable d'environnement 'IbmQuantumBaseUrl' à une valeur null."));
+                c.DefaultRequestHeaders.Add("Authorization", $"Bearer {ibmQuantum}");
             });
         }
 
