@@ -47,6 +47,33 @@ public class RapportsController : ControllerBase
     }
 
     /// <summary>
+    /// Retourne un rapport spécifique
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="idRapport"></param>
+    [HttpGet("{idRapport}")]
+    [ValiderOwnership("id")]
+    [ProducesResponseType(200, Type = typeof(Rapport))]
+    public async Task<IActionResult> GetRapport([FromRoute] Guid id, [FromRoute] Guid idRapport)
+    {
+        var rapport = await _context.Rapports
+            .Include(r => r.Donnees)
+            .FirstOrDefaultAsync(r => r.Id == idRapport, HttpContext.RequestAborted);
+
+        if (rapport == null)
+        {
+            return NotFound();
+        }
+
+        if (id != rapport?.IdErabliere)
+        {
+            return BadRequest($"L'id de la route '{id}' ne concorde pas avec l'id de l'érablière du rapport demandé '{rapport?.IdErabliere}'.");
+        }
+
+        return Ok(rapport);
+    }
+
+    /// <summary>
     /// Effectue le rapport de degré jour pour une érablière
     /// en se basant soit sur l'id du capteur ou sur les données de température
     /// provenat du trio de données.

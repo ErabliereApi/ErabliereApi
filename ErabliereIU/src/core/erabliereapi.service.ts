@@ -579,6 +579,12 @@ export class ErabliereApi implements IErabliereApi {
         return await firstValueFrom(this._httpClient.get<Rapport[]>(url, { headers: headers }));
     }
 
+    async getRapport(erabliereId: any, rapId: any) {
+        const headers = await this.getHeaders();
+        const url = this._environmentService.apiUrl + '/Erablieres/' + erabliereId + '/Rapports/' + rapId;
+        return await firstValueFrom(this._httpClient.get<Rapport>(url, { headers: headers }));
+    }
+
     async postDegresJours(idErabliere: any, form: PostDegresJoursRepportRequest, save?: boolean) {
         const headers = await this.getHeaders();
         let url = this._environmentService.apiUrl + '/Erablieres/' + idErabliere + '/Rapports/RapportDegreeJour';

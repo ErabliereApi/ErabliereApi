@@ -1,5 +1,5 @@
 import { NgFor } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Capteur } from 'src/model/capteur';
@@ -21,10 +21,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 export class RapportDegreJourComponent implements OnInit {
     form: PostDegresJoursRepportRequest = new PostDegresJoursRepportRequest();
     capteurs: Capteur[] = [];
-    degresJours?: ResponseRapportDegreeJours;
     idErabliere: any;
     errorObj: any;
     generalError?: string;
+    @Output() notifierAffichageRapport = new EventEmitter<ResponseRapportDegreeJours>();
 
     constructor(private readonly api: ErabliereApi, private readonly route: ActivatedRoute) {
 
@@ -45,11 +45,11 @@ export class RapportDegreJourComponent implements OnInit {
         try {
             this.form.idErabliere = this.idErabliere;
             const rapport = await this.api.postDegresJours(this.idErabliere, this.form, save);
-            this.degresJours = rapport;
+            console.log('RapportDegreJourComponent notifierAffichageRapport.emit', rapport);
+            this.notifierAffichageRapport.emit(rapport);
         }
         catch (error: any) {
             console.error('RapportDegreJourComponent error', error);
-            this.degresJours = undefined;
             this.errorObj = error;
             if (error.error.errors) {
                 this.generalError = error.error.title;

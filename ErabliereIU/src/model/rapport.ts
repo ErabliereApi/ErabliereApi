@@ -9,4 +9,14 @@ export class Rapport {
     moyenne?: number;
     min?: number;
     max?: number;
+
+    donnees: RapportDonnee[] = [];
+}
+
+export class RapportDonnee {
+    date?: Date;
+    moyenne?: number;
+    somme?: number;
+    min?: number;
+    max?: number;
 }

@@ -13,7 +13,7 @@ import { ModifierErabliereComponent } from 'src/erablieres/modifier-erabliere.co
     imports: [AjouterErabliereComponent, ModifierErabliereComponent]
 })
 export class ErabliereSideBarComponent implements OnInit {
-  private _authService: IAuthorisationSerivce
+  private readonly _authService: IAuthorisationSerivce
 
   @ViewChild(ModifierErabliereComponent) modifierErabliereComponent?: ModifierErabliereComponent;
 
@@ -32,9 +32,9 @@ export class ErabliereSideBarComponent implements OnInit {
   search: string = "";
   displaySearch: boolean = false;
 
-  constructor(private _erabliereApi: ErabliereApi,
+  constructor(private readonly _erabliereApi: ErabliereApi,
       authFactory: AuthorisationFactoryService,
-      private _router: Router) {
+      private readonly _router: Router) {
     this._authService = authFactory.getAuthorisationService();
     if (this._authService.type == "AuthDisabled") {
       this.authDisabled = true;
@@ -47,10 +47,11 @@ export class ErabliereSideBarComponent implements OnInit {
     });
   }
 
-  async ngOnInit() {
-    this.loggedIn = await this._authService.isLoggedIn();
-
-    await this.loadErablieresPage();
+  ngOnInit() {
+    this._authService.isLoggedIn().then(loggedIn => {
+      this.loggedIn = loggedIn;
+      this.loadErablieresPage();
+    });
   }
 
   async searchChanged($event: any) {

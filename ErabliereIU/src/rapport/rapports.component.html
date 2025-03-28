@@ -11,7 +11,7 @@
 
         @switch (typeRapport) {
         @case ("degreJour") {
-        <app-rapport-degre-jour></app-rapport-degre-jour>
+        <app-rapport-degre-jour (notifierAffichageRapport)="changeSelectedReport($event)"></app-rapport-degre-jour>
         }
         @default {
         <span>Rapport inconnu</span>
@@ -25,15 +25,19 @@
             <h4>Rapports enregistrés</h4>
             <ul class="list-group">
                 @for (rapport of rapportsSaved; track rapport) {
-                <li class="list-group-item">
-                    <a class="m-1" (click)="rapportSelected(rapport)">{{rapport.type}} - {{ formatDate(rapport.dateDebut) }} - {{ formatDate(rapport.dateFin) }}</a>
-                    <span class="float-right m-1">
+                <button class="list-group-item" [class.active]="rapportSelected?.id === rapport.id" style="cursor: pointer;" (click)="selectReport(rapport)">
+                    <a class="m-1">{{rapport.type}} - {{ formatDate(rapport.dateDebut) }} - {{ formatDate(rapport.dateFin) }}</a>
+                    <div class="btn-group" style="float: right;">
                         <button class="btn btn-sm btn-info" (click)="refreshRapport(rapport)">Rafraichir</button>
                         <button class="btn btn-sm btn-danger" (click)="deleteRapport(rapport)">Supprimer</button>
-                    </span>
-                </li>
+                    </div>
+                </button>
                 }
             </ul>
         </div>
     </div>
+</div>
+
+<div class="row" *ngIf="rapportSelected">
+    <app-tableau-rapport [rapport]="rapportSelected"></app-tableau-rapport>
 </div>

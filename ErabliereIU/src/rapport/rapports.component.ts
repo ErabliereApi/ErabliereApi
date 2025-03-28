@@ -4,13 +4,18 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ActivatedRoute } from '@angular/router';
 import { Rapport } from 'src/model/rapport';
 import { format } from 'date-fns';
+import { TableauRapportComponent } from "./tableau/tableau-rapport.component";
+import { NgIf } from '@angular/common';
+import { ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
 
 @Component({
     selector: 'app-reports',
     templateUrl: './rapports.component.html',
     styleUrls: ['./rapports.component.css'],
     imports: [
-        RapportDegreJourComponent
+        RapportDegreJourComponent,
+        TableauRapportComponent,
+        NgIf,
     ]
 })
 export class ReportsComponent implements OnInit {
@@ -19,6 +24,7 @@ export class ReportsComponent implements OnInit {
     rapportSavedError: string = '';
     rapportsSaved: Rapport[] = [];
     idErabliereSelectionee?: string | null;
+    rapportSelected: Rapport | null = null;
 
     constructor(private readonly _api: ErabliereApi, private readonly _route: ActivatedRoute) { }
 
@@ -27,18 +33,36 @@ export class ReportsComponent implements OnInit {
             this.idErabliereSelectionee = params.get('idErabliereSelectionee');
 
             if (this.idErabliereSelectionee) {
-                this._api.getRapports(this.idErabliereSelectionee).then(rapports => {
-                    this.rapportsSaved = rapports;
-                    this.rapportSavedError = '';
-                }).catch(err => {
-                    this.rapportSavedError = 'Erreur lors de la récupération des rapports. ' + JSON.stringify(err);
-                    console.error(err);
-                });
+                this.fetchRapports();
             }
             else {
                 this.rapportSavedError = 'Erreur lors de la récupération des rapports. Aucune érablière sélectionnée.';
                 this.rapportsSaved = [];
+                this.rapportSelected = null;
             }
+        });
+    }
+
+    fetchRapports(thenSelectId?: any) {
+        if (!this.idErabliereSelectionee) {
+            return;
+        }
+        this._api.getRapports(this.idErabliereSelectionee).then(rapports => {
+            this.rapportsSaved = rapports;
+            this.rapportSavedError = '';
+            if (rapports.length > 0) {
+                if (thenSelectId) {
+                    this.rapportSelected = rapports.find(r => r.id === thenSelectId) || null;
+                }
+                else {
+                    this.rapportSelected = rapports[0];
+                }
+            }
+        }).catch(err => {
+            this.rapportSavedError = 'Erreur lors de la récupération des rapports. ' + JSON.stringify(err);
+            this.rapportsSaved = [];
+            this.rapportSelected = null;
+            console.error(err);
         });
     }
 
@@ -48,8 +72,9 @@ export class ReportsComponent implements OnInit {
         console.log("Type rapport", this.typeRapport);
     }
 
-    rapportSelected(_t17: any) {
-        console.log("Rapport selected", _t17);
+    selectReport(rapport: Rapport) {
+        console.log("Select rapport", rapport);
+        this.rapportSelected = rapport;
     }
 
     refreshRapport(_t15: Rapport) {
@@ -65,7 +90,7 @@ export class ReportsComponent implements OnInit {
             this.rapportSavedError = '';
         }).catch(err => {
             this.rapportSavedError = 'Erreur lors de la suppression du rapport. ' + JSON.stringify(err);
-            console.error(err); 
+            console.error(err);
         });
     }
 
@@ -74,5 +99,10 @@ export class ReportsComponent implements OnInit {
             return '';
         }
         return format(date, 'yyyy-MM-dd');
+    }
+
+    changeSelectedReport($event: ResponseRapportDegreeJours) {
+        console.log("Change selected report", $event);
+        this.fetchRapports($event.id);
     }
 }
