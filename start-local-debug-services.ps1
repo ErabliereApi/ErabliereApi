@@ -24,21 +24,9 @@ Start-Process npm.cmd -ArgumentList "start"
 
 Start-Process npm.cmd -ArgumentList "run", "storybook"
 
-# Start-Process npx -ArgumentList "cypress", "open"
-
 Set-Location ..
 
 code .
-
-# if the parent folder contains a folder name ErabliereNestJS, then start the NestJS server in a new process, also in watch mode
-
-$learnNestJS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereNestJS" | Select-Object -expand FullName
-if ($null -ne $learnNestJS) {
-    Set-Location $learnNestJS
-    Start-Process npm.cmd -ArgumentList "run", "start:dev"
-
-    Set-Location ..\ErabliereApi
-}
 
 # if the parent folder contains a folder name EmailImagesObserver, then start the EmailImagesObserver server in a new process, also in watch mode
 

@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EntraRedirectComponent } from './entra-redirect.component';
 import { RouterOutlet } from '@angular/router';
 import { ErabliereAIComponent } from 'src/erabliereai/erabliereai-chat.component';
@@ -10,14 +10,14 @@ import { filter, Subject, takeUntil } from 'rxjs';
 import { InteractionStatus } from '@azure/msal-browser';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: 'app.component.html',
-    imports: [
-        RouterOutlet,
-        EntraRedirectComponent,
-        ErabliereAIComponent,
-        MsalModule
-    ]
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  imports: [
+    RouterOutlet,
+    EntraRedirectComponent,
+    ErabliereAIComponent,
+    MsalModule
+  ]
 })
 export class AppComponent implements OnInit, OnDestroy {
   erabliereAIEnable: boolean = false;
@@ -26,10 +26,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly _destroying$ = new Subject<void>();
   msalEncryptionInitialize: boolean = false;
 
-  constructor(private readonly api: ErabliereApi, 
-              authServiceFactory: AuthorisationFactoryService, 
-              private readonly msalService: MsalService,
-              private readonly msalBroadcastService: MsalBroadcastService) {
+  constructor(private readonly api: ErabliereApi,
+    authServiceFactory: AuthorisationFactoryService,
+    private readonly msalService: MsalService,
+    private readonly msalBroadcastService: MsalBroadcastService) {
     this.authService = authServiceFactory.getAuthorisationService();
     if (this.authService.type == "AzureAD") {
       this.authService.loginChanged.subscribe(() => {
@@ -40,39 +40,46 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.api.getOpenApiSpec().then(spec => {
-        this.erabliereAIEnable = spec.paths['/ErabliereAI/Conversations'] !== undefined;
+      this.erabliereAIEnable = spec.paths['/ErabliereAI/Conversations'] !== undefined;
     })
-    .catch(err => {
+      .catch(err => {
         console.error(err);
-    });
+      });
 
     if (this.authService.type == "AzureAD") {
       console.log("watching the msaBroadcast service progress");
       this.msalBroadcastService.inProgress$
         .pipe(
-            filter(
-                (status: InteractionStatus) => status === InteractionStatus.None
-            ),
-            takeUntil(this._destroying$)
+          filter(
+            function (status: InteractionStatus) {
+              console.log("msalBroadcast service notif status: " + status);
+              return status === InteractionStatus.Startup || status === InteractionStatus.None;
+            }
+          ),
+          takeUntil(this._destroying$)
         )
         .subscribe(async (status) => {
-            console.log("msalBroadcast service notif status: " + status);
-            this.msalEncryptionInitialize = true;
+          console.log("initialize msal encryption service trigger by status " + status);
+          if (this.msalEncryptionInitialize) {
+            return;
+          }
 
-            await this.authService.init();
+          await this.authService.init();
 
-            // get the user role to see if it got the ErabliereAIUser role
-            // if so, enable the chat widget
-            if (this.authService.type == "AzureAD") {
-              this.checkRoleErabliereAI();
-            }
+          this.msalEncryptionInitialize = true;
+
+          // get the user role to see if it got the ErabliereAIUser role
+          // if so, enable the chat widget
+          if (this.authService.type == "AzureAD") {
+            this.checkRoleErabliereAI();
+          }
         });
     }
     else {
       this.msalEncryptionInitialize = true;
     }
   }
-  
+
   private async checkRoleErabliereAI() {
     await this.msalService.instance.initialize();
     const account = this.msalService.instance.getActiveAccount();
