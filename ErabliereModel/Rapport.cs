@@ -46,6 +46,16 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesI
     public DateTime DateFin { get; set; }
 
     /// <summary>
+    /// Date de création du rapport
+    /// </summary>
+    public DateTimeOffset? DateCreation { get; set; }
+
+    /// <summary>
+    /// Date de dernière modification du rapport
+    /// </summary>
+    public DateTimeOffset? DateModification { get; set; }
+
+    /// <summary>
     /// Le seuil de température
     /// </summary>
     [Column(TypeName = "decimal(18, 2)")]

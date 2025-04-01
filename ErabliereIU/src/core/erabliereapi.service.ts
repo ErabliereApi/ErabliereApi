@@ -25,7 +25,7 @@ import {PutCapteurImage} from "../model/putCapteurImage";
 import { WeatherForecast } from 'src/model/weatherForecast';
 import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
 import { IErabliereApi } from './erabliereapi.interface';
 import { ApiKey } from 'src/model/apikey';
@@ -33,6 +33,26 @@ import { Rapport } from 'src/model/rapport';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi implements IErabliereApi {
+    delete(arg0: string): Observable<void> {
+        throw new Error('Method not implemented.');
+    }
+
+    patch<T>(arg0: string, item: Partial<T>): Observable<T> {
+        throw new Error('Method not implemented.');
+    }
+
+    put<T>(arg0: string, item: T): Observable<T> {
+        throw new Error('Method not implemented.');
+    }
+
+    get<T>(apiUrl: string): Observable<T> {
+        throw new Error('Method not implemented.');
+    }
+
+    post<T>(apiUrl: string, newItem: Partial<T>): Observable<T> {
+        throw new Error('Method not implemented.');
+    }
+
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,

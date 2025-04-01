@@ -6,7 +6,7 @@ import { AlerteCapteur } from "src/model/alerteCapteur";
 import { ModifierAlerteComponent } from "./modifier-alerte.component";
 import { AjouterAlerteComponent } from "./ajouter-alerte.component";
 import { NgIf, NgFor } from "@angular/common";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { Erabliere } from "src/model/erabliere";
 
 @Component({
@@ -29,7 +29,7 @@ export class AlerteComponent implements OnInit {
   alerteEditFormObservable;
   alerteEditForm?: Alerte;
 
-  displayEditAlerteCapteurFormSubject: Subject<Boolean>;
+  displayEditAlerteCapteurFormSubject: Subject<boolean>;
   displayEditAlerteCapteurFormObservable: Observable<string>;
   displayEditAlerteCapteurForm: boolean;
 
@@ -40,7 +40,7 @@ export class AlerteComponent implements OnInit {
   editAlerte: boolean;
   editAlerteCapteur: boolean;
 
-  constructor(private _api: ErabliereApi, private route: ActivatedRoute) {
+  constructor(private readonly _api: ErabliereApi, private readonly route: ActivatedRoute) {
     this.displayEditFormSubject = new Subject<string>();
     this.displayEditFormObservable = this.displayEditFormSubject.asObservable();
 
@@ -48,7 +48,7 @@ export class AlerteComponent implements OnInit {
     this.alerteEditFormObservable = this.displayEditFormSubject.asObservable();
     this.displayEditForm = false;
 
-    this.displayEditAlerteCapteurFormSubject = new Subject<Boolean>();
+    this.displayEditAlerteCapteurFormSubject = new Subject<boolean>();
     this.displayEditAlerteCapteurFormObservable = this.displayEditFormSubject.asObservable();
     this.displayEditAlerteCapteurForm = false;
 

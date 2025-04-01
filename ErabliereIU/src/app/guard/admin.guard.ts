@@ -18,11 +18,11 @@ export class AdminGuard implements CanActivate {
   async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Promise<boolean> {
-    const userHasRoleAdministrateur = await this.authServiceInstance.userIsInRole('administrateur');
-    console.log('Can active /a, User has role administrateur: ', userHasRoleAdministrateur);
-    if (!userHasRoleAdministrateur) {
+    const userHasRole = await this.authServiceInstance.userIsInRole('administrateur');
+    console.log(`Can active ${route.url}, User has role administrateur: `, userHasRole);
+    if (!userHasRole) {
       this.router.navigate(['/page401']);
     }
-    return userHasRoleAdministrateur;
+    return userHasRole;
   }
 }

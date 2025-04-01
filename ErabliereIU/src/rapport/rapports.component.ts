@@ -78,7 +78,10 @@ export class ReportsComponent implements OnInit {
     }
 
     refreshRapport(_t15: Rapport) {
-        this._api.refreshRapport(this.idErabliereSelectionee, _t15.id).catch(err => {
+        this._api.refreshRapport(this.idErabliereSelectionee, _t15.id).then(res => {
+            this.fetchRapports(_t15.id);
+            this.rapportSavedError = '';
+        }).catch(err => {
             this.rapportSavedError = 'Erreur lors de la mise à jour du rapport. ' + JSON.stringify(err);
             console.error(err);
         });

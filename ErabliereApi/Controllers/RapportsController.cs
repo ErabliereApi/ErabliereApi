@@ -114,6 +114,8 @@ public class RapportsController : ControllerBase
                 RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
                 AfficherDansDashboard = rapportDegreeJour.AfficherDansDashboard,
                 DC = DateTimeOffset.Now,
+                DateCreation = DateTimeOffset.Now,
+                DateModification = DateTimeOffset.Now,
                 IdErabliere = id
             };
         }
@@ -222,6 +224,7 @@ public class RapportsController : ControllerBase
         rapport.Min = Math.Round(rapport.Donnees.Min(d => d.Min));
         rapport.Moyenne = Math.Round(rapport.Donnees.Average(d => d.Moyenne));
         rapport.Somme = Math.Round(rapport.Donnees.LastOrDefault()?.Somme ?? 0);
+        rapport.DateModification = DateTimeOffset.Now;
 
         return Ok(rapport);
     }

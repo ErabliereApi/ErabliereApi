@@ -1,66 +1,13 @@
-import { NgFor } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Rapport } from 'src/model/rapport';
 
 @Component({
     selector: 'app-tableau-rapport',
-    template: `
-        <div>
-            @if (erreur) {
-                <div class="alert alert-danger" role="alert">
-                    {{ erreur }}
-                </div>
-            }
-            <div class="card mb-3 mt-3">
-                <div class="card-header">
-                    <h5 class="card-title">{{rapport?.type}} - {{ formatDate(rapport?.dateDebut) }} - {{ formatDate(rapport?.dateFin) }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <strong>Moyenne:</strong>
-                            {{ formatNumber(rapportData?.moyenne) }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Somme:</strong>
-                            {{ formatNumber(rapportData?.somme) }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Min:</strong>
-                            {{ formatNumber(rapportData?.min) }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Max:</strong>
-                            {{ formatNumber(rapportData?.max) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <table class="table table-striped table-responsive">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Moyenne</th>
-                        <th>Degré jour</th>
-                        <th>Min</th>
-                        <th>Max</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let ligne of rapportData?.donnees">
-                        <td>{{ formatDate(ligne.date) }}</td>
-                        <td>{{ formatNumber(ligne.moyenne) }}</td>
-                        <td>{{ formatNumber(ligne.somme) }}</td>
-                        <td>{{ formatNumber(ligne.min) }}</td>
-                        <td>{{ formatNumber(ligne.max) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    `,
+    templateUrl: './tableau-rapport.component.html',
     styleUrls: ['./tableau-rapport.component.css'],
-    imports: [NgFor]
+    imports: [NgFor, CommonModule]
 })
 export class TableauRapportComponent implements OnChanges {
     @Input() rapport: Rapport | null = null;
@@ -98,5 +45,40 @@ export class TableauRapportComponent implements OnChanges {
         }
         const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
         return new Intl.DateTimeFormat('fr-CA', options).format(new Date(date));
+    }
+
+    sortPropName?: string;
+    sortDirection: 'asc' | 'desc' = 'asc';
+
+    keyPressSortBy($event: KeyboardEvent, arg0: 'date' | 'moyenne' | 'somme' | 'min' | 'max') {
+        if ($event.key === 'Enter') {
+            this.sortBy(arg0);
+        }
+    }
+
+    sortBy(arg0: 'date' | 'moyenne' | 'somme' | 'min' | 'max') {
+        this.rapportData?.donnees?.sort((a, b) => {
+            if (a[arg0] === undefined || a[arg0] === null) return 1;
+            if (b[arg0] === undefined || b[arg0] === null) return -1;
+            const an = a[arg0] as number;
+            const bn = b[arg0] as number;
+            if (an < bn) return -1;
+            if (an > bn) return 1;
+            return 0;
+        });
+        if (this.sortPropName === arg0) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            if (this.sortDirection === 'desc') {
+                this.rapportData?.donnees?.reverse();
+            }
+        }
+        this.sortPropName = arg0;
+    }
+
+    getHeaderClass(arg0: string) {
+        if (this.sortPropName === arg0) {
+            return this.sortDirection === 'asc' ? 'sortable-down' : 'sortable-up';
+        }
+        return 'sortable-down';
     }
 }

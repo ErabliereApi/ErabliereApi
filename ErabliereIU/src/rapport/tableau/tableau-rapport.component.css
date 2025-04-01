@@ -1,0 +1,15 @@
+.sortable-down {
+    cursor: pointer;
+    background-image: url("/assets/sort-down.svg");
+    background-repeat: no-repeat;
+    background-position: left center;
+    padding: .5rem 1.2rem;
+}
+
+.sortable-up {
+    cursor: pointer;
+    background-image: url("/assets/sort-up.svg");
+    background-repeat: no-repeat;
+    background-position: left center;
+    padding: .5rem 1.2rem;
+}

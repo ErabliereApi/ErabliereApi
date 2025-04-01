@@ -16,9 +16,10 @@ import { ReportsComponent } from 'src/rapport/rapports.component';
 import { AdminAPIKeysComponent } from 'src/admin/admin-apikeys/admin-apikeys.component';
 import { MapViewComponent } from './map-view/map-view.component';
 import { ErablieresMapComponent } from 'src/map/erablieres-map.component';
-import { AdminGuard } from './admin-view/auth/admin.guard';
+import { AdminGuard } from './guard/admin.guard';
 import { Page401Component } from './page401/page401.component';
 import { AdminHologramComponent } from 'src/admin/admin-hologram/admin-hologram.component';
+import { ErabliereAiWindowComponent } from 'src/erabliereai/window/erabliereai-window.component';
 
 export const routes: Routes = [
     {
@@ -59,10 +60,6 @@ export const routes: Routes = [
         ]
     },
     {
-        path: 'page401',
-        component: Page401Component
-    },
-    {
         path: 'map',
         component: MapViewComponent,
         children: [
@@ -71,6 +68,10 @@ export const routes: Routes = [
                 component: ErablieresMapComponent
             }
         ]
+    },
+    {
+        path: 'ai',
+        component: ErabliereAiWindowComponent
     },
     {
         path: '',
@@ -134,5 +135,9 @@ export const routes: Routes = [
         ]
     },
     { path: 'signin-callback', component: SigninRedirectCallbackComponent },
-    { path: 'signout-callback', component: SignoutRedirectCallbackComponent }
+    { path: 'signout-callback', component: SignoutRedirectCallbackComponent },
+    {
+        path: 'page401',
+        component: Page401Component
+    }
 ]

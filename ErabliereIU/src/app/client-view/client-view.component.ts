@@ -15,12 +15,12 @@ import {YouAreNotConnectedComponent} from "./you-are-not-connected/you-are-not-c
     templateUrl: './client-view.component.html'
 })
 export class ClientViewComponent implements OnInit {
-    private _pagesSansMenu = ["apropos"];
+    private readonly _pagesSansMenu = ["apropos"];
     @Input() idErabliereSelectionee?: string;
     showMenu: boolean = true;
     thereIsAtLeastOneErabliere: boolean = false;
 
-    constructor(private _router: Router) {
+    constructor(private readonly _router: Router) {
     }
 
     ngOnInit(): void {
