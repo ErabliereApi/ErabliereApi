@@ -6,7 +6,7 @@
     }
     <div class="card mb-3 mt-3">
         <div class="card-header">
-            <h5 class="card-title">{{rapport?.type}} - {{ formatDate(rapport?.dateDebut) }} - {{
+            <h5 class="card-title">{{rapport?.type}} - {{ rapport?.nom }} - {{ formatDate(rapport?.dateDebut) }} - {{
                 formatDate(rapport?.dateFin) }}</h5>
         </div>
         <div class="card-body">
@@ -33,7 +33,7 @@
                 </div>
                 <div class="col-md-3">
                     <strong>Date de création:</strong><br/>
-                    {{ rapportData?.dateCreation | date:'yyyy-MM-dd hh:mm:ss' }}
+                    {{ rapportData?.dc | date:'yyyy-MM-dd hh:mm:ss' }}
                 </div>
                 <div class="col-md-3">
                     <strong>Date de mise à jour:</strong><br/>

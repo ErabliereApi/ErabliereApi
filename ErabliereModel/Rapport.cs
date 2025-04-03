@@ -2,6 +2,7 @@
 using ErabliereApi.Donnees.Ownable;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ErabliereApi.Donnees;
@@ -29,7 +30,6 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesI
     /// </summary>
     public string Type { get; set; } = string.Empty;
 
-
     /// <summary>
     /// Utilisation du trio de donnée au lieu des données d'un capteur
     /// </summary>
@@ -44,11 +44,6 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesI
     /// Date de fin
     /// </summary>
     public DateTime DateFin { get; set; }
-
-    /// <summary>
-    /// Date de création du rapport
-    /// </summary>
-    public DateTimeOffset? DateCreation { get; set; }
 
     /// <summary>
     /// Date de dernière modification du rapport
@@ -70,6 +65,12 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesI
     /// Objet JSON des paramètres de la requête pour générer le rapport
     /// </summary>
     public string RequestParameters { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Le nom du rapport, soit temperature pour le trio de données ou le nom du capteur
+    /// </summary>
+    [MaxLength(50)]
+    public string Nom { get; set; } = string.Empty;
 
     /// <summary>
     /// La moyenne de la donnée

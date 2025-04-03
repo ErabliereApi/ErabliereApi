@@ -13,6 +13,9 @@ import { Rapport } from 'src/model/rapport';
             <div class="card-body">
                 <p class="card-text h1 p-5">{{rapport?.somme}} {{getSymbol()}}</p>
             </div>
+            <div class="card-footer text-muted">
+                <p class="card-text">Dernier calcule: {{rapport?.dateModification?.toString()?.substring(0, 19)?.replace('T', ' ')}}</p>
+            </div>
         </div>
     `,
 })

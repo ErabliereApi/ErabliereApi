@@ -54,7 +54,7 @@ export class CapteurPanelsComponent implements OnInit, OnChanges {
         });
     }
 
-    async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    ngOnChanges(changes: SimpleChanges) {
         if (changes.capteurs) {
             let taille = this.capteurs?.find(capteur => capteur.taille)?.taille;
             if (taille) {
@@ -63,7 +63,12 @@ export class CapteurPanelsComponent implements OnInit, OnChanges {
                 this.tailleGraphiques = 6;
             }
         }
-        this.isLogged = await this._authService.getAuthorisationService().isLoggedIn();
+        this._authService.getAuthorisationService().isLoggedIn().then(loggedIn => {
+            this.isLogged = loggedIn;
+        }).catch(err => {
+            console.error(err);
+            this.isLogged = false;
+        });
     }
 
     changerDimension(taille: number) {

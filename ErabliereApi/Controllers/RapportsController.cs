@@ -114,7 +114,6 @@ public class RapportsController : ControllerBase
                 RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
                 AfficherDansDashboard = rapportDegreeJour.AfficherDansDashboard,
                 DC = DateTimeOffset.Now,
-                DateCreation = DateTimeOffset.Now,
                 DateModification = DateTimeOffset.Now,
                 IdErabliere = id
             };
@@ -208,6 +207,7 @@ public class RapportsController : ControllerBase
     {
         if (rapportDegreeJour.UtiliserTemperatureTrioDonnee)
         {
+            rapport.Nom = "Température";
             await InnerCalculateFromTrioDonnees(rapportDegreeJour, rapport, token);
         }
         else
@@ -240,6 +240,8 @@ public class RapportsController : ControllerBase
 
             return (isErrorActionResult: true, value: BadRequest(new ValidationProblemDetails(ModelState)));
         }
+
+        rapport.Nom = capteur.Nom ?? string.Empty;
 
         var dateDebutFiltre = rapportDegreeJour.DateDebut.Date;
 

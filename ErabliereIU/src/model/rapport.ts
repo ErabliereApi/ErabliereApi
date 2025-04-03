@@ -3,10 +3,11 @@ export class Rapport {
     idErabliere?: string;
     dateDebut?: Date;
     dateFin?: Date;
-    dateCreation?: Date;
+    dc?: Date;
     dateModification?: Date;
     type?: string;
     utiliserTemperatureTrioDonnee?: boolean;
+    nom?: string;
     somme?: number;
     moyenne?: number;
     min?: number;
