@@ -37,6 +37,7 @@ public class RapportsController : ControllerBase
     [EnableQuery]
     [HttpGet]
     [ValiderOwnership("id")]
+    [AllowAnonymous]
     [ProducesResponseType(200, Type = typeof(List<Rapport>))]
     public IActionResult GetSaveReports([FromRoute] Guid id)
     {
@@ -53,6 +54,7 @@ public class RapportsController : ControllerBase
     /// <param name="idRapport"></param>
     [HttpGet("{idRapport}")]
     [ValiderOwnership("id")]
+    [AllowAnonymous]
     [ProducesResponseType(200, Type = typeof(Rapport))]
     public async Task<IActionResult> GetRapport([FromRoute] Guid id, [FromRoute] Guid idRapport)
     {
