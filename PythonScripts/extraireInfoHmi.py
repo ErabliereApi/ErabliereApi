@@ -108,10 +108,10 @@ for url in urls.split(","):
         temperature = -77
 
     try:
-      file_save = "/tmp/" + str(temperature) + "_" + str(vaccium) + "_" + str(nb) + ".jpg"
+      file_save = "~/images/" + str(temperature) + "_" + str(vaccium) + "_" + str(nb) + ".jpg"
       # Check if it is windows
       if os.name == 'nt':
-          file_save = file_save.replace("/tmp/", "__pycache__\\")
+          file_save = file_save.replace("~/images/", "__pycache__\\")
       file = open(file_save, "wb")
       print("write file", file_save)
       file.write(response.content)

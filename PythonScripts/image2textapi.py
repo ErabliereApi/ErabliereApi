@@ -1,10 +1,11 @@
+from base64 import b64decode
+import datetime
 from flask import Flask
 from flask import request
-from base64 import b64decode
+import os
 from PIL import Image
 from pytesseract import image_to_string
 import uuid
-import os
 
 app = Flask(__name__)
 
@@ -20,10 +21,11 @@ def image2text():
 
     # Check if it is windows
     if os.name == 'nt':
-        temp_file = "__pycache__\\tmp_image.jpg"
+        temp_file = "__pycache__\\tmp_image" + str(uuid.uuid1()) + ".jpg"
 
     file = open(temp_file, "wb")
-    print("write file", temp_file)
+    # Print the datetime to the console
+    print(str(datetime.datetime.now()) + " Image saved to: " + temp_file)
     file.write(image_bytes)
 
     file.close()
