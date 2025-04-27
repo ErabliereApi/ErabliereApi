@@ -36,6 +36,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^4.1.0",
     "mapbox-gl": "^3.10.0",
+    "marked": "^15.0.11",
     "ng2-charts": "^8.0.0",
     "ngx-mask": "^19.0.6",
     "rxjs": "^7.8.2",

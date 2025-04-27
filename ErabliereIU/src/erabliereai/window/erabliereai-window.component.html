@@ -83,9 +83,9 @@
                       }}</p>
                   </div>
                   <div class="card-body">
-                    <p [className]="message.isUser ? '' : 'mb-5'" style="white-space: pre-wrap; word-wrap: break-word;">
-                      {{ message.content }}
-                    </p>
+                    <div [className]="message.isUser ? '' : 'mb-5'" style="white-space: pre-wrap; word-wrap: break-word;">
+                      <eapi-markdown [content]="message.content"></eapi-markdown>
+                    </div>
                     <button class="btn btn-link" *ngIf="!message.isUser" (click)="traduire(message.content, i)">
                       Traduire <span style="font-size: 1.2em;">🌐</span>
                     </button>
