@@ -4,7 +4,8 @@ import { ApiKey } from "src/model/apikey";
 import { Observable } from "rxjs";
 
 export const StorybookMockErabliereApiFn: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
-    if (req.url.includes("erabliere/api/donneesCapteur")) {
+    console.log("Intercept: [" + req.method + "] " + req.url)
+    if (req.url.includes("capteurs/capteur-guid/DonneesCapteurV2")) {
         const donneesCapteur: DonneeCapteur[] = [
             {
                 d: "2021-09-01T00:00:00",
