@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { IErabliereApi } from 'src/core/erabliereapi.interface';
+import { Component, OnInit } from '@angular/core';
+import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ApiKeyListComponent } from './api-key-list/api-key-list.component';
 import { ApiKey } from 'src/model/apikey';
 
@@ -18,7 +18,7 @@ import { ApiKey } from 'src/model/apikey';
 })
 export class AdminAPIKeysComponent implements OnInit {
 
-    constructor(@Inject('IErabliereApi') private readonly _api: IErabliereApi) { }
+    constructor(private readonly _api: ErabliereApi) { }
 
     ngOnInit(): void {
         this._api.getApiKeys().then(apikeys => {

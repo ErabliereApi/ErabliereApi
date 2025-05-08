@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
 import { EnvironmentService } from '../../../environments/environment.service';
-import { UrlModel } from '../../../model/urlModel';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { MsalService } from '@azure/msal-angular';
@@ -21,7 +20,6 @@ export class ClientNavBarComponent implements OnInit {
 
   useAuthentication: boolean = false;
   isLoggedIn: boolean;
-  urls?: UrlModel[];
   isAdminUser: boolean = false;
   mapFeatureEnable: boolean = false;
 
@@ -34,7 +32,6 @@ export class ClientNavBarComponent implements OnInit {
     this.useAuthentication = this._environmentService.authEnable ?? false;
     this.thereIsAtLeastOneErabliere = false
     this.isLoggedIn = !this.useAuthentication
-    this.urls = this._environmentService.additionnalUrls;
   }
 
   ngOnInit(): void {

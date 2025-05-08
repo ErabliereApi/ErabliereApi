@@ -47,19 +47,16 @@ export class AppComponent implements OnInit, OnDestroy {
       });
 
     if (this.authService.type == "AzureAD") {
-      console.log("watching the msaBroadcast service progress");
       this.msalBroadcastService.inProgress$
         .pipe(
           filter(
             function (status: InteractionStatus) {
-              console.log("msalBroadcast service notif status: " + status);
               return status === InteractionStatus.Startup || status === InteractionStatus.None;
             }
           ),
           takeUntil(this._destroying$)
         )
         .subscribe(async (status) => {
-          console.log("initialize msal encryption service trigger by status " + status);
           if (this.msalEncryptionInitialize) {
             return;
           }

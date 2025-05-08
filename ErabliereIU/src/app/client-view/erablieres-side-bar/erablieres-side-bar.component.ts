@@ -41,7 +41,6 @@ export class ErabliereSideBarComponent implements OnInit {
     }
     this._authService.loginChanged.subscribe(async loggedIn => {
       this.loggedIn = loggedIn;
-      console.log("erablieres-side-bar: logged in changed. New value is " + loggedIn);
       this.erablieres = [];
       await this.loadErablieresPage();
     });
@@ -133,12 +132,6 @@ export class ErabliereSideBarComponent implements OnInit {
       if (this.modifierErabliereComponent.erabliereForm != undefined) {
         this.modifierErabliereComponent.erabliereForm.erabliere = { ...erabliere };
       }
-      else {
-        console.log("erabliereForm is undefined");
-      }
-    }
-    else {
-      console.log("modifierErabliereComponent is undefined");
     }
   }
 }

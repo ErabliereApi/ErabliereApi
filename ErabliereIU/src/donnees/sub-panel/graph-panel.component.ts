@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { IErabliereApi } from 'src/core/erabliereapi.interface';
+import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { AjouterDonneeCapteurComponent } from '../../donneeCapteurs/ajouter-donnee-capteur.component';
 import { DateTimeSelectorComponent } from './userinput/date-time-selector.component';
 import { calculerMoyenne } from '../util';
@@ -43,7 +43,7 @@ export class GraphPanelComponent implements OnInit {
     col12: string = "col-12";
     col10: string = "col-10";
 
-    constructor(@Inject('IErabliereApi') private readonly _api: IErabliereApi) {
+    constructor(private readonly _api: ErabliereApi) {
         this.chart = undefined;
     }
 
@@ -66,8 +66,6 @@ export class GraphPanelComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log("GraphPanelComponent ngOnInit", this.titre, this.displayMin, this.displayMax);
-
         this.lineChartOptions = {
             maintainAspectRatio: false,
             aspectRatio: 1.7,

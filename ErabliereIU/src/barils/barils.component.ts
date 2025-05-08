@@ -53,7 +53,7 @@ export class BarilsComponent implements OnInit, OnChanges {
     @Input() erabliereId:any
     errorMessage?: string;
 
-    constructor(private _erabliereApi : ErabliereApi) { }
+    constructor(private readonly _erabliereApi : ErabliereApi) { }
 
     ngOnChanges(changes: SimpleChanges): void {
         this.fetchBaril();
@@ -65,13 +65,13 @@ export class BarilsComponent implements OnInit, OnChanges {
 
     fetchBaril() {
         this._erabliereApi.getBarils(this.erabliereId)
-                          .then(d => {
-                            this.barils = d
-                            this.errorMessage = undefined
-                          })
-                          .catch(e => {
-                            this.barils = undefined
-                            this.errorMessage = e
-                          })
+            .then(d => {
+            this.barils = d
+            this.errorMessage = undefined
+            })
+            .catch(e => {
+            this.barils = undefined
+            this.errorMessage = e
+            });
     }
 }

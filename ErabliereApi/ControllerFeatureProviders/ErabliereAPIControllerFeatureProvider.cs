@@ -37,13 +37,6 @@ public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
             return aiEnable;
         }
 
-        if (typeInfo.Name == nameof(ImagesCapteurController))
-        {
-            var enableImages = !string.IsNullOrWhiteSpace(_config["EmailImageObserverUrl"]);
-
-            return enableImages;
-        }
-
         if (typeInfo.Name == nameof(MapController))
         {
             var enableMap = !string.IsNullOrWhiteSpace(_config["Mapbox_AccessToken"]);

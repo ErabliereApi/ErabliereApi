@@ -1,11 +1,15 @@
 ﻿using ErabliereApi.Extensions;
 using ErabliereApi.OperationFilter;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Writers;
+using Swashbuckle.AspNetCore.Swagger;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using static System.Boolean;
 using static System.StringComparison;
 
@@ -165,6 +169,10 @@ public static class Swagger
                         var reader = new StreamReader(responseBody);
                         var swaggerJson = await reader.ReadToEndAsync();
                         SwaggerJsonCache = swaggerJson;
+
+                        // Transform the SwaggerJsonCache that is an indented JSON string into a compact JSON string
+                        SwaggerJsonCache = JsonSerializer.Serialize(
+                            JsonSerializer.Deserialize<object>(swaggerJson), new JsonSerializerOptions { WriteIndented = false });
                     }
                     // copy the response stream to the original stream
                     context.Response.Body.Seek(0, SeekOrigin.Begin);

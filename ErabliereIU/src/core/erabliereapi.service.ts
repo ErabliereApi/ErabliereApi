@@ -27,12 +27,11 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
 import { firstValueFrom, Observable } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
-import { IErabliereApi } from './erabliereapi.interface';
 import { ApiKey } from 'src/model/apikey';
 import { Rapport } from 'src/model/rapport';
 
 @Injectable({ providedIn: 'root' })
-export class ErabliereApi implements IErabliereApi {
+export class ErabliereApi {
     delete(arg0: string): Observable<void> {
         throw new Error('Method not implemented.');
     }
@@ -562,8 +561,29 @@ export class ErabliereApi implements IErabliereApi {
         return firstValueFrom(this._httpClient.delete<any>(url, { headers: headers }));
     }
 
+    private openApiSpecCache: any = null;
+    private openApiSpecRequest: Promise<any> | null = null;
+
     async getOpenApiSpec(): Promise<any> {
-        return await firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + "/api/v1/swagger.json", {}));
+        if (this.openApiSpecCache) {
+            return this.openApiSpecCache;
+        }
+    
+        if (this.openApiSpecRequest) {
+            return this.openApiSpecRequest; // Return the ongoing request
+        }
+    
+        this.openApiSpecRequest = firstValueFrom(
+            this._httpClient.get<any>(this._environmentService.apiUrl + "/api/v1/swagger.json", {})
+        );
+    
+        try {
+            this.openApiSpecCache = await this.openApiSpecRequest;
+        } finally {
+            this.openApiSpecRequest = null; // Reset the request tracker
+        }
+    
+        return this.openApiSpecCache;
     }
 
     async getImages(idErabliereSelectionnee: any, take: number, skip: number = 0, search?: string): Promise<GetImageInfo[]> {

@@ -20,30 +20,21 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   }
 
   async login() {
-    console.log("login");
     if (!this.initialize) {
       await this.init();
-    }
-    else {
-      console.log("MSAL already initialize at login");
     }
     const popupParam: PopupRequest = {
       scopes: this._environmentService.scopes?.split(' ') ?? [],
       prompt: "select_account"
     }
-    const appUser = await firstValueFrom(this._msalInstance.loginPopup(popupParam)).then(response => {
+    await firstValueFrom(this._msalInstance.loginPopup(popupParam)).then(response => {
       return this.completeLogin();
     });
-    console.log("AppUser", appUser);
   }
 
   async isLoggedIn(): Promise<boolean> {
-    console.log("isLoggedIn");
     if (!this.initialize) {
       await this.init();
-    }
-    else {
-      console.log("MSAL already initialize at isLoggedIn");
     }
 
     let user = this.getUser();
@@ -54,12 +45,8 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   }
 
   async completeLogin(): Promise<AppUser> {
-    console.log("completeLogin")
     if (!this.initialize) {
       await this.init();
-    }
-    else {
-      console.log("MSAL already initialize at completeLogin");
     }
 
     const user = this.getUser();
@@ -92,18 +79,13 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   }
 
   async getAccessToken(): Promise<string | null> {
-    console.log("getAccessToken");
     if (!this.initialize) {
       await this.init();
-    }
-    else {
-      console.log("MSAL already initialize at getAccessToken");
     }
 
     const user = this.getUser();
 
     if (user == null) {
-      console.log("No user found when getting access token, exiting the function");
       return null
     }
 
@@ -159,7 +141,6 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
 
   async init(): Promise<void> {
     if (!this.initialize) {
-      console.log("Initilize MSAL Instance");
       await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
     }

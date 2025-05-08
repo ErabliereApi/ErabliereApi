@@ -22,14 +22,6 @@
                     </a>
                     }
                 </li>
-                @for (url of urls; track url) {
-                @if (url.requiredLogin && isLoggedIn) {
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url.href }}" target="_blank" rel="noopener noreferrer">{{
-                        url.text }}</a>
-                </li>
-                }
-                }
                 @if (isLoggedIn && thereIsAtLeastOneErabliere) {
                 <li class="nav-item">
                     <a class="nav-link" routerLink="e/{{idErabliereSelectionee}}/capteurs" routerLinkActive="active"
