@@ -1,11 +1,11 @@
-import { provideHttpClient } from "@angular/common/http";
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
 import { provideRouter } from "@angular/router";
 import { MSAL_INSTANCE, MsalService } from "@azure/msal-angular";
 import { applicationConfig } from "@storybook/angular";
 import { provideNgxMask } from "ngx-mask";
-import { MSALInstanceFactory } from "src/app/app.module";
+import { MSALInstanceFactory } from "src/app/app.config";
 import { EnvironmentService } from "src/environments/environment.service";
-import { StorybookMockErabliereApi } from "../mock/StorybookMockErabliereApi";
+import { StorybookMockErabliereApiFn } from "../mock/StorybookMockErabliereApi";
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export class ModuleStoryHelper{
@@ -13,7 +13,7 @@ export class ModuleStoryHelper{
         return applicationConfig({
             providers: [
                 provideRouter([]),
-                provideHttpClient(), 
+                provideHttpClient(withInterceptors([StorybookMockErabliereApiFn])), 
                 provideNgxMask(),
                 provideCharts(withDefaultRegisterables()),
                 MsalService,
@@ -21,10 +21,6 @@ export class ModuleStoryHelper{
                   provide: MSAL_INSTANCE,
                   useFactory: MSALInstanceFactory,
                   deps: [EnvironmentService]
-                },
-                {
-                    provide: 'IErabliereApi',
-                    useClass: StorybookMockErabliereApi
                 }
             ]
         });

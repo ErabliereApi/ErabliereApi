@@ -1,37 +1,44 @@
 import { DonneeCapteur } from "src/model/donneeCapteur";
-import { IErabliereApi } from "src/core/erabliereapi.interface";
-import { HttpHeaders, HttpResponse } from "@angular/common/http";
+import { HttpEvent, HttpHandlerFn, HttpHeaders, HttpInterceptorFn, HttpRequest, HttpResponse } from "@angular/common/http";
 import { ApiKey } from "src/model/apikey";
+import { Observable } from "rxjs";
 
-export class StorybookMockErabliereApi implements IErabliereApi {
-    getApiKeys(): Promise<ApiKey[]> {
-        throw new Error("Method not implemented.");
+export const StorybookMockErabliereApiFn: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
+    if (req.url.includes("erabliere/api/donneesCapteur")) {
+        const donneesCapteur: DonneeCapteur[] = [
+            {
+                d: "2021-09-01T00:00:00",
+                valeur: 10
+            },
+            {
+                d: "2021-09-01T00:01:00",
+                valeur: 11
+            },
+            {
+                d: "2021-09-01T00:02:00",
+                valeur: 12
+            },
+            {
+                d: "2021-09-01T00:03:00",
+                valeur: 13
+            },
+        ];
+        return mockResponse(req, donneesCapteur);
+    } else if (req.url.includes("erabliere/api/apikeys")) {
+        const apiKeys: ApiKey[] = [
+            { id: "1", key: "12345" },
+            { id: "2", key: "67890" }
+        ];
+        return mockResponse(req, apiKeys);
     }
-    async getDonneesCapteur(idCapteur: any, debutFiltre: string, finFiltre: string, xddr?: any): Promise<HttpResponse<DonneeCapteur[]>> {
-        await new Promise(resolve => setTimeout(resolve, 1));
-        return {
-            body: [
-                {
-                    d: "2021-09-01T00:00:00",
-                    valeur: 10
-                },
-                {
-                    d: "2021-09-01T00:01:00",
-                    valeur: 11
-                },
-                {
-                    d: "2021-09-01T00:02:00",
-                    valeur: 12
-                },
-                {
-                    d: "2021-09-01T00:03:00",
-                    valeur: 13
-                },
-            ],
-            status: 200,
-            statusText: "OK",
-            headers: new HttpHeaders(),
-            url: "mockStorybook"
-        } as HttpResponse<DonneeCapteur[]>;
-    }
+    return next(req);
+}
+
+const mockResponse = (req: HttpRequest<any>, body: any): Observable<HttpEvent<any>> => {
+    const headers = new HttpHeaders({ "Content-Type": "application/json" });
+    const response = new HttpResponse({ status: 200, body, headers });
+    return new Observable((observer) => {
+        observer.next(response);
+        observer.complete();
+    })
 }
