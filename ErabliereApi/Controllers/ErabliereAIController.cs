@@ -71,6 +71,42 @@ public class ErabliereAIController : ControllerBase
 #nullable enable             
     }
 
+
+    [HttpGet("Conversations/Public/{id}")]
+    [AllowAnonymous]
+    [ProducesResponseType(200, Type = typeof(List<Message>))]
+    public async Task<IActionResult> GetPublicConversation(Guid id, CancellationToken token)
+    {
+        var conversation = await _depot.Conversations
+            .Include(c => c.Messages)
+            .Select(c => new
+            {
+                c.Id,
+                c.Name,
+                c.SystemMessage,
+                c.IsPublic,
+                c.CreatedOn,
+                c.LastMessageDate,
+#nullable disable
+                Messages = c.Messages.Select(m => new
+#nullable enable
+                {
+                    m.Id,
+                    m.Content,
+                    m.IsUser,
+                    m.CreatedAt
+                })
+            })
+            .FirstOrDefaultAsync(c => c.Id == id && c.IsPublic, token);
+
+        if (conversation == null)
+        {
+            return NoContent();
+        }
+
+        return Ok(conversation);
+    }
+
     /// <summary>
     /// Envoyer un prompt à l'IA
     /// </summary>
@@ -279,6 +315,41 @@ public class ErabliereAIController : ControllerBase
         return Ok(images);
     }
 
+    /// <summary>
+    /// Liste les messages
+    /// </summary>
+    [HttpPatch("Conversations/{id}")]
+    [EnableQuery]
+    [ProducesResponseType(200, Type = typeof(List<Message>))]
+    public async Task<IActionResult> PatchConversation(Guid id, PatchConversation patch)
+    {
+        if (patch.UserId != null)
+        {
+            return BadRequest("Seulement les administrateurs peuvent modifier l'id de l'utilisateur.");
+        }
+
+        // conversation should be filtered by the user
+        using var scope = HttpContext.RequestServices.CreateScope();
+
+        var userId = UsersUtils.GetUniqueName(scope, HttpContext.User);
+
+        var conversation = await _depot.Conversations.FindAsync([id], HttpContext.RequestAborted);
+
+        if (conversation == null || conversation.UserId != userId)
+        {
+            return NotFound();
+        }
+
+        if (patch.IsPublic != null)
+        {
+            conversation.IsPublic = patch.IsPublic.Value;
+        }
+
+        await _depot.SaveChangesAsync(HttpContext.RequestAborted);
+
+        return NoContent();
+    }
+
 
     /// <summary>
     /// Delete a conversation
@@ -286,9 +357,13 @@ public class ErabliereAIController : ControllerBase
     [HttpDelete("Conversations/{id}")]
     public async Task<IActionResult> DeleteConversation(Guid id, CancellationToken cancellationToken)
     {
+        using var scope = HttpContext.RequestServices.CreateScope();
+
+        var userId = UsersUtils.GetUniqueName(scope, HttpContext.User);
+
         var conversation = await _depot.Conversations
             .Include(c => c.Messages)
-            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, cancellationToken);
 
         if (conversation == null)
         {
@@ -335,6 +410,11 @@ public class ErabliereAIController : ControllerBase
         if (patch.UserId != null)
         {
             conversation.UserId = patch.UserId;
+        }
+
+        if (patch.IsPublic != null)
+        {
+            conversation.IsPublic = patch.IsPublic.Value;
         }
 
         await _depot.SaveChangesAsync(token);

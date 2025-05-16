@@ -30,6 +30,11 @@ public class Conversation : IIdentifiable<Guid?, Conversation>
     public string? SystemMessage { get; set; }
 
     /// <summary>
+    /// Indique si la conversation est publique. Peut être consultée sans être authentifié.
+    /// </summary>
+    public bool IsPublic { get; set; }
+
+    /// <summary>
     /// La date de création de la conversation.
     /// </summary>
     public DateTimeOffset? CreatedOn { get; set; }

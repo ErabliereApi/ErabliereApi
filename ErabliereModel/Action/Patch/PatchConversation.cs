@@ -9,4 +9,9 @@ public class PatchConversation
     /// New userId to set
     /// </summary>
     public string? UserId { get; set; }
+
+    /// <summary>
+    /// IsPublic to set
+    /// </summary>
+    public bool? IsPublic { get; set; }
 }
