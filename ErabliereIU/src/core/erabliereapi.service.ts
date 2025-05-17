@@ -81,9 +81,7 @@ export class ErabliereApi {
 
     async getErablieres(top?: number, search?: string): Promise<Erabliere[]> {
         const headers = await this.getHeaders();
-        if (!top) {
-            top = 10;
-        }
+        top ??= 10;
         let url = this._environmentService.apiUrl + '/erablieres?$top=' + top;
         if (search) {
             url += "&$filter=contains(nom, '" + search + "') or contains(codePostal, '" + search + "')";
@@ -295,7 +293,7 @@ export class ErabliereApi {
     async getActiveRappelNotes(idErabliereSelectionee: any): Promise<Note[]> {
         let headers = await this.getHeaders();
         headers = headers.set('Accept', 'application/json');
-        const rtn = firstValueFrom(await this._httpClient.get<Note[]>(
+        const rtn = firstValueFrom(this._httpClient.get<Note[]>(
             this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/Notes' + "/ActiveRappelsNotes",
             { headers: headers }));
         return rtn ?? [];
@@ -559,6 +557,17 @@ export class ErabliereApi {
         const headers = await this.getHeaders();
         const url = this._environmentService.apiUrl + "/ErabliereAI/Conversations/" + id;
         return firstValueFrom(this._httpClient.delete<any>(url, { headers: headers }));
+    }
+
+    async patchConversation(id: any, arg1: { isPublic: boolean; }) {
+        const headers = await this.getHeaders();
+        const url = this._environmentService.apiUrl + "/ErabliereAI/Conversations/" + id;
+        return firstValueFrom(this._httpClient.patch<any>(url, arg1, { headers: headers }));
+    }
+
+    async getPublicConversation(conversationId: any) {
+        const url = this._environmentService.apiUrl + "/ErabliereAI/Conversations/Public/" + conversationId;
+        return firstValueFrom(this._httpClient.get<Conversation>(url));
     }
 
     private openApiSpecCache: any = null;

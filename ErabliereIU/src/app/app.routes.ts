@@ -20,6 +20,7 @@ import { AdminGuard } from './guard/admin.guard';
 import { Page401Component } from './page401/page401.component';
 import { AdminHologramComponent } from 'src/admin/admin-hologram/admin-hologram.component';
 import { ErabliereAiWindowComponent } from 'src/erabliereai/window/erabliereai-window.component';
+import { ErabliereAiPublicConversationComponent } from 'src/erabliereai/publicConversation/erabliereai-public-conversation.component';
 
 export const routes: Routes = [
     {
@@ -72,6 +73,10 @@ export const routes: Routes = [
     {
         path: 'ai',
         component: ErabliereAiWindowComponent
+    },
+    {
+        path: 'ai/public/:conversationId',
+        component: ErabliereAiPublicConversationComponent
     },
     {
         path: '',
