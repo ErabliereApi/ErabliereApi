@@ -2,7 +2,9 @@ export class Conversation {
     id: any;
     userId?: string;
     name?: string;
+    systemMessage?: string;
     createdOn?: Date;
+    isPublic: boolean = false;
     lastMessageDate?: Date;
     messages?: Message[];
 }

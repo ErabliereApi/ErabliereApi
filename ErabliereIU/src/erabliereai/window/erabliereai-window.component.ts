@@ -5,13 +5,13 @@ import { fr } from 'date-fns/locale';
 import { Conversation, Message, PromptResponse } from 'src/model/conversation';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
-import { MarkdownRendererComponent } from "../../generic/eapi-markdown.component";
+import { MessageListComponent } from "../messageList/message-list.component";
 
 @Component({
     selector: 'app-erabliereai-window',
     templateUrl: './erabliereai-window.component.html',
     styleUrls: ['./erabliereai-window.component.css'],
-    imports: [FormsModule, NgIf, NgFor, MarkdownRendererComponent],
+    imports: [FormsModule, NgIf, NgFor, MessageListComponent],
 })
 export class ErabliereAiWindowComponent implements OnInit {
     @Output() closeChatWindowEvent = new EventEmitter<boolean>();
@@ -32,8 +32,8 @@ export class ErabliereAiWindowComponent implements OnInit {
         this.fetchConversations();
     }
 
-    conversations: any[];
-    currentConversation: any;
+    conversations: Conversation[];
+    currentConversation?: Conversation;
     messages: Message[];
     typePrompt: string;
 
@@ -44,7 +44,7 @@ export class ErabliereAiWindowComponent implements OnInit {
             }
             else {
                 this.conversations = [];
-                this.currentConversation = null;
+                this.currentConversation = undefined;
                 this.messages = [];
             }
             this.lastSearch = this.search;
@@ -69,7 +69,7 @@ export class ErabliereAiWindowComponent implements OnInit {
         }
         else {
             let newConversations = conversations.find((c) => {
-                return c.id === this.currentConversation.id;
+                return c.id === this.currentConversation?.id;
             });
             if (newConversations) {
                 this.currentConversation = newConversations;
@@ -108,7 +108,9 @@ export class ErabliereAiWindowComponent implements OnInit {
             }
             if (this.currentConversation == null) {
                 this.currentConversation = response.conversation;
-                this.conversations.unshift(this.currentConversation);
+                if (this.currentConversation) {
+                    this.conversations.unshift(this.currentConversation);
+                }
             }
         }).catch((error) => {
             this.aiIsThinking = false;
@@ -141,15 +143,15 @@ export class ErabliereAiWindowComponent implements OnInit {
     }
 
     newChat() {
-        this.currentConversation = null;
+        this.currentConversation = undefined;
         this.messages = [];
     }
 
     deleteConversation(c: any) {
-        if (confirm('Are you sure you want to delete this conversation?')) {
+        if (confirm('Êtes vous sur de vouloir supprimer cette conversation?')) {
             this.api.deleteConversation(c.id).then(() => {
                 if (c.id === this.currentConversation?.id) {
-                    this.currentConversation = null;
+                    this.currentConversation = undefined;
                     this.messages = [];
                 }
                 this.fetchConversations();
@@ -173,17 +175,6 @@ export class ErabliereAiWindowComponent implements OnInit {
         if (event.key === 'Escape') {
             this.closeChatWindowEvent.emit(true);
         }
-    }
-
-    traduire(message: string | undefined, index: number) {
-        if (!message) {
-            return;
-        }
-        this.api.traduire(message).then((response: any) => {
-            this.messages[index].content = response[0].translations[0].text;
-        }).catch((error: any) => {
-            alert('Error sending message ' + JSON.stringify(error));
-        });
     }
 
     searchConversation($event: Event) {
@@ -215,6 +206,9 @@ export class ErabliereAiWindowComponent implements OnInit {
     }
 
     elispseText(text: string, nbChar: number) {
+        if (text == null) {
+            return '';
+        }
         if (text.length > nbChar) {
             return text.slice(0, nbChar) + '...';
         }
@@ -243,5 +237,36 @@ export class ErabliereAiWindowComponent implements OnInit {
 
     resetChatConfig() {
         this.currentSystemPhrase = this.defaultSystemPhrase
+    }
+
+    toggleVisibilityCurrentConversation() {
+        console.log('toggleVisibilityCurrentConversation', this.currentConversation);
+        if (this.currentConversation == null) {
+            return;
+        }
+
+        const newState = !this.currentConversation.isPublic;
+        this.api.patchConversation(this.currentConversation.id, { isPublic: newState }).then(() => {
+            if (this.currentConversation) {
+                this.currentConversation.isPublic = newState;
+            }
+        }).catch((error: any) => {
+            console.error(error);
+            alert('Error updating conversation ' + JSON.stringify(error));
+        });
+    }
+
+    copyShareLink() {
+        if (this.currentConversation == null) {
+            return;
+        }
+
+        const shareLink = `${window.location.origin}/ai/public/${this.currentConversation.id}`;
+        navigator.clipboard.writeText(shareLink).then(() => {
+            
+        }).catch((error) => {
+            console.error(error);
+            alert('Erreur lors de la copie du lien de partage ' + JSON.stringify(error));
+        });
     }
 }
