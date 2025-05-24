@@ -1,6 +1,8 @@
 using System;
 using ErabliereApi.Donnees.Interfaces;
 
+namespace ErabliereApi.Donnees;
+
 /// <summary>
 /// Classe représentant un message dans une conversation avec ErabliereAI
 /// </summary>

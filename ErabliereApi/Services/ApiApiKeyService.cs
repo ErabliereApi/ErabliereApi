@@ -39,14 +39,14 @@ public class ApiApiKeyService : IApiKeyService
     }
 
     /// <inheritdoc />
-    public async Task<(ApiKey, string)> CreateApiKeyAsync(Donnees.Customer customer, CancellationToken token)
+    public async Task<(ApiKey, string)> CreateApiKeyAsync(CreateApiKeyParameters param, CancellationToken token)
     {
-        if (customer == null)
+        if (param.Customer == null)
         {
             throw new InvalidOperationException("A customer instance is required");
         }
 
-        if (!customer.Id.HasValue)
+        if (!param.Customer.Id.HasValue)
         {
             throw new InvalidOperationException("customer is supposed to have Id");
         }
@@ -56,8 +56,9 @@ public class ApiApiKeyService : IApiKeyService
         var apiKeyObj = new ApiKey
         {
             Key = HashApiKey(apiKeyBytes),
-            CustomerId = customer.Id.Value,
-            CreationTime = DateTimeOffset.Now
+            CustomerId = param.Customer.Id.Value,
+            CreationTime = DateTimeOffset.Now,
+            Name = param.Name ?? ""
         };
 
         var originalKey = Convert.ToBase64String(apiKeyBytes);
@@ -71,7 +72,7 @@ public class ApiApiKeyService : IApiKeyService
             await context.SaveChangesAsync(token);
         }        
 
-        await SendEmailAsync(customer.Email, originalKey, token);
+        await SendEmailAsync(param.Customer.Email, originalKey, token);
 
         return (apiKeyObj, originalKey);
     }

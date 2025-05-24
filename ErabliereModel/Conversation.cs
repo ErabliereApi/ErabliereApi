@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ErabliereApi.Donnees.Interfaces;
 
+namespace ErabliereApi.Donnees;
+
 /// <summary>
 /// Entité représentant une conversation entre avec ErabliereAI.
 /// </summary>

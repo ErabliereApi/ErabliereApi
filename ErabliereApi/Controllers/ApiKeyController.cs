@@ -1,5 +1,6 @@
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Put;
 using ErabliereApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,11 +36,12 @@ public class ApiKeyController : ControllerBase
     /// </summary>
     [HttpGet]
     [EnableQuery]
-    public IQueryable<Donnees.ApiKey> GetApiKeys()
+    public IQueryable<ApiKey> GetApiKeys()
     {
-        return _context.ApiKeys.Select(k => new Donnees.ApiKey
+        return _context.ApiKeys.Select(k => new ApiKey
         {
             Id = k.Id,
+            Name = k.Name,
             CreationTime = k.CreationTime,
             CustomerId = k.CustomerId,
             DeletionTime = k.DeletionTime,
@@ -72,14 +74,40 @@ public class ApiKeyController : ControllerBase
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
-        var (apikey, originalKey) = await _apiApiKeyService.CreateApiKeyAsync(cust, token);
+        var (apikey, originalKey) = await _apiApiKeyService.CreateApiKeyAsync(new CreateApiKeyParameters { Customer = cust, Name = postApiKey.Name }, token);
 
-        return Ok(new ApiKey {
+        return Ok(new ApiKey
+        {
             Id = apikey.Id,
+            Name = apikey.Name,
             Key = originalKey,
             CreationTime = apikey.CreationTime,
             CustomerId = apikey.CustomerId
         });
+    }
+
+    /// <summary>
+    /// Permet de modifier le nom d'une clé d'API.
+    /// </summary>
+    [HttpPut("{id}/name")]
+    public async Task<IActionResult> UpdateApiKeyName(Guid id, [FromBody] PutApiKeyName param, CancellationToken token)
+    {
+        var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
+        if (apiKey == null)
+        {
+            return NotFound();
+        }
+        
+        if (string.IsNullOrWhiteSpace(param.Name))
+        {
+            ModelState.AddModelError("Name", "Name is required.");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
+
+        apiKey.Name = param.Name;
+        await _context.SaveChangesAsync(token);
+        return NoContent();
     }
 
     /// <summary>

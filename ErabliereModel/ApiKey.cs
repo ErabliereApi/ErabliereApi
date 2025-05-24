@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ErabliereApi.Donnees;
 
@@ -16,6 +17,12 @@ public class ApiKey
     /// La clé d'api sous forme de hash
     /// </summary>
     public string Key { get; set; } = "";
+
+    /// <summary>
+    /// Nom de la clé d'api
+    /// </summary>
+    [MaxLength(50)]
+    public string Name { get; set; } = "";
 
     /// <summary>
     /// Date de création de la clé

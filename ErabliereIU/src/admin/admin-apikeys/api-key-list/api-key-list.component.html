@@ -3,6 +3,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Nom</th>
                 <th>Utilisateur</th>
                 <th>Date création</th>
                 <th>Révoqué</th>
@@ -14,6 +15,7 @@
             @for (apikey of apiKeys; track apikey.id) {
             <tr>
                 <td>{{apikey.id}}</td>
+                <td>{{apikey.name}}</td>
                 <td>{{apikey?.customer?.name}}</td>
                 <td>{{apikey.creationTime}}</td>
                 <td>{{apikey.revocationTime != null}}</td>

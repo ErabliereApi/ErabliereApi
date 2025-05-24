@@ -48,7 +48,7 @@ public class Dompeux : IIdentifiable<Guid?, Dompeux>, IErabliereOwnable
             return 1;
         }
 
-        if (T.HasValue == false)
+        if (!T.HasValue)
         {
             return other.T.HasValue ? -1 : 0;
         }

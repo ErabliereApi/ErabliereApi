@@ -28,12 +28,6 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
                 </div>
               </div>
             </li>
-            <li *ngIf="aiIsThinking">
-              <div class="spinner-border text-success">
-                <span class="visually-hidden">Pensif...</span>
-              </div>
-              <p>ÉrabliereAI réfléchit...</p>
-            </li>
           </ul>
     `,
     standalone: true,
@@ -42,7 +36,6 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 export class MessageListComponent implements OnInit, OnChanges {
     @Input() conversation?: Conversation;
     messages?: Message[] = [];
-    @Input() aiIsThinking: boolean = false;
     @Input() enableTranslation: boolean = false;
 
     constructor(private readonly api: ErabliereApi) { }

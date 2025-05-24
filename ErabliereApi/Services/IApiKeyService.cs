@@ -3,6 +3,22 @@
 namespace ErabliereApi.Services;
 
 /// <summary>
+/// Modèle de données pour créer une clé d'API.
+/// </summary>
+public struct CreateApiKeyParameters
+{
+    /// <summary>
+    /// Nom de a clé d'API.
+    /// </summary>
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Référence de l'utilisateur.
+    /// </summary>
+    public Customer Customer { get; set; }
+}
+
+/// <summary>
 /// Interface d'abstraction des clé d'api
 /// </summary>
 public interface IApiKeyService
@@ -10,10 +26,10 @@ public interface IApiKeyService
     /// <summary>
     /// Créer une clé d'api pour le email donnée
     /// </summary>
-    /// <param name="customer"></param>
+    /// <param name="param"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    Task<(ApiKey, string)> CreateApiKeyAsync(Customer customer, CancellationToken token);
+    Task<(ApiKey, string)> CreateApiKeyAsync(CreateApiKeyParameters param, CancellationToken token);
 
     /// <summary>
     /// Hash an api key from a string

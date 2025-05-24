@@ -13,4 +13,10 @@ public class PostApiKey
     /// </summary>
     [Required]
     public Guid? CustomerId { get; set; }
+
+    /// <summary>
+    /// Nom de la clé d'API.
+    /// </summary>
+    [MaxLength(50)]
+    public string? Name { get; set; }
 }

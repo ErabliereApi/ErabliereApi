@@ -123,7 +123,7 @@ public class StripeCheckoutService : ICheckoutService
 
                 if (subscription is null)
                 {
-                    throw new ArgumentNullException(nameof(subscription));
+                    throw new ArgumentNullException(nameof(stripeEvent), "Stripe.Data.Object event is null");
                 }
 
                 logger.LogInformation("Begin of create customer");
@@ -134,7 +134,7 @@ public class StripeCheckoutService : ICheckoutService
                 logger.LogInformation("End of create customer");
 
                 logger.LogInformation("Begin of create API Key");
-                await apiKeyService.CreateApiKeyAsync(customer, token);
+                await apiKeyService.CreateApiKeyAsync(new CreateApiKeyParameters { Customer = customer }, token);
                 logger.LogInformation("End of create API Key");
 
                 logger.LogInformation("Begin of customer.subscription.created");
@@ -144,22 +144,22 @@ public class StripeCheckoutService : ICheckoutService
                 break;
 
             default:
-                logger.LogTrace("Unknow stripe event: {event}", stripeEvent);
+                logger.LogTrace("Unknow stripe event: {Event}", stripeEvent);
                 break;
         }
     }
 
     /// <inheritdoc />
-    public Task ReccordUsageAsync(ApiKey apiKeyEntity)
+    public Task ReccordUsageAsync(ApiKey apiKey)
     {
-        if (apiKeyEntity.SubscriptionId is null)
+        if (apiKey.SubscriptionId is null)
         {
-            throw new ArgumentNullException(nameof(apiKeyEntity.SubscriptionId));
+            throw new ArgumentNullException(nameof(apiKey), "apiKeyEntity.SubscriptionId is null");
         }
 
         _usageContext.Usages.Enqueue(new Usage
         {
-            SubscriptionId = apiKeyEntity.SubscriptionId,
+            SubscriptionId = apiKey.SubscriptionId,
             Quantite = 1
         });
 

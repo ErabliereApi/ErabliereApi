@@ -2,6 +2,7 @@ using AutoMapper;
 using Azure;
 using Azure.AI.OpenAI;
 using ErabliereApi.Depot.Sql;
+using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Patch;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Services.Users;

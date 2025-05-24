@@ -1,12 +1,7 @@
 ﻿using ErabliereApi.Donnees.Interfaces;
 using ErabliereApi.Donnees.Ownable;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ErabliereApi.Donnees;
 

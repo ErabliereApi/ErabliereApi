@@ -91,9 +91,15 @@
 
           @if (currentConversation)
           {
-            <erabliereai-message-list [aiIsThinking]="aiIsThinking" [enableTranslation]="true"
-              [conversation]="currentConversation"></erabliereai-message-list>
+          <erabliereai-message-list [enableTranslation]="true" [conversation]="currentConversation"></erabliereai-message-list>
           }
+
+          <div *ngIf="aiIsThinking">
+            <div class="spinner-border text-success">
+              <span class="visually-hidden">Pensif...</span>
+            </div>
+            <p class="text-white">ÉrabliereAI réfléchit...</p>
+          </div>
 
 
           <div class="form-outline form-white">
