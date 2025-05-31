@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Depot.Sql;
+﻿using ErabliereApi.Authorization;
+using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -87,7 +88,10 @@ public class ApiApiKeyService : IApiKeyService
             mailMessage.Subject = $"Your API Key for ErabliereAPI";
             mailMessage.Body = new TextPart("plain")
             {
-                Text = $"Your api key is: {originalKey}"
+                Text = $"Your api key is: {originalKey}\n" +
+                       $"Use it in the header '{ApiKeyMiddleware.XApiKeyHeader}' for your API requests.\n\n" +
+                       $"Please keep it safe and do not share it with anyone.\n" +
+                       $"If you believe this key has been compromised, please revoke it immediately."
             };
 
             await _emailService.SendEmailAsync(mailMessage, token);

@@ -1,3 +1,4 @@
+using ErabliereApi.Authorization;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Put;
@@ -76,10 +77,11 @@ public class ApiKeyController : ControllerBase
 
         var (apikey, originalKey) = await _apiApiKeyService.CreateApiKeyAsync(new CreateApiKeyParameters { Customer = cust, Name = postApiKey.Name }, token);
 
-        return Ok(new ApiKey
+        return Ok(new
         {
             Id = apikey.Id,
             Name = apikey.Name,
+            HeaderName = ApiKeyMiddleware.XApiKeyHeader,
             Key = originalKey,
             CreationTime = apikey.CreationTime,
             CustomerId = apikey.CustomerId

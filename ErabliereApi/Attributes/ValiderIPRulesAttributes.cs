@@ -9,6 +9,7 @@ namespace ErabliereApi.Attributes;
 /// <summary>
 /// Attribue permettant de restraindre les accès a un seul adresse IP selon l'id enregistré dans les données de l'érablière.
 /// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class ValiderIPRulesAttribute : ActionFilterAttribute
 {
     private const string Key = "X-Real-IP";

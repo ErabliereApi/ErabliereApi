@@ -217,7 +217,7 @@ public class DonneesController : ControllerBase
                 d.IdErabliere = id;
             }
 
-            return donnees;
+            return d;
         }), cancellationToken: token);
 
         var nbStateEntrySaved = await _context.SaveChangesAsync(token);

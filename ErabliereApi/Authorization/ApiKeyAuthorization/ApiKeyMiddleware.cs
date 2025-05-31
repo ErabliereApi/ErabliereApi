@@ -11,7 +11,10 @@ namespace ErabliereApi.Authorization;
 /// </summary>
 public class ApiKeyMiddleware : IMiddleware
 {
-    const string XApiKeyHeader = "X-ErabliereApi-ApiKey";
+    /// <summary>
+    /// Nom de l'en-tête HTTP utilisé pour transmettre la clé d'API
+    /// </summary>
+    public const string XApiKeyHeader = "X-ErabliereApi-ApiKey";
 
     /// <summary>
     /// Execute the logic needed to track usage of api keys

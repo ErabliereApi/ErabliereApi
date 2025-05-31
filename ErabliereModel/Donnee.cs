@@ -71,7 +71,7 @@ public class Donnee : IIdentifiable<Guid?, Donnee>, IErabliereOwnable
             return 1;
         }
 
-        if (D.HasValue == false)
+        if (!D.HasValue)
         {
             return other.D.HasValue ? -1 : 0;
         }
