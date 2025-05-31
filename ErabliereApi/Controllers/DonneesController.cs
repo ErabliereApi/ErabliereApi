@@ -47,7 +47,7 @@ public class DonneesController : ControllerBase
     /// <param name="o">Doit être croissant "c" ou decroissant "d". Par défaut "c"</param>
     /// <param name="ddr">Date de la dernière données reçu. Permet au client d'optimiser le nombres de données reçu.</param>
     /// <response code="200">Retourne une liste de données. La liste est potentiellement vide.</response>
-    [ProducesResponseType(200, Type = typeof(GetDonnee))]
+    [ProducesResponseType(200, Type = typeof(GetDonnee[]))]
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Text.Plain, "text/json", "text/csv")]
     [ValiderOwnership("id")]
@@ -292,6 +292,7 @@ public class DonneesController : ControllerBase
     [HttpDelete("{idDonnee}")]
     [ValiderIPRules]
     [ValiderOwnership("id")]
+    [ProducesResponseType(204)]
     public async Task<IActionResult> Supprimer(Guid id, Guid idDonnee, Donnee donnee)
     {
         if (id != donnee.IdErabliere)
