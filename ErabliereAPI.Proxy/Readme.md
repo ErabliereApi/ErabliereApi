@@ -18,5 +18,5 @@ Client proxy pour l'api ErabliereAPI.
 
 ```csharp
 var client = new ErabliereAPIProxy("https://localhost:5001", new HttpClient());
-var result = await client.GetWeatherAsync();
+var result = await client.ErablieresAllAsync(null, null, null, null, null, null);
 ```
