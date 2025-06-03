@@ -35,7 +35,7 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 })
 export class MessageListComponent implements OnInit, OnChanges {
     @Input() conversation?: Conversation;
-    messages?: Message[] = [];
+    @Input() messages?: Message[];
     @Input() enableTranslation: boolean = false;
 
     constructor(private readonly api: ErabliereApi) { }
@@ -56,7 +56,6 @@ export class MessageListComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        console.log('MessageListComponent changes', changes);
         const conversationChange: SimpleChange = changes['conversation'];
         if (conversationChange?.currentValue) {
             this.conversation = conversationChange.currentValue;

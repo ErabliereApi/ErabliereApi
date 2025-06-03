@@ -91,7 +91,7 @@
 
           @if (currentConversation)
           {
-          <erabliereai-message-list [enableTranslation]="true" [conversation]="currentConversation"></erabliereai-message-list>
+          <erabliereai-message-list [enableTranslation]="true" [conversation]="currentConversation" [messages]="messages"></erabliereai-message-list>
           }
 
           <div *ngIf="aiIsThinking">
