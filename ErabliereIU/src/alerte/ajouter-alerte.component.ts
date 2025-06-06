@@ -36,7 +36,7 @@ export class AjouterAlerteComponent implements OnInit {
         this.alerteCapteurForm = this.fb.group({});
     }
     
-    async ngOnInit(): Promise<void> {
+    ngOnInit() {
         this.route.params.subscribe(params => {
             this.idErabliereSelectionee = params['idErabliereSelectionee'];
             this.updateState();
@@ -53,6 +53,7 @@ export class AjouterAlerteComponent implements OnInit {
         if (!this.erabliere?.afficherTrioDonnees) {
             this.typeAlerteSelectListForm.controls['state'].setValue(2);
             this.typeAlerte = 2;
+            this.onChangeAlerteType({ target: { value: 2 } });
         }
         else {
             this.typeAlerte = 1;
