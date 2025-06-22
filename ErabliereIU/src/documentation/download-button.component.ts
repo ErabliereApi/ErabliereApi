@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Documentation } from 'src/model/documentation';
@@ -7,11 +7,13 @@ import { Documentation } from 'src/model/documentation';
     selector: 'app-download-button',
     template: `
         <button (click)="downloadFile()" [disabled]="isDisabled" class="btn btn-secondary btn-sm">
-            {{label}}
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          {{label}}
+          @if (isLoading) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          }
         </button>
-    `,
-    imports: [NgIf]
+        `,
+    imports: []
 })
 export class DownloadButtonComponent {
     @Input() label: string = 'Télécharger';

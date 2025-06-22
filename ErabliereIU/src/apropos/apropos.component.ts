@@ -1,12 +1,12 @@
 import { Component } from "@angular/core";
 import { EnvironmentService } from "src/environments/environment.service";
 import { ErabliereApi } from "src/core/erabliereapi.service";
-import { NgIf } from "@angular/common";
+
 
 @Component({
     selector: 'apropos',
     templateUrl: "./apropos.component.html",
-    imports: [NgIf]
+    imports: []
 })
 export class AproposComponent {
     urlApi?: string

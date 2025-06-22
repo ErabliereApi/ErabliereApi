@@ -1,22 +1,26 @@
 <nav aria-label="Pages de la liste de documentations">
-    <ul class="pagination justify-content-center">
+  <ul class="pagination justify-content-center">
+    <li class="page-item">
+      <button (click)="pagePrecedente()" type="button" class="btn btn-outline-primary me-2" [disabled]="estPremierePage"><</button>
+    </li>
+    @for (page of pagesToShow; track page) {
+      @if (page !== '...') {
         <li class="page-item">
-            <button (click)="pagePrecedente()" type="button" class="btn btn-outline-primary me-2" [disabled]="estPremierePage"><</button>
+          <button (click)="changerPage(page)" type="button"
+            class="btn btn-outline-primary me-2{{ page === pageActuelle ? ' active' : '' }}">
+            {{page}}
+          </button>
         </li>
-        <ng-container *ngFor="let page of pagesToShow">
-            <li class="page-item" *ngIf="page !== '...'">
-                <button (click)="changerPage(page)" type="button"
-                    class="btn btn-outline-primary me-2{{ page === pageActuelle ? ' active' : '' }}">
-                    {{page}}
-                </button>
-            </li>
-            <li class="page-item" *ngIf="page === '...'">
-                <span class="btn btn-outline-secondary me-2 disabled">...</span>
-            </li>
-        </ng-container>
+      }
+      @if (page === '...') {
         <li class="page-item">
-            <button (click)="pageSuivante()" type="button" class="btn btn-outline-primary" [disabled]="estDernierePage">></button>
+          <span class="btn btn-outline-secondary me-2 disabled">...</span>
         </li>
-    </ul>
-    <p class="text-center">{{numeroPremierElementDeLaPage}} - {{numeroDernierElementDeLaPage}}</p>
+      }
+    }
+    <li class="page-item">
+      <button (click)="pageSuivante()" type="button" class="btn btn-outline-primary" [disabled]="estDernierePage">></button>
+    </li>
+  </ul>
+  <p class="text-center">{{numeroPremierElementDeLaPage}} - {{numeroDernierElementDeLaPage}}</p>
 </nav>

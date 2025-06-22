@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Note } from 'src/model/note';
 import { NoteComponent } from './note.component';
-import { NgIf } from '@angular/common';
+
 import { AjouterNoteComponent } from './ajouter-note.component';
 import { ModifierNoteComponent } from './modifier-note.component';
 import { Subject } from 'rxjs';
@@ -13,12 +13,11 @@ import { PaginationComponent } from "../pagination/pagination.component";
     selector: 'notes',
     templateUrl: "./notes.component.html",
     imports: [
-        AjouterNoteComponent,
-        ModifierNoteComponent,
-        NgIf,
-        NoteComponent,
-        PaginationComponent
-    ]
+    AjouterNoteComponent,
+    ModifierNoteComponent,
+    NoteComponent,
+    PaginationComponent
+]
 })
 export class NotesComponent implements OnInit {
     @Input() idErabliereSelectionee: any

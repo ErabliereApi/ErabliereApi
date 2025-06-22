@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Note } from 'src/model/note';
-import {DatePipe, NgIf} from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 
 @Component({
     selector: 'note',
     templateUrl: 'note.component.html',
-    imports: [NgIf, DatePipe]
+    imports: [DatePipe]
 })
 
 export class NoteComponent {

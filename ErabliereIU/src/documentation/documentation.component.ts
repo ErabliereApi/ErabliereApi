@@ -3,7 +3,7 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { Documentation } from 'src/model/documentation';
 import { ErabliereApiDocument } from 'src/model/erabliereApiDocument';
-import { NgIf, NgFor } from '@angular/common';
+
 import { AjouterDocumentationComponent } from './ajouter-documentation.component';
 import { ModifierDocumentationComponent } from './modifier-documentation.component';
 import { Subject } from 'rxjs';
@@ -18,8 +18,6 @@ import { DownloadButtonComponent } from "./download-button.component";
     AjouterDocumentationComponent,
     ModifierDocumentationComponent,
     PaginationComponent,
-    NgIf,
-    NgFor,
     DownloadButtonComponent
 ]
 })

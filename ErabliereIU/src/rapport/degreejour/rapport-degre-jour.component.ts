@@ -1,4 +1,4 @@
-import { NgFor } from '@angular/common';
+
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
@@ -12,11 +12,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     templateUrl: './rapport-degre-jour.component.html',
     styleUrls: ['./rapport-degre-jour.component.css'],
     imports: [
-        NgFor,
-        FormsModule,
-        ReactiveFormsModule,
-        InputErrorComponent
-    ]
+    FormsModule,
+    ReactiveFormsModule,
+    InputErrorComponent
+]
 })
 export class RapportDegreJourComponent implements OnInit {
     form: PostDegresJoursRepportRequest = new PostDegresJoursRepportRequest();

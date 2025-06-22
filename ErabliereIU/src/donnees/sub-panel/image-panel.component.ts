@@ -1,4 +1,4 @@
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
@@ -96,7 +96,7 @@ import { GetImageInfo } from 'src/model/imageInfo';
             }
         }
     `],
-    imports: [NgFor, NgIf]
+    imports: []
 })
 export class ImagePanelComponent implements OnInit {
   

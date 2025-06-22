@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Rapport } from 'src/model/rapport';
 import { format } from 'date-fns';
 import { TableauRapportComponent } from "./tableau/tableau-rapport.component";
-import { NgIf } from '@angular/common';
+
 import { ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
 
 @Component({
@@ -13,10 +13,9 @@ import { ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequ
     templateUrl: './rapports.component.html',
     styleUrls: ['./rapports.component.css'],
     imports: [
-        RapportDegreJourComponent,
-        TableauRapportComponent,
-        NgIf,
-    ]
+    RapportDegreJourComponent,
+    TableauRapportComponent
+]
 })
 export class ReportsComponent implements OnInit {
     typeRapport: string = 'degreJour';

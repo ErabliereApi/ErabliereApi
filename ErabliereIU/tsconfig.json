@@ -11,7 +11,7 @@
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "isolatedModules": true,
     "target": "ES2022",
@@ -22,6 +22,9 @@
       "ES2020.Intl"
     ],
     "useDefineForClassFields": true,
+    "paths": {
+      "chart.js/dist/types/utils": ["node_modules/chart.js/dist/types/utils.d.ts"]
+    }
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

@@ -1,45 +1,48 @@
-<div *ngIf="editAlerte">
+@if (editAlerte) {
+  <div>
     <span class="text-danger">{{generalError}}</span>
     <p>Id: {{ alerte?.id }}</p>
     <form [formGroup]="alerteForm">
-        <div class="form-group">
-          <label class="form-label">Nom: </label><input class="form-control" type="text" formControlName="nom">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Destinataires du courriel: </label><input class="form-control" type="text" formControlName="destinataireCourriel">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Destinataires du SMS: </label><input class="form-control" type="text" formControlName="destinataireSMS">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Temperature Min.: </label><einput [formGroup]="alerteForm" name="temperatureMin" symbole="°C" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Temperature Max.: </label><einput [formGroup]="alerteForm" name="temperatureMax" symbole="°C" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Vaccium Min.: </label><einput [formGroup]="alerteForm" name="vacciumMin" symbole="HG" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Vaccium Max.: </label><einput [formGroup]="alerteForm" name="vacciumMax" symbole="HG" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Niveau Bassin Min.: </label><einput [formGroup]="alerteForm" name="niveauBassinMin" symbole="%" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Niveau Bassin Max.: </label><einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
-        </div>
+      <div class="form-group">
+        <label class="form-label">Nom: </label><input class="form-control" type="text" formControlName="nom">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Destinataires du courriel: </label><input class="form-control" type="text" formControlName="destinataireCourriel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Destinataires du SMS: </label><input class="form-control" type="text" formControlName="destinataireSMS">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Temperature Min.: </label><einput [formGroup]="alerteForm" name="temperatureMin" symbole="°C" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Temperature Max.: </label><einput [formGroup]="alerteForm" name="temperatureMax" symbole="°C" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vaccium Min.: </label><einput [formGroup]="alerteForm" name="vacciumMin" symbole="HG" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vaccium Max.: </label><einput [formGroup]="alerteForm" name="vacciumMax" symbole="HG" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Niveau Bassin Min.: </label><einput [formGroup]="alerteForm" name="niveauBassinMin" symbole="%" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Niveau Bassin Max.: </label><einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
+      </div>
       <button class="btn btn-primary" (click)="onButtonModifierClick()">Modifier</button>
       <button class="btn btn-secondary" (click)="onButtonAnnuleClick()">Annuler</button>
       <div>
         <span class="text-danger">{{generalError}}</span>
       </div>
     </form>
-</div>
-<div *ngIf="editAlerteCapteur">
-  <span class="text-danger">{{generalError}}</span>
-  <p>Id: {{ alerteCapteur?.id }}</p>
-  <form [formGroup]="alerteCapteurForm">
+  </div>
+}
+@if (editAlerteCapteur) {
+  <div>
+    <span class="text-danger">{{generalError}}</span>
+    <p>Id: {{ alerteCapteur?.id }}</p>
+    <form [formGroup]="alerteCapteurForm">
       <div class="form-group">
         <label class="form-label">Nom: </label><input class="form-control" type="text" formControlName="nom">
       </div>
@@ -57,8 +60,9 @@
       </div>
       <button class="btn btn-primary mt-3 mb-3" (click)="onButtonModifierAlerteCapteurClick()">Modifier</button>
       <button class="btn btn-secondary mt-3 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
-    <div>
-      <span class="text-danger">{{generalError}}</span>
-    </div>
-  </form>
-</div>
+      <div>
+        <span class="text-danger">{{generalError}}</span>
+      </div>
+    </form>
+  </div>
+}

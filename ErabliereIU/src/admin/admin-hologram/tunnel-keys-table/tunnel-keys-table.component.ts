@@ -1,13 +1,10 @@
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
     selector: 'tunnel-keys-table',
     templateUrl: './tunnel-keys-table.component.html',
-    imports: [
-        NgFor,
-        NgIf
-    ]
+    imports: []
 })
 export class TunnelKeysTableComponent {
     @Input() tunnelKeys: any[] = [];
