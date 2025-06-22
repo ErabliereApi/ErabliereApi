@@ -18,7 +18,7 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
     error?: any;
     interval?: NodeJS.Timeout;
 
-    constructor(private api: ErabliereApi) {
+    constructor(private readonly api: ErabliereApi) {
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -133,7 +133,7 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
                                     return `Jour: ${dt} - Nuit: ${nt}`;
                                 },
                                 label: function (context: any) {
-                                    let label = context.dataset.label || '';
+                                    let label = context.dataset.label ?? '';
                                     if (label) {
                                         label += ': ';
                                     }

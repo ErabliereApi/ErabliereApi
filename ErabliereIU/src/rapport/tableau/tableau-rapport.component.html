@@ -1,65 +1,67 @@
 <div>
-    @if (erreur) {
+  @if (erreur) {
     <div class="alert alert-danger" role="alert">
-        {{ erreur }}
+      {{ erreur }}
     </div>
-    }
-    <div class="card mb-3 mt-3">
-        <div class="card-header">
-            <h5 class="card-title">{{rapport?.type}} - {{ rapport?.nom }} - {{ formatDate(rapport?.dateDebut) }} - {{
-                formatDate(rapport?.dateFin) }}</h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <strong>Moyenne:</strong>
-                    {{ formatNumber(rapportData?.moyenne) }}
-                </div>
-                <div class="col-md-3">
-                    <strong>Somme:</strong>
-                    {{ formatNumber(rapportData?.somme) }}
-                </div>
-                <div class="col-md-3">
-                    <strong>Min:</strong>
-                    {{ formatNumber(rapportData?.min) }}
-                </div>
-                <div class="col-md-3">
-                    <strong>Max:</strong>
-                    {{ formatNumber(rapportData?.max) }}
-                </div>
-                <div class="col-md-3">
-                    <strong>Nombre de jours:</strong>
-                    {{ rapportData?.donnees?.length }}
-                </div>
-                <div class="col-md-3">
-                    <strong>Date de création:</strong><br/>
-                    {{ rapportData?.dc | date:'yyyy-MM-dd hh:mm:ss' }}
-                </div>
-                <div class="col-md-3">
-                    <strong>Date de mise à jour:</strong><br/>
-                    {{ rapportData?.dateModification | date:'yyyy-MM-dd hh:mm:ss' }}
-                </div>
-            </div>
-        </div>
+  }
+  <div class="card mb-3 mt-3">
+    <div class="card-header">
+      <h5 class="card-title">{{rapport?.type}} - {{ rapport?.nom }} - {{ formatDate(rapport?.dateDebut) }} - {{
+      formatDate(rapport?.dateFin) }}</h5>
     </div>
-    <table class="table table-striped table-responsive">
-        <thead>
-            <tr>
-                <th [className]="getHeaderClass('date')" (click)="sortBy('date')" (keydown)="keyPressSortBy($event, 'date')">Date</th>
-                <th [className]="getHeaderClass('moyenne')" (click)="sortBy('moyenne')" (keydown)="keyPressSortBy($event, 'moyenne')">Moyenne</th>
-                <th [className]="getHeaderClass('somme')" (click)="sortBy('somme')" (keydown)="keyPressSortBy($event, 'somme')">Degré jour</th>
-                <th [className]="getHeaderClass('min')" (click)="sortBy('min')" (keydown)="keyPressSortBy($event, 'min')">Min</th>
-                <th [className]="getHeaderClass('max')" (click)="sortBy('max')" (keydown)="keyPressSortBy($event, 'max')">Max</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let ligne of rapportData?.donnees">
-                <td>{{ formatDate(ligne.date) }}</td>
-                <td>{{ formatNumber(ligne.moyenne) }}</td>
-                <td>{{ formatNumber(ligne.somme) }}</td>
-                <td>{{ formatNumber(ligne.min) }}</td>
-                <td>{{ formatNumber(ligne.max) }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <strong>Moyenne:</strong>
+          {{ formatNumber(rapportData?.moyenne) }}
+        </div>
+        <div class="col-md-3">
+          <strong>Somme:</strong>
+          {{ formatNumber(rapportData?.somme) }}
+        </div>
+        <div class="col-md-3">
+          <strong>Min:</strong>
+          {{ formatNumber(rapportData?.min) }}
+        </div>
+        <div class="col-md-3">
+          <strong>Max:</strong>
+          {{ formatNumber(rapportData?.max) }}
+        </div>
+        <div class="col-md-3">
+          <strong>Nombre de jours:</strong>
+          {{ rapportData?.donnees?.length }}
+        </div>
+        <div class="col-md-3">
+          <strong>Date de création:</strong><br/>
+          {{ rapportData?.dc | date:'yyyy-MM-dd hh:mm:ss' }}
+        </div>
+        <div class="col-md-3">
+          <strong>Date de mise à jour:</strong><br/>
+          {{ rapportData?.dateModification | date:'yyyy-MM-dd hh:mm:ss' }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="table table-striped table-responsive">
+    <thead>
+      <tr>
+        <th [className]="getHeaderClass('date')" (click)="sortBy('date')" (keydown)="keyPressSortBy($event, 'date')">Date</th>
+        <th [className]="getHeaderClass('moyenne')" (click)="sortBy('moyenne')" (keydown)="keyPressSortBy($event, 'moyenne')">Moyenne</th>
+        <th [className]="getHeaderClass('somme')" (click)="sortBy('somme')" (keydown)="keyPressSortBy($event, 'somme')">Degré jour</th>
+        <th [className]="getHeaderClass('min')" (click)="sortBy('min')" (keydown)="keyPressSortBy($event, 'min')">Min</th>
+        <th [className]="getHeaderClass('max')" (click)="sortBy('max')" (keydown)="keyPressSortBy($event, 'max')">Max</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (ligne of rapportData?.donnees; track ligne) {
+        <tr>
+          <td>{{ formatDate(ligne.date) }}</td>
+          <td>{{ formatNumber(ligne.moyenne) }}</td>
+          <td>{{ formatNumber(ligne.somme) }}</td>
+          <td>{{ formatNumber(ligne.min) }}</td>
+          <td>{{ formatNumber(ligne.max) }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
 </div>

@@ -1,51 +1,53 @@
 <h3>Notes</h3>
-<div class="mb-3" *ngIf="error">
+@if (error) {
+  <div class="mb-3">
     <span class="text-danger">{{error}}</span>
-</div>
+  </div>
+}
 <div class="mb-3">
-    <ajouter-note
-        [idErabliereSelectionee]="idErabliereSelectionee"
-        (needToUpdate)="loadNotes()"
+  <ajouter-note
+    [idErabliereSelectionee]="idErabliereSelectionee"
+    (needToUpdate)="loadNotes()"
     />
     <modifier-note
-        [idErabliereSelectionee]="idErabliereSelectionee"
-        [noteSubject]="noteToModify"
-        (needToUpdate)="loadNotes()"
-    />
-</div>
-<div class="row me-1">
-    <div class="form-group mb-2">
+      [idErabliereSelectionee]="idErabliereSelectionee"
+      [noteSubject]="noteToModify"
+      (needToUpdate)="loadNotes()"
+      />
+    </div>
+    <div class="row me-1">
+      <div class="form-group mb-2">
         <label for="recherche">Recherche</label>
         <input
-            type="text"
-            id="recherche"
-            class="form-control"
-            (keyup)="searchChanged($event)" />
-    </div>
+          type="text"
+          id="recherche"
+          class="form-control"
+          (keyup)="searchChanged($event)" />
+        </div>
 
-    @if(notes === undefined) {
-        <div>
+        @if(notes === undefined) {
+          <div>
             <p>Chargement des notes...</p>
-        </div>
-    } @else if (notes.length === 0) {
-        <div>
+          </div>
+        } @else if (notes.length === 0) {
+          <div>
             <p>Aucune note</p>
-        </div>
-    }
+          </div>
+        }
 
-    @for(note of notes; track note.id) {
-        <div>
+        @for(note of notes; track note.id) {
+          <div>
             <note
-                [note]="note"
-                [noteToModifySubject]="noteToModify"
-                (needToUpdate)="loadNotes()"
-            />
-        </div>
-    }
+              [note]="note"
+              [noteToModifySubject]="noteToModify"
+              (needToUpdate)="loadNotes()"
+              />
+            </div>
+          }
 
-    <app-pagination
-        [nombreParPage]="this.nombreParPage"
-        [nombreElements]="this.nombreTotal"
-        (changementDePageEvent)="this.pageActuelle = $event"
-    />
-</div>
+          <app-pagination
+            [nombreParPage]="this.nombreParPage"
+            [nombreElements]="this.nombreTotal"
+            (changementDePageEvent)="this.pageActuelle = $event"
+            />
+          </div>

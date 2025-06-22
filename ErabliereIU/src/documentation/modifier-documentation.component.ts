@@ -1,4 +1,4 @@
-import { NgIf } from "@angular/common";
+
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Subject } from "rxjs";
@@ -10,10 +10,9 @@ import { ErabliereApiDocument } from "src/model/erabliereApiDocument";
     selector: 'modifier-documentation',
     templateUrl: 'modifier-documentation.component.html',
     imports: [
-        NgIf,
-        ReactiveFormsModule,
-        InputErrorComponent
-    ]
+    ReactiveFormsModule,
+    InputErrorComponent
+]
 })
 export class ModifierDocumentationComponent implements OnInit {
     constructor(private _api: ErabliereApi, private fb: UntypedFormBuilder) {

@@ -1,43 +1,41 @@
-import { NgFor } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { get } from 'cypress/types/lodash';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
-import { Erabliere } from 'src/model/erabliere';
 import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 
 @Component({
     selector: 'hourly-weather-forecast',
     template: `
         <table class="table table-striped table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>Heure</th>
-                    <th>Température</th>
-                    <th>Icône</th>
-                    <th>Type</th>
-                    <th>Intensité</th>
+          <thead>
+            <tr>
+              <th>Heure</th>
+              <th>Température</th>
+              <th>Icône</th>
+              <th>Type</th>
+              <th>Intensité</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (forecast of weatherData; track forecast) {
+              <tr>
+                <td title={{forecast.link}}>{{ getHour(forecast) }}</td>
+                <td>{{ convertToCelsius(forecast.temperature?.value) }}°C</td>
+                <td>
+                  <img
+                    [src]="'/assets/weathericons/accuweather/' + pad2(forecast.weatherIcon) + '-s.png'"
+                    [alt]="forecast.iconPhrase"
+                    [title]="forecast.iconPhrase">
+                  </td>
+                  <td>{{ precipitationTypeText(forecast.precipitationType) }}</td>
+                  <td>{{ precipitationIntensityText(forecast.precipitationIntensity) }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let forecast of weatherData">
-                    <td title={{forecast.link}}>{{ getHour(forecast) }}</td>
-                    <td>{{ convertToCelsius(forecast.temperature?.value) }}°C</td>
-                    <td>
-                        <img 
-                            [src]="'/assets/weathericons/accuweather/' + pad2(forecast.weatherIcon) + '-s.png'"
-                            [alt]="forecast.iconPhrase"
-                            [title]="forecast.iconPhrase">
-                    </td>
-                    <td>{{ precipitationTypeText(forecast.precipitationType) }}</td>
-                    <td>{{ precipitationIntensityText(forecast.precipitationIntensity) }}</td>
-                </tr>
+              }
             </tbody>
-        </table>
-    `,
-    imports: [
-        NgFor
-    ]
+          </table>
+        `,
+    imports: []
 })
 export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
     weatherData: HourlyWeatherForecast[] = [];
@@ -46,7 +44,7 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
     interval?: NodeJS.Timeout;
     idErabliere: any;
 
-    constructor(private api: ErabliereApi, private route: ActivatedRoute) {
+    constructor(private readonly api: ErabliereApi, private readonly route: ActivatedRoute) {
     }
 
     ngOnInit(): void {

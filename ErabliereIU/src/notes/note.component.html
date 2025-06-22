@@ -1,42 +1,61 @@
 <div id="note-{{ note.id }}" class="card mb-3">
-    <h4 class="card-header">{{ note.title }}</h4>
+  <h4 class="card-header">{{ note.title }}</h4>
 
-    <div class="card-body">
-        <p class="noteDescription card-text">{{ note.text }}</p>
+  <div class="card-body">
+    <p class="noteDescription card-text">{{ note.text }}</p>
 
-        <p *ngIf="note.fileExtension === 'csv'" class="card-text">{{ note.decodedTextFile }}</p>
+    @if (note.fileExtension === 'csv') {
+      <p class="card-text">{{ note.decodedTextFile }}</p>
+    }
 
-        <p class="noteDate card-text"><small class="text-muted">Date de Création: {{ note.noteDate | date: 'dd-MM-yyyy' }}</small></p>
+    <p class="noteDate card-text"><small class="text-muted">Date de Création: {{ note.noteDate | date: 'dd-MM-yyyy' }}</small></p>
 
-        <div *ngIf="note.rappel" class="noteReminder card bg-light p-3 mb-3 d-inline-block">
-            <h5 class="card-title">Rappel</h5>
-            <div class="card-text">
-                <small class="text-muted">
-                    <span *ngIf="note.rappel.dateRappel">Début: {{ note.rappel.dateRappel | date: 'dd-MM-yyyy' }}</span><br>
-                    <span *ngIf="note.rappel.dateRappelFin">Fin: {{ note.rappel.dateRappelFin | date: 'dd-MM-yyyy' }}</span><br *ngIf="note.rappel.dateRappelFin">
-                    <span *ngIf="note.rappel.periodicite">Periodicité: {{ note.rappel.periodicite }}</span><br *ngIf="note.rappel.periodicite">
-                    <span *ngIf="note.rappel.isActive !== null">Statut: {{ note.rappel.isActive ? 'Actif' : 'Inactif' }}</span>
+    @if (note.rappel) {
+      <div class="noteReminder card bg-light p-3 mb-3 d-inline-block">
+        <h5 class="card-title">Rappel</h5>
+        <div class="card-text">
+          <small class="text-muted">
+            @if (note.rappel.dateRappel) {
+              <span>Début: {{ note.rappel.dateRappel | date: 'dd-MM-yyyy' }}</span>
+              }<br>
+              @if (note.rappel.dateRappelFin) {
+                <span>Fin: {{ note.rappel.dateRappelFin | date: 'dd-MM-yyyy' }}</span>
+                }@if (note.rappel.dateRappelFin) {
+                <br>
+                }
+                @if (note.rappel.periodicite) {
+                  <span>Periodicité: {{ note.rappel.periodicite }}</span>
+                  }@if (note.rappel.periodicite) {
+                  <br>
+                  }
+                  @if (note.rappel.isActive !== null) {
+                    <span>Statut: {{ note.rappel.isActive ? 'Actif' : 'Inactif' }}</span>
+                  }
                 </small>
+              </div>
             </div>
-        </div>
+          }
 
-        <br>
+          <br>
 
-        <div class="btn-group me-2">
-            <button class="btn btn-info btn-sm" (click)="selectEditNote()">Modifier</button>
-        </div>
-        <div class="btn-group">
-            <button class="btn btn-danger btn-sm" (click)="deleteNote()">Supprimer</button>
-        </div>
-    </div>
+            <div class="btn-group me-2">
+              <button class="btn btn-info btn-sm" (click)="selectEditNote()">Modifier</button>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-danger btn-sm" (click)="deleteNote()">Supprimer</button>
+            </div>
+          </div>
 
-    <div *ngIf="note.fileExtension !== 'csv'">
-        <div class="container">
-            <img
-                *ngIf="note.file !== ''"
-                class="card-img-bottom img-thumbnail rounded mx-auto d-block"
-                style="max-width: 50%;"
-                src="data:image/png;base64,{{ note.file }}" />
+          @if (note.fileExtension !== 'csv') {
+            <div>
+              <div class="container">
+                @if (note.file !== '') {
+                  <img
+                    class="card-img-bottom img-thumbnail rounded mx-auto d-block"
+                    style="max-width: 50%;"
+                    src="data:image/png;base64,{{ note.file }}" />
+                }
+              </div>
+            </div>
+          }
         </div>
-    </div>
-</div>

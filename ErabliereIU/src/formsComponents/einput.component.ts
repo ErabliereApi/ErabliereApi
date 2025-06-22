@@ -1,23 +1,25 @@
 import { Component, Input } from "@angular/core";
 import { FormGroup, ReactiveFormsModule } from "@angular/forms";
-import { NgIf } from "@angular/common";
+
 
 @Component({
     selector: 'einput',
     template: `
         <div [formGroup]="formGroup" class="input-group">
-            <input 
-                class="form-control" 
-                type="{{ type }}" 
-                formControlName="{{ name }}" 
-                name="{{ name }}"
-                placeholder="{{ placeholder }}">
-            <div *ngIf="symbole" class="input-group-append">
+          <input
+            class="form-control"
+            type="{{ type }}"
+            formControlName="{{ name }}"
+            name="{{ name }}"
+            placeholder="{{ placeholder }}">
+            @if (symbole) {
+              <div class="input-group-append">
                 <span class="input-group-text">{{ symbole }}</span>
-            </div>
-        </div>
-    `,
-    imports: [ReactiveFormsModule, NgIf]
+              </div>
+            }
+          </div>
+        `,
+    imports: [ReactiveFormsModule]
 })
 export class EinputComponent {
     @Input() arialabel?: string

@@ -1,30 +1,34 @@
-<div *ngIf="!display">
+@if (!display) {
+  <div>
     <button id="ajouter-documentation-btn" class="btn btn-primary" (click)="onButtonAjouterClick()">Ajouter</button>
-</div>
-<div *ngIf="display">
+  </div>
+}
+@if (display) {
+  <div>
     <span class="text-danger">{{generalError}}</span>
     <form [formGroup]="documentForm">
-        <div class="form-group">
-            <label class="form-label" for="title">Titre: </label><input class="form-control" type="text" formControlName="title">
-            <input-error [errorObj]="errorObj" [controlName]="'title'"></input-error>
-        </div>
-        <div class="form-group">
-            <label class="form-label" for="text">Texte: </label><input class="form-control" type="text" formControlName="text">
-            <input-error [errorObj]="errorObj" [controlName]="'text'"></input-error>
-        </div>
-        <div class="form-group">
-            <label class="form-label" for="file">Fichier: </label><input class="form-control" type="file" formControlName="file" (change)="convertToBase64($event)">
-        </div>
-        <input-error [errorObj]="errorObj" [controlName]="'file'"></input-error>
-        <span class="text-danger">
-            {{fileToLargeErrorMessage}}
-        </span>
+      <div class="form-group">
+        <label class="form-label" for="title">Titre: </label><input class="form-control" type="text" formControlName="title">
+        <input-error [errorObj]="errorObj" [controlName]="'title'"></input-error>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="text">Texte: </label><input class="form-control" type="text" formControlName="text">
+        <input-error [errorObj]="errorObj" [controlName]="'text'"></input-error>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="file">Fichier: </label><input class="form-control" type="file" formControlName="file" (change)="convertToBase64($event)">
+      </div>
+      <input-error [errorObj]="errorObj" [controlName]="'file'"></input-error>
+      <span class="text-danger">
+        {{fileToLargeErrorMessage}}
+      </span>
     </form>
     <button id="creerDocument" class="btn btn-primary mt-3 mb-3 me-2" (click)="onButtonCreerClick()">
-        Créer
-        @if (createDocumentLoading) {
-            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-        }
+      Créer
+      @if (createDocumentLoading) {
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      }
     </button>
     <button id="annuler-creer-document" class="btn btn-secondary mt-3 mb-3" (click)="onButtonAnnulerClick()">Annuler</button>
-</div>
+  </div>
+}

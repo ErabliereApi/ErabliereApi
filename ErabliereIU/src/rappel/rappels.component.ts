@@ -1,5 +1,5 @@
 import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
-import { NgFor } from '@angular/common';
+
 import { Note } from 'src/model/note';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { RappelComponent } from './rappel.component';
@@ -8,9 +8,8 @@ import { AuthorisationFactoryService } from 'src/authorisation/authorisation-fac
 @Component({
   selector: 'app-rappels',
   imports: [
-    NgFor,
     RappelComponent
-  ],
+],
   styleUrls: ['./rappels.component.css'],
   templateUrl: './rappels.component.html'
 })

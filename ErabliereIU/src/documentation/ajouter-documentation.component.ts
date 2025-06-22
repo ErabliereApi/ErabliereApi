@@ -3,16 +3,15 @@ import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators, Reactive
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { ErabliereApiDocument } from "src/model/erabliereApiDocument";
 import { InputErrorComponent } from "../formsComponents/input-error.component";
-import { NgIf } from "@angular/common";
+
 
 @Component({
     selector: 'app-ajouter-documentation',
     templateUrl: 'ajouter-documentation.component.html',
     imports: [
-        NgIf,
-        ReactiveFormsModule,
-        InputErrorComponent,
-    ]
+    ReactiveFormsModule,
+    InputErrorComponent
+]
 })
 export class AjouterDocumentationComponent implements OnInit {
     display:boolean = false;

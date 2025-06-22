@@ -1,4 +1,4 @@
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { MarkdownRendererComponent } from 'src/generic/eapi-markdown.component';
 import { Conversation, Message } from 'src/model/conversation';
@@ -10,28 +10,32 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
     selector: 'erabliereai-message-list',
     template: `
         <ul class="list-unstyled text-white">
-            <li class="d-flex justify-content-between mb-4" *ngFor="let message of messages; index as i">
+          @for (message of messages; track message; let i = $index) {
+            <li class="d-flex justify-content-between mb-4">
               <div class="card mask-custom">
                 <div class="card-header d-flex justify-content-between p-3"
                   style="border-bottom: 1px solid rgba(255,255,255,.3); min-width: 250px;">
                   <p class="fw-bold mb-0">{{ message.isUser ? "Vous" : "ErabliereAI" }}</p>
                   <p class="text-light small mb-0"><i class="far fa-clock"></i> {{ formatMessageDate(message.createdAt)
-                    }}</p>
+                }}</p>
+              </div>
+              <div class="card-body">
+                <div [className]="message.isUser ? '' : 'mb-5'" style="white-space: pre-wrap; word-wrap: break-word;">
+                  <eapi-markdown [content]="message.content"></eapi-markdown>
                 </div>
-                <div class="card-body">
-                  <div [className]="message.isUser ? '' : 'mb-5'" style="white-space: pre-wrap; word-wrap: break-word;">
-                    <eapi-markdown [content]="message.content"></eapi-markdown>
-                  </div>
-                  <button class="btn btn-link" *ngIf="enableTranslation && !message.isUser" (click)="traduire(message.content, i)">
+                @if (enableTranslation && !message.isUser) {
+                  <button class="btn btn-link" (click)="traduire(message.content, i)">
                     Traduire <span style="font-size: 1.2em;">🌐</span>
                   </button>
-                </div>
+                }
               </div>
-            </li>
-          </ul>
-    `,
+            </div>
+          </li>
+        }
+        </ul>
+        `,
     standalone: true,
-    imports: [MarkdownRendererComponent, NgFor, NgIf],
+    imports: [MarkdownRendererComponent],
 })
 export class MessageListComponent implements OnInit, OnChanges {
     @Input() conversation?: Conversation;

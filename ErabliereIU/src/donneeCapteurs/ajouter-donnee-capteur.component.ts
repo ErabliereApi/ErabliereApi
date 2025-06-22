@@ -3,43 +3,53 @@ import { UntypedFormBuilder, UntypedFormGroup, ReactiveFormsModule } from "@angu
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { PostDonneeCapteur } from "src/model/donneeCapteur";
 import { EinputComponent } from "../formsComponents/einput.component";
-import { NgIf } from "@angular/common";
+
 
 @Component({
     selector: 'ajouter-donnee-capteur',
     template: `
-        <button *ngIf="!display" class="btn btn-primary" (click)="afficherForm()">Ajouter</button>
-        <div *ngIf="display" class="ms-3">
+        @if (!display) {
+          <button class="btn btn-primary" (click)="afficherForm()">Ajouter</button>
+        }
+        @if (display) {
+          <div class="ms-3">
             <h3>Ajouter une donnée</h3>
             <form [formGroup]="donneeCapteurForm">
-                <div class="form-group">
-                    <span *ngIf="generalErrorMessage" class="text-danger">{{ generalErrorMessage }}</span>
-                </div>
-                <div class="form-group">
-                    <label for="valeur" class="form-label">Valeur</label>
-                    <einput type="number" id="valeur" name="valeur" [formGroup]="donneeCapteurForm" [symbole]="symbole" />
-                    <div *ngIf="this.donneeCapteurForm.controls['valeur'].errors">
-                        <span class="text-danger">{{ this.donneeCapteurForm.controls['valeur'].errors.message }}</span>
-                    </div>
-                </div>
-                <div class="form-group mb-2">
-                    <label for="date" class="form-label">Date</label>
-                    <input type="datetime-local" class="form-control" id="date" name="date" placeholder="Date" formControlName="date">
-                    <div *ngIf="this.donneeCapteurForm.controls['date'].errors">
-                        <span class="text-danger">{{ this.donneeCapteurForm.controls['date'].errors.message }}</span>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-primary me-2" (click)="ajouterDonnee()">Ajouter</button>
-                <button type="button" class="btn btn-secondary" (click)="annuler()">Annuler</button>
+              <div class="form-group">
+                @if (generalErrorMessage) {
+                  <span class="text-danger">{{ generalErrorMessage }}</span>
+                }
+              </div>
+              <div class="form-group">
+                <label for="valeur" class="form-label">Valeur</label>
+                <einput type="number" id="valeur" name="valeur" [formGroup]="donneeCapteurForm" [symbole]="symbole" />
+                @if (this.donneeCapteurForm.controls['valeur'].errors) {
+                  <div>
+                    <span class="text-danger">{{ this.donneeCapteurForm.controls['valeur'].errors.message }}</span>
+                  </div>
+                }
+              </div>
+              <div class="form-group mb-2">
+                <label for="date" class="form-label">Date</label>
+                <input type="datetime-local" class="form-control" id="date" name="date" placeholder="Date" formControlName="date">
+                @if (this.donneeCapteurForm.controls['date'].errors) {
+                  <div>
+                    <span class="text-danger">{{ this.donneeCapteurForm.controls['date'].errors.message }}</span>
+                  </div>
+                }
+              </div>
+              <button type="button" class="btn btn-primary me-2" (click)="ajouterDonnee()">Ajouter</button>
+              <button type="button" class="btn btn-secondary" (click)="annuler()">Annuler</button>
             </form>
-        </div>
-    `,
+          </div>
+        }
+        `,
     styles: [`
         .border-top {
             border-top: 1px solid #ccc;
         }
     `],
-    imports: [NgIf, ReactiveFormsModule, EinputComponent]
+    imports: [ReactiveFormsModule, EinputComponent]
 })
 export class AjouterDonneeCapteurComponent implements OnInit {
     @Input() idCapteur: any;

@@ -1,6 +1,8 @@
 <div class="row">
-    <h2>Rappels</h2>
-    <div class="col-12 mb-2" *ngFor="let note of todayReminders; let i = index">
+  <h2>Rappels</h2>
+  @for (note of todayReminders; track note; let i = $index) {
+    <div class="col-12 mb-2">
       <app-rappel [note]="note" [index]="i"></app-rappel>
     </div>
+  }
 </div>

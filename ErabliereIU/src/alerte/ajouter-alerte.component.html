@@ -1,7 +1,10 @@
-<div *ngIf="!display">
+@if (!display) {
+  <div>
     <button id="ajouter-alerte-btn" class="btn btn-primary mb-2" (click)="onButtonAjouterClick()">Ajouter</button>
-</div>
-<div *ngIf="display">
+  </div>
+}
+@if (display) {
+  <div>
     <span class="text-danger">{{generalError}}</span>
     <div>
       <div>
@@ -16,8 +19,9 @@
         </form>
       </div>
     </div>
-    <div *ngIf="typeAlerte == 1">
-      <form [formGroup]="alerteForm">
+    @if (typeAlerte == 1) {
+      <div>
+        <form [formGroup]="alerteForm">
           <div class="form-group mb-2">
             <label for="nom" class="form-label" title="Nom de l'alerte utiliser pour l'affichage">Nom: </label>
             <input class="form-control" type="text" formControlName="nom">
@@ -54,15 +58,17 @@
             <label for="niveauBassinMax" class="form-label">Niveau Bassin Max.: </label>
             <einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
           </div>
-        <button id="creer-alerte-donnees-btn" class="btn btn-primary mt-2 me-2 mb-3" (click)="onButtonCreerClick()">Créer</button>
-        <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
-        <div>
-          <span class="text-danger">{{generalError}}</span>
-        </div>
-      </form>
-    </div>
-    <div *ngIf="typeAlerte == 2">
-      <form [formGroup]="alerteCapteurForm">
+          <button id="creer-alerte-donnees-btn" class="btn btn-primary mt-2 me-2 mb-3" (click)="onButtonCreerClick()">Créer</button>
+          <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
+          <div>
+            <span class="text-danger">{{generalError}}</span>
+          </div>
+        </form>
+      </div>
+    }
+    @if (typeAlerte == 2) {
+      <div>
+        <form [formGroup]="alerteCapteurForm">
           <div class="form-group">
             <label for="nom" class="form-label">Nom: </label>
             <input class="form-control" type="text" formControlName="nom">
@@ -70,7 +76,9 @@
           <div class="form-group">
             <label for="idCapteur" class="form-label">Capteur: </label>
             <select class="form-control" formControlName="idCapteur">
-              <option *ngFor="let capteur of capteurs" [value]="capteur.id">{{capteur.nom}}</option>
+              @for (capteur of capteurs; track capteur) {
+                <option [value]="capteur.id">{{capteur.nom}}</option>
+              }
             </select>
           </div>
           <div class="form-group mb-2">
@@ -89,11 +97,13 @@
             <label for="max" class="form-label">Max.: </label>
             <einput [formGroup]="alerteCapteurForm" name="max" symbole={{capteurSymbole()}} />
           </div>
-        <button id="creer-alerte-capteur-btn" class="btn btn-primary mt-2 me-2 mb-3" (click)="onButtonCreerAlerteCapteurClick()">Créer</button>
-        <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
-        <div>
-          <span class="text-danger">{{generalError}}</span>
-        </div>
-      </form>
-    </div>
-</div>
+          <button id="creer-alerte-capteur-btn" class="btn btn-primary mt-2 me-2 mb-3" (click)="onButtonCreerAlerteCapteurClick()">Créer</button>
+          <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
+          <div>
+            <span class="text-danger">{{generalError}}</span>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+}

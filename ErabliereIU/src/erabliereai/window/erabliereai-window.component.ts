@@ -4,14 +4,14 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Conversation, Message, PromptResponse } from 'src/model/conversation';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
+
 import { MessageListComponent } from "../messageList/message-list.component";
 
 @Component({
     selector: 'app-erabliereai-window',
     templateUrl: './erabliereai-window.component.html',
     styleUrls: ['./erabliereai-window.component.css'],
-    imports: [FormsModule, NgIf, NgFor, MessageListComponent],
+    imports: [FormsModule, MessageListComponent],
 })
 export class ErabliereAiWindowComponent implements OnInit {
     @Output() closeChatWindowEvent = new EventEmitter<boolean>();

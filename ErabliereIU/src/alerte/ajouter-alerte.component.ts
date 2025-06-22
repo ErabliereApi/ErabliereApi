@@ -6,14 +6,14 @@ import { AlerteCapteur } from "src/model/alerteCapteur";
 import { Capteur } from "src/model/capteur";
 import { convertTenthToNormale } from "src/core/calculator.service";
 import { EinputComponent } from "../formsComponents/einput.component";
-import { NgIf, NgFor } from "@angular/common";
+
 import { Erabliere } from "src/model/erabliere";
 import { ActivatedRoute } from "@angular/router";
 
 @Component({
     selector: 'ajouter-alerte-modal',
     templateUrl: 'ajouter-alerte.component.html',
-    imports: [NgIf, ReactiveFormsModule, EinputComponent, NgFor]
+    imports: [ReactiveFormsModule, EinputComponent]
 })
 export class AjouterAlerteComponent implements OnInit {
     typeAlerteSelectListForm: UntypedFormGroup
@@ -36,7 +36,7 @@ export class AjouterAlerteComponent implements OnInit {
         this.alerteCapteurForm = this.fb.group({});
     }
     
-    async ngOnInit(): Promise<void> {
+    ngOnInit() {
         this.route.params.subscribe(params => {
             this.idErabliereSelectionee = params['idErabliereSelectionee'];
             this.updateState();
@@ -53,6 +53,7 @@ export class AjouterAlerteComponent implements OnInit {
         if (!this.erabliere?.afficherTrioDonnees) {
             this.typeAlerteSelectListForm.controls['state'].setValue(2);
             this.typeAlerte = 2;
+            this.onChangeAlerteType({ target: { value: 2 } });
         }
         else {
             this.typeAlerte = 1;
