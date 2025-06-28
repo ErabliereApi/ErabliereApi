@@ -13,7 +13,7 @@ tentative = 0
 r = None
 while tentative < 20:
   try:
-    r = proxy.envoyer_donnee_capteur(sys.argv[len(sys.argv)-1], 1)
+    r = proxy.envoyer_donnee_capteur_v2(sys.argv[len(sys.argv)-1], 1)
     if r.status_code != 200 and r.status_code != 201 and r.status_code != 204:
       print(r.status_code)
       print(r.text)
