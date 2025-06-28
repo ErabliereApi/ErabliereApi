@@ -22,9 +22,9 @@ import time
 import sys
 
 def measure_temp():
-        temp = os.popen("vcgencmd measure_temp").readline()
-        return (temp.replace("temp=",""))
-
+  temp = os.popen("vcgencmd measure_temp").readline()
+  temp = (temp.replace("temp=",""))
+  return float(temp.split("'")[0])
 
 t = measure_temp()
 
@@ -42,14 +42,6 @@ if len(sys.argv) > 2:
 
 proxy = ErabliereApiProxy(sys.argv[1], authType)
 
-def get_all_digit(x):
-  xp = ""
-  for c in x:
-    if c.isdigit():
-      xp = xp + c
-
-  return int(xp)
-
-r = proxy.envoyer_donnee_capteur(sys.argv[len(sys.argv)-1], get_all_digit(t))
+r = proxy.envoyer_donnee_capteur_v2(sys.argv[len(sys.argv)-1], t)
 
 print(r)
