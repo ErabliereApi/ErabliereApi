@@ -1,5 +1,4 @@
 import json
-from warnings import deprecated
 import requests
 import os
 from urllib.parse import urlparse
@@ -30,11 +29,6 @@ class ErabliereApiProxy:
                'dd': datedebut,
                'df': datefin}
     return self.post_request(self.path_e + str(id_erabliere) + "/dompeux", dompeux)
-
-  @deprecated(reason="This method is obsolete, use new_method instead.")
-  def envoyer_donnee_capteur(self, id_capteur, valeur, text = None):
-    donnee = {'V': valeur, 'idCapteur': id_capteur, 'text': text}
-    return self.post_request("/capteurs/" + str(id_capteur) + "/donneesCapteur", donnee)
   
   def envoyer_donnee_capteur_v2(self, id_capteur, valeur, text = None):
     donnee = {'V': valeur, 'idCapteur': id_capteur, 'text': text}
