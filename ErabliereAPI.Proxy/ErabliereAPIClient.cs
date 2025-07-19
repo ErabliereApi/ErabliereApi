@@ -6895,9 +6895,9 @@ namespace ErabliereAPI.Proxy
         /// <param name="noteId">Id de la note</param>
         /// <returns>Retourne l'image de la note</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> ImageAsync(System.Guid id, System.Guid noteId)
+        public virtual System.Threading.Tasks.Task<FileResponse> ImageGETAsync(System.Guid id, System.Guid noteId)
         {
-            return ImageAsync(id, noteId, System.Threading.CancellationToken.None);
+            return ImageGETAsync(id, noteId, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -6908,7 +6908,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="noteId">Id de la note</param>
         /// <returns>Retourne l'image de la note</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> ImageAsync(System.Guid id, System.Guid noteId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<FileResponse> ImageGETAsync(System.Guid id, System.Guid noteId, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -6965,6 +6965,12 @@ namespace ErabliereAPI.Proxy
                             return fileResponse_;
                         }
                         else
+                        if (status_ == 204)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("La note n\'a pas d\'image", status_, responseText_, headers_, null);
+                        }
+                        else
                         if (status_ == 401)
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -6993,6 +6999,140 @@ namespace ErabliereAPI.Proxy
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("L\'\u00e9rabli\u00e8re ne poss\u00e8de pas la note", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Action permettant de mettre à jour l'image d'une note
+        /// </summary>
+        /// <param name="noteId">L'id de la note</param>
+        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="idErabliere">L'id de l'érablière</param>
+        /// <param name="fileExtension">L'extension du fichier</param>
+        /// <param name="file">Fichier obtenu depuis le multipart</param>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task ImagePUTAsync(System.Guid noteId, System.Guid id, System.Guid? idErabliere, string? fileExtension, FileParameter file)
+        {
+            return ImagePUTAsync(noteId, id, idErabliere, fileExtension, file, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Action permettant de mettre à jour l'image d'une note
+        /// </summary>
+        /// <param name="noteId">L'id de la note</param>
+        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="idErabliere">L'id de l'érablière</param>
+        /// <param name="fileExtension">L'extension du fichier</param>
+        /// <param name="file">Fichier obtenu depuis le multipart</param>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ImagePUTAsync(System.Guid noteId, System.Guid id, System.Guid? idErabliere, string? fileExtension, FileParameter file, System.Threading.CancellationToken cancellationToken)
+        {
+            if (noteId == null)
+                throw new System.ArgumentNullException("noteId");
+
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var boundary_ = System.Guid.NewGuid().ToString();
+                    var content_ = new System.Net.Http.MultipartFormDataContent(boundary_);
+                    content_.Headers.Remove("Content-Type");
+                    content_.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary_);
+
+                    if (file == null)
+                        throw new System.ArgumentNullException("file");
+                    else
+                    {
+                        var content_file_ = new System.Net.Http.StreamContent(file.Data);
+                        if (!string.IsNullOrEmpty(file.ContentType))
+                            content_file_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(file.ContentType);
+                        content_.Add(content_file_, "File", file.FileName ?? "File");
+                    }
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Erablieres/{id}/Notes/{noteId}/Image"
+                    urlBuilder_.Append("Erablieres/");
+                    urlBuilder_.Append("/Notes/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(noteId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Image");
+                    urlBuilder_.Append('?');
+                    if (idErabliere != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("IdErabliere")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(idErabliere, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (fileExtension != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("FileExtension")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(fileExtension, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 204)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -12482,6 +12622,12 @@ namespace ErabliereAPI.Proxy
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 204)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("No Content", status_, responseText_, headers_, null);
                         }
                         else
                         if (status_ == 401)
