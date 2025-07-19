@@ -93,6 +93,32 @@ public class NotesController : ControllerBase
                      && n.Rappel.IsActive
                      && n.Rappel.DateRappel <= today
                      && (n.Rappel.DateRappelFin == null || n.Rappel.DateRappelFin >= today))
+            .Select(n => new Note
+            {
+                Id = n.Id,
+                IdErabliere = n.IdErabliere,
+                Title = n.Title,
+                Text = n.Text,
+                NoteDate = n.NoteDate,
+                FileExtension = n.FileExtension,
+                FileName = n.FileName,
+                ExternalStorageType = n.ExternalStorageType,
+                ExternalStorageUrl = n.ExternalStorageUrl,
+                Rappel = new Rappel
+                {
+#nullable disable
+                    Id = n.Rappel.Id,
+                    NoteId = n.Rappel.NoteId,
+#nullable enable
+                    DateRappel = n.Rappel.DateRappel,
+                    DateRappelFin = n.Rappel.DateRappelFin,
+                    Periodicite = n.Rappel.Periodicite,
+                    IsActive = n.Rappel.IsActive
+                }
+            })
+#nullable disable
+            .OrderByDescending(n => n.Rappel.DateRappel)
+#nullable enable
             .ToListAsync(token);
         
 
@@ -107,6 +133,7 @@ public class NotesController : ControllerBase
     /// <param name="token"></param>
     /// <returns></returns>
     /// <response code="200">Retourne l'image de la note</response>
+    /// <response code="204">La note n'a pas d'image</response>
     /// <response code="404">La note n'existe pas</response>
     /// <response code="500">Erreur interne</response>
     /// <response code="400">L'érablière ne possède pas la note</response>
@@ -114,6 +141,7 @@ public class NotesController : ControllerBase
     /// <response code="403">Interdit</response>
     [HttpGet("{noteId}/Image")]
     [ProducesResponseType(200, Type = typeof(FileStreamResult))]
+    [ProducesResponseType(204)]
     [ValiderOwnership("id")]
     public async Task<IActionResult> ObtenirImage(Guid id, Guid noteId, CancellationToken token)
     {
@@ -329,6 +357,7 @@ public class NotesController : ControllerBase
     /// <returns></returns>
     [HttpPut("PeriodiciteNotes")]
     [ProducesResponseType(200, Type = typeof(Note))]
+    [ProducesResponseType(204)]
     [ValiderOwnership("id")]
     public async Task<IActionResult> UpdateRappels(Guid id, CancellationToken token)
     {
@@ -336,7 +365,20 @@ public class NotesController : ControllerBase
 
         var notesWithRappel = await _depot.Notes
             .Include(n => n.Rappel)
-            .Where(n => n.IdErabliere == id && n.Rappel != null && n.Rappel.IsActive &&  n.Rappel.DateRappelFin < today && n.Rappel.Periodicite != null)
+            .Where(n => n.IdErabliere == id && n.Rappel != null && n.Rappel.IsActive && n.Rappel.DateRappelFin < today && n.Rappel.Periodicite != null)
+            .Select(n => new Note
+            {
+                Id = n.Id,
+                Rappel = new Rappel
+                {
+#nullable disable
+                    Id = n.Rappel.Id,
+#nullable enable
+                    DateRappel = n.Rappel.DateRappel,
+                    DateRappelFin = n.Rappel.DateRappelFin,
+                    Periodicite = n.Rappel.Periodicite
+                }
+            })
             .ToListAsync(token);
 
         if (!notesWithRappel.Any())
@@ -344,62 +386,77 @@ public class NotesController : ControllerBase
             return NoContent();
         }
 
+        UpdateNoteWithRappel(notesWithRappel);
+
+        await _depot.SaveChangesAsync(token);
+
+        return Ok(notesWithRappel);
+    }
+
+    private void UpdateNoteWithRappel(List<Note> notesWithRappel)
+    {
         foreach (var note in notesWithRappel)
         {
-            if (note == null || 
-                note.Rappel == null || 
-                note.Rappel.Periodicite == null ||
-                note.Rappel.DateRappel == null) 
+            if (!IsNoteRappelValid(note))
             {
                 _logger.LogWarning("Note with id {NoteId} has a null rappel or rappel properties", note?.Id);
                 continue;
             }
 
-            if (note.Rappel.Periodicite == "annuel")
+            if (note.Rappel == null)
             {
-                note.Rappel.DateRappel = note.Rappel.DateRappel.Value.AddYears(1);
-                if (note.Rappel.DateRappelFin != null)
-                {
-                    note.Rappel.DateRappelFin = note.Rappel.DateRappelFin.Value.AddYears(1);
-                }
+                _logger.LogWarning("Note with id {NoteId} has a null rappel", note.Id);
+                continue;
             }
-            else if (note.Rappel.Periodicite == "mensuel")
-            {
-                note.Rappel.DateRappel = note.Rappel.DateRappel.Value.AddMonths(1);
-                if (note.Rappel.DateRappelFin != null)
-                {
-                    note.Rappel.DateRappelFin = note.Rappel.DateRappelFin.Value.AddMonths(1);
-                }
-            }
-            else if (note.Rappel.Periodicite == "bihebo") 
-            {
-                note.Rappel.DateRappel = note.Rappel.DateRappel.Value.AddDays(14);
-                if (note.Rappel.DateRappelFin != null)
-                {
-                    note.Rappel.DateRappelFin = note.Rappel.DateRappelFin.Value.AddDays(14);
-                }
-            }
-            else if (note.Rappel.Periodicite == "hebdo")
-            {
-                note.Rappel.DateRappel = note.Rappel.DateRappel.Value.AddDays(7);
-                if (note.Rappel.DateRappelFin != null)
-                {
-                    note.Rappel.DateRappelFin = note.Rappel.DateRappelFin.Value.AddDays(7);
-                }
-            }
-            else if (note.Rappel.Periodicite == "quotidien")
-            {
-                note.Rappel.DateRappel = note.Rappel.DateRappel.Value.AddDays(1);
-                if (note.Rappel.DateRappelFin != null)
-                {
-                    note.Rappel.DateRappelFin = note.Rappel.DateRappelFin.Value.AddDays(1);
-                }
-            }
+
+            UpdateRappelDates(note.Rappel);
+        }
+    }
+
+    private static bool IsNoteRappelValid(Note? note)
+    {
+        return note != null &&
+               note.Rappel != null &&
+               note.Rappel.Periodicite != null &&
+               note.Rappel.DateRappel != null;
+    }
+
+    private void UpdateRappelDates(Rappel rappel)
+    {
+        if (rappel.DateRappel == null)
+        {
+            _logger.LogWarning("Rappel with id {RappelId} has a null DateRappel", rappel.Id);
+            return;
         }
 
-        await _depot.SaveChangesAsync(token);
-
-        return Ok(notesWithRappel);
+        switch (rappel.Periodicite)
+        {
+            case "annuel":
+                rappel.DateRappel = rappel.DateRappel.Value.AddYears(1);
+                if (rappel.DateRappelFin != null)
+                    rappel.DateRappelFin = rappel.DateRappelFin.Value.AddYears(1);
+                break;
+            case "mensuel":
+                rappel.DateRappel = rappel.DateRappel.Value.AddMonths(1);
+                if (rappel.DateRappelFin != null)
+                    rappel.DateRappelFin = rappel.DateRappelFin.Value.AddMonths(1);
+                break;
+            case "bihebo":
+                rappel.DateRappel = rappel.DateRappel.Value.AddDays(14);
+                if (rappel.DateRappelFin != null)
+                    rappel.DateRappelFin = rappel.DateRappelFin.Value.AddDays(14);
+                break;
+            case "hebdo":
+                rappel.DateRappel = rappel.DateRappel.Value.AddDays(7);
+                if (rappel.DateRappelFin != null)
+                    rappel.DateRappelFin = rappel.DateRappelFin.Value.AddDays(7);
+                break;
+            case "quotidien":
+                rappel.DateRappel = rappel.DateRappel.Value.AddDays(1);
+                if (rappel.DateRappelFin != null)
+                    rappel.DateRappelFin = rappel.DateRappelFin.Value.AddDays(1);
+                break;
+        }
     }
 
 
