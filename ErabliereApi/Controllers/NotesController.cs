@@ -250,11 +250,6 @@ public class NotesController : ControllerBase
             return BadRequest("Le fichier est manquant");
         }
 
-        if (id != postNoteMultipart.IdErabliere)
-        {
-            return BadRequest("L'id de la route ne concorde pas avec l'érablière possédant la note");
-        }
-
         var note = _mapper.Map<Note>(postNoteMultipart);
 
         note.File = await postNoteMultipart.File.ToByteArray(token);
@@ -281,13 +276,16 @@ public class NotesController : ControllerBase
     {
         if (id != putNote.IdErabliere)
         {
-            return BadRequest("L'id de la route ne concorde pas avec l'érablière possédant la note");
+            ModelState.AddModelError("id", "L'id de la route ne concorde pas avec l'érablière possédant la note");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
         if (noteId != putNote.Id)
         {
-            return BadRequest(
-                "L'id de la note dans la route ne concorde pas avec l'id de la note dans le corps du message.");
+            ModelState.AddModelError("id", "L'id de la note dans la route ne concorde pas avec l'id de la note dans le corps du message");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
         var entity = await _depot.Notes.FindAsync([noteId], token);
@@ -317,10 +315,12 @@ public class NotesController : ControllerBase
             // Update rappel si le rappel est présent
             if (putNote.Rappel != null)
             {
-                var allowedPeriodiciteValues = new[] { "annuel", "mensuel", "hebdo", "bihebo", "quotidien", null };
+                var allowedPeriodiciteValues = new[] { "annuel", "mensuel", "hebdo", "bihebdo", "quotidien", null };
                 if (!allowedPeriodiciteValues.Contains(putNote.Rappel.Periodicite))
                 {
-                    return BadRequest("Periodicité invalide. Valeurs acceptées: annuel, mensuel, hebdo, quotidien");
+                    ModelState.AddModelError("rappel.periodicite", $"Periodicité invalide. Valeurs acceptées: Annuel, Mensuel, Hebdo, Bihebdo, Quotidien. Était: {putNote.Rappel.Periodicite}");
+
+                    return BadRequest(new ValidationProblemDetails(ModelState));
                 }
 
                 var rappel = await _depot.Rappels.FirstOrDefaultAsync(r => r.NoteId == entity.Id, token);
@@ -370,11 +370,6 @@ public class NotesController : ControllerBase
         if (postNoteMultipart.File == null)
         {
             return BadRequest("Le fichier est manquant");
-        }
-
-        if (id != postNoteMultipart.IdErabliere)
-        {
-            return BadRequest("L'id de la route ne concorde pas avec l'érablière possédant la note");
         }
 
         var entity = await _depot.Notes.FindAsync([noteId], token);
@@ -438,6 +433,29 @@ public class NotesController : ControllerBase
         return Ok(notesWithRappel);
     }
 
+    /// <summary>
+    /// Action permettant de rappeler la prochaine période pour les notes avec un rappel actif
+    /// </summary>
+    [ProducesResponseType(200, Type = typeof(Rappel))]
+    [HttpPut("{IdNote}/RappelProchainePeriode")]
+    public async Task<IActionResult> RappelProchainePeriode(Guid id, Guid idNote, CancellationToken token)
+    {
+        var rappel = await _depot.Rappels
+            .Where(r => r.NoteId == idNote && r.IsActive && r.Note.IdErabliere == id)
+            .FirstOrDefaultAsync(token);
+
+        if (rappel == null)
+        {
+            return NotFound("La note ou le rappel n'existe pas");
+        }
+
+        UpdateRappelDates(rappel);
+
+        await _depot.SaveChangesAsync(token);
+
+        return Ok(rappel);
+    }
+
     private void UpdateNoteWithRappel(List<Note> notesWithRappel)
     {
         foreach (var note in notesWithRappel)
@@ -486,7 +504,7 @@ public class NotesController : ControllerBase
                 if (rappel.DateRappelFin != null)
                     rappel.DateRappelFin = rappel.DateRappelFin.Value.AddMonths(1);
                 break;
-            case "bihebo":
+            case "bihebdo":
                 rappel.DateRappel = rappel.DateRappel.Value.AddDays(14);
                 if (rappel.DateRappelFin != null)
                     rappel.DateRappelFin = rappel.DateRappelFin.Value.AddDays(14);

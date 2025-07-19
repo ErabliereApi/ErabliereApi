@@ -14,6 +14,7 @@ export class NoteComponent {
     @Input() note: Note;
     @Input() noteToModifySubject?: Subject<Note | null>;
     @Output() needToUpdate = new EventEmitter();
+    actionError?: string | null;
 
     constructor(private readonly _api: ErabliereApi) {
         this.note = new Note();
@@ -39,10 +40,14 @@ export class NoteComponent {
             if (!file) return;
             // Appel à l'API pour uploader l'image
             try {
+                // Extraire le blob de l'image dans la balise input
+                const blob = input.files != null ? input.files[0] : new Blob([]);
+                const file = new File([blob], `note-${this.note.id}.png`, { type: 'image/png' });
                 await this._api.putNoteImage(this.note.idErabliere, this.note.id, file);
                 this.needToUpdate.emit();
             } catch (error) {
                 console.error('Erreur lors de l\'upload de l\'image:', error);
+                this.actionError = 'Erreur lors de l\'upload de l\'image. Veuillez réessayer.';
             }
         };
         document.body.appendChild(input);
@@ -50,13 +55,15 @@ export class NoteComponent {
         document.body.removeChild(input);
     }
 
+    isGeneratingImage = false;
     genererUneImageParIA() {
+        this.isGeneratingImage = true;
         this._api.ErabliereIAImage({
             imageCount: 1,
             prompt: `Générer une image pour la note: ${this.note.title || 'Sans titre'} avec la description: ${this.note.text || 'Aucune description'}`,
             size: '1024x1024'
         }).then(response => {
-            let imageUrl = response.value.data.url;
+            let imageUrl = response.images[0].url;
             fetch(imageUrl)
                 .then(res => res.blob())
                 .then(blob => {
@@ -64,20 +71,36 @@ export class NoteComponent {
                     this._api.putNoteImage(this.note.idErabliere, this.note.id, file)
                         .then(() => {
                             this.needToUpdate.emit();
+                            this.actionError = null;
                         })
                         .catch(err => {
                             console.error('Erreur lors de l\'upload de l\'image générée:', err);
+                            this.actionError = 'Erreur lors de l\'upload de l\'image générée. Veuillez réessayer.';
                         });
+                }).catch(err => {
+                    console.error('Erreur lors de la récupération de l\'image générée:', err);
+                    this.actionError = 'Erreur lors de la récupération de l\'image générée. Veuillez réessayer.';
+                    this.isGeneratingImage = false
+                }).finally(() => {
+                    this.isGeneratingImage = false;
                 });
-        })
+        }).catch(err => {
+            console.error('Erreur lors de la génération de l\'image par IA:', err);
+            this.actionError = 'Erreur lors de la génération de l\'image par IA. Veuillez réessayer.';
+            this.isGeneratingImage = false;
+        }).finally(() => {
+            this.isGeneratingImage = false;
+        });
     }
 
     deleteNote() {
-        this._api.deleteNote(this.note.idErabliere, this.note.id).then(
-            (data) => {
-                this.needToUpdate.emit();
-            }
-        );
+        if (confirm("Êtes-vous sûr de vouloir supprimer la note " + this.note.title + " ?")) {
+            this._api.deleteNote(this.note.idErabliere, this.note.id).then(
+                (data) => {
+                    this.needToUpdate.emit();
+                }
+            );
+        }
     }
 
     userIsInRole(arg0: string) {

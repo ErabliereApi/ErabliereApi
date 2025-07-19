@@ -1,4 +1,3 @@
-using AutoMapper;
 using Azure;
 using Azure.AI.OpenAI;
 using ErabliereApi.Depot.Sql;
@@ -73,6 +72,9 @@ public class ErabliereAIController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Récupérer une conversation publique
+    /// </summary>
     [HttpGet("Conversations/Public/{id}")]
     [AllowAnonymous]
     [ProducesResponseType(200, Type = typeof(List<Message>))]
@@ -118,32 +120,7 @@ public class ErabliereAIController : ControllerBase
         string defaultSystemPhrase = "Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique.";
         // Premièrement ont obtient la conversation
         // if the convesation id is null, create a new conversation
-        Conversation? conversation = null;
-        if (prompt.ConversationId == null)
-        {
-            using var scope = HttpContext.RequestServices.CreateScope();
-
-            conversation = new Conversation
-            {
-                UserId = UsersUtils.GetUniqueName(scope, HttpContext.User),
-                CreatedOn = DateTime.Now,
-                LastMessageDate = DateTime.Now,
-                Name = prompt.Prompt,
-                SystemMessage = !string.IsNullOrWhiteSpace(prompt.SystemMessage) ? prompt.SystemMessage : defaultSystemPhrase,
-            };
-            _depot.Conversations.Add(conversation);
-            await _depot.SaveChangesAsync(cancellationToken);
-            prompt.ConversationId = conversation.Id;
-        }
-        else 
-        {
-            conversation = await _depot.Conversations.FindAsync([prompt.ConversationId], cancellationToken);
-
-            if (conversation != null) 
-            {
-                conversation.LastMessageDate = DateTime.Now;
-            }
-        }
+        Conversation? conversation = await GetOrCreateConversation(prompt, defaultSystemPhrase, cancellationToken);
 
         // Ensuite ont envoie le prompt à l'IA
         var client = new OpenAIClient(
@@ -213,7 +190,8 @@ public class ErabliereAIController : ControllerBase
                 var completion = completionResponse.Value;
 
                 var localText = completion?.Choices?.FirstOrDefault()?.Text;
-                if (localText != null) {
+                if (localText != null)
+                {
                     aiResponse = localText;
                 }
                 break;
@@ -240,13 +218,46 @@ public class ErabliereAIController : ControllerBase
         await _depot.Messages.AddAsync(response, cancellationToken);
         await _depot.SaveChangesAsync(cancellationToken);
 
-        return Ok(new PostPromptResponse 
+        return Ok(new PostPromptResponse
         {
-            
+
             Prompt = prompt,
             Conversation = conversation,
             Response = response,
         });
+    }
+
+    private async Task<Conversation?> GetOrCreateConversation(PostPrompt prompt, string defaultSystemPhrase, CancellationToken cancellationToken)
+    {
+        Conversation? conversation = null;
+
+        if (prompt.ConversationId == null)
+        {
+            using var scope = HttpContext.RequestServices.CreateScope();
+
+            conversation = new Conversation
+            {
+                UserId = UsersUtils.GetUniqueName(scope, HttpContext.User),
+                CreatedOn = DateTime.Now,
+                LastMessageDate = DateTime.Now,
+                Name = prompt.Prompt,
+                SystemMessage = !string.IsNullOrWhiteSpace(prompt.SystemMessage) ? prompt.SystemMessage : defaultSystemPhrase,
+            };
+            _depot.Conversations.Add(conversation);
+            await _depot.SaveChangesAsync(cancellationToken);
+            prompt.ConversationId = conversation.Id;
+        }
+        else
+        {
+            conversation = await _depot.Conversations.FindAsync([prompt.ConversationId], cancellationToken);
+
+            if (conversation != null)
+            {
+                conversation.LastMessageDate = DateTime.Now;
+            }
+        }
+
+        return conversation;
     }
 
     /// <summary>
@@ -296,6 +307,8 @@ public class ErabliereAIController : ControllerBase
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPost("Images")]
+    [ProducesResponseType(200, Type = typeof(PostImageGenerationResponse))]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Images([FromBody] PostImagesGenerationModel model, CancellationToken token)
     {
         var client = new OpenAIClient(
@@ -305,15 +318,31 @@ public class ErabliereAIController : ControllerBase
 
         var images = await client.GetImageGenerationsAsync(new ImageGenerationOptions
         {
-            DeploymentName = "Dalle3",
+            DeploymentName = model.DeploymentName ?? "Dalle3",
             ImageCount = model.ImageCount ?? 1,
             Prompt = model.Prompt,
-            Quality = ImageGenerationQuality.Standard,
+            Quality = model.Quality == null ? ImageGenerationQuality.Standard : model.Quality switch
+            {
+                "Standard" => ImageGenerationQuality.Standard,
+                "Hd" => ImageGenerationQuality.Hd,
+                _ => throw new ArgumentException("Invalid quality value")
+            },
             Size = new ImageSize(model.Size ?? "1024x1024"),
-            Style = ImageGenerationStyle.Natural
+            Style = model.Style == null ? ImageGenerationStyle.Natural : model.Style switch
+            {
+                "Natural" => ImageGenerationStyle.Natural,
+                "Vivid" => ImageGenerationStyle.Vivid,
+                _ => throw new ArgumentException("Invalid style value")
+            }
         }, token);
 
-        return Ok(images);
+        return Ok(new PostImageGenerationResponse
+        {
+            Images = images.Value.Data.Select(i => new PostImageGenerationResponseImage
+            {
+                Url = i.Url.ToString()
+            }).ToList()
+        });
     }
 
     /// <summary>
@@ -398,7 +427,7 @@ public class ErabliereAIController : ControllerBase
     /// <returns></returns>
     [HttpPatch("Conversations/{id}/UserId")]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
-    public async Task<IActionResult> PatchConversation(Guid id, PatchConversation patch, CancellationToken token)
+    public async Task<IActionResult> PatchConversationAsAdmin(Guid id, PatchConversation patch, CancellationToken token)
     {
         var conversation = await _depot.Conversations
             .FirstOrDefaultAsync(c => c.Id == id, token);

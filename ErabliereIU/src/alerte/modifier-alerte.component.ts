@@ -4,7 +4,7 @@ import { Alerte } from "src/model/alerte";
 import { UntypedFormGroup, UntypedFormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { Subject } from "rxjs";
 import { AlerteCapteur } from "src/model/alerteCapteur";
-import { convertTenthToNormale, divideByTen, divideNByTen } from "src/core/calculator.service";
+import { convertTenthToNormale, divideByTen } from "src/core/calculator.service";
 import { EinputComponent } from "../formsComponents/einput.component";
 
 
@@ -14,7 +14,7 @@ import { EinputComponent } from "../formsComponents/einput.component";
     imports: [ReactiveFormsModule, EinputComponent]
 })
 export class ModifierAlerteComponent implements OnInit {
-    constructor(private _api: ErabliereApi, private fb: UntypedFormBuilder) {
+    constructor(private readonly _api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.alerteForm = this.fb.group({
             nom: '',
             destinataireCourriel: '',

@@ -1,8 +1,9 @@
 import {
     Component,
-    ElementRef,
+    EventEmitter,
     Input,
-    ViewChild,
+    OnInit,
+    Output,
 } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Note } from 'src/model/note';
@@ -12,14 +13,24 @@ import { Note } from 'src/model/note';
     imports: [],
     templateUrl: './modal-rappel.component.html'
 })
-export class ModalRappelComponent {
-    @Input() note: Note;
-    @ViewChild('modalRappel') modalRappel!: ElementRef;
-    @Input() index!: number;
+export class ModalRappelComponent implements OnInit {
+    @Input() note: Note = new Note();
     error: string | null = null;
+    images: any;
+    @Output() closeModal = new EventEmitter<boolean>();
+    @Output() needToUpdate = new EventEmitter<boolean>();
 
     constructor(private readonly _api: ErabliereApi) {
-        this.note = new Note();
+
+    }
+
+    ngOnInit(): void {
+        if (!this.note) {
+            console.error('Note is not provided to ModalRappelComponent');
+            return;
+        }
+        console.log('ModalRappelComponent initialized with note:', this.note);
+        this.getImages();
     }
 
     getImages(): void {
@@ -54,6 +65,14 @@ export class ModalRappelComponent {
     }
 
     reportRappelProchainePeriode() {
-        throw new Error('Method not implemented.');
+        this._api.reportRappelProchainePeriode(this.note.idErabliere, this.note.id).then(() => {
+            this.error = null;
+            console.log('Periodicite due updated successfully');
+            this.closeModal.emit(true);
+            this.needToUpdate.emit(true);
+        }).catch(error => {
+            console.error('Error updating periodicite due:', error);
+            this.error = 'Erreur lors du repport à la prochaine période.';
+        });
     }
 }

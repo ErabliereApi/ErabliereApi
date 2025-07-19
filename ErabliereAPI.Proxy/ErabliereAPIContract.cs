@@ -1523,7 +1523,7 @@ namespace ErabliereAPI.Proxy
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="id">L'id de la note si le client désire l'initialiser</param>
         /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
@@ -1533,14 +1533,14 @@ namespace ErabliereAPI.Proxy
         /// <param name="noteDate">La date de la note</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? idNote, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate);
+        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? id, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
+        /// <param name="id">L'id de la note si le client désire l'initialiser</param>
         /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
@@ -1550,7 +1550,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="noteDate">La date de la note</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? idNote, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? id, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Effectue le rapport de degré jour pour une érablière

@@ -8,16 +8,6 @@ namespace ErabliereApi.Models
     public class PostNoteMultipart
     {
         /// <summary>
-        /// L'id de la note si le client désire l'initialiser
-        /// </summary>
-        public Guid? Id { get; set; }
-
-        /// <summary>
-        /// L'id de l'érablière
-        /// </summary>
-        public Guid? IdErabliere { get; set; }
-
-        /// <summary>
         /// Le titre de la note
         /// </summary>
         [MaxLength(200)]

@@ -8,6 +8,11 @@ namespace ErabliereApi.Donnees.Action.Post;
 public class PostImagesGenerationModel
 {
     /// <summary>
+    /// Nom du déploiement pour la génération d'images. Si aucun nom n'est fourni, le modèle par défaut sera utilisé.
+    /// </summary>
+    public string? DeploymentName { get; set; }
+
+    /// <summary>
     /// Nombre d'images à générer
     /// </summary>
     public int? ImageCount { get; set; }
@@ -23,4 +28,17 @@ public class PostImagesGenerationModel
     /// <example>1024x1024</example>
     [RegularExpression("^(1024x1024|1792x1024|1024x1792)$", ErrorMessage = "La taille devrait être une des suivantes '1024x1024', '1792x1024', '1024x1792'.")]
     public string? Size { get; set; }
+
+    /// <summary>
+    /// Qualité des images
+    /// </summary>
+    [RegularExpression("^(Standard|Hd)$", ErrorMessage = "La qualité devrait être une des suivantes 'Standard', 'HD'.")]
+    public string? Quality { get; set; }
+
+    /// <summary>
+    /// Style des images
+    /// </summary>
+    [RegularExpression("^(Natural|Vivid)$", ErrorMessage = "Le style devrait être une des suivantes 'Natural', 'Vivid'.")]
+    public string? Style { get; set; }
+    
 }

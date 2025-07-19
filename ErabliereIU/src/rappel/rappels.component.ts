@@ -4,11 +4,14 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { RappelComponent } from './rappel.component';
 import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
 import { ActivatedRoute } from '@angular/router';
+import { ModalRappelComponent } from './modal-rappel/modal-rappel.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-rappels',
   imports: [
-    RappelComponent
+    RappelComponent,
+    ModalRappelComponent
   ],
   templateUrl: './rappels.component.html'
 })
@@ -16,6 +19,8 @@ export class RappelsComponent implements OnChanges, OnInit {
   @Input() idErabliereSelectionnee: any;
   todayReminders: Note[] = [];
   isLogged: boolean = false;
+  modalNoteSubject: Subject<Note | null> = new Subject<Note | null>();
+  modalNote: Note | null = null;
 
   constructor(private readonly erabliereapiService: ErabliereApi, private readonly _authService: AuthorisationFactoryService, private readonly _router: ActivatedRoute) {
     if (this._authService.getAuthorisationService().type == "AuthDisabled") {
@@ -74,4 +79,16 @@ export class RappelsComponent implements OnChanges, OnInit {
         console.error('Error updating putNotePeriodiciteDue:', error);
       });
   }
+
+  modalIsOpen = false;
+  openModal(note: Note) {
+    console.log('1. Open modal called');
+    this.modalNote = note;
+    this.modalIsOpen = true;
+  }
+
+  closeModal() {
+    this.modalNote = null;
+    this.modalIsOpen = false;
+}
 }

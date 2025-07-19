@@ -9214,7 +9214,7 @@ namespace ErabliereAPI.Proxy
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? idNote, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate)
         {
-            return MultipartAsync(id, idNote, idErabliere, title, text, file, fileExtension, created, noteDate, System.Threading.CancellationToken.None);
+            return MultipartAsync(id, id, idErabliere, title, text, file, fileExtension, created, noteDate, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -9248,11 +9248,11 @@ namespace ErabliereAPI.Proxy
                     content_.Headers.Remove("Content-Type");
                     content_.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary_);
 
-                    if (idNote == null)
+                    if (id == null)
                         throw new System.ArgumentNullException("id");
                     else
                     {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(idNote, System.Globalization.CultureInfo.InvariantCulture)), "Id");
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)), "Id");
                     }
 
                     if (idErabliere == null)

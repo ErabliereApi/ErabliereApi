@@ -1,19 +1,16 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, ViewChild } from '@angular/core';
 import { Note } from 'src/model/note';
-import { ModalRappelComponent} from "./modal-rappel/modal-rappel.component";
+import { ModalRappelComponent } from "./modal-rappel/modal-rappel.component";
 
 @Component({
     selector: 'app-rappel',
-    imports: [
-        ModalRappelComponent
-    ],
     styleUrls: ['./rappel.component.css'],
     templateUrl: './rappel.component.html'
 })
 export class RappelComponent {
     @Input() note: Note;
-    @Input() index!: number;
     @ViewChild(ModalRappelComponent, { static: false }) modalRappelComponent!: ModalRappelComponent;
+    openedNote: Note | null = null;
 
     constructor() {
         this.note = new Note();

@@ -5,7 +5,6 @@ import { Alerte } from "src/model/alerte";
 import { AlerteCapteur } from "src/model/alerteCapteur";
 import { ModifierAlerteComponent } from "./modifier-alerte.component";
 import { AjouterAlerteComponent } from "./ajouter-alerte.component";
-import { NgIf, NgFor } from "@angular/common";
 import { ActivatedRoute } from "@angular/router";
 import { Erabliere } from "src/model/erabliere";
 
@@ -13,7 +12,7 @@ import { Erabliere } from "src/model/erabliere";
     selector: 'alerte-page',
     templateUrl: './alerte.component.html',
     styleUrls: ['./alerte.component.css'],
-    imports: [NgIf, AjouterAlerteComponent, ModifierAlerteComponent, NgFor]
+    imports: [AjouterAlerteComponent, ModifierAlerteComponent]
 })
 export class AlerteComponent implements OnInit {
   @Input() alertes?: Array<Alerte>;

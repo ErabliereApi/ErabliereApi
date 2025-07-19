@@ -29,6 +29,7 @@ import { firstValueFrom, Observable } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
 import { ApiKey } from 'src/model/apikey';
 import { Rapport } from 'src/model/rapport';
+import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
@@ -394,8 +395,8 @@ export class ErabliereApi {
         return firstValueFrom(this._httpClient.put<Note>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/" + note.id, note, { headers: headers }));
     }
     async putNotePeriodiciteDue(idErabliereSelectionnee: any): Promise<any> {
-    const headers = await this.getHeaders();
-    return firstValueFrom(this._httpClient.put<Note>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/" + "PeriodiciteNotes", {},{ headers: headers }));
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<Note>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/" + "PeriodiciteNotes", {},{ headers: headers }));
     }
 
     async putDocumentation(idErabliereSelectionnee: any, documentation: Documentation): Promise<any> {
@@ -715,15 +716,25 @@ export class ErabliereApi {
                 this._environmentService.apiUrl + '/api/Hologram/' + deviceid + '/Disable', {}, { headers: header }));
     }
 
-    async putNoteImage(idErabliere: any, id: any, file: any) {
+    async putNoteImage(idErabliere: any, id: any, file: File): Promise<void> {
         const headers = await this.getHeaders();
-        headers.append('Content-Type', 'application/octet-stream');
-        return firstValueFrom(this._httpClient.put(this._environmentService.apiUrl + '/erablieres/' + idErabliere + "/notes/" + id + "/image", file, { headers: headers }));
+        headers.append('Content-Type', 'multipart/form-data');
+        const formData = new FormData();
+        formData.append('File', file, file.name);
+        const fileExtension = file.name.split('.').pop();
+        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliere + '/Notes/' + id + '/Image?FileExtension=' + fileExtension;
+        await firstValueFrom(this._httpClient.put(url, formData, { headers: headers, responseType: 'arraybuffer' }));
     }
 
-    async ErabliereIAImage(arg0: { imageCount: number; prompt: string; size: string; }): Promise<any> {
+    async ErabliereIAImage(arg0: { imageCount: number; prompt: string; size: string; }): Promise<PostImageGenerationResponse> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.post<any>(this._environmentService.apiUrl + '/ErabliereAI/Images', arg0, { headers: headers }));
+        return firstValueFrom(this._httpClient.post<PostImageGenerationResponse>(this._environmentService.apiUrl + '/ErabliereAI/Images', arg0, { headers: headers }));
+    }
+
+    async reportRappelProchainePeriode(idErabliere: any, id: any) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<any>(this._environmentService.apiUrl +
+            '/Erablieres/' + idErabliere + '/Notes/' + id + '/RappelProchainePeriode', {}, { headers: headers }));
     }
 }
 

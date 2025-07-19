@@ -1,8 +1,13 @@
 <div class="row">
   <h2>Rappels</h2>
-  @for (note of todayReminders; track note; let i = $index) {
-    <div class="col-12 mb-2">
-      <app-rappel [note]="note" [index]="i"></app-rappel>
-    </div>
+  @for (note of todayReminders; track note;) {
+  <div class="col-12 mb-2">
+    <app-rappel [note]="note" (click)="openModal(note)" style="cursor: pointer;"></app-rappel>
+  </div>
+  }
+
+  @if (modalIsOpen && modalNote)
+  {
+  <app-modal-rappel [note]="modalNote" (closeModal)="closeModal()" (needToUpdate)="updateAndGetRappels()"></app-modal-rappel>
   }
 </div>

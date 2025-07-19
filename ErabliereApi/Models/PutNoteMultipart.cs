@@ -8,16 +8,6 @@ namespace ErabliereApi.Models
     public class PutNoteMultipart
     {
         /// <summary>
-        /// L'id de la note si le client désire l'initialiser
-        /// </summary>
-        public Guid? Id { get; set; }
-
-        /// <summary>
-        /// L'id de l'érablière
-        /// </summary>
-        public Guid? IdErabliere { get; set; }
-
-        /// <summary>
         /// Fichier obtenu depuis le multipart
         /// </summary>
         public IFormFile? File { get; set; }

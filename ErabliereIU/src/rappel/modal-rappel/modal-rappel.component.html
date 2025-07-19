@@ -1,23 +1,23 @@
 
-<div class="modal fade" id="modalRappel{{index}}" tabindex="-1" aria-labelledby="modalRappelLabel" aria-hidden="true">
+<div class="modal position-absolute d-block">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalRappelLabel">{{note.title}}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" aria-label="Close" (click)="closeModal.emit(true)"></button>
             </div>
             <div class="modal-body">
                 {{note.text}}
             </div>
             <div class="modal-footer">
                 @if (note.file) {
-                    <img [src]="getImages()" class="img-fluid" alt="de la note">
+                    <img [src]="note.file" class="img-fluid" alt="{{note.title}}">
                 }
                 @if (error) {
                     <div class="alert alert-danger" style="width: 100%;">{{error}}</div>
                 }
-                <button type="button" class="btn btn-information" (click)="reportRappelProchainePeriode()">Cacher</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-information" (click)="reportRappelProchainePeriode()">Terminer</button>
+                <button type="button" class="btn btn-secondary" (click)="closeModal.emit(true)">Fermer</button>
             </div>
         </div>
     </div>

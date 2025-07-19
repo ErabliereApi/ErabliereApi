@@ -5,7 +5,7 @@ import { Component, Input } from "@angular/core";
     selector: 'input-error',
     template: `
         @if (errorObj?.error?.errors != null && errorObj.error.errors.hasOwnProperty(this.controlName)) {
-          <div>
+          <div class="text-danger">
             @for (error of errorObj.error.errors[this.controlName]; track error) {
               <span class="invalid-feedback">{{error}}</span>
             }

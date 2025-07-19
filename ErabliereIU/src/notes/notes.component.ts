@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Note } from 'src/model/note';
 import { NoteComponent } from './note.component';
-
 import { AjouterNoteComponent } from './ajouter-note.component';
 import { ModifierNoteComponent } from './modifier-note.component';
 import { Subject } from 'rxjs';
@@ -13,11 +12,11 @@ import { PaginationComponent } from "../pagination/pagination.component";
     selector: 'notes',
     templateUrl: "./notes.component.html",
     imports: [
-    AjouterNoteComponent,
-    ModifierNoteComponent,
-    NoteComponent,
-    PaginationComponent
-]
+        AjouterNoteComponent,
+        ModifierNoteComponent,
+        NoteComponent,
+        PaginationComponent
+    ]
 })
 export class NotesComponent implements OnInit {
     @Input() idErabliereSelectionee: any
@@ -67,8 +66,7 @@ export class NotesComponent implements OnInit {
                 this.notes = notes;
                 this.error = null;
 
-                for (let i = 0; i < notes.length; i++) {
-                    let n = notes[i];
+                for (const n of notes) {
                     if (n.fileExtension == 'csv') {
                         n.decodedTextFile = atob(n.file ?? "");
                     }
@@ -101,15 +99,12 @@ export class NotesComponent implements OnInit {
                 if (errorBody.status == 404) {
                     this.error = "Érablière '" + this.idErabliereSelectionee + "' introuvable";
                 }
-                else {
-                    if (errorBody.errors) {
-                        for (let key in errorBody.errors) {
-                            this.error += errorBody[key];
-                        }
+                else if (errorBody.errors) {
+                    for (let key in errorBody.errors) {
+                        this.error += errorBody[key];
                     }
-                    else {
-                        this.error = errorBody;
-                    }
+                } else {
+                    this.error = errorBody;
                 }
             });
     }

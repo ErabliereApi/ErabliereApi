@@ -51,12 +51,23 @@
     </div>
     @if (userIsInRole('ErabliereAIUser')) {
     <div class="btn-group me-2">
-      <button class="btn btn-secondary btn-sm" (click)="genererUneImageParIA()">Générer une image</button>
+      <button class="btn btn-secondary btn-sm" (click)="genererUneImageParIA()">
+        Générer une image
+        @if (isGeneratingImage) {
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        }
+      </button>
     </div>
     }
     <div class="btn-group">
       <button class="btn btn-danger btn-sm" (click)="deleteNote()">Supprimer</button>
     </div>
+
+    @if (actionError) {
+    <div class="row">
+      <span class="text-danger">{{ actionError }}</span>
+    </div>
+    }
 
     @if (note.fileExtension !== 'csv') {
     <div>

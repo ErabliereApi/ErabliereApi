@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {ErabliereApi} from "src/core/erabliereapi.service";
-import {UntypedFormGroup, UntypedFormBuilder, FormControl, Validators, ReactiveFormsModule} from "@angular/forms";
+import {UntypedFormGroup, UntypedFormBuilder, FormControl, Validators, ReactiveFormsModule, AbstractControlOptions} from "@angular/forms";
 import {Note} from "src/model/note";
 import {InputErrorComponent} from "../formsComponents/input-error.component";
 import {Subject} from "rxjs";
@@ -25,7 +25,7 @@ export class ModifierNoteComponent implements OnInit {
     fileToLargeErrorMessage?: string | null;
     generalError?: string | null;
 
-    constructor(private _api: ErabliereApi, private fb: UntypedFormBuilder) {
+    constructor(private readonly _api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.noteForm = this.fb.group({});
     }
 
@@ -42,7 +42,7 @@ export class ModifierNoteComponent implements OnInit {
                         this.noteForm.controls['isEditMode'].setValue(true);
                         this.noteForm.controls['dateRappel'].setValue(this.note.rappel.dateRappel ? new Date(this.note.rappel.dateRappel).toISOString().split('T')[0] : '');
                         this.noteForm.controls['dateRappelFin'].setValue(this.note.rappel.dateRappelFin ? new Date(this.note.rappel.dateRappelFin).toISOString().split('T')[0] : '');
-                        this.noteForm.controls['periodicite'].setValue(this.note.rappel.periodicite);
+                        this.noteForm.controls['rappel.periodicite'].setValue(this.note.rappel.periodicite);
                         this.noteForm.controls['isActive'].setValue(this.note.rappel.isActive);
                     }
                 }
@@ -97,7 +97,7 @@ export class ModifierNoteComponent implements OnInit {
                     updateOn: 'blur'
                 }
             ),
-            periodicite: new FormControl(
+            'rappel.periodicite': new FormControl(
                 '',
                 {
                     updateOn: 'blur'
@@ -110,7 +110,7 @@ export class ModifierNoteComponent implements OnInit {
                 }
             ),
             isEditMode: new FormControl(false)
-        }, {validators: reminderValidator});
+        }, { validators: [reminderValidator] } as AbstractControlOptions);
     }
 
     get displayReminder(): boolean {
@@ -143,15 +143,13 @@ export class ModifierNoteComponent implements OnInit {
                     this.note.noteDate = null;
                 }
                 // Update the Rappel object and set its properties using the form values
-                if (!this.note.rappel) {
-                    this.note.rappel = new Rappel();
-                }
+                this.note.rappel ??= new Rappel();
                 this.note.rappel.dateRappel = this.noteForm.controls['dateRappel'].value;
                 this.note.rappel.dateRappelFin = this.noteForm.controls['dateRappelFin'].value;
-                if (this.noteForm.controls['periodicite'].value === 'Aucune') {
+                if (this.noteForm.controls['rappel.periodicite'].value === 'Aucune') {
                     this.note.rappel.periodicite = null;
                 } else {
-                    this.note.rappel.periodicite = this.noteForm.controls['periodicite'].value;
+                    this.note.rappel.periodicite = this.noteForm.controls['rappel.periodicite'].value;
                 }
                 this.note.rappel.isActive = !!this.noteForm.controls['isActive'].value;
 
@@ -166,10 +164,13 @@ export class ModifierNoteComponent implements OnInit {
                         this.note = null;
                     })
                     .catch(e => {
+                        console.log("Erreur lors de la modification de la note", e);
+                        const form = document.getElementById('modifier-note');
+                        form?.classList.remove('was-validated');
                         if (e.status == 400) {
                             this.errorObj = e
                             this.fileToLargeErrorMessage = null;
-                            this.generalError = null;
+                            this.generalError = e.error?.title || "Une erreur est survenue lors de la modification de la note.";
                         } else if (e.status == 404) {
                             this.errorObj = null;
                             this.fileToLargeErrorMessage = null;
@@ -199,7 +200,11 @@ export class ModifierNoteComponent implements OnInit {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            this.noteForm.controls['fileBase64'].setValue(reader.result?.toString().split(',')[1]);
+            if (typeof reader.result === 'string') {
+                this.noteForm.controls['fileBase64'].setValue(reader.result.split(',')[1]);
+            } else {
+                this.noteForm.controls['fileBase64'].setValue('');
+            }
         };
     }
 }
