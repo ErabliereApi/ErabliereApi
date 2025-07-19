@@ -35,7 +35,7 @@ export class AjouterNoteComponent implements OnInit {
   uploadInProgress: boolean = false
   totalSize?: number = 0;
 
-  constructor(private _api: ErabliereApi, private fb: UntypedFormBuilder) {
+  constructor(private readonly _api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
     this.noteForm = this.fb.group({});
   }
 

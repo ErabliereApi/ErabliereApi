@@ -4,6 +4,7 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
+using ErabliereApi.Extensions;
 using ErabliereApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -223,22 +224,13 @@ public class NotesController : ControllerBase
 
         var note = _mapper.Map<Note>(postNoteMultipart);
 
-        note.File = await ToByteArray(postNoteMultipart.File, token);
+        note.File = await postNoteMultipart.File.ToByteArray(token);
 
         var entite = await _depot.Notes.AddAsync(note, token);
 
         await _depot.SaveChangesAsync(token);
 
         return Ok(_mapper.Map<PostNoteMultipartResponse>(entite.Entity));
-    }
-
-    private async Task<byte[]> ToByteArray(IFormFile file, CancellationToken token)
-    {
-        using var ms = new MemoryStream();
-
-        await file.CopyToAsync(ms, token);
-
-        return ms.ToArray();
     }
 
     /// <summary>
