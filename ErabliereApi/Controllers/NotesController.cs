@@ -250,6 +250,11 @@ public class NotesController : ControllerBase
             return BadRequest("Le fichier est manquant");
         }
 
+        if (id != postNoteMultipart.IdErabliere)
+        {
+            return BadRequest("L'id de la route ne concorde pas avec l'érablière possédant la note");
+        }
+
         var note = _mapper.Map<Note>(postNoteMultipart);
 
         note.File = await postNoteMultipart.File.ToByteArray(token);
@@ -349,6 +354,46 @@ public class NotesController : ControllerBase
             return NotFound();
         }
     }
+
+    /// <summary>
+    /// Action permettant de mettre à jour l'image d'une note
+    /// </summary>
+    /// <param name="id">L'id de l'érablière</param>
+    /// <param name="noteId">L'id de la note</param>
+    /// <param name="postNoteMultipart">Le modèle de la note avec le fichier</param>
+    /// <param name="token">Le jeton d'annulation</param>
+    [HttpPut("{noteId}/Image")]
+    [ProducesResponseType(204)]
+    [ValiderOwnership("id")]
+    public async Task<IActionResult> ModifierImage(Guid id, Guid noteId, PutNoteMultipart postNoteMultipart, CancellationToken token)
+    {
+        if (postNoteMultipart.File == null)
+        {
+            return BadRequest("Le fichier est manquant");
+        }
+
+        if (id != postNoteMultipart.IdErabliere)
+        {
+            return BadRequest("L'id de la route ne concorde pas avec l'érablière possédant la note");
+        }
+
+        var entity = await _depot.Notes.FindAsync([noteId], token);
+
+        if (entity != null && entity.IdErabliere == id)
+        {
+            entity.File = await postNoteMultipart.File.ToByteArray(token);
+            entity.FileExtension = postNoteMultipart.FileExtension;
+
+            await _depot.SaveChangesAsync(token);
+
+            return NoContent();
+        }
+        else
+        {
+            return NotFound();
+        }
+    }
+
     /// <summary>
     ///  Action permettant de mettre à jour les rappels des notes avec une périodicité due
     /// </summary>

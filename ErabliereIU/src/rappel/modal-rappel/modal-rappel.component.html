@@ -11,7 +11,7 @@
             </div>
             <div class="modal-footer">
                 @if (note.file) {
-                    <img [src]="note.file" class="img-fluid" alt="de la note">
+                    <img [src]="getImages()" class="img-fluid" alt="de la note">
                 }
                 @if (error) {
                     <div class="alert alert-danger" style="width: 100%;">{{error}}</div>

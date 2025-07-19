@@ -714,6 +714,17 @@ export class ErabliereApi {
             this._httpClient.put<any>(
                 this._environmentService.apiUrl + '/api/Hologram/' + deviceid + '/Disable', {}, { headers: header }));
     }
+
+    async putNoteImage(idErabliere: any, id: any, file: any) {
+        const headers = await this.getHeaders();
+        headers.append('Content-Type', 'application/octet-stream');
+        return firstValueFrom(this._httpClient.put(this._environmentService.apiUrl + '/erablieres/' + idErabliere + "/notes/" + id + "/image", file, { headers: headers }));
+    }
+
+    async ErabliereIAImage(arg0: { imageCount: number; prompt: string; size: string; }): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.post<any>(this._environmentService.apiUrl + '/ErabliereAI/Images', arg0, { headers: headers }));
+    }
 }
 
 function isNotNullOrWhitespace(search: string | undefined) {
