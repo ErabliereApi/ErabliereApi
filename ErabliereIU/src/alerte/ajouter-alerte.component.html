@@ -1,109 +1,104 @@
 @if (!display) {
-  <div>
-    <button id="ajouter-alerte-btn" class="btn btn-primary mb-2" (click)="onButtonAjouterClick()">Ajouter</button>
-  </div>
+<div>
+  <button id="ajouter-alerte-btn" class="btn btn-primary mb-2" (click)="onButtonAjouterClick()">Ajouter</button>
+</div>
 }
 @if (display) {
+<div>
+  <span class="text-danger">{{generalError}}</span>
   <div>
-    <span class="text-danger">{{generalError}}</span>
     <div>
-      <div>
-        <form [formGroup]="typeAlerteSelectListForm">
-          <div class="form-group mb-2">
-            <label for="typeAlerteSelect" class="form-label">Type d'alerte</label>
-            <select class="form-control" id="typeAlerteSelect" formControlName="state" (change)="onChangeAlerteType($event)">
-              <option value="1" [selected]="typeAlerte == 1">Alerte trio de donnée</option>
-              <option value="2" [selected]="typeAlerte == 2">Alerte de capteur</option>
-            </select>
-          </div>
-        </form>
-      </div>
+      <form [formGroup]="typeAlerteSelectListForm">
+        <div class="form-group mb-2">
+          <label for="typeAlerteSelect" class="form-label">Type d'alerte</label>
+          <select class="form-control" id="typeAlerteSelect" formControlName="state"
+            (change)="onChangeAlerteType($event)">
+            <option value="1" [selected]="typeAlerte == 1">Alerte trio de donnée</option>
+            <option value="2" [selected]="typeAlerte == 2">Alerte de capteur</option>
+          </select>
+        </div>
+      </form>
     </div>
-    @if (typeAlerte == 1) {
-      <div>
-        <form [formGroup]="alerteForm">
-          <div class="form-group mb-2">
-            <label for="nom" class="form-label" title="Nom de l'alerte utiliser pour l'affichage">Nom: </label>
-            <input class="form-control" type="text" formControlName="nom">
-          </div>
-          <div class="form-group mb-2">
-            <label for="destinataireCourriel" class="form-label" title="Adresses courriel des destinataires. Vous pouvez entrer plusieurs adresses séparer par des points virgules.">Destinataires du courriel: </label>
-            <input class="form-control" type="text" formControlName="destinataireCourriel">
-          </div>
-          <div class="form-group mb-2">
-            <label for="destinataireSMS" class="form-label">Destinataires du SMS: </label>
-            <input class="form-control" type="text" formControlName="destinataireSMS">
-          </div>
-          <div class="form-group mb-2">
-            <label for="temperatureMin" class="form-label">Temperature Min.: </label>
-            <einput [formGroup]="alerteForm" name="temperatureMin" symbole="°C" />
-          </div>
-          <div class="form-group mb-2">
-            <label for="temperatureMax" class="form-label">Temperature Max.: </label>
-            <einput [formGroup]="alerteForm" name="temperatureMax" symbole="°C" />
-          </div>
-          <div class="form-group mb-2">
-            <label for="vacciumMin" class="form-label">Vaccium Min.: </label>
-            <einput [formGroup]="alerteForm" name="vacciumMin" symbole="HG" />
-          </div>
-          <div class="form-group mb-2">
-            <label for="vacciumMax" class="form-label">Vaccium Max.: </label>
-            <einput [formGroup]="alerteForm" name="vacciumMax" symbole="HG" />
-          </div>
-          <div class="form-group mb-2">
-            <label for="niveauBassinMin" class="form-label">Niveau Bassin Min.: </label>
-            <einput [formGroup]="alerteForm" name="niveauBassinMin" symbole="%" />
-          </div>
-          <div class="form-group mb-2">
-            <label for="niveauBassinMax" class="form-label">Niveau Bassin Max.: </label>
-            <einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
-          </div>
-          <button id="creer-alerte-donnees-btn" class="btn btn-primary mt-2 me-2 mb-3" (click)="onButtonCreerClick()">Créer</button>
-          <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
-          <div>
-            <span class="text-danger">{{generalError}}</span>
-          </div>
-        </form>
-      </div>
-    }
-    @if (typeAlerte == 2) {
-      <div>
-        <form [formGroup]="alerteCapteurForm">
-          <div class="form-group">
-            <label for="nom" class="form-label">Nom: </label>
-            <input class="form-control" type="text" formControlName="nom">
-          </div>
-          <div class="form-group">
-            <label for="idCapteur" class="form-label">Capteur: </label>
-            <select class="form-control" formControlName="idCapteur">
-              @for (capteur of capteurs; track capteur) {
-                <option [value]="capteur.id">{{capteur.nom}}</option>
-              }
-            </select>
-          </div>
-          <div class="form-group mb-2">
-            <label for="destinataireCourriel" class="form-label">Destinataires du courriel: </label>
-            <input class="form-control" type="text" formControlName="destinataireCourriel">
-          </div>
-          <div class="form-group mb-2">
-            <label for="destinataireSMS" class="form-label">Destinataires du SMS: </label>
-            <input class="form-control" type="text" formControlName="destinataireSMS">
-          </div>
-          <div class="form-group">
-            <label for="min" class="form-label">Min.: </label>
-            <einput [formGroup]="alerteCapteurForm" name="min" symbole={{capteurSymbole()}} />
-          </div>
-          <div class="form-group mb-2">
-            <label for="max" class="form-label">Max.: </label>
-            <einput [formGroup]="alerteCapteurForm" name="max" symbole={{capteurSymbole()}} />
-          </div>
-          <button id="creer-alerte-capteur-btn" class="btn btn-primary mt-2 me-2 mb-3" (click)="onButtonCreerAlerteCapteurClick()">Créer</button>
-          <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
-          <div>
-            <span class="text-danger">{{generalError}}</span>
-          </div>
-        </form>
-      </div>
-    }
   </div>
+  @if (typeAlerte == 1) {
+  <div>
+    <form [formGroup]="alerteForm">
+      <div class="form-group mb-2">
+        <einput [formGroup]="alerteForm" name="nom" placeholder="Nom de l'alerte" />
+      </div>
+      <div class="row">
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" name="destinataireCourriel"
+            placeholder="exemple1@exmeple.com;exemple2@exemple.com" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" name="destinataireSMS" placeholder="1231231234" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" type="number" name="temperatureMin" symbole="°C" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" type="number" name="temperatureMax" symbole="°C" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" name="vacciumMin" symbole="HG" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" name="vacciumMax" symbole="HG" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" name="niveauBassinMin" symbole="%" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
+        </div>
+      </div>
+      <button id="creer-alerte-donnees-btn" class="btn btn-primary mt-2 me-2 mb-3"
+        (click)="onButtonCreerClick()">Créer</button>
+      <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
+      <div>
+        <span class="text-danger">{{generalError}}</span>
+      </div>
+    </form>
+  </div>
+  }
+  @if (typeAlerte == 2) {
+  <div>
+    <form [formGroup]="alerteCapteurForm">
+      <div class="row">
+        <div class="form-group col-md-6">
+          <einput [formGroup]="alerteCapteurForm" name="nom" placeholder="Nom de l'alerte" />
+        </div>
+        <div class="form-group col-md-6">
+          <label for="idCapteur" class="form-label">Capteur: </label>
+          <select class="form-control" formControlName="idCapteur">
+            @for (capteur of capteurs; track capteur) {
+            <option [value]="capteur.id">{{capteur.nom}}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteCapteurForm" name="destinataireCourriel"
+            placeholder="exemple1@exemple.com;exemple2@exemple.com" />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteCapteurForm" name="destinataireSMS" placeholder="1231231234" />
+        </div>
+        <div class="form-group col-md-6">
+          <einput [formGroup]="alerteCapteurForm" name="min" symbole={{capteurSymbole()}} />
+        </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteCapteurForm" name="max" symbole={{capteurSymbole()}} />
+        </div>
+      </div>
+      <button id="creer-alerte-capteur-btn" class="btn btn-primary mt-2 me-2 mb-3"
+        (click)="onButtonCreerAlerteCapteurClick()">Créer</button>
+      <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
+      <div>
+        <span class="text-danger">{{generalError}}</span>
+      </div>
+    </form>
+  </div>
+  }
+</div>
 }

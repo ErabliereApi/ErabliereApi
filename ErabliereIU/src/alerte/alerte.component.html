@@ -2,24 +2,31 @@
     <h3>Alertes</h3>
 </div>
 <div>
-    <ajouter-alerte-modal *ngIf="!displayEditForm" [idErabliereSelectionee]="idErabliereSelectionee" [alertes]="alertes"
+    @if (!displayEditForm) {
+    <ajouter-alerte-modal [idErabliereSelectionee]="idErabliereSelectionee" [alertes]="alertes"
         [alertesCapteur]="alertesCapteur" [erabliere]="erabliere">
     </ajouter-alerte-modal>
+}
 </div>
 <div>
-    <modifier-alerte-modal *ngIf="displayEditForm || displayEditAlerteCapteurForm"
+    @if (displayEditForm || displayEditAlerteCapteurForm) {
+    <modifier-alerte-modal
         [idErabliereSelectionee]="idErabliereSelectionee" [displayEditFormSubject]="displayEditFormSubject"
         [alerteEditFormSubject]="alerteEditFormSubject" [alerte]="alerteEditForm"
         [alerteCapteurEditFormSubject]="alerteCapteurEditFormSubject" [alerteCapteur]="alerteCapteurEditForm"
         [editAlerte]="editAlerte" [editAlerteCapteur]="editAlerteCapteur">
     </modifier-alerte-modal>
+}
 </div>
 <div>
-    <p *ngIf="alertes != null && alertes.length == 0 && alertesCapteur != null && alertesCapteur.length == 0">
+    @if (alertes != null && alertes.length == 0 && alertesCapteur != null && alertesCapteur.length == 0) {
+    <p>
         Aucune alerte de configuré
     </p>
+}
 
-    <div *ngIf="alertesCapteur != null && alertesCapteur.length > 0">
+    @if (alertesCapteur != null && alertesCapteur.length > 0) {
+    <div>
         <h4>Alerte capteurs</h4>
         <table class="table table-striped">
             <thead>
@@ -52,24 +59,31 @@
                 <tr>
             </thead>
             <tbody>
-                <tr *ngFor="let alerte of alertesCapteur">
+                @for (alerte of alertesCapteur; track alerte;) {
+                <tr>
                     <td class="shortid">
                         {{alerte.id}}
                     </td>
                     <td>
                         {{alerte.nom}}
                     </td>
-                    <td *ngIf="alerte.isEnable">
-                        Activé
-                    </td>
-                    <td *ngIf="!alerte.isEnable">
-                        Désactivé
+                    <td>
+                        @if (alerte.isEnable) {
+                        <span>Activé</span>
+                        } 
+                        @else {
+                        <span>Désactivé</span>
+                        }
                     </td>
                     <td>
-                        <span *ngFor="let email of alerte.emails" class="feature_desc">{{email}}</span>
+                        @for (email of alerte.emails; track email;) {
+                        <span class="feature_desc">{{email}}</span>
+                        }
                     </td>
                     <td>
-                        <span *ngFor="let numero of alerte.numeros" class="feature_desc">{{numero}}</span>
+                        @for (numero of alerte.numeros; track numero;) {
+                        <span class="feature_desc">{{numero}}</span>
+                        }
                     </td>
                     <td>
                         {{formatNumber(alerte.minVaue, alerte.capteur?.symbole, true)}}
@@ -82,10 +96,14 @@
                     </td>
                     <td>
                         <div class="d-grid gap-3">
-                            <button *ngIf="alerte.isEnable" class="btn btn-outline-warning"
+                            @if (alerte.isEnable) {
+                            <button  class="btn btn-outline-warning"
                                 (click)="onButtonDesactiverAlerteCapteurClick(alerte.idCapteur, alerte.id)">désactiver</button>
-                            <button *ngIf="!alerte.isEnable" class="btn btn-outline-success"
+                            }
+                            @if (!alerte.isEnable) {
+                            <button class="btn btn-outline-success"
                                 (click)="onButtonActiverAlerteCapteurClick(alerte.idCapteur, alerte.id)">activer</button>
+                            }
                             <button class="btn btn-info"
                                 (click)="onButtonModifierAlerteCapteurClick(alerte.id)">modifier</button>
                             <button class="btn btn-danger"
@@ -94,13 +112,17 @@
                         </div>
                     </td>
                 <tr>
+                }
             </tbody>
         </table>
     </div>
+}
 
-    <div *ngIf="alertes != null && alertes.length > 0">
+    @if (alertes != null && alertes.length > 0) {
+    <div>
         <h4>Alerte trio données</h4>
-        <table *ngIf="alertes != null && alertes.length > 0" class="table table-striped">
+        @if (alertes != null && alertes.length > 0) {
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>
@@ -140,24 +162,31 @@
                 <tr>
             </thead>
             <tbody>
-                <tr *ngFor="let alerte of alertes">
+                @for (alerte of alertes; track alerte;) {
+                <tr>
                     <td class="shortid">
                         {{alerte.id}}
                     </td>
                     <td>
                         {{alerte.nom}}
                     </td>
-                    <td *ngIf="alerte.isEnable">
-                        Activé
-                    </td>
-                    <td *ngIf="!alerte.isEnable">
-                        Désactivé
+                    <td>
+                        @if (alerte.isEnable) {
+                        <span>Activé</span>
+                        }
+                        @else {
+                        <span>Désactivé</span>
+                        }
                     </td>
                     <td>
-                        <span *ngFor="let email of alerte.emails" class="feature_desc">{{email}}</span>
+                        @for (email of alerte.emails; track email;) {
+                        <span class="feature_desc">{{email}}</span>
+                        }
                     </td>
                     <td>
-                        <span *ngFor="let numero of alerte.numeros" class="feature_desc">{{numero}}</span>
+                        @for (numero of alerte.numeros; track numero;) {
+                        <span class="feature_desc">{{numero}}</span>
+                        }
                     </td>
                     <td>
                         {{formatStringNumber(alerte.temperatureThresholdHight, "°C")}}
@@ -179,16 +208,23 @@
                     </td>
                     <td>
                         <div class="d-grid gap-3">
-                            <button *ngIf="alerte.isEnable" class="btn btn-outline-warning"
+                            @if (alerte.isEnable) {
+                            <button class="btn btn-outline-warning"
                                 (click)="onButtonDesactiverAlerteClick(alerte.id)">désactiver</button>
-                            <button *ngIf="!alerte.isEnable" class="btn btn-outline-success"
+                            }
+                            @if (!alerte.isEnable) {
+                            <button class="btn btn-outline-success"
                                 (click)="onButtonActiverAlerteClick(alerte.id)">activer</button>
+                            }
                             <button class="btn btn-info" (click)="onButtonModifierClick(alerte.id)">modifier</button>
                             <button class="btn btn-danger" (click)="onButtonDeleteClick(alerte.id)">supprimer</button>
                         </div>
                     </td>
                 <tr>
+                }
             </tbody>
         </table>
+    }
     </div>
+    }
 </div>

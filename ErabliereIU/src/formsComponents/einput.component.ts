@@ -5,6 +5,7 @@ import { FormGroup, ReactiveFormsModule } from "@angular/forms";
 @Component({
     selector: 'einput',
     template: `
+        <label for="nom" class="form-label">{{ arialabel ?? smartName(name) }}:</label>
         <div [formGroup]="formGroup" class="input-group">
           <input
             class="form-control"
@@ -35,5 +36,18 @@ export class EinputComponent {
 
     constructor() {
 
+    }
+
+    /**
+     * This method is transforming a string that is camelCase to a more human readable format.
+     * For example: "temperatureMin" will be transformed to "Temperature Min"
+     * @param arg0 name of the input
+     */
+    smartName(arg0: string): string|undefined {
+        if (!arg0) {
+            return undefined;
+        }
+        const words = arg0.replace(/([a-z])([A-Z])/g, '$1 $2').split(' ');
+        return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 }

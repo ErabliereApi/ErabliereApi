@@ -1,68 +1,77 @@
 @if (editAlerte) {
-  <div>
-    <span class="text-danger">{{generalError}}</span>
-    <p>Id: {{ alerte?.id }}</p>
-    <form [formGroup]="alerteForm">
-      <div class="form-group">
-        <label class="form-label">Nom: </label><input class="form-control" type="text" formControlName="nom">
+<div>
+  <span class="text-danger">{{generalError}}</span>
+  <p>Id: {{ alerte?.id }}</p>
+  <form [formGroup]="alerteForm">
+    <div class="form-group">
+      <einput [formGroup]="alerteForm" name="nom" />
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="destinataireCourriel" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Destinataires du courriel: </label><input class="form-control" type="text" formControlName="destinataireCourriel">
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="destinataireSMS" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Destinataires du SMS: </label><input class="form-control" type="text" formControlName="destinataireSMS">
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="temperatureMin" symbole="°C" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Temperature Min.: </label><einput [formGroup]="alerteForm" name="temperatureMin" symbole="°C" />
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="temperatureMax" symbole="°C" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Temperature Max.: </label><einput [formGroup]="alerteForm" name="temperatureMax" symbole="°C" />
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="vacciumMin" symbole="HG" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Vaccium Min.: </label><einput [formGroup]="alerteForm" name="vacciumMin" symbole="HG" />
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="vacciumMax" symbole="HG" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Vaccium Max.: </label><einput [formGroup]="alerteForm" name="vacciumMax" symbole="HG" />
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="niveauBassinMin" symbole="%" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Niveau Bassin Min.: </label><einput [formGroup]="alerteForm" name="niveauBassinMin" symbole="%" />
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Niveau Bassin Max.: </label><einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
-      </div>
-      <button class="btn btn-primary" (click)="onButtonModifierClick()">Modifier</button>
+    </div>
+    <div class="mt-3 mb-3">
+      <button class="btn btn-primary me-2" (click)="onButtonModifierClick()">Modifier</button>
       <button class="btn btn-secondary" (click)="onButtonAnnuleClick()">Annuler</button>
-      <div>
-        <span class="text-danger">{{generalError}}</span>
-      </div>
-    </form>
-  </div>
+    </div>
+    <div>
+      <span class="text-danger">{{generalError}}</span>
+    </div>
+  </form>
+</div>
 }
 @if (editAlerteCapteur) {
-  <div>
-    <span class="text-danger">{{generalError}}</span>
-    <p>Id: {{ alerteCapteur?.id }}</p>
-    <form [formGroup]="alerteCapteurForm">
-      <div class="form-group">
-        <label class="form-label">Nom: </label><input class="form-control" type="text" formControlName="nom">
+<div>
+  <span class="text-danger">{{generalError}}</span>
+  <p>Id: {{ alerteCapteur?.id }}</p>
+  <form [formGroup]="alerteCapteurForm">
+    <div class="form-group">
+      <einput [formGroup]="alerteCapteurForm" name="nom" placeholder="Nom de l'alerte" />
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteCapteurForm" name="destinataireCourriel"
+          placeholder="exemple1@exemple.com;exemple2@exemple.com" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Destinataires du courriel: </label><input class="form-control" type="text" formControlName="destinataireCourriel">
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteCapteurForm" name="destinataireSMS" placeholder="1231231234" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Destinataires du SMS: </label><input class="form-control" type="text" formControlName="destinataireSMS">
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteCapteurForm" name="min" [symbole]="alerteCapteur?.capteur?.symbole" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Min.: </label><einput [formGroup]="alerteCapteurForm" name="min" [symbole]="alerteCapteur?.capteur?.symbole" />
+      <div class="form-group col-md-6">
+        <einput [formGroup]="alerteCapteurForm" name="max" [symbole]="alerteCapteur?.capteur?.symbole" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Max.: </label><einput [formGroup]="alerteCapteurForm" name="max" [symbole]="alerteCapteur?.capteur?.symbole" />
-      </div>
-      <button class="btn btn-primary mt-3 mb-3" (click)="onButtonModifierAlerteCapteurClick()">Modifier</button>
-      <button class="btn btn-secondary mt-3 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
-      <div>
-        <span class="text-danger">{{generalError}}</span>
-      </div>
-    </form>
-  </div>
+    </div>
+    <button class="btn btn-primary mt-3 mb-3 me-2" (click)="onButtonModifierAlerteCapteurClick()">Modifier</button>
+    <button class="btn btn-secondary mt-3 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
+    <div>
+      <span class="text-danger">{{generalError}}</span>
+    </div>
+  </form>
+</div>
 }
