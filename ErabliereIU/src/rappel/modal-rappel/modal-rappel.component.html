@@ -16,8 +16,8 @@
                 @if (error) {
                     <div class="alert alert-danger" style="width: 100%;">{{error}}</div>
                 }
-                <button type="button" class="btn btn-information" (click)="reportRappelProchainePeriode()">Terminer</button>
-                <button type="button" class="btn btn-secondary" (click)="closeModal.emit(true)">Fermer</button>
+                <button type="button" class="btn btn-info" (click)="reportRappelProchainePeriode()" title="Marquer le rappel comme terminé et passer à la prochaine période.">Terminer</button>
+                <button type="button" class="btn btn-secondary" (click)="closeModal.emit(true)" title="Fermer la modal">Fermer</button>
             </div>
         </div>
     </div>

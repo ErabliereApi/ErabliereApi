@@ -1,0 +1,31 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary gradient-custom-header">
+    <div class="container-fluid">
+        <a class="navbar-brand" routerLinkActive="active" ariaCurrentWhenActive="page">
+            <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+            Érablière AI
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-lg-inline-flex flex-lg-row">
+            <div class="navbar-nav me-auto mb-2 mb-lg-0">
+                <a class="nav-link" routerLinkActive="active" ariaCurrentWhenActive="page"
+                    routerLink="/ai">Conversations</a>
+            </div>
+            <div class="d-flex gap-2">
+                <button id="zone-admin-button" class="btn btn-primary" routerLink="">ÉrablièreIU</button>
+                @if (mapFeatureEnable) {
+                <button id="zone-carte-button" class="btn btn-primary" routerLink="/map"><span>🗺️ </span>Carte</button>
+                }
+                @if (!useAuthentication || isAdminUser) {
+                <button id="zone-admin-button" class="btn btn-primary" routerLink="/a"><span>⚙️ </span>Érablière
+                    Admin</button>
+                }
+                @if (useAuthentication) {
+                <connection-button (loginChange)="onLoginChange($event)" />
+                }
+            </div>
+        </div>
+    </div>
+</nav>

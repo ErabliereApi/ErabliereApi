@@ -6,12 +6,12 @@ import { SignoutRedirectCallbackComponent } from 'src/authorisation/signout-redi
 import { DocumentationComponent } from 'src/documentation/documentation.component';
 import { ErabliereComponent } from 'src/erablieres/erabliere.component';
 import { NotesComponent } from 'src/notes/notes.component';
-import {AdminCustomersComponent} from "../admin/admin-customers/admin-customers.component";
-import {Page404Component} from "./page404/page404.component";
-import {AdminViewComponent} from "./admin-view/admin-view.component";
-import {AdminErablieresComponent} from "../admin/admin-erablieres/admin-erablieres.component";
-import {ClientViewComponent} from "./client-view/client-view.component";
-import {GestionCapteursComponent} from "../capteurs/gestion-capteurs.component";
+import { AdminCustomersComponent } from "../admin/admin-customers/admin-customers.component";
+import { Page404Component } from "./page404/page404.component";
+import { AdminViewComponent } from "./admin-view/admin-view.component";
+import { AdminErablieresComponent } from "../admin/admin-erablieres/admin-erablieres.component";
+import { ClientViewComponent } from "./client-view/client-view.component";
+import { GestionCapteursComponent } from "../capteurs/gestion-capteurs.component";
 import { ReportsComponent } from 'src/rapport/rapports.component';
 import { AdminAPIKeysComponent } from 'src/admin/admin-apikeys/admin-apikeys.component';
 import { MapViewComponent } from './map-view/map-view.component';
@@ -21,6 +21,7 @@ import { Page401Component } from './page401/page401.component';
 import { AdminHologramComponent } from 'src/admin/admin-hologram/admin-hologram.component';
 import { ErabliereAiWindowComponent } from 'src/erabliereai/window/erabliereai-window.component';
 import { ErabliereAiPublicConversationComponent } from 'src/erabliereai/publicConversation/erabliereai-public-conversation.component';
+import { AiViewComponent } from './ai-view/ai-view.component';
 
 export const routes: Routes = [
     {
@@ -72,7 +73,13 @@ export const routes: Routes = [
     },
     {
         path: 'ai',
-        component: ErabliereAiWindowComponent
+        component: AiViewComponent,
+        children: [
+            {
+                path: '',
+                component: ErabliereAiWindowComponent
+            }
+        ]
     },
     {
         path: 'ai/public/:conversationId',

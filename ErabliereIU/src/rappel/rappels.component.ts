@@ -21,6 +21,7 @@ export class RappelsComponent implements OnChanges, OnInit {
   isLogged: boolean = false;
   modalNoteSubject: Subject<Note | null> = new Subject<Note | null>();
   modalNote: Note | null = null;
+  chargementEnCours: boolean = false;
 
   constructor(private readonly erabliereapiService: ErabliereApi, private readonly _authService: AuthorisationFactoryService, private readonly _router: ActivatedRoute) {
     if (this._authService.getAuthorisationService().type == "AuthDisabled") {
@@ -66,6 +67,7 @@ export class RappelsComponent implements OnChanges, OnInit {
       this.todayReminders = [];
       return;
     }
+    this.chargementEnCours = true;
     this.erabliereapiService.putNotePeriodiciteDue(this.idErabliereSelectionnee)
       .then(() => {
         this.erabliereapiService.getActiveRappelNotes(this.idErabliereSelectionnee)
@@ -77,6 +79,15 @@ export class RappelsComponent implements OnChanges, OnInit {
       })
       .catch((error) => {
         console.error('Error updating putNotePeriodiciteDue:', error);
+        this.erabliereapiService.getActiveRappelNotes(this.idErabliereSelectionnee)
+          .then((reminder) => {
+            this.todayReminders = reminder;
+          }).catch((error) => {
+            console.error('Error fetching getActiveRappelNotes:', error);
+          });
+      })
+      .finally(() => {
+        this.chargementEnCours = false;
       });
   }
 

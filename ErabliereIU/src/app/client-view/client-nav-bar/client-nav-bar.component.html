@@ -60,11 +60,14 @@
                 </li>
             </ul>
             <div class="d-flex gap-2">
+                @if (isErabliereAIUser && useAuthentication && isLoggedIn) {
+                <button id="zone-ai-button" class="btn btn-success" routerLink="/ai"><span>🤖 </span>Erabliere AI</button>
+                }
                 @if (mapFeatureEnable) {
                 <button id="zone-carte-button" class="btn btn-primary" routerLink="/map"><span>🗺️ </span>Carte</button>
                 }
-                @if (!useAuthentication || isAdminUser) {
-                <button id="zone-admin-button" class="btn btn-outline-primary" routerLink="/a">Érablière
+                @if (useAuthentication && isAdminUser) {
+                <button id="zone-admin-button" class="btn btn-outline-primary" routerLink="/a"><span>⚙️ </span>Érablière
                     Admin</button>
                 }
                 @if (useAuthentication) {

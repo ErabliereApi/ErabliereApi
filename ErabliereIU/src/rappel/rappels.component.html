@@ -1,13 +1,27 @@
 <div class="row">
   <h2>Rappels</h2>
+  <div class="col-12">
+  @if (!isLogged) {
+  <p>Vous devez être connecté pour voir les rappels.</p>
+  }
+  @else if (chargementEnCours) {
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  } @else if (todayReminders.length === 0) {
+  <p>Aucun rappel pour aujourd'hui.</p>
+  } @else {
   @for (note of todayReminders; track note;) {
   <div class="col-12 mb-2">
     <app-rappel [note]="note" (click)="openModal(note)" style="cursor: pointer;"></app-rappel>
   </div>
   }
+  }
+  </div>
 
   @if (modalIsOpen && modalNote)
   {
-  <app-modal-rappel [note]="modalNote" (closeModal)="closeModal()" (needToUpdate)="updateAndGetRappels()"></app-modal-rappel>
+  <app-modal-rappel [note]="modalNote" (closeModal)="closeModal()"
+    (needToUpdate)="updateAndGetRappels()"></app-modal-rappel>
   }
 </div>
