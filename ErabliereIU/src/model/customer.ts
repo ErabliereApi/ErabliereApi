@@ -1,3 +1,4 @@
+import { ApiKey } from "./apikey";
 import {CustomerAccess} from "./customerAccess";
 
 export class Customer {
@@ -12,4 +13,5 @@ export class Customer {
     creationTime?: string
     lastAccessTime?: string
     customerErablieres?: Array<CustomerAccess>
+    apiKeys?: Array<ApiKey>
 }

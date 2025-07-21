@@ -6,21 +6,61 @@
     <div class="card col-md-4">
         <h3>Connexion active</h3>
         <span class="text-danger">{{errorToken}}</span>
-        <p><strong>ID:</strong> {{ user?.id }} <copy-id-button [text]="user?.id" tile="Copier l'id de mon utilisateur"></copy-id-button></p>
+        <p><strong>ID:</strong> {{ user?.id }} <copy-id-button [text]="user?.id"
+                tile="Copier l'id de mon utilisateur"></copy-id-button></p>
         <p><strong>Nom:</strong> {{ user?.name }}</p>
         <p><strong>Email:</strong> {{ user?.email }}</p>
         <p><strong>Rôles:</strong> {{ user?.roles?.join(', ') }}</p>
     </div>
+    @if (customer != null) {
     <div class="card col-md-4">
         <h3>Informations du compte</h3>
         <span class="text-danger">{{errorCustomer}}</span>
-        <p><strong>ID:</strong> {{ customer?.id }} <copy-id-button [text]="customer?.id" title="Copier l'id de mon compte"></copy-id-button></p>
-        <p><strong>Nom:</strong> {{ customer?.name }}</p>
-        <p><strong>Unique Name:</strong> {{ customer?.uniqueName }}</p>
-        <p><strong>Email:</strong> {{ customer?.email }}</p>
-        <p><strong>Email secondaire:</strong> {{ customer?.secondaryEmail}}</p>
-        <p><strong>Type de compte:</strong> {{ customer?.accountType }}</p>
-        <p><strong>Créé le:</strong> {{ customer?.creationTime  }}</p>
-        <p><strong>Dernière connexion:</strong> {{ customer?.lastAccessTime }}</p>
+        <p><strong>ID:</strong> {{ customer.id }} <copy-id-button [text]="customer.id"
+                title="Copier l'id de mon compte"></copy-id-button></p>
+        <p><strong>Nom:</strong> {{ customer.name }}</p>
+        <p><strong>Unique Name:</strong> {{ customer.uniqueName }}</p>
+        <p><strong>Email:</strong> {{ customer.email }}</p>
+        <p><strong>Email secondaire:</strong> {{ customer.secondaryEmail}}</p>
+        <p><strong>Type de compte:</strong> {{ customer.accountType }}</p>
+        <p><strong>Créé le:</strong> {{ customer.creationTime }}</p>
+        <p><strong>Dernière connexion:</strong> {{ customer.lastAccessTime }}</p>
     </div>
+    <div class="card col-md-4">
+        <h3>Clés API</h3>
+        <div class="btn-group mb-3">
+            <button class="btn btn-success" (click)="buyApiKey()">Obtenir une clé d'api</button>
+        </div>
+        <span class="text-danger">{{errorApiKey}}</span>
+        <ul>
+            @if (customer.apiKeys && customer.apiKeys.length > 0) {
+                @for (apiKey of customer.apiKeys; track apiKey.id) {
+                    <li>
+                        <strong>{{ apiKey.name }}</strong> - {{ apiKey.creationTime }}<br>
+                        <button class="btn btn-danger btn-sm" (click)="deleteApiKey(apiKey.id)">Supprimer</button>
+                    </li>
+                }
+            } 
+            @else {
+                <li>Aucune clé API disponible.</li>
+            }
+        </ul>
+    </div>
+    <div class="col-md-4 card">
+        <h3>Abonnement</h3>
+        <p>L'utilisateur ne possède pas d'abonnement</p>
+    </div>
+    <div class="col-md-4 card">
+        <h3>ErabliereAI</h3>
+        @if (user?.roles?.includes('ErabliereAIUser')) {
+            <p>ErabliereAI est activé pour cet utilisateur.</p>
+        } @else {
+            <p>ErabliereAI n'est pas activé pour cet utilisateur.</p>
+        }
+    </div>
+    <div class="col-md-4 card">
+        <h3>Coût</h3>
+        <p>Les coûts ne sont pas disponibles actuellement.</p>
+    </div>
+    }
 </div>

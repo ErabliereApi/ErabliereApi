@@ -3,6 +3,7 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Put;
 using ErabliereApi.Services;
+using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -99,7 +100,7 @@ public class ApiKeyController : ControllerBase
         {
             return NotFound();
         }
-        
+
         if (string.IsNullOrWhiteSpace(param.Name))
         {
             ModelState.AddModelError("Name", "Name is required.");
@@ -136,19 +137,43 @@ public class ApiKeyController : ControllerBase
     /// Permet de supprimer une clé d'API.
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize]
+    [ProducesResponseType(204)]
     public async Task<IActionResult> DeleteApiKey(Guid id, CancellationToken token)
     {
-        var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
-
-        if (apiKey == null)
+        if (!User.IsInRole("administrateur"))
         {
-            return NotFound();
+            using var scope = HttpContext.RequestServices.CreateScope();
+
+            var unique_name = UsersUtils.GetUniqueName(scope, User);
+#nullable disable
+            var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id && k.Customer.UniqueName == unique_name, token);
+#nullable enable
+            if (apiKey == null)
+            {
+                return NoContent();
+            }
+
+            _context.ApiKeys.Remove(apiKey);
+
+            await _context.SaveChangesAsync(token);
+
+            return NoContent();
         }
+        else
+        {
+            var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
 
-        _context.ApiKeys.Remove(apiKey);
+            if (apiKey == null)
+            {
+                return NotFound();
+            }
 
-        await _context.SaveChangesAsync(token);
+            _context.ApiKeys.Remove(apiKey);
 
-        return NoContent();
+            await _context.SaveChangesAsync(token);
+
+            return NoContent();
+        }
     }
 }

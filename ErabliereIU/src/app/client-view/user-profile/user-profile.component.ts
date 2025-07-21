@@ -12,13 +12,11 @@ import { Customer } from "src/model/customer";
     imports: [CopyTextButtonComponent],
 })
 export class UserProfileComponent implements OnInit {
-editProfile() {
-throw new Error('Method not implemented.');
-}
     user: AppUser | null = null;
     customer: Customer | null = null;
     errorToken: string | null = null;
     errorCustomer: string | null = null;
+    errorApiKey: string | null = null;
     private readonly authSvc: IAuthorisationSerivce;
 
     constructor(authSvcFactory: AuthorisationFactoryService, private readonly api: ErabliereApi) {
@@ -44,6 +42,23 @@ throw new Error('Method not implemented.');
         }).catch(error => {
             console.error("Error loading customer profile:", error);
             this.errorCustomer = "Erreur lors du chargement du profil client.";
+        });
+    }
+
+    deleteApiKey(arg0: string|undefined) {
+        this.api.deleteApiKey(arg0).then(() => {
+            console.log("API key deleted successfully.");
+            this.errorApiKey = null;
+            this.loadUserProfile(); // Reload user profile to reflect changes
+        }).catch(error => {
+            console.error("Error deleting API key:", error);
+            this.errorApiKey = "Erreur lors de la suppression de la clé API.";
+        });
+    }
+
+    buyApiKey(): void {
+        this.api.startCheckoutSession().then(resonse => {
+            window.location.href = resonse.url;
         });
     }
 }

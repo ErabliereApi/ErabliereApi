@@ -165,4 +165,15 @@ public class StripeCheckoutService : ICheckoutService
 
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc />
+    public Task<object> GetBalanceAsync(CancellationToken token)
+    {
+        StripeConfiguration.ApiKey = _options.Value.ApiKey;
+
+        var service = new BalanceService();
+        var balance = service.Get();
+
+        return Task.FromResult<object>(balance);
+    }
 }

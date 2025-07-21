@@ -58,9 +58,26 @@ public class CheckoutController : ControllerBase
         using var reader = new StreamReader(HttpContext.Request.Body);
 
         var json = await reader.ReadToEndAsync();
-        
+
         await _checkoutService.Webhook(json);
 
         return Ok();
+    }
+
+    /// <summary>
+    /// Get current balance for a customer
+    /// </summary>
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetBalance(CancellationToken token)
+    {
+        if (!_configuration.StripeIsEnabled())
+        {
+            return NotFound();
+        }
+
+        var balance = await _checkoutService.GetBalanceAsync(token);
+
+        return Ok(balance);
     }
 }

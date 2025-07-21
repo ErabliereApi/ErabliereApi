@@ -47,12 +47,27 @@ public class CustomersController : ControllerBase
 
         var unique_name = UsersUtils.GetUniqueName(scope, User);
 
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UniqueName == unique_name, token);
+        var customer = await _context.Customers
+            .Include(c => c.ApiKeys)
+            .FirstOrDefaultAsync(c => c.UniqueName == unique_name, token);
 
         if (customer == null)
         {
             return NotFound("Utilisateur non trouvé: " + unique_name);
         }
+
+        customer.ApiKeys = customer.ApiKeys?.Select(k => new ApiKey
+        {
+            Id = k.Id,
+            Name = k.Name,
+            CreationTime = k.CreationTime,
+            CustomerId = k.CustomerId,
+            DeletionTime = k.DeletionTime,
+            RevocationTime = k.RevocationTime,
+            SubscriptionId = k.SubscriptionId,
+            Key = "***", // Masquer la clé pour des raisons de sécurité
+            Customer = null // Ne pas inclure le client dans la clé API
+        }).ToList();
 
         return Ok(customer);
     }
@@ -72,7 +87,8 @@ public class CustomersController : ControllerBase
         // Masquer avec des * certains caractères des adresses courriel
         foreach (var customer in customers.Where(c => !string.IsNullOrEmpty(c.Email) && c.Email.Contains('@')))
         {
-            if (customer.Email == null) {
+            if (customer.Email == null)
+            {
                 continue;
             }
 

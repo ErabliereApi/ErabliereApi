@@ -17,13 +17,13 @@ export class AproposComponent {
     demoMode?: boolean
     realAppUrl?: string
     
-    constructor(private _enviromentService: EnvironmentService, private _erbliereApi: ErabliereApi){}
+    constructor(private readonly env: EnvironmentService, private readonly api: ErabliereApi){}
 
     ngOnInit(): void {
-        this.urlApi = this._enviromentService.apiUrl;
-        this.tenantId = this._enviromentService.tenantId;
+        this.urlApi = this.env.apiUrl;
+        this.tenantId = this.env.tenantId;
 
-        this._erbliereApi.getOpenApiSpec().then(spec => {
+        this.api.getOpenApiSpec().then(spec => {
             this.supportEmail = spec.info.contact.email;
             this.checkoutEnabled = spec.paths['/Checkout'] !== undefined;
             this.demoMode = spec.info.demoMode;
@@ -35,7 +35,7 @@ export class AproposComponent {
     }
 
     buyApiKey(): void {
-        this._erbliereApi.startCheckoutSession().then(resonse => {
+        this.api.startCheckoutSession().then(resonse => {
             window.location.href = resonse.url;
         });
     }
