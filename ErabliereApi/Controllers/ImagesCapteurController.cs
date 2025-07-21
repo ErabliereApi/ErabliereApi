@@ -15,13 +15,17 @@ namespace ErabliereApi.Controllers;
 public class ImagesCapteurController : ControllerBase
 {
     private readonly IHttpClientFactory _httpClietFactory;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<ImagesCapteurController> _logger;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
-    public ImagesCapteurController(IHttpClientFactory httpClientFactory)
+    public ImagesCapteurController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ImagesCapteurController> logger)
     {
         _httpClietFactory = httpClientFactory;
+        _configuration = configuration;
+        _logger = logger;
     }
 
     /// <summary>
@@ -42,6 +46,13 @@ public class ImagesCapteurController : ControllerBase
                                             [FromQuery] string? search,
                                                         CancellationToken token)
     {
+        if (string.IsNullOrWhiteSpace(_configuration["EmailImageObserverUrl"]))
+        {
+            _logger.LogWarning("L'URL de l'observateur d'images n'est pas configurée. Une liste vide sera retournée.");
+
+            return Ok(new List<GetImageInfo>());
+        }
+
         using var client = _httpClietFactory.CreateClient("EmailImageObserver");
 
         string route = $"/api/image?ownerId={id}";
