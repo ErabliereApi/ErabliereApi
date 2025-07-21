@@ -10,19 +10,21 @@ import { RappelsComponent } from 'src/rappel/rappels.component';
 import { WeatherForecastComponent } from 'src/donnees/weather-forecast.component';
 import { HourlyWeatherForecastComponent } from 'src/donnees/hourly-weather-forecast';
 import { CapteurPanelsComponent } from 'src/donnees/sub-panel/capteur-panels.component';
+import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
+import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
 
 @Component({
-    selector: 'erablieres',
-    templateUrl: 'erabliere.component.html',
-    imports: [
-        DonneesComponent,
-        CapteurPanelsComponent,
-        BarilsComponent,
-        ImagePanelComponent,
-        RappelsComponent,
-        WeatherForecastComponent,
-        HourlyWeatherForecastComponent
-    ]
+  selector: 'erablieres',
+  templateUrl: 'erabliere.component.html',
+  imports: [
+    DonneesComponent,
+    CapteurPanelsComponent,
+    BarilsComponent,
+    ImagePanelComponent,
+    RappelsComponent,
+    WeatherForecastComponent,
+    HourlyWeatherForecastComponent
+  ]
 })
 export class ErabliereComponent implements OnInit {
   idErabliereSelectionee?: any;
@@ -32,16 +34,16 @@ export class ErabliereComponent implements OnInit {
   displayCapteurs: boolean = false;
   displayImages: boolean = false;
 
-  constructor(private readonly _api: ErabliereApi, private readonly route: ActivatedRoute) {
+  private readonly authSvc: IAuthorisationSerivce;
+
+  constructor(
+    private readonly _api: ErabliereApi,
+    private readonly route: ActivatedRoute,
+    private readonly authSvcFactory: AuthorisationFactoryService) {
+    this.authSvc = this.authSvcFactory.getAuthorisationService();
     this.route.paramMap.subscribe(params => {
       this.idErabliereSelectionee = params.get('idErabliereSelectionee');
-      if (this.idErabliereSelectionee) {
-        this._api.getErabliere(this.idErabliereSelectionee).then((erabliere) => {
-          this.erabliere = erabliere;
-          this.resetErabliere.next(erabliere);
-          this.displayCapteurs = !!(this.erabliere.capteurs?.find(capteur => capteur.afficherCapteurDashboard));
-        });
-      }
+      this.getErabliere();
     });
     this.resetErabliere.subscribe((erabliere) => {
       this.erabliere = erabliere;
@@ -57,9 +59,45 @@ export class ErabliereComponent implements OnInit {
         });
       }
     });
+
+    this.authSvc.loginChanged.subscribe(isLoggedIn => {
+      this._api.getErablieres(1).then((erablieres) => {
+        if (erablieres.length == 0) {
+          this.idErabliereSelectionee = undefined;
+          this.erabliere = new Erabliere();
+          this.resetErabliere.next(this.erabliere);
+          this.displayCapteurs = false;
+          this.displayImages = false;
+        }
+        else {
+          this.resetErabliere.next(this.erabliere ?? new Erabliere());
+        }
+      }).catch((error) => {
+        console.error('Error fetching erablieres:', error)
+        this.idErabliereSelectionee = undefined;
+        this.erabliere = new Erabliere();
+        this.resetErabliere.next(this.erabliere);
+        this.displayCapteurs = false;
+        this.displayImages = false;
+      });
+    });
   }
 
-  getClassPanneauImage(arg0: Erabliere|undefined) {
+  getErabliere() {
+    this._api.getErabliere(this.idErabliereSelectionee).then((erabliere) => {
+        this.erabliere = erabliere;
+        this.resetErabliere.next(erabliere);
+        this.displayCapteurs = !!(this.erabliere.capteurs?.find(capteur => capteur.afficherCapteurDashboard));
+      }).catch((error) => {
+        console.error('Error fetching erabliere:', error)
+        this.erabliere = undefined;
+        this.resetErabliere.next(new Erabliere());
+        this.displayCapteurs = false;
+        this.displayImages = false;
+      });
+  }
+
+  getClassPanneauImage(arg0: Erabliere | undefined) {
     if (arg0?.dimensionPanneauImage) {
       return 'col-md-' + arg0.dimensionPanneauImage;
     }

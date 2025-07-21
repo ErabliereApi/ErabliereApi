@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
 import { MsalService } from "@azure/msal-angular";
-import { environment } from "src/environments/environment";
 import { EnvironmentService } from "src/environments/environment.service";
 import { AuthorisationBypassService } from "./authorisation-bypass-service";
 import { AzureADAuthorisationService } from "./azuread-autorisation-service";

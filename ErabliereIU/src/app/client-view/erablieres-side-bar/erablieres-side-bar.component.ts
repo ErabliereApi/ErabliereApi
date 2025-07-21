@@ -98,6 +98,9 @@ export class ErabliereSideBarComponent implements OnInit {
       else {
         this.etat = "Aucune erablière";
         this.thereIsAtLeastOneErabliere = false;
+        this._router.navigate(['/']);
+        this.idSelectionne = undefined;
+        this.idSelectionneChange.emit(this.idSelectionne);
         this.thereIsAtLeastOneErabliereChange.emit(false);
         if (this.search == "") {
           this.displaySearch = false;
