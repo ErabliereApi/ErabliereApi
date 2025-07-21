@@ -7,7 +7,7 @@ import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service'
 @Injectable({
   providedIn: 'root'
 })
-export class AdminGuard implements CanActivate {
+export class AuthenticatedUserGard implements CanActivate {
 
   private readonly authSvc: IAuthorisationSerivce;
 
@@ -18,11 +18,11 @@ export class AdminGuard implements CanActivate {
   async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Promise<boolean> {
-    const userHasRole = await this.authSvc.userIsInRole('administrateur');
-    console.log(`Can active ${route.url}, User has role administrateur: `, userHasRole);
-    if (!userHasRole) {
+    const isLoggedIn = await this.authSvc.isLoggedIn();
+    console.log(`Can active ${route.url}, User is logged in: `, isLoggedIn);
+    if (!isLoggedIn) {
       this.router.navigate(['/page401']);
     }
-    return userHasRole;
+    return isLoggedIn;
   }
 }

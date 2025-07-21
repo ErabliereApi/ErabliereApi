@@ -1,9 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Put;
+using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -31,6 +33,28 @@ public class CustomersController : ControllerBase
     {
         _context = context;
         _mapper = mapper;
+    }
+
+    /// <summary>
+    /// Point de terminaison pour récupérer le profil de l'utilisateur authentifié.
+    ///</summary>
+    [HttpGet("me")]
+    [Authorize]
+    [ProducesResponseType(typeof(Customer), 200)]
+    public async Task<IActionResult> GetProfile(CancellationToken token)
+    {
+        using var scope = HttpContext.RequestServices.CreateScope();
+
+        var unique_name = UsersUtils.GetUniqueName(scope, User);
+
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UniqueName == unique_name, token);
+
+        if (customer == null)
+        {
+            return NotFound("Utilisateur non trouvé: " + unique_name);
+        }
+
+        return Ok(customer);
     }
 
     /// <summary>

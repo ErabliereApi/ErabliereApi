@@ -13,4 +13,5 @@ export interface IAuthorisationSerivce {
     getAccessToken() : Promise<string | null>
     userIsInRole(role: string): Promise<boolean>
     init(): Promise<void>
+    getUserInfo(): Promise<AppUser>
 }

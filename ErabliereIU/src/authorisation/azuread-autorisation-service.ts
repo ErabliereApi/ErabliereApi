@@ -54,13 +54,23 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
       this._isLoggedIn = true;
       this._loginChangedSubject.next(true);
       this._msalInstance.instance.setActiveAccount(user);
-      return new AppUser();
+      return {
+        id: user.localAccountId ?? null,
+        name: user.name ?? null,
+        email: user.idTokenClaims?.email ?? null,
+        roles: user.idTokenClaims?.roles ?? []
+      } as AppUser;
     }
 
     this._isLoggedIn = false;
     this._loginChangedSubject.next(false);
     this._msalInstance.instance.setActiveAccount(null);
-    return new AppUser();
+    return {
+      id: null,
+      name: null,
+      email: null,
+      roles: []
+    } as AppUser;
   }
 
   logout() {
@@ -143,6 +153,21 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     if (!this.initialize) {
       await firstValueFrom(this._msalInstance.initialize());
       this.initialize = true;
+    }
+  }
+
+  getUserInfo(): Promise<AppUser> {
+    const user = this.getUser();
+
+    if (user != null) {
+      return Promise.resolve({
+        id: user.localAccountId ?? null,
+        name: user.name ?? null,
+        email: user.username ?? null,
+        roles: user.idTokenClaims?.roles ?? []
+      } as AppUser);
+    } else {
+      return Promise.reject(new Error("User not logged in"));
     }
   }
 }

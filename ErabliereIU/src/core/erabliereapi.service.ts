@@ -33,6 +33,7 @@ import { PostImageGenerationResponse } from 'src/model/postImageGenerationRespon
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
+    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -715,6 +716,12 @@ export class ErabliereApi {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.put<any>(this._environmentService.apiUrl +
             '/Erablieres/' + idErabliere + '/Notes/' + id + '/RappelProchainePeriode', {}, { headers: headers }));
+    }
+
+    async getCurrentCustomer() {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<Customer>(this._environmentService.apiUrl +
+            '/Customers/me', { headers: headers }));
     }
 }
 

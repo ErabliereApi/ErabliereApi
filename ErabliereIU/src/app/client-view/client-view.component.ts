@@ -15,7 +15,7 @@ import {YouAreNotConnectedComponent} from "./you-are-not-connected/you-are-not-c
     templateUrl: './client-view.component.html'
 })
 export class ClientViewComponent implements OnInit {
-    private readonly _pagesSansMenu = ["apropos"];
+    private readonly _pagesSansMenu = ["apropos", "profile"];
     @Input() idErabliereSelectionee?: string;
     showMenu: boolean = true;
     thereIsAtLeastOneErabliere: boolean = false;

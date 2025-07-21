@@ -1,0 +1,26 @@
+<h3>Votre profile - {{user?.name}}</h3>
+
+<p>Bienvenue sur votre page de profil. Ici, vous pouvez voir et modifier vos informations personnelles.</p>
+
+<div class="row">
+    <div class="card col-md-4">
+        <h3>Connexion active</h3>
+        <span class="text-danger">{{errorToken}}</span>
+        <p><strong>ID:</strong> {{ user?.id }} <copy-id-button [text]="user?.id" tile="Copier l'id de mon utilisateur"></copy-id-button></p>
+        <p><strong>Nom:</strong> {{ user?.name }}</p>
+        <p><strong>Email:</strong> {{ user?.email }}</p>
+        <p><strong>Rôles:</strong> {{ user?.roles?.join(', ') }}</p>
+    </div>
+    <div class="card col-md-4">
+        <h3>Informations du compte</h3>
+        <span class="text-danger">{{errorCustomer}}</span>
+        <p><strong>ID:</strong> {{ customer?.id }} <copy-id-button [text]="customer?.id" title="Copier l'id de mon compte"></copy-id-button></p>
+        <p><strong>Nom:</strong> {{ customer?.name }}</p>
+        <p><strong>Unique Name:</strong> {{ customer?.uniqueName }}</p>
+        <p><strong>Email:</strong> {{ customer?.email }}</p>
+        <p><strong>Email secondaire:</strong> {{ customer?.secondaryEmail}}</p>
+        <p><strong>Type de compte:</strong> {{ customer?.accountType }}</p>
+        <p><strong>Créé le:</strong> {{ customer?.creationTime  }}</p>
+        <p><strong>Dernière connexion:</strong> {{ customer?.lastAccessTime }}</p>
+    </div>
+</div>

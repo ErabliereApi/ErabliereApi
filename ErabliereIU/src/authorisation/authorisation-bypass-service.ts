@@ -6,6 +6,12 @@ import { IAuthorisationSerivce } from "./iauthorisation-service";
 export class AuthorisationBypassService implements IAuthorisationSerivce {
     loginChanged: Observable<boolean> = new Observable<boolean>();
     type: string = "AuthDisabled";
+    anonymous: AppUser = {
+        id: null,
+        name: "Utilisateur anonyme",
+        email: null,
+        roles: []
+    };
 
     login(): Promise<void> {
         return Promise.resolve();
@@ -14,7 +20,7 @@ export class AuthorisationBypassService implements IAuthorisationSerivce {
         return Promise.resolve(true);
     }
     completeLogin(): Promise<AppUser> {
-        return Promise.resolve(new AppUser());
+        return Promise.resolve(this.anonymous);
     }
     logout(): void {
         // Do nothing
@@ -30,5 +36,8 @@ export class AuthorisationBypassService implements IAuthorisationSerivce {
     }
     init(): Promise<void> {
         return Promise.resolve();
+    }
+    getUserInfo(): Promise<AppUser> {
+        return Promise.resolve(this.anonymous);
     }
 }

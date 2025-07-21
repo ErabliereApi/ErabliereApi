@@ -61,7 +61,8 @@
             </ul>
             <div class="d-flex gap-2">
                 @if (isErabliereAIUser && useAuthentication && isLoggedIn) {
-                <button id="zone-ai-button" class="btn btn-success" routerLink="/ai"><span>🤖 </span>Erabliere AI</button>
+                <button id="zone-ai-button" class="btn btn-success" routerLink="/ai"><span>🤖 </span>Erabliere
+                    AI</button>
                 }
                 @if (mapFeatureEnable) {
                 <button id="zone-carte-button" class="btn btn-primary" routerLink="/map"><span>🗺️ </span>Carte</button>
@@ -72,6 +73,12 @@
                 }
                 @if (useAuthentication) {
                 <connection-button (loginChange)="onLoginChange($event)" />
+                }
+                @if (isLoggedIn) {
+                <button id="zone-profile-button" class="btn btn-outline-secondary" routerLink="/profile"
+                    routerLinkActive="active" ariaCurrentWhenActive="page">
+                    <span>👤</span>
+                </button>
                 }
             </div>
         </div>

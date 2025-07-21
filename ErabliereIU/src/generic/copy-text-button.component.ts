@@ -10,10 +10,10 @@ import { Component, Input } from "@angular/core";
     `
 })
 export class CopyTextButtonComponent {
-    @Input() text: string | undefined = '';
+    @Input() text: string | undefined | null = '';
     @Input() title: string = 'Copier';
 
-    copyText(event: MouseEvent, text?: string) {
+    copyText(event: MouseEvent, text?: string | null) {
         const button = event.target as HTMLButtonElement;
         
         if (!text) {

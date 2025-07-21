@@ -22,6 +22,8 @@ import { AdminHologramComponent } from 'src/admin/admin-hologram/admin-hologram.
 import { ErabliereAiWindowComponent } from 'src/erabliereai/window/erabliereai-window.component';
 import { ErabliereAiPublicConversationComponent } from 'src/erabliereai/publicConversation/erabliereai-public-conversation.component';
 import { AiViewComponent } from './ai-view/ai-view.component';
+import { UserProfileComponent } from './client-view/user-profile/user-profile.component';
+import { AuthenticatedUserGard } from './guard/authenticated-user.gard';
 
 export const routes: Routes = [
     {
@@ -138,6 +140,12 @@ export const routes: Routes = [
                 path: 'apropos',
                 title: 'ÉrablièreIU - À propos',
                 component: AproposComponent
+            },
+            {
+                path: 'profile',
+                title: 'ÉrablièreIU - Mon profil',
+                canActivate: [AuthenticatedUserGard],
+                component: UserProfileComponent
             },
             {
                 path: '**',
