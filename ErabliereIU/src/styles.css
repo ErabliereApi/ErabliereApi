@@ -131,7 +131,7 @@
     background: #1ecb2f;
 
     /* Chrome 10-25, Safari 5.1-6 */
-    background: -webkit-linear-gradient(to bottom right, rgb(144, 251, 165), rgb(33, 250, 69));
+    background: -webkit-linear-gradient(right bottom, rgb(144, 251, 165), rgb(33, 250, 69));
 
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     background: linear-gradient(to bottom right, rgb(91, 243, 116), rgb(22, 248, 82))
@@ -142,7 +142,7 @@
     background: #17d12a;
 
     /* Chrome 10-25, Safari 5.1-6 */
-    background: -webkit-linear-gradient(to bottom right, rgb(36, 194, 68), rgb(37, 201, 64));
+    background: -webkit-linear-gradient(right bottom, rgb(36, 194, 68), rgb(37, 201, 64));
 
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     background: linear-gradient(to bottom right, rgb(36, 196, 68), rgb(25, 175, 50))
