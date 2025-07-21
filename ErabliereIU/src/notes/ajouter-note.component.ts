@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule
 } from "@angular/forms";
 import { Note } from "src/model/note";
-import { InputErrorComponent } from "../formsComponents/input-error.component";
+import { InputErrorComponent } from "../generic/input-error.component";
 import { Rappel } from "../model/Rappel";
 import { reminderValidator } from "./note.custom-validators";
 

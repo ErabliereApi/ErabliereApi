@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { PutCapteur } from "src/model/putCapteur";
-import { InputErrorComponent } from "../formsComponents/input-error.component";
+import { InputErrorComponent } from "../generic/input-error.component";
 import {
     ReactiveFormsModule,
     FormsModule,

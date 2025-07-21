@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, ReactiveFormsModule } from "@angular/forms";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { PostDonneeCapteur } from "src/model/donneeCapteur";
-import { EinputComponent } from "../formsComponents/einput.component";
+import { EinputComponent } from "../generic/einput.component";
 
 
 @Component({
@@ -21,7 +21,6 @@ import { EinputComponent } from "../formsComponents/einput.component";
                 }
               </div>
               <div class="form-group">
-                <label for="valeur" class="form-label">Valeur</label>
                 <einput type="number" id="valeur" name="valeur" [formGroup]="donneeCapteurForm" [symbole]="symbole" />
                 @if (this.donneeCapteurForm.controls['valeur'].errors) {
                   <div>
@@ -90,6 +89,7 @@ export class AjouterDonneeCapteurComponent implements OnInit {
         try {
             donneeCapteur.v = parseFloat(this.donneeCapteurForm.controls['valeur'].value);
         } catch (error) {
+            console.error("Erreur lors de la conversion de la valeur en nombre décimal", error);
             this.donneeCapteurForm.controls['valeur'].setErrors({
                 'incorrect': true,
                 'message': 'Impossible de convertir la valeur en nombre décimal'
@@ -99,6 +99,7 @@ export class AjouterDonneeCapteurComponent implements OnInit {
         try {
             donneeCapteur.d = new Date(this.donneeCapteurForm.controls['date'].value).toISOString();
         } catch (error) {
+            console.error("Erreur lors de la conversion de la date", error);
             this.donneeCapteurForm.controls['date'].setErrors({
                 'incorrect': true,
                 'message': "Impossible d'interpreter la date"

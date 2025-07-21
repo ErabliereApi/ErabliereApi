@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Subject } from "rxjs";
 import { ErabliereApi } from "src/core/erabliereapi.service";
-import { InputErrorComponent } from "src/formsComponents/input-error.component";
+import { InputErrorComponent } from "src/generic/input-error.component";
 import { ErabliereApiDocument } from "src/model/erabliereApiDocument";
 
 @Component({

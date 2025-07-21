@@ -33,7 +33,9 @@ import { AjouterDonneeCapteurComponent } from 'src/donneeCapteurs/ajouter-donnee
                 <tr>
                   <th scope="col">Date</th>
                   <th scope="col">Valeur</th>
+                  @if (symbole) {
                   <th scope="col">Unité</th>
+                  }
                 </tr>
               </thead>
               <tbody>
@@ -41,7 +43,9 @@ import { AjouterDonneeCapteurComponent } from 'src/donneeCapteurs/ajouter-donnee
                   <tr>
                     <td>{{donnee.d | date:'short'}}</td>
                     <td>{{donnee.valeur}}</td>
+                    @if (symbole) {
                     <td>{{symbole}}</td>
+                    }
                   </tr>
                 }
               </tbody>

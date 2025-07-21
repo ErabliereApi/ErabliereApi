@@ -5,7 +5,7 @@ import { UntypedFormGroup, UntypedFormBuilder, ReactiveFormsModule } from "@angu
 import { Subject } from "rxjs";
 import { AlerteCapteur } from "src/model/alerteCapteur";
 import { convertTenthToNormale, divideByTen } from "src/core/calculator.service";
-import { EinputComponent } from "../formsComponents/einput.component";
+import { EinputComponent } from "../generic/einput.component";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 
 

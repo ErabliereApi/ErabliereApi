@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output, OnInit} from '@angular/core';
 import {Customer} from "../../../model/customer";
 import {ErabliereApi} from "../../../core/erabliereapi.service";
 import {FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
-import {InputErrorComponent} from "../../../formsComponents/input-error.component";
+import {InputErrorComponent} from "../../../generic/input-error.component";
 
 @Component({
     selector: 'modifier-customer-modal',

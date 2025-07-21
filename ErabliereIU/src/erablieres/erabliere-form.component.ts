@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
 import { Erabliere } from 'src/model/erabliere';
 import { NgClass } from '@angular/common';
-import { InputErrorComponent } from '../formsComponents/input-error.component';
+import { InputErrorComponent } from '../generic/input-error.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @Component({

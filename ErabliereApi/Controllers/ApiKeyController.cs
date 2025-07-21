@@ -16,7 +16,6 @@ namespace ErabliereApi.Controllers;
 /// </summary>
 [Route("access/[controller]")]
 [ApiController]
-[Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
 public class ApiKeyController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
@@ -38,6 +37,7 @@ public class ApiKeyController : ControllerBase
     /// </summary>
     [HttpGet]
     [EnableQuery]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     public IQueryable<ApiKey> GetApiKeys()
     {
         return _context.ApiKeys.Select(k => new ApiKey
@@ -58,6 +58,7 @@ public class ApiKeyController : ControllerBase
     /// Permet de créer une nouvelle clé d'API.
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     public async Task<IActionResult> CreateApiKey([FromBody] PostApiKey postApiKey, CancellationToken token)
     {
         if (postApiKey.CustomerId == null)
@@ -93,6 +94,7 @@ public class ApiKeyController : ControllerBase
     /// Permet de modifier le nom d'une clé d'API.
     /// </summary>
     [HttpPut("{id}/name")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     public async Task<IActionResult> UpdateApiKeyName(Guid id, [FromBody] PutApiKeyName param, CancellationToken token)
     {
         var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
@@ -117,6 +119,7 @@ public class ApiKeyController : ControllerBase
     /// Permet de révoquer une clé d'API.
     /// </summary>
     [HttpPut("{id}/revoke")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     public async Task<IActionResult> RevokeApiKey(Guid id, CancellationToken token)
     {
         var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);

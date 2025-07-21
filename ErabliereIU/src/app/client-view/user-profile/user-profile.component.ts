@@ -25,6 +25,9 @@ export class UserProfileComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadUserProfile();
+        this.authSvc.loginChanged.subscribe(() => {
+            this.loadUserProfile();
+        });
     }
 
     loadUserProfile(): void {
@@ -35,6 +38,7 @@ export class UserProfileComponent implements OnInit {
         }).catch(error => {
             console.error("Error loading user profile:", error);
             this.errorToken = "Erreur lors du chargement du profil utilisateur.";
+            this.user = null;
         });
         this.api.getCurrentCustomer().then(customer => {
             this.customer = customer;
@@ -42,17 +46,23 @@ export class UserProfileComponent implements OnInit {
         }).catch(error => {
             console.error("Error loading customer profile:", error);
             this.errorCustomer = "Erreur lors du chargement du profil client.";
+            this.customer = null;
         });
     }
 
-    deleteApiKey(arg0: string|undefined) {
+    deleteApiKey(arg0: string | undefined) {
         this.api.deleteApiKey(arg0).then(() => {
             console.log("API key deleted successfully.");
             this.errorApiKey = null;
             this.loadUserProfile(); // Reload user profile to reflect changes
         }).catch(error => {
             console.error("Error deleting API key:", error);
-            this.errorApiKey = "Erreur lors de la suppression de la clé API.";
+            if (error.status === 403) {
+                this.errorApiKey = "Vous n'avez pas les droits pour supprimer cette clé API.";
+            }
+            else {
+                this.errorApiKey = "Erreur lors de la suppression de la clé API.";
+            }
         });
     }
 

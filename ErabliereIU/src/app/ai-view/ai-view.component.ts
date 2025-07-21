@@ -10,12 +10,7 @@ import { AiNavBarComponent } from './ai-nav-bar/ai-nav-bar.component';
         AiNavBarComponent,
         YouAreNotConnectedComponent
     ],
-    templateUrl: './ai-view.component.html',
-    styles: [`
-        body: {
-            background-color: #f8f9fa;
-        }
-    `]      
+    templateUrl: './ai-view.component.html'
 })
 export class AiViewComponent {
 

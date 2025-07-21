@@ -5,7 +5,7 @@ import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, ReactiveForms
 import { AlerteCapteur } from "src/model/alerteCapteur";
 import { Capteur } from "src/model/capteur";
 import { convertTenthToNormale } from "src/core/calculator.service";
-import { EinputComponent } from "../formsComponents/einput.component";
+import { EinputComponent } from "../generic/einput.component";
 
 import { Erabliere } from "src/model/erabliere";
 import { ActivatedRoute } from "@angular/router";

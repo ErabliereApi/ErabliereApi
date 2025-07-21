@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {ErabliereApi} from "src/core/erabliereapi.service";
 import {UntypedFormGroup, UntypedFormBuilder, FormControl, Validators, ReactiveFormsModule, AbstractControlOptions} from "@angular/forms";
 import {Note} from "src/model/note";
-import {InputErrorComponent} from "../formsComponents/input-error.component";
+import {InputErrorComponent} from "../generic/input-error.component";
 import {Subject} from "rxjs";
 import {Rappel} from "../model/Rappel";
 import {reminderValidator} from "./note.custom-validators";

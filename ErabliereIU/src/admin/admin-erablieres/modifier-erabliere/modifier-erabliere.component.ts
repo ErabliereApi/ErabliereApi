@@ -9,7 +9,7 @@ import {
 } from "@angular/forms";
 import {ErabliereApi} from "../../../core/erabliereapi.service";
 import {Erabliere} from "../../../model/erabliere";
-import {InputErrorComponent} from "../../../formsComponents/input-error.component";
+import {InputErrorComponent} from "../../../generic/input-error.component";
 
 @Component({
     selector: 'modifier-erabliere-modal',

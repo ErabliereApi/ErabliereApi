@@ -34,10 +34,7 @@ import { Component, Input } from '@angular/core';
                 </div>
             }
         </div>
-    `,
-    imports: [
-        
-    ]
+    `
 })
 export class PanelHeaderComponent {
     @Input() titre?: string;

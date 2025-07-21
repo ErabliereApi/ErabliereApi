@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Capteur } from 'src/model/capteur';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
-import { InputErrorComponent } from "../../formsComponents/input-error.component";
+import { InputErrorComponent } from "../../generic/input-error.component";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -12,10 +12,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     templateUrl: './rapport-degre-jour.component.html',
     styleUrls: ['./rapport-degre-jour.component.css'],
     imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    InputErrorComponent
-]
+        FormsModule,
+        ReactiveFormsModule,
+        InputErrorComponent
+    ]
 })
 export class RapportDegreJourComponent implements OnInit {
     form: PostDegresJoursRepportRequest = new PostDegresJoursRepportRequest();
@@ -46,15 +46,23 @@ export class RapportDegreJourComponent implements OnInit {
             const rapport = await this.api.postDegresJours(this.idErabliere, this.form, save);
             console.log('RapportDegreJourComponent notifierAffichageRapport.emit', rapport);
             this.notifierAffichageRapport.emit(rapport);
+            this.errorObj = null;
+            this.generalError = undefined;
         }
         catch (error: any) {
             console.error('RapportDegreJourComponent error', error);
-            this.errorObj = error;
-            if (error.error.errors) {
-                this.generalError = error.error.title;
+            if (error.status >= 500) {
+                this.generalError = "Erreur interne du serveur (" + error.name + "). Veuillez réessayer plus tard.";
+                this.errorObj = null;
             }
             else {
-                this.generalError = error.error;
+                this.errorObj = error;
+                if (error.error.errors) {
+                    this.generalError = error.error.title;
+                }
+                else {
+                    this.generalError = error.error;
+                }
             }
         }
     }
