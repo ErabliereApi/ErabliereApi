@@ -79,4 +79,53 @@ public class MSGraphEmailService : IEmailService
             _logger.LogCritical(e, e.Message);
         }
     }
+
+    /// <inheritdoc />
+    public async Task SendEmailAsync(string messageText, string recipient, CancellationToken token)
+    {
+        try
+        {
+            _logger.LogInformation("Begin sending email...");
+
+            string? tenantId = _emailConfig.TenantId;
+            string? clientId = _config.GetValue<string>("AzureAD:ClientId");
+            string? clientSecret = _config.GetValue<string>("AzureAD:ClientSecret");
+
+            ClientSecretCredential credential = new(tenantId, clientId, clientSecret);
+            GraphServiceClient graphClient = new(credential);
+
+            Microsoft.Graph.Models.Message message = new()
+            {
+                Subject = "ErabliereAPI - Notification",
+                Body = new ItemBody
+                {
+                    ContentType = BodyType.Text,
+                    Content = messageText
+                },
+                ToRecipients = recipient.Split(';').Select(r => new Recipient
+                {
+                    EmailAddress = new EmailAddress
+                    {
+                        Address = r.ToString()
+                    }
+                }).ToList()
+            };
+
+            bool saveToSentItems = true;
+
+            var requestBuilder = graphClient.Users[_emailConfig.Sender];
+
+            await requestBuilder.SendMail.PostAsync(new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
+            {
+                Message = message,
+                SaveToSentItems = saveToSentItems
+            }, cancellationToken: token);
+
+            _logger.LogInformation("Email sent successfully");
+        }
+        catch (Exception e)
+        {
+            _logger.LogCritical(e, e.Message);
+        }
+    }
 }

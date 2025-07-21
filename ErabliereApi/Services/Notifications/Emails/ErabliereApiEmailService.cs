@@ -39,7 +39,7 @@ public class ErabliereApiEmailService : IEmailService
     /// <inheritdoc />
     public async Task SendEmailAsync(MimeMessage message, CancellationToken token)
     {
-        if (_smtpClient.IsConnected == false)
+        if (!_smtpClient.IsConnected)
         {
             await _smtpClient.ConnectAsync(_config.SmtpServer, _config.SmtpPort, SecureSocketOptions.StartTls, token);
         }
@@ -55,6 +55,12 @@ public class ErabliereApiEmailService : IEmailService
 
         await _smtpClient.SendAsync(message, token);
         await _smtpClient.DisconnectAsync(true, token);
+    }
+
+    /// <inheritdoc />
+    public Task SendEmailAsync(string message, string recipient, CancellationToken token)
+    {
+        throw new NotImplementedException("This method is not implemented. Use SendEmailAsync(MimeMessage message, CancellationToken token) instead.");
     }
 
     private async Task OAuthAuthenticateAsync(CancellationToken token)

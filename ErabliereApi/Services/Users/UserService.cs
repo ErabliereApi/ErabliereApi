@@ -4,7 +4,9 @@ using ErabliereApi.Authorization;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.NonHttp;
+using ErabliereApi.Services.Notifications;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Stripe;
 
 namespace ErabliereApi.Services.Users;
@@ -18,6 +20,8 @@ public class UserService : IUserService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ApiKeyAuthorizationContext _apiKeyAuthorizationContext;
     private readonly IConfiguration _config;
+    private readonly NotificationService _notificationService;
+    private readonly EmailConfig _emailConfig;
 
     /// <summary>
     /// Constructeur par initialisation
@@ -26,16 +30,22 @@ public class UserService : IUserService
     /// <param name="serviceScope"></param>
     /// <param name="apiKeyAuthorizationContext"></param>
     /// <param name="config"></param>
+    /// <param name="notificationService"></param>
+    /// <param name="emailConfig"></param>
     public UserService(
-        ErabliereDbContext context, 
-        IServiceScopeFactory serviceScope, 
+        ErabliereDbContext context,
+        IServiceScopeFactory serviceScope,
         ApiKeyAuthorizationContext apiKeyAuthorizationContext,
-        IConfiguration config)
+        IConfiguration config,
+        NotificationService notificationService,
+        IOptions<EmailConfig> emailConfig)
     {
         _context = context;
         _scopeFactory = serviceScope;
         _apiKeyAuthorizationContext = apiKeyAuthorizationContext;
         _config = config;
+        _notificationService = notificationService;
+        _emailConfig = emailConfig.Value;
     }
 
     /// <inheritdoc />
@@ -65,6 +75,19 @@ public class UserService : IUserService
             var entity = await _context.Customers.AddAsync(customer, token);
 
             await _context.SaveChangesAsync(token);
+
+            await _notificationService.SendNotificationAsync(
+                $"{customer.Name} Bienvenue dans l'application ErabliereApi !",
+                customer.Email,
+                NotificationType.Email,
+                token);
+
+            await _notificationService.SendNotificationAsync(
+                $"Un nouveau client a été créé avec succès. {customer.UniqueName}",
+                _emailConfig.Sender ?? throw new InvalidOperationException("Email sender is not configured"),
+                NotificationType.Email,
+                token
+            );
 
             return entity.Entity;
         }

@@ -11,8 +11,6 @@ using StackExchange.Profiling;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using StackExchange.Profiling.SqlFormatters;
-using Microsoft.AspNetCore.OData;
-using System.Text.Json.Serialization;
 using System.Text.Json;
 using Prometheus;
 using ErabliereApi.HealthCheck;
@@ -29,11 +27,9 @@ using MailKit;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Services.Emails;
 using ErabliereApi.Services.SMS;
-using ErabliereApi.ControllerFeatureProviders;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using MQTTnet.AspNetCore;
 using System.Text;
+using ErabliereApi.Services.Notifications;
+using MQTTnet.AspNetCore;
 
 namespace ErabliereApi;
 
@@ -56,82 +52,17 @@ public class Startup
         Configuration = configuration;
     }
 
-    const string enUSCulture = "en-US";
-    const string enCACulture = "en-CA";
-    const string frCACulture = "fr-CA";
-
     /// <summary>
     /// Méthodes ConfigureServices
     /// </summary>
     public void ConfigureServices(IServiceCollection services)
     {
-        // Localization
-        services.AddLocalization(options => options.ResourcesPath = "Resources");
-
-        services.Configure<RequestLocalizationOptions>(options =>
-        {
-            var supportedCultures = new[]
-            {
-                new CultureInfo(enUSCulture),
-                new CultureInfo(enCACulture),
-                new CultureInfo(frCACulture)
-            };
-
-            options.DefaultRequestCulture = new RequestCulture(frCACulture, frCACulture);
-            options.SupportedCultures = supportedCultures;
-            options.SupportedUICultures = supportedCultures;
-
-            options.AddInitialRequestCultureProvider(new CustomRequestCultureProvider(async context =>
-            {
-                // My custom request culture logic
-                return await Task.FromResult(new ProviderCultureResult(frCACulture));
-            }));
-        });
-
-        // contrôleur
-        services.AddControllers(o =>
-        {
-            if (string.Equals(Configuration["MiniProfiler.Enable"], TrueString, OrdinalIgnoreCase))
-            {
-                o.Filters.Add<MiniProfilerAsyncLogger>();
-            }
-        })
-        .ConfigureApplicationPartManager(manager => 
-        {
-            // This code is used to scan for controller using the StripeIntegrationToggleFiltrer
-            // which is going to control if the stripe controller must be enabled or disabled
-            manager.FeatureProviders.Clear();
-            manager.FeatureProviders.Add(new ErabliereApiControllerFeatureProvider(Configuration));
-        })
-        .AddOData(o =>
-        {
-            o.Select().Filter().OrderBy().SetMaxTop(100).Expand();
-        })
-        .AddJsonOptions(c =>
-        {
-            c.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-            c.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        });
-
-        if (Configuration.UseMQTT())
-        {
-            services
-                .AddHostedMqttServerWithServices(builder =>
-                {
-                    builder.WithDefaultEndpointPort(1883);
-                })
-                .AddMqttConnectionHandler()
-                .AddConnections();
-        }
-
-        // Forwarded headers
-        services.AddErabliereAPIForwardedHeaders(Configuration);
-
-        // Authentication
-        services.AddErabliereAPIAuthentication(Configuration);
-
-        // Swagger
-        services.AjouterSwagger(Configuration);
+        services.AddLocalisation().
+            AddErabliereApiControllers(Configuration).
+            AddMqtt(Configuration).
+            AddErabliereAPIForwardedHeaders(Configuration).
+            AddErabliereAPIAuthentication(Configuration).
+            AjouterSwagger(Configuration);
 
         // Cors
         if (string.Equals(Configuration["USE_CORS"], TrueString, OrdinalIgnoreCase))
@@ -184,40 +115,7 @@ public class Startup
         }
 
         // Database
-        if (string.Equals(Configuration["USE_SQL"], TrueString, OrdinalIgnoreCase))
-        {
-            services.AddDbContext<ErabliereDbContext>(options =>
-            {
-                var connectionString = Configuration["SQL_CONNEXION_STRING"] ?? throw new InvalidOperationException("La variable d'environnement 'SQL_CONNEXION_STRING' à une valeur null.");
-
-                if (string.Equals(Configuration["MiniProlifer.EntityFramework.Enable"], TrueString, OrdinalIgnoreCase))
-                {
-                    DbConnection connection = new SqlConnection(connectionString);
-
-                    connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
-
-                    options.UseSqlServer(connection, o => o.EnableRetryOnFailure());
-                }
-                else
-                {
-                    options.UseSqlServer(connectionString, o => o.EnableRetryOnFailure());
-                }
-
-                if (string.Equals(Configuration["LOG_SQL"], "Console", OrdinalIgnoreCase))
-                {
-                    options.LogTo(Console.WriteLine, LogLevel.Information);
-                }
-            });
-        }
-        else
-        {
-            services.AddDbContext<ErabliereDbContext>(options =>
-            {
-                options.UseInMemoryDatabase(nameof(ErabliereDbContext));
-
-            }, contextLifetime: ServiceLifetime.Singleton, 
-               optionsLifetime: ServiceLifetime.Transient);
-        }
+        services.AddDatabase(Configuration);
 
         // HealthCheck
         services.AddHealthChecks()
@@ -272,106 +170,10 @@ public class Startup
             services.AddSingleton<UsageContext>();
         }
 
-        // Email
-        services.AddTransient<ErabliereApiEmailService>();
-        services.AddTransient<MSGraphEmailService>();
-        services.AddTransient<IEmailService>(sp =>
-        {
-            var o = sp.GetRequiredService<IOptions<EmailConfig>>().Value;
-
-            if (o.UseMSGraphAPI == true)
-            {
-                return sp.GetRequiredService<MSGraphEmailService>();
-            }
-
-            return sp.GetRequiredService<ErabliereApiEmailService>();
-        });
-        services.AddSingleton<ISmtpClient, SmtpClient>();
-        services.AddSingleton<IProtocolLogger>(sp =>
-        {
-            if (Configuration.IsDevelopment())
-            {
-                return new ProtocolLogger(Console.OpenStandardOutput());
-            }
-            else
-            {
-                return new ProtocolLogger(Stream.Null);
-            }
-        });
-        services.AddSingleton<SmtpClient>(sp =>
-        {
-           return new SmtpClient(sp.GetRequiredService<IProtocolLogger>());
-        });
-        services.Configure<EmailConfig>(o =>
-        {
-            var path = Configuration["EMAIL_CONFIG_PATH"];
-
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                Console.WriteLine("La variable d'environment 'EMAIL_CONFIG_PATH' ne possédant pas de valeur, les configurations de courriel ne seront pas désérialisé.");
-            }
-            else
-            {
-                try
-                {
-                    var v = File.ReadAllText(path);
-
-                    var deserializedConfig = JsonSerializer.Deserialize<EmailConfig>(v);
-
-                    if (deserializedConfig != null)
-                    {
-                        o.Sender = deserializedConfig.Sender;
-                        o.Email = deserializedConfig.Email;
-                        o.Password = deserializedConfig.Password;
-                        o.TenantId = deserializedConfig.TenantId;
-                        o.SmtpServer = deserializedConfig.SmtpServer;
-                        o.SmtpPort = deserializedConfig.SmtpPort;
-                        o.UseMSGraphAPI = deserializedConfig.UseMSGraphAPI;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.Error.WriteLine("Erreur en désérialisant les configurations de l'email. La fonctionnalité des alertes ne pourra pas être utilisé.");
-                    Console.Error.WriteLine(e.Message);
-                    Console.Error.WriteLine(e.StackTrace);
-                }
-            }
-        });
-
-        // SMS
-        services.AddTransient<TwilioSmsService>();
-        services.AddTransient<ISmsService, TwilioSmsService>();
-        services.Configure<SMSConfig>(o =>
-        {
-            var path = Configuration["SMS_CONFIG_PATH"];
-
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                Console.WriteLine("La variable d'environment 'SMS_CONFIG_PATH' ne possédant pas de valeur, les configurations de SMS ne seront pas désérialisé.");
-            }
-            else
-            {
-                try
-                {
-                    var v = File.ReadAllText(path);
-
-                    var deserializedConfig = JsonSerializer.Deserialize<SMSConfig>(v);
-
-                    if (deserializedConfig != null)
-                    {
-                        o.Numero = deserializedConfig.Numero;
-                        o.AccountSid = deserializedConfig.AccountSid;
-                        o.AuthToken = deserializedConfig.AuthToken;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.Error.WriteLine("Erreur en désérialisant les configurations du SMS. La fonctionnalité des alertes ne pourra pas être utilisé.");
-                    Console.Error.WriteLine(e.Message);
-                    Console.Error.WriteLine(e.StackTrace);
-                }
-            }
-        });
+        // Notifications
+        services.AddEmailServices(Configuration)
+                .AddSMSServices(Configuration)
+                .AddTransient<NotificationService>();
 
 
         // Distributed cache
@@ -383,7 +185,7 @@ public class Startup
                 options.Configuration = Configuration["REDIS_CONNEXION_STRING"];
             });
         }
-        else 
+        else
         {
             services.AddDistributedMemoryCache();
         }
