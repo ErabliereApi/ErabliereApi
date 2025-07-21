@@ -7,32 +7,32 @@ export class NotesPage {
     }
 
     getAddButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-        var addButton = cy.get('#addNoteButton');
+        let addButton = cy.get('#addNoteButton');
         return addButton;
     }
 
     getCancelButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-        var cancelButton = cy.get("#annulerCreerNote");
+        let cancelButton = cy.get("#annulerCreerNote");
         return cancelButton;
     }
 
     enterNoteTitle(value: string): void {
-        FormUtil.typeText(value, "notes", "title");
+        FormUtil.typeTextBaseOnFormControlName(value, "notes", "title");
     }
 
     enterNoteDescription(value: string): void {
-        FormUtil.typeText(value, "notes", "text");
+        FormUtil.typeTextBaseOnFormControlName(value, "notes", "text");
     }
 
     enterNoteDate(date: string) {
-        FormUtil.typeText(date, "notes", "noteDate");
+        FormUtil.typeTextBaseOnFormControlName(date, "notes", "noteDate");
     }
 
     sendNote(): void {
         FormUtil.clickButton("notes", "creerNote");
     }
 
-    addNote(title: string, content: string, date: string | undefined = undefined): NotesPage {
+    addNote(title: string, content: string, date: string | undefined = undefined): this {
         this.getAddButton()
             .click();
 

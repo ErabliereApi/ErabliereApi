@@ -1,5 +1,12 @@
 export class FormUtil {
-    static typeText(text: string, selector: string, formControl: string, timeout: number = 10000): void {
+    static typeTextBaseOnName(text: string, selector: string, name: string, timeout: number = 10000): void {
+        cy.get(selector, { timeout: timeout }).then(element => {
+            cy.wrap(element)
+                .find('input[name="' + name + '"]')
+                .type(text);
+        });
+    }
+    static typeTextBaseOnFormControlName(text: string, selector: string, formControl: string, timeout: number = 10000): void {
         cy.get(selector, { timeout: timeout }).then(element => {
             cy.wrap(element)
                 .find('input[formcontrolname="' + formControl + '"]')

@@ -4,19 +4,19 @@ export class AlertesPage {
     getPageTitle(): Cypress.Chainable<JQuery<HTMLElement>> {
         return cy.get('alerte-page > div > h3')
     }
-    clickOnAddAlerteButton(): AlertesPage {
+    clickOnAddAlerteButton(): this {
         FormUtil.clickButton("alerte-page", "ajouter-alerte-btn");
         return this;
     }
-    typeEmail(email: string): AlertesPage {
-        FormUtil.typeText(email, "alerte-page", "destinataireCourriel");
+    typeEmail(email: string): this {
+        FormUtil.typeTextBaseOnName(email, "alerte-page", "destinataireCourriel");
         return this;
     }
-    typeName(name: string): AlertesPage {
-        FormUtil.typeText(name, "alerte-page", "nom");
+    typeName(name: string): this {
+        FormUtil.typeTextBaseOnFormControlName(name, "alerte-page", "nom");
         return this;
     }
-    clickOnCreateButton(): AlertesPage {
+    clickOnCreateButton(): this {
         FormUtil.clickButton("alerte-page", "creer-alerte-donnees-btn");
         return this;
     }
