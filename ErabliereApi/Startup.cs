@@ -72,7 +72,7 @@ public class Startup
         }
 
         // Automapper
-        services.AjouterAutoMapperErabliereApiDonnee(config => 
+        services.AjouterAutoMapperErabliereApiDonnee(config =>
             {
                 StripeIntegration.AutoMapperExtension.AddCustomersApiKeyMappings(config);
 
@@ -85,16 +85,13 @@ public class Startup
 
         // HttpClient
         var emailImageObserverBaseUrl = Configuration["EmailImageObserverUrl"];
-        if (!string.IsNullOrWhiteSpace(emailImageObserverBaseUrl)) 
+        services.AddHttpClient("EmailImageObserver", c =>
         {
-            services.AddHttpClient("EmailImageObserver", c =>
-            {
-                c.BaseAddress = new Uri(emailImageObserverBaseUrl);
-            });
-        }
+            c.BaseAddress = new Uri(emailImageObserverBaseUrl ?? "");
+        });
 
         var hologramApiKey = Configuration["Hologram_Token"];
-        if (!string.IsNullOrWhiteSpace(hologramApiKey)) 
+        if (!string.IsNullOrWhiteSpace(hologramApiKey))
         {
             services.AddHttpClient("HologramClient", c =>
             {
@@ -105,7 +102,7 @@ public class Startup
         }
 
         var ibmQuantum = Configuration["IQP_API_TOKEN"];
-        if (!string.IsNullOrWhiteSpace(ibmQuantum)) 
+        if (!string.IsNullOrWhiteSpace(ibmQuantum))
         {
             services.AddHttpClient("IbmQuantumClient", c =>
             {
@@ -191,7 +188,7 @@ public class Startup
         }
 
         // ChaosEngineering
-        if (Configuration.IsChaosEngineeringEnabled()) 
+        if (Configuration.IsChaosEngineeringEnabled())
         {
             services.AddSingleton<ChaosEngineeringMiddleware>();
         }
@@ -204,8 +201,8 @@ public class Startup
     /// Configure
     /// </summary>
     public void Configure(
-        IApplicationBuilder app, 
-        IWebHostEnvironment env, 
+        IApplicationBuilder app,
+        IWebHostEnvironment env,
         IServiceProvider serviceProvider)
     {
         var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
@@ -285,12 +282,12 @@ public class Startup
 
         if (Configuration.IsChaosEngineeringEnabled())
         {
-            if (env.IsProduction()) 
+            if (env.IsProduction())
             {
                 logger.LogWarning("Chaos engineering is enabled in production. This is not recommended.");
             }
             logger.LogInformation("Chaos engineering is enabled with a probability of {0}%", Configuration["ChaosEngineeringPercent"]);
-            
+
             app.UseMiddleware<ChaosEngineeringMiddleware>();
         }
 
@@ -309,7 +306,7 @@ public class Startup
 
         if (Configuration.UseMQTT())
         {
-            app.UseMqttServer(server => 
+            app.UseMqttServer(server =>
             {
                 server.ClientConnectedAsync += async (e) =>
                 {
@@ -329,7 +326,7 @@ public class Startup
 
         app.UseSpa(spa =>
         {
-        
+
         });
     }
 }

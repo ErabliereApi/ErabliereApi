@@ -113,52 +113,60 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
 
         if (customer.CustomerErablieres == null || customer.CustomerErablieres.Count == 0)
         {
-            allowAccess = false;
-            if (_logger == null)
-            {
-                _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
-            }
-            if (customer.CustomerErablieres == null)
-            {
-                _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres == null", customer.Id);
-            }
-            else
-            {
-                _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres.Count == 0", customer.Id);
-            }
+            allowAccess = DenyAllowAccessOnNullOrEmpty(context, customer);
         }
         else
         {
-            var type = context.HttpContext.Request.Method switch
+            allowAccess = CheckAllowAccessOnHttpVerb(context, allowAccess, erabliere, customer);
+        }
+
+        return allowAccess;
+    }
+
+    private bool CheckAllowAccessOnHttpVerb(ActionExecutingContext context, bool allowAccess, Erabliere erabliere, Donnees.Action.NonHttp.CustomerOwnershipAccess customer)
+    {
+        var type = context.HttpContext.Request.Method switch
+        {
+            "GET" => 1,
+            "POST" => 2,
+            "PUT" => 4,
+            "PATCH" => 4,
+            "DELETE" => 8,
+            _ => throw new InvalidOperationException($"Ownership not implement for HTTP Verb {context.HttpContext.Request.Method}"),
+        };
+
+        for (int i = 0; i < customer.CustomerErablieres.Count && allowAccess; i++)
+        {
+            if (customer.CustomerErablieres[i].IdErabliere != erabliere.Id)
             {
-                "GET" => 1,
-                "POST" => 2,
-                "PUT" => 4,
-                "PATCH" => 4,
-                "DELETE" => 8,
-                _ => throw new InvalidOperationException($"Ownership not implement for HTTP Verb {context.HttpContext.Request.Method}"),
-            };
-
-            for (int i = 0; i < customer.CustomerErablieres.Count && allowAccess; i++)
-            {
-                if (customer.CustomerErablieres[i].IdErabliere != erabliere.Id)
-                {
-                    continue;
-                }
-
-                var access = customer.CustomerErablieres[i].Access;
-
-                allowAccess = (access & type) > 0;
+                continue;
             }
 
-            if (!allowAccess)
-            {
-                if (_logger == null)
-                {
-                    _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
-                }
-                _logger.LogWarning("Customer {CustomerId} has no access to erabliere {ErabliereId} for {Method}", customer.Id, erabliere.Id, context.HttpContext.Request.Method.Sanatize());
-            }
+            var access = customer.CustomerErablieres[i].Access;
+
+            allowAccess = (access & type) > 0;
+        }
+
+        if (!allowAccess)
+        {
+            _logger ??= context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+            _logger.LogWarning("Customer {CustomerId} has no access to erabliere {ErabliereId} for {Method}", customer.Id, erabliere.Id, context.HttpContext.Request.Method.Sanatize());
+        }
+
+        return allowAccess;
+    }
+
+    private bool DenyAllowAccessOnNullOrEmpty(ActionExecutingContext context, Donnees.Action.NonHttp.CustomerOwnershipAccess customer)
+    {
+        bool allowAccess = false;
+        _logger ??= context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
+        if (customer.CustomerErablieres == null)
+        {
+            _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres == null", customer.Id);
+        }
+        else
+        {
+            _logger.LogWarning("Customer {CustomerId} has no access to any erabliere as customer.CustomerErablieres.Count == 0", customer.Id);
         }
 
         return allowAccess;
@@ -177,12 +185,8 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
                 return null;
             }
 
-            var instance = entity as IErabliereOwnable;
-
-            if (instance == null)
-            {
+            var instance = entity as IErabliereOwnable ??
                 throw new InvalidOperationException($"type {entity.GetType().Name} cannot be convert into {nameof(IErabliereOwnable)}");
-            }
 
             if (!instance.IdErabliere.HasValue)
             {

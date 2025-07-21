@@ -98,28 +98,20 @@ public class RapportsController : ControllerBase
             return BadRequest($"L'id de la route '{id}' ne concorde pas avec l'id de l'érablière du rapport demandé '{rapportDegreeJour.IdErabliere}'.");
         }
 
-        Rapport rapport;
-
-        if (rapportDegreeJour.IdRapport.HasValue)
+        var rapport = new Rapport
         {
-            return BadRequest("L'id du rapport ne doit pas être spécifié lors de la création d'un nouveau rapport.");
-        }
-        else
-        {
-            rapport = new Rapport
-            {
-                Type = "Degré jour",
-                DateDebut = rapportDegreeJour.DateDebut,
-                DateFin = rapportDegreeJour.DateFin,
-                SeuilTemperature = rapportDegreeJour.SeuilTemperature,
-                UtiliserTemperatureTrioDonnee = rapportDegreeJour.UtiliserTemperatureTrioDonnee,
-                RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
-                AfficherDansDashboard = rapportDegreeJour.AfficherDansDashboard,
-                DC = DateTimeOffset.Now,
-                DateModification = DateTimeOffset.Now,
-                IdErabliere = id
-            };
-        }
+            Id = rapportDegreeJour.IdRapport,
+            Type = "Degré jour",
+            DateDebut = rapportDegreeJour.DateDebut,
+            DateFin = rapportDegreeJour.DateFin,
+            SeuilTemperature = rapportDegreeJour.SeuilTemperature,
+            UtiliserTemperatureTrioDonnee = rapportDegreeJour.UtiliserTemperatureTrioDonnee,
+            RequestParameters = JsonSerializer.Serialize(rapportDegreeJour),
+            AfficherDansDashboard = rapportDegreeJour.AfficherDansDashboard,
+            DC = DateTimeOffset.Now,
+            DateModification = DateTimeOffset.Now,
+            IdErabliere = id
+        };
 
         IActionResult value = await InnerCalculateDegreeJour(id, rapportDegreeJour, rapport, token);
 
@@ -215,18 +207,25 @@ public class RapportsController : ControllerBase
         else
         {
             (bool isErrorActionResult, IActionResult value) = await InnerCalculateFromSensorValues(id, rapportDegreeJour, rapport, token);
-            
+
             if (isErrorActionResult)
             {
                 return value;
             }
         }
 
-        rapport.Max = Math.Round(rapport.Donnees.Max(d => d.Max));
-        rapport.Min = Math.Round(rapport.Donnees.Min(d => d.Min));
-        rapport.Moyenne = Math.Round(rapport.Donnees.Average(d => d.Moyenne));
-        rapport.Somme = Math.Round(rapport.Donnees.LastOrDefault()?.Somme ?? 0);
-        rapport.DateModification = DateTimeOffset.Now;
+        if (rapport.Donnees.Count > 0)
+        {
+            rapport.Max = Math.Round(rapport.Donnees.Max(d => d.Max));
+            rapport.Min = Math.Round(rapport.Donnees.Min(d => d.Min));
+            rapport.Moyenne = Math.Round(rapport.Donnees.Average(d => d.Moyenne));
+            rapport.Somme = Math.Round(rapport.Donnees.LastOrDefault()?.Somme ?? 0);
+            rapport.DateModification = DateTimeOffset.Now;
+        }
+        else
+        {
+            _logger.LogWarning("Aucune donnée n'a été trouvée pour le rapport de degré jour. Le rapport sera vide.");
+        }
 
         return Ok(rapport);
     }
@@ -253,8 +252,8 @@ public class RapportsController : ControllerBase
         }
 
         var donnees = await _context.DonneesCapteur
-            .Where(donneesCapteur => donneesCapteur.IdCapteur == rapportDegreeJour.IdCapteur && 
-                                     donneesCapteur.D >= dateDebutFiltre && 
+            .Where(donneesCapteur => donneesCapteur.IdCapteur == rapportDegreeJour.IdCapteur &&
+                                     donneesCapteur.D >= dateDebutFiltre &&
                                      donneesCapteur.D <= rapportDegreeJour.DateFin)
             .OrderBy(d => d.D)
             .ToListAsync(token);
@@ -304,8 +303,8 @@ public class RapportsController : ControllerBase
         }
 
         var triodonnees = await _context.Donnees
-                        .Where(donneesTrio => donneesTrio.IdErabliere == rapportDegreeJour.IdErabliere && 
-                                              donneesTrio.D >= dateDebutFiltre && 
+                        .Where(donneesTrio => donneesTrio.IdErabliere == rapportDegreeJour.IdErabliere &&
+                                              donneesTrio.D >= dateDebutFiltre &&
                                               donneesTrio.D <= rapportDegreeJour.DateFin)
                         .OrderBy(d => d.D)
                         .ToListAsync(token);

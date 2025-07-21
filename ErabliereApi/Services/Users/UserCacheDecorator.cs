@@ -82,7 +82,7 @@ public class UserCacheDecorator : IUserService
                 {
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<UserCacheDecorator>>();
 
-                    logger.LogWarning($"CustomerWithAccess {uniqueName} cannot be set in cache, error: {e.Message}");
+                    logger.LogWarning(e, "CustomerWithAccess {UniqueName} cannot be set in cache, error: {Message}", uniqueName, e.Message);
                     logger.LogDebug(JsonSerializer.Serialize(customerWithAccess));
                 }
             }
@@ -92,7 +92,7 @@ public class UserCacheDecorator : IUserService
             // Log that the CustomerWithAccess was found in cache
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<UserCacheDecorator>>();
 
-            logger.LogDebug($"CustomerWithAccess {uniqueName} was found in cache");
+            logger.LogDebug("CustomerWithAccess {UniqueName} was found in cache", uniqueName);
         }
 
         return customerWithAccess;
