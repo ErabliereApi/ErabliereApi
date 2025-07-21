@@ -61,8 +61,8 @@
             <tbody>
                 @for (alerte of alertesCapteur; track alerte;) {
                 <tr>
-                    <td class="shortid">
-                        {{alerte.id}}
+                    <td>
+                        <copy-id-button [text]="alerte.id" title="Copier l'id de l'alerte {{alerte.id}}"></copy-id-button>
                     </td>
                     <td>
                         {{alerte.nom}}
@@ -164,8 +164,8 @@
             <tbody>
                 @for (alerte of alertes; track alerte;) {
                 <tr>
-                    <td class="shortid">
-                        {{alerte.id}}
+                    <td>
+                        <copy-id-button [text]="alerte.id" title="Copier l'id de l'alerte {{alerte.id}}"></copy-id-button>
                     </td>
                     <td>
                         {{alerte.nom}}

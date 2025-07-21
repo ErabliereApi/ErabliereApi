@@ -41,16 +41,16 @@
           <einput [formGroup]="alerteForm" type="number" name="temperatureMax" symbole="°C" />
         </div>
         <div class="form-group mb-2 col-md-6">
-          <einput [formGroup]="alerteForm" name="vacciumMin" symbole="HG" />
+          <einput [formGroup]="alerteForm" type="number" name="vacciumMin" symbole="HG" arialabel="Vaccum Min"  />
         </div>
         <div class="form-group mb-2 col-md-6">
-          <einput [formGroup]="alerteForm" name="vacciumMax" symbole="HG" />
+          <einput [formGroup]="alerteForm" type="number" name="vacciumMax" symbole="HG" arialabel="Vaccum Max" />
         </div>
         <div class="form-group mb-2 col-md-6">
-          <einput [formGroup]="alerteForm" name="niveauBassinMin" symbole="%" />
+          <einput [formGroup]="alerteForm" type="number" name="niveauBassinMin" symbole="%" />
         </div>
         <div class="form-group mb-2 col-md-6">
-          <einput [formGroup]="alerteForm" name="niveauBassinMax" symbole="%" />
+          <einput [formGroup]="alerteForm" type="number" name="niveauBassinMax" symbole="%" />
         </div>
       </div>
       <button id="creer-alerte-donnees-btn" class="btn btn-primary mt-2 me-2 mb-3"
@@ -85,10 +85,10 @@
           <einput [formGroup]="alerteCapteurForm" name="destinataireSMS" placeholder="1231231234" />
         </div>
         <div class="form-group col-md-6">
-          <einput [formGroup]="alerteCapteurForm" name="min" symbole={{capteurSymbole()}} />
+          <einput [formGroup]="alerteCapteurForm" type="number" name="min" symbole={{capteurSymbole()}} />
         </div>
         <div class="form-group mb-2 col-md-6">
-          <einput [formGroup]="alerteCapteurForm" name="max" symbole={{capteurSymbole()}} />
+          <einput [formGroup]="alerteCapteurForm" type="number" name="max" symbole={{capteurSymbole()}} />
         </div>
       </div>
       <button id="creer-alerte-capteur-btn" class="btn btn-primary mt-2 me-2 mb-3"

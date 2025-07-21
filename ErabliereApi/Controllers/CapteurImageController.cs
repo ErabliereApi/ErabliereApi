@@ -24,19 +24,16 @@ namespace ErabliereApi.Controllers
     {
         private readonly ErabliereDbContext _depot;
         private readonly IMapper _mapper;
-        private readonly IConfiguration _config;
 
         /// <summary>
         /// Constructeur par initialisation
         /// </summary>
         /// <param name="depot">Le dépôt des capteurs d'image</param>
         /// <param name="mapper">Interface de mapping entre les données</param>
-        /// <param name="config">Configuration de l'application</param>
-        public CapteurImageController(ErabliereDbContext depot, IMapper mapper, IConfiguration config)
+        public CapteurImageController(ErabliereDbContext depot, IMapper mapper)
         {
             _depot = depot;
             _mapper = mapper;
-            _config = config;
         }
 
         /// <summary>
@@ -51,11 +48,6 @@ namespace ErabliereApi.Controllers
         [EnableQuery]
         public async Task<IEnumerable<GetCapteurImage>> Lister(Guid id, string? filtreNom, CancellationToken token)
         {
-            if (string.IsNullOrWhiteSpace(_config["EmailImageObserverUrl"]))
-            {
-                return [];
-            }
-
             return await _depot.CapteurImage.AsNoTracking()
                                 .Where(b => b.IdErabliere == id &&
                                         (filtreNom == null || (b.Nom != null && b.Nom.Contains(filtreNom))))
@@ -89,9 +81,6 @@ namespace ErabliereApi.Controllers
             }
 
             var entity = await _depot.CapteurImage.AddAsync(capteurImage, token);
-
-
-
 
             await _depot.SaveChangesAsync(token);
 

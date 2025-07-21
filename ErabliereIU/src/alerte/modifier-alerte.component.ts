@@ -6,12 +6,13 @@ import { Subject } from "rxjs";
 import { AlerteCapteur } from "src/model/alerteCapteur";
 import { convertTenthToNormale, divideByTen } from "src/core/calculator.service";
 import { EinputComponent } from "../formsComponents/einput.component";
+import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 
 
 @Component({
     selector: 'modifier-alerte-modal',
     templateUrl: 'modifier-alerte.component.html',
-    imports: [ReactiveFormsModule, EinputComponent]
+    imports: [ReactiveFormsModule, EinputComponent, CopyTextButtonComponent]
 })
 export class ModifierAlerteComponent implements OnInit {
     constructor(private readonly _api: ErabliereApi, private readonly fb: UntypedFormBuilder) {

@@ -11,11 +11,12 @@ import {
 import {ErabliereApi} from "../../core/erabliereapi.service";
 import {CapteurImage} from "../../model/capteurImage";
 import {PutCapteurImage} from "../../model/putCapteurImage";
+import { CopyTextButtonComponent } from 'src/generic/copy-text-button.component';
 
 @Component({
     selector: 'app-capteur-image-list',
     imports: [
-        ReactiveFormsModule
+        ReactiveFormsModule, CopyTextButtonComponent
     ],
     templateUrl: './capteur-image-list.component.html',
     styleUrl: './capteur-image-list.component.css'

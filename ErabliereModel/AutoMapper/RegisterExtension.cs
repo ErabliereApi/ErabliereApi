@@ -77,6 +77,7 @@ public static class RegisterExtension
             config.CreateMap<Note, PostNoteMultipartResponse>()
                   .ReverseMap();
             config.CreateMap<PostRappel, Rappel>();
+            config.CreateMap<PostCapteurImage, CapteurImage>();
 
             config.CreateMap<PutAlerteCapteur, AlerteCapteur>();
 

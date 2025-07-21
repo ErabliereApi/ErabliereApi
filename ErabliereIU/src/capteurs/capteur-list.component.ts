@@ -13,6 +13,7 @@ import {
 import { CapteurDetailTooltipComponent } from "./capteur-detail-tooltip.component";
 import { ModifierCapteurDetailsComponent } from "./modifier-capteur-details.component";
 import { ModifierCapteurStyleComponent } from "./modifier-capteur-style.component";
+import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 
 @Component({
     selector: 'capteur-list',
@@ -22,7 +23,8 @@ import { ModifierCapteurStyleComponent } from "./modifier-capteur-style.componen
         ReactiveFormsModule, 
         CapteurDetailTooltipComponent, 
         ModifierCapteurDetailsComponent,
-        ModifierCapteurStyleComponent
+        ModifierCapteurStyleComponent,
+        CopyTextButtonComponent
     ]
 })
 export class CapteurListComponent implements OnChanges {
@@ -207,19 +209,6 @@ export class CapteurListComponent implements OnChanges {
     }
     getEstSaisieManuelle(capteurId: string) {
         return this.getCapteur(capteurId).controls['estSaisieManuelle'] ?? null;
-    }
-
-    copyId(event: MouseEvent, capteurId?: string) {
-        if (!capteurId) {
-            return;
-        }
-
-        const button = event.target as HTMLButtonElement;
-        button.innerText = "Copié!";
-        navigator.clipboard.writeText(capteurId);
-        setTimeout(() => {
-            button.innerHTML = "&#x2398;"
-        }, 750);
     }
 
     validateForm(capteurId: string) {

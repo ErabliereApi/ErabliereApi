@@ -31,10 +31,7 @@
             @for(capteur of capteurs; track capteur.id) {
             <tr [formGroup]="getCapteur(capteur.id ?? '')" [id]="'capteur-' + capteur.id">
                 <td>
-                    <button type="button" class="btn btn-outline-primary btn-sm" style="width: fit-content;"
-                        (click)="copyId($event, capteur.id)" title="Copier l'id du capteur">
-                        &#x2398;
-                    </button>
+                    <copy-id-button [text]="capteur.id" title="Copier l'id du capteur {{capteur.id}}"></copy-id-button>
                 </td>
                 <td [class.was-validated]="getIndice(capteur.id ?? '')?.touched">
                     @if(isDisplayEditForm(capteur.id)) {
