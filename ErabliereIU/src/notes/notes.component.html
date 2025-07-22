@@ -40,7 +40,7 @@
             <note
               [note]="note"
               [noteToModifySubject]="noteToModify"
-              (needToUpdate)="loadNotes()"
+              (needToUpdate)="loadNotes(note.id)"
               />
             </div>
           }
