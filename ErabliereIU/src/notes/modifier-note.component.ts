@@ -144,9 +144,10 @@ export class ModifierNoteComponent implements OnInit {
                 }
                 // Update the Rappel object and set its properties using the form values
                 this.note.rappel ??= new Rappel();
-                this.note.rappel.dateRappel = this.noteForm.controls['dateRappel'].value;
-                this.note.rappel.dateRappelFin = this.noteForm.controls['dateRappelFin'].value;
-                if (this.noteForm.controls['rappel.periodicite'].value === 'Aucune') {
+                this.note.rappel.dateRappel = nullIfEmpty(this.noteForm.controls['dateRappel'].value);
+                this.note.rappel.dateRappelFin = nullIfEmpty(this.noteForm.controls['dateRappelFin'].value);
+                if (this.noteForm.controls['rappel.periodicite'].value === 'Aucune' || 
+                    this.noteForm.controls['rappel.periodicite'].value === '') {
                     this.note.rappel.periodicite = null;
                 } else {
                     this.note.rappel.periodicite = this.noteForm.controls['rappel.periodicite'].value;
@@ -208,3 +209,7 @@ export class ModifierNoteComponent implements OnInit {
         };
     }
 }
+function nullIfEmpty(value: any): string | null {
+    return value == '' || value == null ? null : value;
+}
+

@@ -4,7 +4,7 @@ export class Rappel {
     id: any;
     idErabliere: any;
     isActive?: boolean;
-    dateRappel?: string;
+    dateRappel?: string | null;
     dateRappelFin?: string | null;
     periodicite?: string | null;
     noteId?: any;

@@ -290,9 +290,15 @@ export class ErabliereApi {
         return rtn ?? 0;
     }
 
-    async getNoteImage(idErabliere: any, id: any) {
+    async getNoteImage(idErabliere: any, id: any, noCache: boolean = false): Promise<ArrayBuffer> {
         let headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.get(this._environmentService.apiUrl + '/erablieres/' + idErabliere + "/notes/" + id + "/image", { headers: headers, responseType: 'arraybuffer' }));
+        if (noCache) {
+            headers = headers.set('Cache-Control', 'no-cache');
+        }
+        return firstValueFrom(this._httpClient.get(
+            this._environmentService.apiUrl + 
+            '/erablieres/' + idErabliere + "/notes/" + id + "/image", 
+            { headers: headers, responseType: 'arraybuffer' }));
     }
 
     async postNote(idErabliereSelectionnee:any, note:Note): Promise<Note> {

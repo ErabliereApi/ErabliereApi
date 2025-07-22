@@ -59,7 +59,7 @@ export class NotesComponent implements OnInit {
         });
     }
 
-    loadNotes() {
+    loadNotes(noteId?: any) {
         this._api.getNotesCount(this.idErabliereSelectionee, this.search).then(count => this._nombreTotal = count);
         this._api.getNotes(this.idErabliereSelectionee, this.search, (this._pageActuelle - 1) * this._nombreParPage, this._nombreParPage)
             .then(async notes => {
@@ -72,7 +72,7 @@ export class NotesComponent implements OnInit {
                     }
                     else {
                         try {
-                            let data = await this._api.getNoteImage(n.idErabliere, n.id);
+                            let data = await this._api.getNoteImage(n.idErabliere, n.id, n.id == noteId);
 
                             if (data) {
                                 let binary = '';

@@ -1,8 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Note } from 'src/model/note';
 import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
+import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
+import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
 
 @Component({
     selector: 'note',
@@ -10,14 +12,27 @@ import { Subject } from 'rxjs';
     imports: [DatePipe]
 })
 
-export class NoteComponent {
+export class NoteComponent implements OnInit{
     @Input() note: Note;
     @Input() noteToModifySubject?: Subject<Note | null>;
     @Output() needToUpdate = new EventEmitter();
     actionError?: string | null;
+    private readonly authSvc: IAuthorisationSerivce;
+    isAIUser: boolean = false;
+    progressionText: string | null = null;
 
-    constructor(private readonly _api: ErabliereApi) {
+    constructor(private readonly _api: ErabliereApi, private readonly authSvcFactory: AuthorisationFactoryService) {
         this.note = new Note();
+        this.authSvc = this.authSvcFactory.getAuthorisationService();
+    }
+
+    ngOnInit() {
+        this.authSvc.getUserInfo().then(user => {
+            this.isAIUser = user.roles.includes('ErabliereAIUser') || false;
+        }).catch(err => {
+            console.error('Erreur lors de la récupération des informations utilisateur:', err);
+            this.isAIUser = false;
+        });
     }
 
     selectEditNote() {
@@ -58,29 +73,37 @@ export class NoteComponent {
     isGeneratingImage = false;
     genererUneImageParIA() {
         this.isGeneratingImage = true;
+        this.progressionText = 'Génération de l\'image en cours...';
         this._api.ErabliereIAImage({
             imageCount: 1,
             prompt: `Générer une image pour la note: ${this.note.title || 'Sans titre'} avec la description: ${this.note.text || 'Aucune description'}`,
             size: '1024x1024'
         }).then(response => {
             let imageUrl = response.images[0].url;
+            this.progressionText = 'Image générée avec succès. Téléchargement en cours...';
             fetch(imageUrl)
                 .then(res => res.blob())
                 .then(blob => {
+                    this.progressionText = 'Image téléchargée. Envoi à l\'API...';
                     const file = new File([blob], `note-${this.note.id}.png`, { type: 'image/png' });
                     this._api.putNoteImage(this.note.idErabliere, this.note.id, file)
                         .then(() => {
                             this.needToUpdate.emit();
+                            this.progressionText = 'Image généré avec succès!'
                             this.actionError = null;
                         })
                         .catch(err => {
                             console.error('Erreur lors de l\'upload de l\'image générée:', err);
                             this.actionError = 'Erreur lors de l\'upload de l\'image générée. Veuillez réessayer.';
+                            this.progressionText = null;
+                        }).finally(() => {
+                            this.progressionText = null;
                         });
                 }).catch(err => {
                     console.error('Erreur lors de la récupération de l\'image générée:', err);
                     this.actionError = 'Erreur lors de la récupération de l\'image générée. Veuillez réessayer.';
-                    this.isGeneratingImage = false
+                    this.isGeneratingImage = false;
+                    this.progressionText = null;
                 }).finally(() => {
                     this.isGeneratingImage = false;
                 });
@@ -88,6 +111,7 @@ export class NoteComponent {
             console.error('Erreur lors de la génération de l\'image par IA:', err);
             this.actionError = 'Erreur lors de la génération de l\'image par IA. Veuillez réessayer.';
             this.isGeneratingImage = false;
+            this.progressionText = null;
         }).finally(() => {
             this.isGeneratingImage = false;
         });
@@ -101,9 +125,5 @@ export class NoteComponent {
                 }
             );
         }
-    }
-
-    userIsInRole(arg0: string) {
-        return true;
     }
 }
