@@ -32,7 +32,7 @@ public class NotesController : ControllerBase
     /// <param name="mapper"></param>
     /// <param name="logger"></param>
     public NotesController(
-        ErabliereDbContext depot, 
+        ErabliereDbContext depot,
         IMapper mapper,
         ILogger<NotesController> logger)
     {
@@ -120,7 +120,7 @@ public class NotesController : ControllerBase
             .OrderByDescending(n => n.Rappel.DateRappel)
 #nullable enable
             .ToListAsync(token);
-        
+
 
         return Ok(notesWithRappel);
     }
@@ -288,71 +288,72 @@ public class NotesController : ControllerBase
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
+        if (putNote.Rappel != null)
+        {
+            var allowedPeriodiciteValues = new[] { "annuel", "mensuel", "hebdo", "bihebdo", "quotidien", null };
+            if (!allowedPeriodiciteValues.Contains(putNote.Rappel.Periodicite))
+            {
+                ModelState.AddModelError("rappel.periodicite", $"Periodicité invalide. Valeurs acceptées: Annuel, Mensuel, Hebdo, Bihebdo, Quotidien. Était: {putNote.Rappel.Periodicite}");
+
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+        }
+
         var entity = await _depot.Notes.FindAsync([noteId], token);
 
-        if (entity != null && entity.IdErabliere == id)
-        {
-            if (putNote.FileExtension != null)
-            {
-                entity.FileExtension = putNote.FileExtension;
-            }
-
-            if (putNote.NoteDate != null)
-            {
-                entity.NoteDate = putNote.NoteDate;
-            }
-
-            if (putNote.Text != null)
-            {
-                entity.Text = putNote.Text;
-            }
-
-            if (putNote.Title != null)
-            {
-                entity.Title = putNote.Title;
-            }
-
-            // Update rappel si le rappel est présent
-            if (putNote.Rappel != null)
-            {
-                var allowedPeriodiciteValues = new[] { "annuel", "mensuel", "hebdo", "bihebdo", "quotidien", null };
-                if (!allowedPeriodiciteValues.Contains(putNote.Rappel.Periodicite))
-                {
-                    ModelState.AddModelError("rappel.periodicite", $"Periodicité invalide. Valeurs acceptées: Annuel, Mensuel, Hebdo, Bihebdo, Quotidien. Était: {putNote.Rappel.Periodicite}");
-
-                    return BadRequest(new ValidationProblemDetails(ModelState));
-                }
-
-                var rappel = await _depot.Rappels.FirstOrDefaultAsync(r => r.NoteId == entity.Id, token);
-                if (rappel != null)
-                {
-                    rappel.DateRappel = putNote.Rappel.DateRappel;
-                    rappel.DateRappelFin = putNote.Rappel.DateRappelFin;
-                    rappel.Periodicite = putNote.Rappel.Periodicite;
-                    rappel.IsActive = putNote.Rappel.IsActive;
-                }
-                else
-                {
-                    entity.Rappel = new Rappel
-                    {
-                        NoteId = entity.Id,
-                        IdErabliere = id,
-                        IsActive = putNote.Rappel.IsActive,
-                        DateRappel = putNote.Rappel.DateRappel,
-                        DateRappelFin = putNote.Rappel.DateRappelFin,
-                        Periodicite = putNote.Rappel.Periodicite
-                    };
-                }
-            }
-
-            await _depot.SaveChangesAsync(token);
-
-            return Ok(entity);
-        }
-        else
+        if (entity == null || entity.IdErabliere != id)
         {
             return NotFound();
         }
+
+        if (putNote.FileExtension != null)
+        {
+            entity.FileExtension = putNote.FileExtension;
+        }
+
+        if (putNote.NoteDate != null)
+        {
+            entity.NoteDate = putNote.NoteDate;
+        }
+
+        if (putNote.Text != null)
+        {
+            entity.Text = putNote.Text;
+        }
+
+        if (putNote.Title != null)
+        {
+            entity.Title = putNote.Title;
+        }
+
+        // Update rappel si le rappel est présent
+        if (putNote.Rappel != null)
+        {
+            var rappel = await _depot.Rappels.FirstOrDefaultAsync(r => r.NoteId == entity.Id, token);
+            if (rappel != null)
+            {
+                rappel.DateRappel = putNote.Rappel.DateRappel;
+                rappel.DateRappelFin = putNote.Rappel.DateRappelFin;
+                rappel.Periodicite = putNote.Rappel.Periodicite;
+                rappel.IsActive = putNote.Rappel.IsActive;
+            }
+            else
+            {
+                entity.Rappel = new Rappel
+                {
+                    NoteId = entity.Id,
+                    IdErabliere = id,
+                    IsActive = putNote.Rappel.IsActive,
+                    DateRappel = putNote.Rappel.DateRappel,
+                    DateRappelFin = putNote.Rappel.DateRappelFin,
+                    Periodicite = putNote.Rappel.Periodicite
+                };
+            }
+        }
+
+        await _depot.SaveChangesAsync(token);
+
+        return Ok(entity);
     }
 
     /// <summary>
@@ -441,7 +442,9 @@ public class NotesController : ControllerBase
     public async Task<IActionResult> RappelProchainePeriode(Guid id, Guid idNote, CancellationToken token)
     {
         var rappel = await _depot.Rappels
+#nullable disable
             .Where(r => r.NoteId == idNote && r.IsActive && r.Note.IdErabliere == id)
+#nullable enable
             .FirstOrDefaultAsync(token);
 
         if (rappel == null)
