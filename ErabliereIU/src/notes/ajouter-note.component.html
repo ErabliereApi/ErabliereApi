@@ -7,31 +7,20 @@
     <div class="row">
       <div class="col-md-6">
         <div [class]="'form-group mb-3' + (noteForm.controls['title'].touched ? ' was-validated' : '')">
-          <label class="form-label" for="ajouter-note-title">Titre&nbsp;: </label>
-          <input [class]="'form-control'" type="text" formControlName="title" id="ajouter-note-title" />
-          @if (noteForm.controls['title'].errors && noteForm.controls['title'].touched) {
-          <div>
-            @if (noteForm.controls['title'].errors!.required) {
-            <small class="text-danger">Titre obligatoire.</small>
-            }
-            @if (noteForm.controls['title'].errors!.maxlength) {
-            <small class="text-danger">Taille maximal dépassée.</small>
-            }
-          </div>
-          }
-          <input-error [errorObj]="errorObj" [controlName]="'title'"></input-error>
+          <einput 
+            arialabel="Titre" 
+            [formGroup]="noteForm" 
+            name="title"
+            placeholder="Titre de la note"
+            [errorObj]="errorObj"></einput>
         </div>
         <div [class]="'form-group mb-3' + (noteForm.controls['text'].touched ? ' was-validated' : '')">
-          <label class="form-label" for="ajouter-note-text">Texte : </label>
-          <input class="form-control" type="text" formControlName="text" id="ajouter-note-text" />
-          @if (noteForm.controls['text'].errors && noteForm.controls['text'].touched) {
-          <div>
-            @if (noteForm.controls['text'].errors!.maxlength) {
-            <small class="text-danger">Taille maximal dépassée.</small>
-            }
-          </div>
-          }
-          <input-error [errorObj]="errorObj" [controlName]="'text'"></input-error>
+          <einput 
+            arialabel="Text" 
+            [formGroup]="noteForm" 
+            name="text"
+            placeholder="Description"
+            [errorObj]="errorObj"></einput>
         </div>
         <div [class]="'form-group mb-3' + (noteForm.controls['file'].touched ? ' was-validated' : '')">
           <label class="form-label" for="ajouter-note-file">Fichier: </label>
@@ -45,9 +34,13 @@
           }
         </div>
         <div [class]="'form-group mb-3' + (noteForm.controls['noteDate'].touched ? ' was-validated' : '')">
-          <label class="form-label" for="ajouter-note-noteDate">Date de la note: </label>
-          <input class="form-control" type="date" formControlName="noteDate" id="ajouter-note-noteDate" />
-          <input-error [errorObj]="errorObj" [controlName]="'noteDate'"></input-error>
+          <einput 
+            arialabel="Date de la note" 
+            [formGroup]="noteForm" 
+            name="noteDate"
+            type="date"
+            placeholder="Date de la note"
+            [errorObj]="errorObj"></einput>
         </div>
       </div>
       <div class="col-md-6">
@@ -58,33 +51,23 @@
         </div>
         @if(displayReminder) {
         <div [class]="'form-group mb-3' + (noteForm.controls['dateRappel'].touched ? ' was-validated' : '')">
-          <label for="dateRappel">Date Rappel</label>
-          <input type="date" id="dateRappel" class="form-control" formControlName="dateRappel">
-          @if (noteForm.controls['dateRappel'].errors && noteForm.controls['dateRappel'].touched) {
-          <div>
-            @if (noteForm.controls['dateRappel'].errors!.dateRappelRequired) {
-            <small class="text-danger">Date de rappel obligatoire.</small>
-            }
-            @if (noteForm.controls['dateRappel'].errors!.dateRappelPast) {
-            <small class="text-danger">Date de rappel doit être dans le futur.</small>
-            }
-          </div>
-          }
-          <input-error [errorObj]="errorObj" [controlName]="'dateRappel'"></input-error>
+          <einput 
+            arialabel="Date Rappel" 
+            [formGroup]="noteForm" 
+            name="dateRappel"
+            type="date"
+            placeholder="Date de rappel"
+            [errorObj]="errorObj"></einput>
         </div>
 
         <div [class]="'form-group mb-3' + (noteForm.controls['dateRappelFin'].touched ? ' was-validated' : '')">
-          <label for="dateRappelFin">Date Rappel Fin</label>
-          <input type="date" id="dateRappelFin" class="form-control" formControlName="dateRappelFin">
-          @if (noteForm.controls['dateRappelFin'].errors && noteForm.controls['dateRappelFin'].touched) {
-          <div>
-            @if (noteForm.controls['dateRappelFin'].errors!.dateRappelFinBeforeDateRappel) {
-            <small class="text-danger">Date de fin de rappel doit être après ou égale à la date de début de
-              rappel.</small>
-            }
-          </div>
-          }
-          <input-error [errorObj]="errorObj" [controlName]="'dateRappelFin'"></input-error>
+          <einput 
+            arialabel="Date Rappel Fin" 
+            [formGroup]="noteForm" 
+            name="dateRappelFin"
+            type="date"
+            placeholder="Date de fin de rappel"
+            [errorObj]="errorObj"></einput>
         </div>
 
         <div [class]="'form-group mb-3' + (noteForm.controls['periodicite'].touched ? ' was-validated' : '')">

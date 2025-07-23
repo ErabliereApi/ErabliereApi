@@ -11,11 +11,12 @@ import { Note } from "src/model/note";
 import { InputErrorComponent } from "../generic/input-error.component";
 import { Rappel } from "../model/Rappel";
 import { reminderValidator } from "./note.custom-validators";
+import { EinputComponent } from "src/generic/einput.component";
 
 @Component({
     selector: 'ajouter-note',
     templateUrl: 'ajouter-note.component.html',
-    imports: [ReactiveFormsModule, InputErrorComponent]
+    imports: [ReactiveFormsModule, InputErrorComponent, EinputComponent]
 })
 export class AjouterNoteComponent implements OnInit {
   @Input() notes?: Note[];
