@@ -5,10 +5,8 @@ ncu
 Write-Host "Updating angular"
 . .\update-angular-version.ps1
 
-Write-Host "Update storybook"
-. .\update-storybook.ps1
-npm dedupe
-
 ncu -u
 
 npm install
+
+Write-Host "Watchout when passing from babel-loader ^9.2.1  →  ^10.0.0. It may not compile."

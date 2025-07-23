@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "da6f8554-3a83-475f-aff4-007b5880d1ab",
+		"_postman_id": "fb00ef55-1b63-4ab8-a5bd-79416d20167f",
 		"name": "ErablièreAPI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "6202256"
+		"_exporter_id": "6202256",
+		"_collection_link": "https://www.postman.com/erabliereapi/erabliereapi/collection/y41sv8i/erablireapi?action=share&source=collection_link&creator=6202256"
 	},
 	"item": [
 		{
@@ -101,7 +102,7 @@
 									"else {\r",
 									"    pm.test(\"Status code is 400\", function () {\r",
 									"        pm.response.to.have.status(400);\r",
-									"        pm.expect(pm.response.text()).to.eq(\"Le capteur avec l'id '010e708b-a7d0-449e-77e2-08d9d37ca582' exite déjà\");\r",
+									"        pm.expect(pm.response.text()).to.contains(\"Le capteur avec l'id '010e708b-a7d0-449e-77e2-08d9d37ca582' exite déjà\");\r",
 									"    });\r",
 									"\r",
 									"    const getRequest = {\r",
@@ -129,7 +130,8 @@
 									"    });\r",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -211,7 +213,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"nom\": \"Érablière B\",\r\n  \"ipRules\": \"192.160.45.45\",\r\n  \"indiceOrdre\": 1,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
+							"raw": "{\r\n  \"nom\": \"Érablière B\",\r\n  \"ipRules\": \"192.160.45.45\",\r\n  \"indiceOrdre\": 0,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -282,7 +284,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"nom\": \"Érablière Saint-Alfred\",\r\n  \"ipRules\": \"-\",\r\n  \"indiceOrdre\": 2,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
+							"raw": "{\r\n  \"nom\": \"Érablière Saint-Alfred\",\r\n  \"ipRules\": \"-\",\r\n  \"indiceOrdre\": 0,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -798,8 +800,118 @@
 			"name": "Preset alimentation",
 			"item": [
 				{
-					"name": "Erabliere 1",
+					"name": "Erabliere A",
 					"item": [
+						{
+							"name": "Ajouter une nouvelle donnée Janvier",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"dateDonnee\", new Date(pm.variables.get('thisYear'), 00, 01).toISOString());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Vérifier status réponse.\", () => {\r",
+											"    pm.expect(pm.response.code).to.eq(200);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"d\": \"{{dateDonnee}}\",\r\n  \"t\": {{temperature}},\r\n  \"nb\": {{niveauBassin}},\r\n  \"v\": {{vaccium}},\r\n  \"idErabliere\": \"{{ErabliereA_ID}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/erablieres/{{ErabliereA_ID}}/donnees",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"erablieres",
+										"{{ErabliereA_ID}}",
+										"donnees"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Ajouter une nouvelle donnée Février",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"dateDonnee\", new Date(pm.variables.get('thisYear'), 01, 01).toISOString());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Vérifier status réponse.\", () => {\r",
+											"    pm.expect(pm.response.code).to.eq(200);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"d\": \"{{dateDonnee}}\",\r\n  \"t\": {{temperature}},\r\n  \"nb\": {{niveauBassin}},\r\n  \"v\": {{vaccium}},\r\n  \"idErabliere\": \"{{ErabliereA_ID}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/erablieres/{{ErabliereA_ID}}/donnees",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"erablieres",
+										"{{ErabliereA_ID}}",
+										"donnees"
+									]
+								}
+							},
+							"response": []
+						},
 						{
 							"name": "Ajouter une nouvelle donnée",
 							"event": [
@@ -1526,6 +1638,46 @@
 			]
 		},
 		{
+			"name": "Rapports",
+			"item": [
+				{
+					"name": "Créer un rapport",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"idErabliere\": \"{{ErabliereA_ID}}\",\r\n  \"utiliserTemperatureTrioDonnee\": true,\r\n  \"dateDebut\": \"{{thisYear}}-01-01\",\r\n  \"dateFin\": \"{{thisYear}}-12-31\",\r\n  \"seuilTemperature\": 0,\r\n  \"afficherDansDashboard\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/{{ErabliereA_ID}}/Rapports/RapportDegreeJour?sauvegarder=true",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"{{ErabliereA_ID}}",
+								"Rapports",
+								"RapportDegreeJour"
+							],
+							"query": [
+								{
+									"key": "sauvegarder",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "OData",
 			"item": [
 				{
@@ -1637,7 +1789,8 @@
 					"    const echoPostRequest = {",
 					"        url: pm.environment.get(\"Authentification.Url\"),",
 					"        method: 'POST',",
-					"        header: 'Content-Type:application/x-www-form-urlencoded\\nAuthorization:Basic cmFzcGJlcnJ5bG9jYWw6c2VjcmV0',",
+					"        header: 'Content-Type:application/x-www-form-urlencoded\\nAuthorization:Basic ' + ",
+					"            pm.environment.get(\"Basic.Auth\"),",
 					"        body: {",
 					"            mode: 'application/x-www-form-urlencoded',",
 					"            raw: \"grant_type=client_credentials&scope=erabliereapi\"",
@@ -1670,7 +1823,9 @@
 					"            }",
 					"        });",
 					"    }",
-					"}"
+					"}",
+					"",
+					"pm.collectionVariables.set(\"thisYear\", new Date().getFullYear())"
 				]
 			}
 		},
@@ -1682,7 +1837,9 @@
 					"// console.log(\"Requete : \");",
 					"// console.log(pm.request.body);",
 					"// console.log(\"Reponse : \");",
-					"// console.log(pm.response.text());"
+					"// console.log(pm.response.text());",
+					"",
+					""
 				]
 			}
 		}
@@ -1738,6 +1895,10 @@
 		},
 		{
 			"key": "ErabliereSaintAlfred_ID",
+			"value": ""
+		},
+		{
+			"key": "thisYear",
 			"value": ""
 		}
 	]

@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: matt-ball/newman-action@master
         with:
-          collection: Postman/ErabliereAPI.postman_collection.json
+          collection: Postman/ErablièreAPI.postman_collection.json
           environment: Postman/ErabliereAPI-Demo.postman_environment.json
           reporters: '["cli","junit"]'
 
