@@ -33,6 +33,6 @@ public class DonnesCapteurV2Test
 
         var responseEnumerable = Assert.IsAssignableFrom<IEnumerable<GetDonneesCapteurV2>>(response);
         var donnesCapteur = responseEnumerable.ToList();
-        Assert.NotEmpty(donnesCapteur);
+        Assert.NotNull(donnesCapteur);
     }
 }

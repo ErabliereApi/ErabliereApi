@@ -171,6 +171,7 @@ export class CapteurListComponent implements OnChanges {
                 this.shouldRefreshCapteurs.emit();
             }
             catch (e) {
+                console.error('Erreur lors de la suppression du capteur:', e);
                 alert('Erreur lors de la suppression du capteur');
             }
         }

@@ -606,11 +606,14 @@ export class ErabliereApi {
             { headers: headers }));
     }
 
-    async getRapports(idErabliereSelectionee: string, filter?: string) {
+    async getRapports(idErabliereSelectionee: string, filter?: string, expand?: string): Promise<Rapport[]> {
         const headers = await this.getHeaders();
         let url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports';
         if (filter) {
             url += '?$filter=' + filter;
+        }
+        if (expand) {
+            url += (filter ? '&' : '?') + '$expand=' + expand;
         }
         return await firstValueFrom(this._httpClient.get<Rapport[]>(url, { headers: headers }));
     }

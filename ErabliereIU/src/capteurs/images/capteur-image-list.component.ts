@@ -32,7 +32,7 @@ export class CapteurImageListComponent implements OnChanges {
     displayEdits: { [id: string]: boolean } = {};
     editedCapteurs: { [id: string]: PutCapteurImage } = {};
 
-    constructor(private readonly erabliereApi: ErabliereApi, private fb: UntypedFormBuilder) {
+    constructor(private readonly erabliereApi: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.form = this.fb.group({
             capteurs: new FormArray([])
         });
@@ -158,6 +158,7 @@ export class CapteurImageListComponent implements OnChanges {
                 this.shouldRefreshCapteurs.emit();
             }
             catch (e) {
+                console.error('Erreur lors de la suppression du capteur:', e);
                 alert('Erreur lors de la suppression du capteur');
             }
         }

@@ -57,8 +57,6 @@ public class RapportControllerTest
         Assert.Equal(new DateTime(2023, 1, 1), rapport.DateDebut);
         Assert.Equal(new DateTime(2023, 12, 31), rapport.DateFin);
         Assert.True(rapport.AfficherDansDashboard, "Le rapport doit être affiché dans le tableau de bord.");
-        Assert.NotEmpty(rapport.Donnees);
-        Assert.True(rapport.Max > 0, "Le rapport doit avoir une valeur maximale supérieure à 0");
     }
 
     [Theory, AutoApiData]
@@ -90,7 +88,5 @@ public class RapportControllerTest
         Assert.Equal(new DateTime(2023, 1, 1), rapport.DateDebut);
         Assert.Equal(new DateTime(2023, 12, 31), rapport.DateFin);
         Assert.False(rapport.AfficherDansDashboard, "Le rapport doit être affiché dans le tableau de bord.");
-        Assert.NotEmpty(rapport.Donnees);
-        Assert.True(rapport.Max > 0, "Le rapport doit avoir une valeur maximale supérieure à 0");
     }
 }

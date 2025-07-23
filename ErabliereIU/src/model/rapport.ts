@@ -1,3 +1,5 @@
+import { Capteur } from "./capteur";
+
 export class Rapport {
     id?: string;
     idErabliere?: string;

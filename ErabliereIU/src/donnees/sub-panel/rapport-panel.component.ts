@@ -7,7 +7,7 @@ import { Rapport } from 'src/model/rapport';
         <div class="card text-center">
             <div class="card-header">
                 <h5 class="card-title d-flex justify-content-between align-items-center">
-                    <span>{{rapport?.type}} - {{rapport?.dateDebut?.toString()?.substring(0, 4)}}</span>
+                    <span>{{rapport?.nom}} - {{rapport?.type}} - {{rapport?.dateDebut?.toString()?.substring(0, 4)}}</span>
                 </h5>
             </div>
             <div class="card-body">
