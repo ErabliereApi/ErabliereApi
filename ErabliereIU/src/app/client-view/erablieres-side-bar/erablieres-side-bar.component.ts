@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
-import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
+import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
+import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Erabliere } from 'src/model/erabliere';
-import { AjouterErabliereComponent } from 'src/erablieres/ajouter-erabliere.component';
-import { ModifierErabliereComponent } from 'src/erablieres/modifier-erabliere.component';
+import { AjouterErabliereComponent } from 'src/app/client-view/erablieres/ajouter-erabliere.component';
+import { ModifierErabliereComponent } from 'src/app/client-view/erablieres/modifier-erabliere.component';
 
 @Component({
     selector: 'erablieres-side-bar',

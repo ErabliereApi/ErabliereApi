@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ConnectionButtonComponent } from 'src/authorisation/connection-button/connection-button.component';
+import { ConnectionButtonComponent } from 'src/core/authorisation/connection-button/connection-button.component';
 import { EnvironmentService } from 'src/environments/environment.service';
 
 @Component({

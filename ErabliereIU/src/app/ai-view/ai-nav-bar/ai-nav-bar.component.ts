@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
-import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
+import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
+import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { EnvironmentService } from '../../../environments/environment.service';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { MsalService } from '@azure/msal-angular';
-import {ConnectionButtonComponent} from "../../../authorisation/connection-button/connection-button.component";
+import {ConnectionButtonComponent} from "src/core/authorisation/connection-button/connection-button.component";
 
 @Component({
     selector: 'ai-nav-bar',

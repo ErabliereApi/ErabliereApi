@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
-import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
+import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
+import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 
 
 @Injectable({

@@ -1,27 +1,27 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {AuthorisationFactoryService} from 'src/authorisation/authorisation-factory-service';
-import {IAuthorisationSerivce} from 'src/authorisation/iauthorisation-service';
-import {EnvironmentService} from 'src/environments/environment.service';
-import {Alerte} from 'src/model/alerte';
-import {AlerteCapteur} from 'src/model/alerteCapteur';
-import {Baril} from 'src/model/baril';
-import {Capteur} from 'src/model/capteur';
-import {Conversation, Message} from 'src/model/conversation';
-import {Customer} from 'src/model/customer';
-import {CustomerAccess} from 'src/model/customerAccess';
-import {Documentation} from 'src/model/documentation';
-import {Dompeux} from 'src/model/dompeux';
-import {Donnee} from 'src/model/donnee';
-import {DonneeCapteur, PostDonneeCapteur} from 'src/model/donneeCapteur';
-import {Erabliere} from 'src/model/erabliere';
-import {ErabliereApiDocument} from 'src/model/erabliereApiDocument';
-import {GetImageInfo} from 'src/model/imageInfo';
-import {Note} from 'src/model/note';
-import {PutCapteur} from 'src/model/putCapteur';
-import {PostCapteurImage} from "../model/postCapteurImage";
-import {CapteurImage} from "../model/capteurImage";
-import {PutCapteurImage} from "../model/putCapteurImage";
+import { Injectable } from '@angular/core';
+import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
+import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
+import { EnvironmentService } from 'src/environments/environment.service';
+import { Alerte } from 'src/model/alerte';
+import { AlerteCapteur } from 'src/model/alerteCapteur';
+import { Baril } from 'src/model/baril';
+import { Capteur } from 'src/model/capteur';
+import { Conversation, Message } from 'src/model/conversation';
+import { Customer } from 'src/model/customer';
+import { CustomerAccess } from 'src/model/customerAccess';
+import { Documentation } from 'src/model/documentation';
+import { Dompeux } from 'src/model/dompeux';
+import { Donnee } from 'src/model/donnee';
+import { DonneeCapteur, PostDonneeCapteur } from 'src/model/donneeCapteur';
+import { Erabliere } from 'src/model/erabliere';
+import { ErabliereApiDocument } from 'src/model/erabliereApiDocument';
+import { GetImageInfo } from 'src/model/imageInfo';
+import { Note } from 'src/model/note';
+import { PutCapteur } from 'src/model/putCapteur';
+import { PostCapteurImage } from "../model/postCapteurImage";
+import { CapteurImage } from "../model/capteurImage";
+import { PutCapteurImage } from "../model/putCapteurImage";
 import { WeatherForecast } from 'src/model/weatherForecast';
 import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
@@ -229,11 +229,11 @@ export class ErabliereApi {
         return rtn ?? new HttpResponse();
     }
 
-    async getDocumentations(idErabliereSelectionnee:any, skip: number = 0, top?: number): Promise<Documentation[]> {
+    async getDocumentations(idErabliereSelectionnee: any, skip: number = 0, top?: number): Promise<Documentation[]> {
         const headers = await this.getHeaders();
         let odataOptions = "?$select=id,idErabliere,created,title,text,fileExtension";
-            odataOptions += "&$skip=" + skip;
-            odataOptions += top ? "&$top=" + top : "";
+        odataOptions += "&$skip=" + skip;
+        odataOptions += top ? "&$top=" + top : "";
         const rtn = firstValueFrom(this._httpClient.get<Documentation[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation" + odataOptions, { headers: headers }));
         return rtn ?? [];
     }
@@ -245,25 +245,25 @@ export class ErabliereApi {
         return rtn ?? [];
     }
 
-    async getDocumentationCount(idErabliereSelectionnee:any): Promise<number> {
+    async getDocumentationCount(idErabliereSelectionnee: any): Promise<number> {
         let headers = await this.getHeaders();
         headers = headers.set('Accept', 'application/json');
         const rtn = firstValueFrom(this._httpClient.get<number>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation/quantite", { headers: headers }));
         return rtn ?? 0;
     }
 
-    async deleteDocumentation(idErabliereSelectionnee:any, idDocumentation:any): Promise<any> {
+    async deleteDocumentation(idErabliereSelectionnee: any, idDocumentation: any): Promise<any> {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation/" + idDocumentation, { headers: headers }));
     }
 
-    async getNotes(idErabliereSelectionnee:any, search?: string, skip: number = 0, top?: number): Promise<Note[]> {
+    async getNotes(idErabliereSelectionnee: any, search?: string, skip: number = 0, top?: number): Promise<Note[]> {
         const headers = await this.getHeaders();
         let odataOptions = "?$orderby=NoteDate desc";
-            odataOptions += "&$skip=" + skip;
-            odataOptions += top ? "&$top=" + top : "";
-            odataOptions += "&$select=id,idErabliere,noteDate,created,text,title,fileExtension,notificationFilter";
-            odataOptions += "&$expand=rappel";
+        odataOptions += "&$skip=" + skip;
+        odataOptions += top ? "&$top=" + top : "";
+        odataOptions += "&$select=id,idErabliere,noteDate,created,text,title,fileExtension,notificationFilter";
+        odataOptions += "&$expand=rappel";
         if (search) {
             odataOptions += "&$filter=contains(text, '" + search + "') or contains(title, '" + search + "')";
         }
@@ -280,12 +280,12 @@ export class ErabliereApi {
         return rtn ?? [];
     }
 
-    async getNotesCount(idErabliereSelectionnee:any, search?: string): Promise<number> {
+    async getNotesCount(idErabliereSelectionnee: any, search?: string): Promise<number> {
         let headers = await this.getHeaders();
         headers = headers.set('Accept', 'application/json');
         const rtn = await firstValueFrom(
             this._httpClient.get<number>(
-                this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/quantite?search=" + search, 
+                this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/quantite?search=" + search,
                 { headers: headers }));
         return rtn ?? 0;
     }
@@ -296,12 +296,12 @@ export class ErabliereApi {
             headers = headers.set('Cache-Control', 'no-cache');
         }
         return firstValueFrom(this._httpClient.get(
-            this._environmentService.apiUrl + 
-            '/erablieres/' + idErabliere + "/notes/" + id + "/image", 
+            this._environmentService.apiUrl +
+            '/erablieres/' + idErabliere + "/notes/" + id + "/image",
             { headers: headers, responseType: 'arraybuffer' }));
     }
 
-    async postNote(idErabliereSelectionnee:any, note:Note): Promise<Note> {
+    async postNote(idErabliereSelectionnee: any, note: Note): Promise<Note> {
         const headers = await this.getHeaders();
         const rtn = firstValueFrom(this._httpClient.post<Note>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes", note, { headers: headers }));
         return rtn ?? new Note();
@@ -326,22 +326,22 @@ export class ErabliereApi {
 
     async postCapteurImage(idErabliereSelectionee: any, capteurImage: PostCapteurImage): Promise<CapteurImage | undefined> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.post<CapteurImage>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage', capteurImage, {headers: headers}));
+        return firstValueFrom(this._httpClient.post<CapteurImage>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage', capteurImage, { headers: headers }));
     }
 
     async putCapteurImage(idErabliereSelectionee: any, idCapteur: string, capteurImage: PutCapteurImage): Promise<CapteurImage | undefined> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.put<CapteurImage>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage/' + idCapteur, capteurImage, {headers: headers}));
+        return firstValueFrom(this._httpClient.put<CapteurImage>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage/' + idCapteur, capteurImage, { headers: headers }));
     }
 
     async deleteCapteurImage(idErabliereSelectionee: any, idCapteur: string) {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.delete<CapteurImage>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage/' + idCapteur, {headers: headers}));
+        return firstValueFrom(this._httpClient.delete<CapteurImage>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage/' + idCapteur, { headers: headers }));
     }
 
     async getCapteursImage(idErabliereSelectionee: any) {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.get<CapteurImage[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage', {headers: headers})) ?? [];
+        return firstValueFrom(this._httpClient.get<CapteurImage[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/CapteurImage', { headers: headers })) ?? [];
     }
 
     async postDocument(idErabliereSelectionee: any, document: ErabliereApiDocument): Promise<any> {
@@ -382,7 +382,7 @@ export class ErabliereApi {
     }
     async putNotePeriodiciteDue(idErabliereSelectionnee: any): Promise<any> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.put<Note>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/" + "PeriodiciteNotes", {},{ headers: headers }));
+        return firstValueFrom(this._httpClient.put<Note>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/" + "PeriodiciteNotes", {}, { headers: headers }));
     }
 
     async putDocumentation(idErabliereSelectionnee: any, documentation: Documentation): Promise<any> {
@@ -398,16 +398,16 @@ export class ErabliereApi {
 
     async getCustomersAdminExpandAccess(): Promise<Customer[]> {
         const headers = await this.getHeaders();
-        const rtn = firstValueFrom(this._httpClient.get<Customer[]>(this._environmentService.apiUrl + '/admin/customers' + '?$expand=customerErablieres', { headers: headers}));
+        const rtn = firstValueFrom(this._httpClient.get<Customer[]>(this._environmentService.apiUrl + '/admin/customers' + '?$expand=customerErablieres', { headers: headers }));
         return rtn ?? [];
     }
 
-    async putCustomer(idCustomer: string, customer: Customer) : Promise<any> {
+    async putCustomer(idCustomer: string, customer: Customer): Promise<any> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.put<Customer>(this._environmentService.apiUrl + '/admin/customers/' + idCustomer, customer, { headers: headers}));
+        return firstValueFrom(this._httpClient.put<Customer>(this._environmentService.apiUrl + '/admin/customers/' + idCustomer, customer, { headers: headers }));
     }
 
-    async deleteCustomer(idCustomer: string) : Promise<any> {
+    async deleteCustomer(idCustomer: string): Promise<any> {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/admin/customers/' + idCustomer, { headers: headers }));
     }
@@ -564,21 +564,21 @@ export class ErabliereApi {
         if (this.openApiSpecCache) {
             return this.openApiSpecCache;
         }
-    
+
         if (this.openApiSpecRequest) {
             return this.openApiSpecRequest; // Return the ongoing request
         }
-    
+
         this.openApiSpecRequest = firstValueFrom(
             this._httpClient.get<any>(this._environmentService.apiUrl + "/api/v1/swagger.json", {})
         );
-    
+
         try {
             this.openApiSpecCache = await this.openApiSpecRequest;
         } finally {
             this.openApiSpecRequest = null; // Reset the request tracker
         }
-    
+
         return this.openApiSpecCache;
     }
 
@@ -601,8 +601,8 @@ export class ErabliereApi {
     async traduire(message: string) {
         const headers = await this.getHeaders();
         return await firstValueFrom(this._httpClient.post<any>(
-            this._environmentService.apiUrl + '/ErabliereAI/Traduction?from=en&to=fr', 
-            { text: message }, 
+            this._environmentService.apiUrl + '/ErabliereAI/Traduction?from=en&to=fr',
+            { text: message },
             { headers: headers }));
     }
 
@@ -659,7 +659,7 @@ export class ErabliereApi {
 
     async getErablieresGeoJson(isPublic?: boolean, my?: boolean, capteur?: string, maxCapteur?: number | null): Promise<any> {
         const header = await this.getHeaders();
-        
+
         let url = this._environmentService.apiUrl + '/Erablieres/GeoJson?';
 
         if (isPublic != null) {
@@ -678,7 +678,7 @@ export class ErabliereApi {
             url += '&topCapteur=' + maxCapteur;
         }
 
-        return await firstValueFrom(this._httpClient.get<GeoJSON.GeoJSON>(url, { headers: header }));
+        return await firstValueFrom(this._httpClient.get<any>(url, { headers: header }));
     }
 
     async getApiKeys(): Promise<ApiKey[]> {

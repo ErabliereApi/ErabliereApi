@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EntraRedirectComponent } from './entra-redirect.component';
 import { RouterOutlet } from '@angular/router';
-import { ErabliereAIComponent } from 'src/erabliereai/erabliereai-chat.component';
+import { ErabliereAIComponent } from 'src/generic/erabliereai/erabliereai-chat.component';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { MsalBroadcastService, MsalModule, MsalService } from '@azure/msal-angular';
-import { IAuthorisationSerivce } from 'src/authorisation/iauthorisation-service';
-import { AuthorisationFactoryService } from 'src/authorisation/authorisation-factory-service';
+import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
+import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { InteractionStatus } from '@azure/msal-browser';
 
