@@ -12,6 +12,7 @@ export class Customer {
     externalAccountUrl?: string
     creationTime?: string
     lastAccessTime?: string
+    acceptTermsAt?: string
     customerErablieres?: Array<CustomerAccess>
     apiKeys?: Array<ApiKey>
 }

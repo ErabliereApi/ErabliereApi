@@ -33,6 +33,7 @@ import { PostImageGenerationResponse } from 'src/model/postImageGenerationRespon
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
+    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -749,6 +750,11 @@ export class ErabliereApi {
     async acceptTerms() {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.post<void>(this._environmentService.apiUrl + '/Customers/me/accept-terms', {}, { headers: headers }));
+    }
+
+    async adminAcceptTermsForDevices(deviceUniqueName: any) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.post<void>(this._environmentService.apiUrl + '/Admin/Customer/ConsentForDevice/' + deviceUniqueName, {}, { headers: headers }));
     }
 }
 

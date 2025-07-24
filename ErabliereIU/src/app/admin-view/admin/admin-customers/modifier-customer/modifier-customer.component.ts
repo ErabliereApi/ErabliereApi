@@ -1,8 +1,8 @@
-import {Component, EventEmitter, Input, Output, OnInit} from '@angular/core';
-import {Customer} from "src/model/customer";
-import {ErabliereApi} from "src/core/erabliereapi.service";
-import {FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
-import {InputErrorComponent} from "src/generic/input-error.component";
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Customer } from "src/model/customer";
+import { ErabliereApi } from "src/core/erabliereapi.service";
+import { FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { InputErrorComponent } from 'src/generic/input-error.component';
 
 @Component({
     selector: 'modifier-customer-modal',
@@ -13,6 +13,7 @@ import {InputErrorComponent} from "src/generic/input-error.component";
     templateUrl: './modifier-customer.component.html'
 })
 export class ModifierCustomerComponent implements OnInit {
+
     @Input() customer: Customer | null = null;
     @Output() needToUpdate: EventEmitter<boolean> = new EventEmitter();
 
@@ -55,7 +56,7 @@ export class ModifierCustomerComponent implements OnInit {
             this.validateForm();
 
             if (this.customerForm.valid)
-            this.customer.name = this.customerForm.controls['nom'].value;
+                this.customer.name = this.customerForm.controls['nom'].value;
 
             this._api.putCustomer(this.customer.id, this.customer)
                 .then(r => {
@@ -81,5 +82,27 @@ export class ModifierCustomerComponent implements OnInit {
 
     onAnnuler() {
         this.needToUpdate.emit(false);
+    }
+
+    acceptTerms(deviceUniqueName: any) {
+        this._api.adminAcceptTermsForDevices(deviceUniqueName)
+            .then(() => {
+                this.errorObj = null;
+                this.generalError = null;
+                this.customerForm.reset();
+                this.needToUpdate.emit(true);
+            })
+            .catch(e => {
+                if (e.status == 404) {
+                    this.generalError = "L'utilisateur n'existe pas."
+                } else {
+                    this.generalError = "Une erreur est survenue."
+                }
+            });
+    }
+
+    isUUID(arg0: any) {
+        const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        return typeof arg0 === 'string' && arg0.length == 36 && regex.test(arg0);
     }
 }
