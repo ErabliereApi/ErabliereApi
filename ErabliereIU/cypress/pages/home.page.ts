@@ -4,7 +4,7 @@ import { GraphPannelCompoenent } from "./component/graphpannel.component";
 import { AProposPage } from "./apropos.page";
 
 export class HomePage {
-    visit(): HomePage {
+    visit(): this {
         cy.login();
         cy.visit('/');
         return this;

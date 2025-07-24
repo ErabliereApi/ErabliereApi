@@ -3,7 +3,7 @@ import { HomePage } from "../pages/home.page";
 describe('Graph pannel test', { testIsolation: false }, () => {
     const homePage = new HomePage();
     const tauxSucreId = "010e708b-a7d0-449e-77e2-08d9d37ca582";
-    var baseValue = "2.3";
+    let baseValue = "2.3";
 
     it('Check the base value of "Taux de sucre" pannel', () => {
         homePage.visit()
@@ -21,8 +21,8 @@ describe('Graph pannel test', { testIsolation: false }, () => {
     });
 
     it('Add data in "Taux de sucre" pannel', () => {
-        var pannelCompoenent = homePage.getGraphPannel(tauxSucreId);
-        var addButton = pannelCompoenent.getAddButton();
+        let pannelCompoenent = homePage.getGraphPannel(tauxSucreId);
+        let addButton = pannelCompoenent.getAddButton();
 
         addButton.should('exist');
         addButton.click();
@@ -31,7 +31,7 @@ describe('Graph pannel test', { testIsolation: false }, () => {
         pannelCompoenent.enterDate();
         
         // There is now a new button 'Ajouter' that appears when the first click happend.
-        var addButton = pannelCompoenent.getAddButton();
+        addButton = pannelCompoenent.getAddButton();
 
         addButton.should('exist');
         addButton.click();
@@ -39,8 +39,8 @@ describe('Graph pannel test', { testIsolation: false }, () => {
 
     it('Should make the form disappear', () => {
         // Find the button 'Annuler'
-        var graphPannel = homePage.getGraphPannel(tauxSucreId);
-        var cancelButton = graphPannel.getCancelButton();
+        let graphPannel = homePage.getGraphPannel(tauxSucreId);
+        let cancelButton = graphPannel.getCancelButton();
         
         cancelButton.should('exist');
         cancelButton.click();
@@ -51,11 +51,11 @@ describe('Graph pannel test', { testIsolation: false }, () => {
     });
 
     it('Should see that the data is added', () => {
-        var graphPannel = homePage.getGraphPannel(tauxSucreId);
+        let graphPannel = homePage.getGraphPannel(tauxSucreId);
 
         cy.wait(5000);
 
-        var title = graphPannel.find('h3');
+        let title = graphPannel.find('h3');
         title.should('exist');
         title.should('contain', baseValue);
     });

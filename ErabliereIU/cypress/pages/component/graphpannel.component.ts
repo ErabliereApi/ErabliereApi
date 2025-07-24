@@ -1,13 +1,13 @@
 export class GraphPannelCompoenent {
     
-    constructor(private pannelId: string) {
+    constructor(private readonly pannelId: string) {
 
     }
 
     getAddButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-        var addButton = cy.get(this.pannelId).then($pannel => {
-            var buttons = cy.wrap($pannel).find('button');
-            var addButton = buttons.filter(function(index, element) {
+        let addButton = cy.get(this.pannelId).then($pannel => {
+            let buttons = cy.wrap($pannel).find('button');
+            let addButton = buttons.filter(function(index, element) {
                 return element.innerText === "Ajouter";
             });
             return addButton;
@@ -16,9 +16,9 @@ export class GraphPannelCompoenent {
     }
 
     getCancelButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-        var cancelButton = cy.get(this.pannelId).then($pannel => {
-            var buttons = cy.wrap($pannel).find('button');
-            var cancelButton = buttons.filter(function(index, element) {
+        let cancelButton = cy.get(this.pannelId).then($pannel => {
+            let buttons = cy.wrap($pannel).find('button');
+            let cancelButton = buttons.filter(function(index, element) {
                 return element.innerText === "Annuler";
             });
             return cancelButton;
@@ -27,8 +27,8 @@ export class GraphPannelCompoenent {
     }
 
     find(selector: string): Cypress.Chainable<JQuery<HTMLElement>> {
-        var elem = cy.get(this.pannelId).then($pannel => {
-            var element = cy.wrap($pannel).find(selector);
+        let elem = cy.get(this.pannelId).then($pannel => {
+            let element = cy.wrap($pannel).find(selector);
             return element;
         });
         return elem;
@@ -36,7 +36,7 @@ export class GraphPannelCompoenent {
 
     enterValue(value: string): void {
         cy.get(this.pannelId).then($pannel => {
-            var valeurField = cy.wrap($pannel).find('input[name="valeur"]');
+            let valeurField = cy.wrap($pannel).find('input[name="valeur"]');
             valeurField.type(value);
         });
     }

@@ -11,6 +11,9 @@
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">{{etat}}</h5>
             </div>
+            @if (errorDetails) {
+                <small class="text-danger">{{errorDetails}}</small>
+            }
         </a>
         }
         @for (erabliere of erablieres; track  erabliere.id) {

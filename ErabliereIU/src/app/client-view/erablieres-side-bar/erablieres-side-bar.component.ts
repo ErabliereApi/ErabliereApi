@@ -26,6 +26,7 @@ export class ErabliereSideBarComponent implements OnInit {
   authDisabled: boolean = false;
   erablieres: Array<Erabliere> = [];
   etat: string = "";
+  errorDetails: string = "";
   erabliereSelectionnee?: Erabliere;
   loggedIn: boolean = false;
 
@@ -61,6 +62,7 @@ export class ErabliereSideBarComponent implements OnInit {
 
   async loadErablieresPage() {
     const titreChargement = "Chargement des érablières...";
+    this.errorDetails = "";
 
     if (this.etat == titreChargement) {
       return new Promise<void>((resolve, reject) => { });
@@ -70,7 +72,8 @@ export class ErabliereSideBarComponent implements OnInit {
 
     const erablieres = await (this._erabliereApi.getErablieres(10, this.search).catch(err => {
       console.error(err);
-      this.etat = "Erreur lors du chargement des érablieres";
+      this.etat = "Erreur lors du chargement des érablieres.";
+      this.errorDetails = err.message;
     }));
 
     if (erablieres != null) {

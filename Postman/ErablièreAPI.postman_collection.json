@@ -62,7 +62,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"nom\": \"Érablière A\",\r\n  \"ipRules\": \"-\",\r\n  \"indiceOrdre\": 0,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
+							"raw": "{\r\n  \"nom\": \"Érablière A\",\r\n  \"ipRules\": \"-\",\r\n  \"indiceOrdre\": -100,\r\n  \"afficherSectionBaril\": true,\r\n  \"afficherTrioDonnees\": true,\r\n  \"afficherSectionDompeux\": true,\r\n  \"isPublic\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1674,6 +1674,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Lister les rapports",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"idErabliere\": \"{{ErabliereA_ID}}\",\r\n  \"utiliserTemperatureTrioDonnee\": true,\r\n  \"dateDebut\": \"{{thisYear}}-01-01\",\r\n  \"dateFin\": \"{{thisYear}}-12-31\",\r\n  \"seuilTemperature\": 0,\r\n  \"afficherDansDashboard\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/{{ErabliereA_ID}}/Rapports",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"{{ErabliereA_ID}}",
+								"Rapports"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1834,11 +1865,6 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"// console.log(\"Requete : \");",
-					"// console.log(pm.request.body);",
-					"// console.log(\"Reponse : \");",
-					"// console.log(pm.response.text());",
-					"",
 					""
 				]
 			}
