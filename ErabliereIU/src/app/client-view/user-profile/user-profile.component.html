@@ -32,19 +32,36 @@
             <button class="btn btn-success" (click)="buyApiKey()">Obtenir une clé d'api</button>
         </div>
         <span class="text-danger">{{errorApiKey}}</span>
-        <ul>
-            @if (customer.apiKeys && customer.apiKeys.length > 0) {
-                @for (apiKey of customer.apiKeys; track apiKey.id) {
-                    <li>
-                        <strong>{{ apiKey.name }}</strong> - {{ apiKey.creationTime }}<br>
-                        <button class="btn btn-danger btn-sm" (click)="deleteApiKey(apiKey.id)">Supprimer</button>
-                    </li>
-                }
-            } 
-            @else {
-                <li>Aucune clé API disponible.</li>
-            }
-        </ul>
+        <div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Date de création</th>
+                        <th>Dernière utilisation</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (customer.apiKeys && customer.apiKeys.length > 0) {
+                        @for (apiKey of customer.apiKeys; track apiKey.id) {
+                            <tr>
+                                <td>{{ apiKey.name }}</td>
+                                <td>{{ apiKey.creationTime | date: 'yyyy-MM-dd' }}</td>
+                                <td>{{ apiKey.lastUsage | date: 'yyyy-MM-dd' }}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" (click)="deleteApiKey(apiKey.id)">Supprimer</button>
+                                </td>
+                            </tr>
+                        }
+                    } @else {
+                        <tr>
+                            <td colspan="4">Aucune clé API disponible.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-md-4 card">
         <h3>Abonnement</h3>

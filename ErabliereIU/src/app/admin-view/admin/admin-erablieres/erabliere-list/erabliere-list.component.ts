@@ -2,11 +2,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Erabliere } from "src/model/erabliere";
 import { AdminErabliereAccessListComponent } from "src/app/admin-view/access/erabliere-access-list/admin-erabliere-access-list.component";
 import { CustomerAccess } from "src/model/customerAccess";
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'erabliere-list',
     imports: [
-        AdminErabliereAccessListComponent
+        AdminErabliereAccessListComponent,
+        DatePipe
     ],
     templateUrl: './erabliere-list.component.html',
     styleUrl: './erabliere-list.component.css'

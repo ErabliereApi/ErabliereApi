@@ -55,6 +55,11 @@ public class ApiKey
     public string? SubscriptionId { get; set; }
 
     /// <summary>
+    /// The last usage of the api key
+    /// </summary>
+    public DateTimeOffset? LastUsage { get; set; }
+
+    /// <summary>
     /// Tel if the api key is active
     /// </summary>
     /// <returns></returns>

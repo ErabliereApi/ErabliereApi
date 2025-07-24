@@ -34,7 +34,7 @@ public class ApiKeyMiddleware : IMiddleware
 
             var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
-            var apiKeyEntity = await dbContext.ApiKeys.AsNoTracking().FirstOrDefaultAsync(k => k.Key == hashkey);
+            var apiKeyEntity = await dbContext.ApiKeys.FirstOrDefaultAsync(k => k.Key == hashkey, context.RequestAborted);
 
             if (apiKeyEntity != null && apiKeyEntity.IsActive())
             {
@@ -44,6 +44,14 @@ public class ApiKeyMiddleware : IMiddleware
                     var checkoutService = context.RequestServices.GetRequiredService<ICheckoutService>();
 
                     await checkoutService.ReccordUsageAsync(apiKeyEntity);
+                }
+
+                // Update the last usage time
+                if (apiKeyEntity.LastUsage == null || apiKeyEntity.LastUsage < DateTimeOffset.Now.AddMinutes(-5))
+                {
+                    apiKeyEntity.LastUsage = DateTimeOffset.Now;
+                    dbContext.ApiKeys.Update(apiKeyEntity);
+                    await dbContext.TrySaveChangesAsync(context.RequestAborted);
                 }
 
                 await AuthorizeRequestAsync(context, dbContext, apiKeyEntity);

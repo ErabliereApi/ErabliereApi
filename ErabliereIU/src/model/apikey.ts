@@ -10,4 +10,5 @@ export class ApiKey
     deletionTime?: Date;
     customerId?: string;
     customer?: Customer
+    lastUsage?: Date;
 }

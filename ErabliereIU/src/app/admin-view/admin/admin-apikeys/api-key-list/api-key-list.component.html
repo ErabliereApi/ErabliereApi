@@ -6,6 +6,7 @@
                 <th>Nom</th>
                 <th>Utilisateur</th>
                 <th>Date création</th>
+                <th>Dernière utilisation</th>
                 <th>Révoqué</th>
                 <th>Date révocation</th>
                 <th class="min"></th>
@@ -14,12 +15,13 @@
         <tbody>
             @for (apikey of apiKeys; track apikey.id) {
             <tr>
-                <td>{{apikey.id}}</td>
+                <td><copy-id-button [text]="apikey.id" [title]="'Copier l\'id de la clé d\'api:' + apikey.id"></copy-id-button></td>
                 <td>{{apikey.name}}</td>
                 <td>{{apikey?.customer?.name}}</td>
-                <td>{{apikey.creationTime}}</td>
+                <td>{{apikey.creationTime | date: 'yyyy-MM-dd' }}</td>
+                <td>{{apikey.lastUsage | date: 'yyyy-MM-dd' }}</td>
                 <td>{{apikey.revocationTime != null}}</td>
-                <td>{{apikey.revocationTime}}</td>
+                <td>{{apikey.revocationTime | date: 'yyyy-MM-dd' }}</td>
                 <td class="min"></td>
             </tr>
             }

@@ -5,11 +5,12 @@ import { AppUser } from "src/model/appuser";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Customer } from "src/model/customer";
+import { DatePipe } from "@angular/common";
 
 @Component({
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
-    imports: [CopyTextButtonComponent],
+    imports: [CopyTextButtonComponent, DatePipe],
 })
 export class UserProfileComponent implements OnInit {
     user: AppUser | null = null;

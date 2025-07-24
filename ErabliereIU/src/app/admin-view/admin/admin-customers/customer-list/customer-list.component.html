@@ -39,7 +39,7 @@
                 <td>{{customer.email}}</td>
                 <td><span title="{{ formatMessageDate(customer.creationTime) }}">{{customer.creationTime | date: 'yyyy-MM-dd' }}</span></td>
                 <td><span title="{{ formatMessageDate(customer.lastAccessTime) }}">{{customer.lastAccessTime | date: 'yyyy-MM-dd' }}</span></td>
-                <td><span title="{{ customer.acceptTermsAt }}">{{ customer.acceptTermsAt }}</span></td>
+                <td><span title="{{ customer.acceptTermsAt }}">{{ customer.acceptTermsAt | date: 'yyyy-MM-dd' }}</span></td>
                 <td>{{customer.customerErablieres?.length}}</td>
                 <td class="min">
                     <button
