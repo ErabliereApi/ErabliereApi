@@ -181,13 +181,44 @@ public class CustomersController : ControllerBase
     /// Point de terminaison pour l'administration des utilisateurs
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
+    [HttpGet("/Admin/Customers")]
     [EnableQuery]
-    [Route("/Admin/Customers")]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     public IQueryable<Customer> GetCustomersAdmin()
     {
         return _context.Customers;
+    }
+
+    /// <summary>
+    /// Permet a un administrateur de consentir aux termes d'utilisation pour un appareil spécifique.
+    /// </summary>
+    /// <param name="deviceId"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpPost("/Admin/Customer/ConsentForDevice/{deviceId}")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> ConsentTermeForDevice(Guid deviceId, CancellationToken token)
+    {
+        var device = await _context.Customers.FirstOrDefaultAsync(c => c.UniqueName == deviceId.ToString(), token);
+
+        if (device == null)
+        {
+            return NotFound("L'appareil n'a pas été trouvé.");
+        }
+
+        if (device.AcceptTermsAt != null)
+        {
+            return BadRequest("Les conditions d'utilisation ont déjà été acceptées pour cet appareil.");
+        }
+
+        device.AcceptTermsAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(token);
+
+        await _cache.RemoveAsync($"Customer_{device.UniqueName}", token);
+
+        return NoContent();
     }
 
     /// <summary>
