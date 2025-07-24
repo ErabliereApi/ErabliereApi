@@ -24,8 +24,19 @@ import { ErabliereAiPublicConversationComponent } from 'src/generic/erabliereai/
 import { AiViewComponent } from './ai-view/ai-view.component';
 import { UserProfileComponent } from './client-view/user-profile/user-profile.component';
 import { AuthenticatedUserGard } from './guard/authenticated-user.gard';
+import { TermeAndConditionComponent } from './app.termes-and-conditions.component';
 
 export const routes: Routes = [
+    {
+        path: 'termesandcondition',
+        component: ClientViewComponent,
+        children: [
+            {
+                path: '',
+                component: TermeAndConditionComponent
+            }
+        ]
+    },
     {
         path: 'a',
         component: AdminViewComponent,
