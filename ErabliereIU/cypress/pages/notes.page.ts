@@ -17,15 +17,15 @@ export class NotesPage {
     }
 
     enterNoteTitle(value: string): void {
-        FormUtil.typeTextBaseOnFormControlName(value, "notes", "title");
+        FormUtil.typeTextBaseOnName(value, "notes", "title");
     }
 
     enterNoteDescription(value: string): void {
-        FormUtil.typeTextBaseOnFormControlName(value, "notes", "text");
+        FormUtil.typeTextBaseOnName(value, "notes", "text");
     }
 
     enterNoteDate(date: string) {
-        FormUtil.typeTextBaseOnFormControlName(date, "notes", "noteDate");
+        FormUtil.typeTextBaseOnName(date, "notes", "noteDate");
     }
 
     sendNote(): void {
