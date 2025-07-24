@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace ErabliereApi.Controllers;
 
@@ -23,16 +24,19 @@ public class CustomersController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IDistributedCache _cache;
 
     /// <summary>
     /// Constructeur avec dépendance
     /// </summary>
     /// <param name="context">La base de données</param>
     /// <param name="mapper">Le mapper</param>
-    public CustomersController(ErabliereDbContext context, IMapper mapper)
+    /// <param name="cache">Le cache distribué</param>
+    public CustomersController(ErabliereDbContext context, IMapper mapper, IDistributedCache cache)
     {
         _context = context;
         _mapper = mapper;
+        _cache = cache;
     }
 
     /// <summary>
@@ -70,6 +74,72 @@ public class CustomersController : ControllerBase
         }).ToList();
 
         return Ok(customer);
+    }
+
+    /// <summary>
+    /// Point de terminaison pour vérifier si l'utilisateur a accepté les conditions d'utilisation.
+    /// Si l'utilisateur n'existe pas, un code 404 est retourné.
+    /// Si l'utilisateur a accepté les conditions, un code 200 est retourné avec la date d'acceptation.
+    /// Si l'utilisateur n'a pas accepté les conditions, un code 200 est retourné avec un champ `hasAcceptedTerms` à false.
+    /// </summary>
+    [HttpGet("me/has-accepted-terms")]
+    [Authorize]
+    [ProducesResponseType(200, Type = typeof(object))]
+    public async Task<IActionResult> HasAcceptedTerms(CancellationToken token)
+    {
+        using var scope = HttpContext.RequestServices.CreateScope();
+
+        var unique_name = UsersUtils.GetUniqueName(scope, User);
+
+        var customer = await _context.Customers
+            .FirstOrDefaultAsync(c => c.UniqueName == unique_name, token);
+
+        if (customer == null)
+        {
+            return NotFound("Utilisateur non trouvé: " + unique_name);
+        }
+
+        return Ok(new
+        {
+            hasAcceptedTerms = customer.AcceptTermsAt != null,
+            acceptTermsAt = customer.AcceptTermsAt
+        });
+    }
+
+    /// <summary>
+    /// Point de terminaison pour qu'un utilisateur accepte les conditions d'utilisation.
+    /// Si l'utilisateur a déjà accepté les conditions, un code 400 est retourné.
+    /// </summary>
+    [HttpPost("me/accept-terms")]
+    [Authorize]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> AcceptTerms(CancellationToken token)
+    {
+        using var scope = HttpContext.RequestServices.CreateScope();
+
+        var unique_name = UsersUtils.GetUniqueName(scope, User);
+
+        var customer = await _context.Customers
+            .FirstOrDefaultAsync(c => c.UniqueName == unique_name, token);
+
+        if (customer == null)
+        {
+            return NotFound("Utilisateur non trouvé: " + unique_name);
+        }
+
+        if (customer.AcceptTermsAt != null)
+        {
+            return BadRequest("Les conditions d'utilisation ont déjà été acceptées.");
+        }
+
+        customer.AcceptTermsAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(token);
+
+        await _cache.RemoveAsync($"Customer_{customer.UniqueName}", token);
+
+        return NoContent();
     }
 
     /// <summary>
@@ -149,6 +219,8 @@ public class CustomersController : ControllerBase
 
             await _context.SaveChangesAsync(token);
 
+            await _cache.RemoveAsync($"Customer_{entity.UniqueName}", token);
+
             return Ok(entity);
         }
         else
@@ -180,6 +252,8 @@ public class CustomersController : ControllerBase
         _context.Remove(customer);
 
         await _context.SaveChangesAsync(token);
+
+        await _cache.RemoveAsync($"Customer_{customer.UniqueName}", token);
 
         return NoContent();
     }

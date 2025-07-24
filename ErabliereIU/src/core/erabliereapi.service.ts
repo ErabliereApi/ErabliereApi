@@ -740,6 +740,16 @@ export class ErabliereApi {
         const headers = await this.getHeaders();
         await firstValueFrom(this._httpClient.delete<void>(this._environmentService.apiUrl + '/access/ApiKey/' + arg0, { headers: headers }));
     }
+
+    async getCustomerAcceptTerms() {
+      const headers = await this.getHeaders();
+      return firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + '/Customers/me/has-accepted-terms', { headers: headers }));
+    }
+
+    async acceptTerms() {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.post<void>(this._environmentService.apiUrl + '/Customers/me/accept-terms', {}, { headers: headers }));
+    }
 }
 
 function isNotNullOrWhitespace(search: string | undefined) {

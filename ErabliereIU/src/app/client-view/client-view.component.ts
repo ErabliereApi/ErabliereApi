@@ -3,6 +3,7 @@ import {ErabliereSideBarComponent} from "./erablieres-side-bar/erablieres-side-b
 import {NavigationEnd, Router, RouterOutlet} from "@angular/router";
 import {ClientNavBarComponent} from "./client-nav-bar/client-nav-bar.component";
 import {YouAreNotConnectedComponent} from "./you-are-not-connected/you-are-not-connected.component";
+import { TermsOfServiceBannerComponent } from './terms-of-service/terms-of-service-banner.component';
 
 @Component({
     selector: 'client-view',
@@ -10,7 +11,8 @@ import {YouAreNotConnectedComponent} from "./you-are-not-connected/you-are-not-c
         ErabliereSideBarComponent,
         RouterOutlet,
         ClientNavBarComponent,
-        YouAreNotConnectedComponent
+        YouAreNotConnectedComponent,
+        TermsOfServiceBannerComponent
     ],
     templateUrl: './client-view.component.html'
 })

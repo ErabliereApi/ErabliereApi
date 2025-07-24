@@ -22,7 +22,7 @@ public class EnsureCustomerExist : IMiddleware
         if (context.User?.Identity?.IsAuthenticated == true)
         {
             using var scope = context.RequestServices.CreateScope();
-            
+
             var uniqueName = UsersUtils.GetUniqueName(scope, context.User);
 
             if (uniqueName == null)
@@ -30,7 +30,7 @@ public class EnsureCustomerExist : IMiddleware
                 throw new InvalidOperationException("User is authenticated but no unique name was found");
             }
 
-            if (uniqueName == "") 
+            if (uniqueName == "")
             {
                 throw new InvalidOperationException("User is authenticated but unique name is empty");
             }
@@ -47,13 +47,55 @@ public class EnsureCustomerExist : IMiddleware
             {
                 await HandleCaseCustomerIsInCache(context, uniqueName, cache, customer, logger);
             }
+
+            var customerAcceptTerms = await EnsureCustomerAcceptTermes(context, uniqueName, cache, logger);
+
+            if (!customerAcceptTerms)
+            {
+                // Write an unauthorized response if the customer has not accepted terms
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsync("You must accept the terms of service before proceeding.");
+                return;
+            }
         }
-        else 
+        else
         {
             logger.LogInformation("User is not authenticated");
         }
 
         await next(context);
+    }
+
+    private readonly string[] termeRestrictionVerbes = ["POST", "PUT", "DELETE", "PATCH"];
+
+    private async ValueTask<bool> EnsureCustomerAcceptTermes(HttpContext context, string uniqueName, IDistributedCache cache, ILogger<EnsureCustomerExist> logger)
+    {
+        if (context.Request.Path.Equals("/Customers/me/accept-terms", StringComparison.OrdinalIgnoreCase))
+        {
+            logger.LogDebug("User is accepting termes, skipping terms check for customer {Customer}", uniqueName);
+            return true;
+        }
+        else if (!termeRestrictionVerbes.Contains(context.Request.Method, StringComparer.OrdinalIgnoreCase))
+        {
+            logger.LogDebug("Request method is not GET, skipping terms check for customer {Customer}", uniqueName);
+            return true;
+        }
+
+        var customer = await cache.GetAsync<Customer>($"Customer_{uniqueName}", context.RequestAborted);
+
+        if (customer == null)
+        {
+            logger.LogWarning("Customer {Customer} was not found in cache", uniqueName);
+        }
+
+        if (customer != null && customer.AcceptTermsAt == null)
+        {
+            logger.LogInformation("Customer {Customer} has not accepted terms", uniqueName);
+
+            return false;
+        }
+
+        return true;
     }
 
     private static async Task HandleCaseCustomerIsInCache(HttpContext context, string uniqueName, IDistributedCache cache, Customer customer, ILogger<EnsureCustomerExist> logger)
@@ -79,7 +121,7 @@ public class EnsureCustomerExist : IMiddleware
                 logger.LogCritical("Customer {Customer} was not found in database after it was found in cache", uniqueName);
             }
         }
-        else 
+        else
         {
             logger.LogInformation("Customer {Customer} lastAccessTime is today ({Date}) and was in cache", customer.UniqueName, customer.LastAccessTime);
         }
@@ -120,7 +162,7 @@ public class EnsureCustomerExist : IMiddleware
         else
         {
             var customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
-            
+
             if (ShouldUpdateLastAccessTime(customer, logger, out var userTime))
             {
                 customer.LastAccessTime = userTime;
@@ -183,7 +225,7 @@ public class EnsureCustomerExist : IMiddleware
     private static bool ShouldUpdateLastAccessTime(Customer customer, ILogger<EnsureCustomerExist> logger, out DateTimeOffset userTime)
     {
         userTime = GetUserDateTimeOffSetNow(customer, logger);
-        
+
         if (customer.LastAccessTime == null)
         {
             return true;

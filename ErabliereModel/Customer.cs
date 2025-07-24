@@ -57,6 +57,19 @@ public class Customer
     public string? TimeZone { get; set; }
 
     /// <summary>
+    /// La langue de l'utilisateur
+    /// </summary>
+    [MaxLength(10)]
+    [RegularExpression(@"^[a-z]{2}(-[A-Z]{2})?$", ErrorMessage = "Le format de la langue doit être 'xx' ou 'xx-XX' où xx est le code de langue et XX est le code de pays.")]
+    public string? Language { get; set; }
+
+    /// <summary>
+    /// La date à laquelle l'utilisateur a accepté les conditions d'utilisation
+    /// ou null si l'utilisateur ne les a pas acceptées
+    /// </summary>
+    public DateTimeOffset? AcceptTermsAt { get; set; }
+
+    /// <summary>
     /// La date de création de l'utilisateur
     /// </summary>
     public DateTimeOffset CreationTime { get; set; } = DateTimeOffset.Now;
