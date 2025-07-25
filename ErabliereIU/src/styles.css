@@ -1,6 +1,7 @@
 @charset "UTF-8";
 
-.was-validated .ng-valid ~ .valid-feedback, .was-validated .ng-valid ~ .valid-tooltip {
+.was-validated .ng-valid~.valid-feedback,
+.was-validated .ng-valid~.valid-tooltip {
   display: block
 }
 
@@ -27,7 +28,8 @@
   border-color: var(--bs-form-valid-border-color)
 }
 
-.was-validated .form-select.ng-valid:not([multiple]):not([size]), .was-validated .form-select.ng-valid:not([multiple])[size="1"] {
+.was-validated .form-select.ng-valid:not([multiple]):not([size]),
+.was-validated .form-select.ng-valid:not([multiple])[size="1"] {
   --bs-form-select-bg-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
   padding-right: 4.125rem;
   background-position: right .75rem center, center right 2.25rem;
@@ -55,15 +57,18 @@
   box-shadow: 0 0 0 .25rem rgba(var(--bs-success-rgb), .25)
 }
 
-.was-validated .form-check-input.ng-valid ~ .form-check-label {
+.was-validated .form-check-input.ng-valid~.form-check-label {
   color: var(--bs-form-valid-color)
 }
 
-.was-validated .input-group > .form-control:not(:focus).ng-valid, .was-validated .input-group > .form-floating:not(:focus-within).ng-valid, .was-validated .input-group > .form-select:not(:focus).ng-valid {
+.was-validated .input-group>.form-control:not(:focus).ng-valid,
+.was-validated .input-group>.form-floating:not(:focus-within).ng-valid,
+.was-validated .input-group>.form-select:not(:focus).ng-valid {
   z-index: 3
 }
 
-.was-validated .ng-invalid ~ .invalid-feedback, .was-validated .ng-invalid ~ .invalid-tooltip {
+.was-validated .ng-invalid~.invalid-feedback,
+.was-validated .ng-invalid~.invalid-tooltip {
   display: block
 }
 
@@ -90,7 +95,8 @@
   border-color: var(--bs-form-invalid-border-color)
 }
 
-.was-validated .form-select.ng-invalid:not([multiple]):not([size]), .was-validated .form-select.ng-invalid:not([multiple])[size="1"] {
+.was-validated .form-select.ng-invalid:not([multiple]):not([size]),
+.was-validated .form-select.ng-invalid:not([multiple])[size="1"] {
   --bs-form-select-bg-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
   padding-right: 4.125rem;
   background-position: right .75rem center, center right 2.25rem;
@@ -118,49 +124,149 @@
   box-shadow: 0 0 0 .25rem rgba(var(--bs-danger-rgb), .25)
 }
 
-.was-validated .form-check-input.ng-invalid ~ .form-check-label {
+.was-validated .form-check-input.ng-invalid~.form-check-label {
   color: var(--bs-form-invalid-color)
 }
 
-.was-validated .input-group > .form-control:not(:focus).ng-invalid, .was-validated .input-group > .form-floating:not(:focus-within).ng-invalid, .was-validated .input-group > .form-select:not(:focus).ng-invalid {
+.was-validated .input-group>.form-control:not(:focus).ng-invalid,
+.was-validated .input-group>.form-floating:not(:focus-within).ng-invalid,
+.was-validated .input-group>.form-select:not(:focus).ng-invalid {
   z-index: 4
 }
 
 .gradient-custom {
-    /* fallback for old browsers */
-    background: #1ecb2f;
+  /* fallback for old browsers */
+  background: #1ecb2f;
 
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: -webkit-linear-gradient(right bottom, rgb(144, 251, 165), rgb(33, 250, 69));
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(right bottom, rgb(144, 251, 165), rgb(33, 250, 69));
 
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    background: linear-gradient(to bottom right, rgb(91, 243, 116), rgb(22, 248, 82))
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(to bottom right, rgb(91, 243, 116), rgb(22, 248, 82))
 }
 
 .gradient-custom-header {
-    /* fallback for old browsers */
-    background: #17d12a;
+  /* fallback for old browsers */
+  background: #17d12a;
 
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: -webkit-linear-gradient(right bottom, rgb(36, 194, 68), rgb(37, 201, 64));
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(right bottom, rgb(36, 194, 68), rgb(37, 201, 64));
 
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    background: linear-gradient(to bottom right, rgb(36, 196, 68), rgb(25, 175, 50))
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(to bottom right, rgb(36, 196, 68), rgb(25, 175, 50))
 }
 
 .mask-custom {
-    background: rgba(24, 24, 16, .2);
-    border-radius: 2em;
-    backdrop-filter: blur(15px);
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    background-clip: padding-box;
-    box-shadow: 10px 10px 10px rgba(46, 54, 68, 0.03);
+  background: rgba(24, 24, 16, .2);
+  border-radius: 2em;
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  background-clip: padding-box;
+  box-shadow: 10px 10px 10px rgba(46, 54, 68, 0.03);
 }
 
 @media screen and (max-width: 600px) {
-    .chat-window {
-        width: 100%;
-        bottom: 0;
-        right: 0;
-    }
+  .chat-window {
+    width: 100%;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+/* Style the Image Used to Trigger the Modal */
+.trigger-modal {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.trigger-modal:hover {
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+/* The Modal (background) */
+.modal-image {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  padding-top: 100px;
+  /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.9);
+  /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.modal-image-content {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+#caption {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation - Zoom in the Modal */
+.modal-image-content,
+#caption {
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+  from {
+    transform: scale(0)
+  }
+
+  to {
+    transform: scale(1)
+  }
+}
+
+/* The Close Button */
+.closeImageModel {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.closeImageModel:hover,
+.closeImageModel:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px) {
+  .modal-content {
+    width: 100%;
+  }
 }

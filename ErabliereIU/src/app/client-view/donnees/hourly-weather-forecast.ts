@@ -18,6 +18,15 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
             </tr>
           </thead>
           <tbody>
+            @if (error) {
+              <tr>
+                <td colspan="5" class="text-danger">{{ error.message }}</td>
+              </tr>
+            } @else if (weatherData.length === 0) {
+              <tr>
+                <td colspan="5">Aucune donnée disponible</td>
+              </tr>
+            }
             @for (forecast of weatherData; track forecast) {
               <tr>
                 <td title={{forecast.link}}>{{ getHour(forecast) }}</td>

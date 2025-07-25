@@ -36,13 +36,13 @@ public class WeatherService : IWeaterService
     /// <summary>
     /// Obtenir le code de localisation à partir d'un code postal
     /// </summary>
-    public async ValueTask<string> GetLocationCodeAsync(string postalCode)
+    public async Task<(int, string)> GetLocationCodeAsync(string postalCode)
     {
         var cacheKey = $"WeatherService.PostalCode.{postalCode}";
         var locationCode = await _cache.GetStringAsync(cacheKey);
         if (!string.IsNullOrWhiteSpace(locationCode))
         {
-            return locationCode;
+            return (200, locationCode);
         }
 
         string responseBodyString = string.Empty;
@@ -61,19 +61,19 @@ public class WeatherService : IWeaterService
             
             if (responseBody == null || responseBody.Count == 0)
             {
-                return "";
+                return (404, "");
             }
 
             var locationKey = responseBody[0].Key ?? "";
 
             await _cache.SetStringAsync(cacheKey, locationKey);
 
-            return locationKey;
+            return (200, locationKey);
         }
         catch (Exception ex)
         {
             _logger.LogCritical(ex, "Error retrieving location code: {Message} {Response}", ex.Message, responseBodyString);
-            return "";
+            return (500, responseBodyString);
         }
     }
 

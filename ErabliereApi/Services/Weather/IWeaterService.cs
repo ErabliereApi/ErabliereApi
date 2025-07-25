@@ -10,7 +10,7 @@ public interface IWeaterService
     /// <summary>
     /// Obtenir le code de localisation à partir d'un code postal
     /// </summary>
-    ValueTask<string> GetLocationCodeAsync(string postalCode);
+    Task<(int, string)> GetLocationCodeAsync(string postalCode);
 
     /// <summary>
     /// Obtenir les prédiction météorologiques pour une localisation pour 5 jours

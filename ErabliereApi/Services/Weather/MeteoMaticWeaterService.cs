@@ -10,7 +10,7 @@ namespace ErabliereApi.Services;
 public class MeteoMaticWeaterService : IWeaterService
 {
     /// <inheritdoc />
-    public async ValueTask<string> GetLocationCodeAsync(string postalCode)
+    public async Task<(int, string)> GetLocationCodeAsync(string postalCode)
     {
         using var http = new HttpClient();
 
@@ -20,10 +20,10 @@ public class MeteoMaticWeaterService : IWeaterService
 
         if (geo == null)
         {
-            return "";
+            return (404 , "");
         }
 
-        return $"{geo.lat},{geo.lng}";
+        return (200, $"{geo.lat},{geo.lng}");
     }
 
     /// <inheritdoc />

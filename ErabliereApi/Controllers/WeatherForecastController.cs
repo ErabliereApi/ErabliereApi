@@ -13,7 +13,7 @@ namespace ErabliereApi.Controllers;
 [ApiController]
 [Route("Erablieres/{id}/[controller]")]
 [Authorize]
-public class WeatherForecastController
+public class WeatherForecastController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
     private readonly WeatherService _weatherService;
@@ -32,6 +32,7 @@ public class WeatherForecastController
     /// </summary>
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="lang">Paramètre de langue, fr-ca par défaut.</param>
+    /// <param name="token">Token d'annulation</param>
     /// <returns>Prévisions météo</returns>
     /// <response code="200">Prévisions météo</response>
     /// <response code="401">Non autorisé</response>
@@ -41,10 +42,10 @@ public class WeatherForecastController
     [ProducesResponseType(200, Type = typeof(WeatherForecastResponse))]
     [AllowAnonymous]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> GetWeatherForecast(Guid id, string lang = "fr-ca")
+    public async Task<IActionResult> GetWeatherForecast(Guid id, string lang = "fr-ca", CancellationToken token = default)
     {
         // Résoudre l'érablière
-        var erabliere = await _context.Erabliere.FindAsync(id);
+        var erabliere = await _context.Erabliere.FindAsync([id], token);
 
         // Vérifier si l'érablière existe
         if (erabliere == null)
@@ -54,21 +55,27 @@ public class WeatherForecastController
 
         if (string.IsNullOrWhiteSpace(erabliere.CodePostal))
         {
-            return new BadRequestObjectResult("L'érablière n'a pas de code postal");
+            ModelState.AddModelError("id", "L'érablière n'a pas de code postal");
+
+            return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var locationCode = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal);
+        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal);
 
-        if (string.IsNullOrWhiteSpace(locationCode))
+        if (code != 200)
         {
-            return new BadRequestObjectResult("Impossible de trouver le code de localisation");
+            ModelState.AddModelError("id", "Impossible de trouver le code de localisation.");
+
+            return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
         var weatherForecast = await _weatherService.GetWeatherForecastAsync(locationCode, lang);
 
         if (weatherForecast == null)
         {
-            return new BadRequestObjectResult("Impossible de trouver les prévisions météo");
+            ModelState.AddModelError("id", "Impossible de trouver les prévisions météo");
+
+            return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
         return new OkObjectResult(weatherForecast);
@@ -101,21 +108,27 @@ public class WeatherForecastController
 
         if (string.IsNullOrWhiteSpace(erabliere.CodePostal))
         {
-            return new BadRequestObjectResult("L'érablière n'a pas de code postal");
+            ModelState.AddModelError("id", "L'érablière n'a pas de code postal");
+
+            return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var locationCode = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal);
+        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal);
 
-        if (string.IsNullOrWhiteSpace(locationCode))
+        if (code != 200)
         {
-            return new BadRequestObjectResult("Impossible de trouver le code de localisation");
+            ModelState.AddModelError("id", "Impossible de trouver le code de localisation.");
+
+            return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
         var weatherForecast = await _weatherService.GetHoulyForecastAsync(locationCode, lang);
 
         if (weatherForecast == null)
         {
-            return new BadRequestObjectResult("Impossible de trouver les prévisions météo");
+            ModelState.AddModelError("id", "Impossible de trouver les prévisions météo");
+
+            return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
         return new OkObjectResult(weatherForecast);

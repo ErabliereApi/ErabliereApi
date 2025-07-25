@@ -3,6 +3,7 @@ import { Chart, TooltipItem } from 'chart.js';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { WeatherForecast } from 'src/model/weatherForecast';
 import { Erabliere } from "src/model/erabliere";
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'weather-forecast',
@@ -48,7 +49,7 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
             this.weatherData = data;
             this.error = null;
             this.createChart();
-        }).catch((error: any) => {
+        }).catch((error: HttpErrorResponse) => {
             console.error(error);
             this.error = error;
             this.weatherData = undefined;

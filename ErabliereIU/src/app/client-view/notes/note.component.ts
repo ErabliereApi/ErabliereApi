@@ -12,7 +12,7 @@ import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-ser
     imports: [DatePipe]
 })
 
-export class NoteComponent implements OnInit{
+export class NoteComponent implements OnInit {
     @Input() note: Note;
     @Input() noteToModifySubject?: Subject<Note | null>;
     @Output() needToUpdate = new EventEmitter();
@@ -20,6 +20,7 @@ export class NoteComponent implements OnInit{
     private readonly authSvc: IAuthorisationSerivce;
     isAIUser: boolean = false;
     progressionText: string | null = null;
+    displayImageModal: boolean = false;
 
     constructor(private readonly _api: ErabliereApi, private readonly authSvcFactory: AuthorisationFactoryService) {
         this.note = new Note();
@@ -124,6 +125,17 @@ export class NoteComponent implements OnInit{
                     this.needToUpdate.emit();
                 }
             );
+        }
+    }
+
+    displayImageModalFunc() {
+        console.log("displayImageModalFunc called for note", this.note);
+        this.displayImageModal = true;
+    }
+
+    openModalOnKeyUp($event: KeyboardEvent) {
+        if ($event.key === 'Enter') {
+            this.displayImageModalFunc();
         }
     }
 }

@@ -93,7 +93,6 @@ export class RappelsComponent implements OnChanges, OnInit {
 
   modalIsOpen = false;
   openModal(note: Note) {
-    console.log('1. Open modal called');
     this.modalNote = note;
     this.modalIsOpen = true;
   }
@@ -101,5 +100,12 @@ export class RappelsComponent implements OnChanges, OnInit {
   closeModal() {
     this.modalNote = null;
     this.modalIsOpen = false;
+  }
+
+  openModalOnKeyUp($event: KeyboardEvent, _t8: Note) {
+    if ($event.key === 'Enter') {
+      this.openModal(_t8);
+    }
+  }
 }
-}
+
