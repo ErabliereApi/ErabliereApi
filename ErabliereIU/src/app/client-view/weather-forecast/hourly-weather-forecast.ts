@@ -1,5 +1,5 @@
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
@@ -7,6 +7,15 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 @Component({
     selector: 'hourly-weather-forecast',
     template: `
+    @if (displayAccueatherLogo) {
+    <div class="text-center">
+                    <small class="text-muted">
+                        Prévisions 12 heures fournies par <a href="https://www.accuweather.com" target="_blank"><img
+                                src="/assets/weathericons/accuweather/favicon.ico" alt="AccuWeather Logo" width="20"
+                                height="20"> AccuWeather</a>
+                    </small>
+                </div>
+    }
         <table class="table table-striped table-bordered table-hover">
           <thead>
             <tr>
@@ -52,6 +61,7 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
     error?: any;
     interval?: NodeJS.Timeout;
     idErabliere: any;
+    @Input() displayAccueatherLogo: boolean = true;
 
     constructor(private readonly api: ErabliereApi, private readonly route: ActivatedRoute) {
     }
@@ -109,7 +119,7 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
         return '';
     }
 
-    precipitationTypeText(arg0: string|undefined) {
+    precipitationTypeText(arg0: string | undefined) {
         if (arg0 == null) {
             return '';
         }
@@ -128,7 +138,7 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
         }
     }
 
-    precipitationIntensityText(arg0: string|undefined) {
+    precipitationIntensityText(arg0: string | undefined) {
         if (arg0 == null) {
             return '';
         }

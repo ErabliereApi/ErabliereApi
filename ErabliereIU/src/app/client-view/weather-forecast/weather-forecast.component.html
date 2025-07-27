@@ -1,0 +1,27 @@
+<div id="graph-pannel-weather-forecast">
+    <h3 title="{{weatherData?.headline?.link}}">Prévision 5 jours</h3>
+    <small class="text-muted">
+        {{ weatherData?.headline?.text }}
+    </small>
+    @if (error) {
+    <div class="alert alert-danger" role="alert">
+        {{ error.error.errors.id ? error.error.errors.id[0] : error.message }}
+    </div>
+    } @else {
+    <span data-bs-toggle="tooltip" title="{{ weatherData?.headline?.category }}" data-bs-placement="top">{{ text
+        }}</span>
+    <div class="chart-wrapper">
+        <canvas id="weatherChart" class="chart">
+        </canvas>
+    </div>
+    }
+    @if (!erabliere?.afficherPredictionMeteoHeure) {
+    <div class="text-center">
+        <small class="text-muted">
+            Prévisions 5 jours fournies par <a href="https://www.accuweather.com" target="_blank"><img
+                    src="/assets/weathericons/accuweather/favicon.ico" alt="AccuWeather Logo" width="20" height="20">
+                AccuWeather</a>
+        </small>
+    </div>
+    }
+</div>
