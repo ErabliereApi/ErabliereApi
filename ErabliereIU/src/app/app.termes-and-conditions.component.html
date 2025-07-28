@@ -48,7 +48,7 @@
     <p>En utilisant notre application, vous reconnaissez avoir lu et compris ces termes d'utilisation et vous vous
         engagez à les respecter.</p>
     <div class="text-center mb-3">
-        @if (!hasAcceptTerms && isLoggedIn)
+        @if (authEnable && !hasAcceptTerms && isLoggedIn)
         {
         <div class="btn-group me-2">
             <button class="btn btn-info" title="Accepter les conditions" (click)="acceptTerms()">J'accepte les conditions !</button>

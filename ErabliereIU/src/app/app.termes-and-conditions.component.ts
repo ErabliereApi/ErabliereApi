@@ -19,6 +19,7 @@ export class TermeAndConditionComponent implements OnInit {
     readonly authSvc: IAuthorisationSerivce;
     isLoggedIn: boolean = false;
     emailContact: string | null = null;
+    authEnable: boolean = false;
 
     constructor(private readonly api: ErabliereApi, private readonly authSvcFactory: AuthorisationFactoryService, private readonly env: EnvironmentService, private readonly router: Router) {
         this.authSvc = this.authSvcFactory.getAuthorisationService();
@@ -44,6 +45,7 @@ export class TermeAndConditionComponent implements OnInit {
             console.error("Failed to load OpenAPI spec:", error);
             this.emailContact = null; // Fallback if the spec cannot be loaded
         });
+        this.authEnable = this.env.authEnable ?? false;
     }
 
     checkTermsAcceptance(): void {

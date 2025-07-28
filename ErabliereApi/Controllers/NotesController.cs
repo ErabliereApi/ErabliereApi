@@ -397,8 +397,7 @@ public class NotesController : ControllerBase
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPut("PeriodiciteNotes")]
-    [ProducesResponseType(200, Type = typeof(Note))]
-    [ProducesResponseType(204)]
+    [ProducesResponseType(200)]
     [ValiderOwnership("id")]
     public async Task<IActionResult> UpdateRappels(Guid id, CancellationToken token)
     {
@@ -420,11 +419,11 @@ public class NotesController : ControllerBase
                     Periodicite = n.Rappel.Periodicite
                 }
             })
-            .ToListAsync(token);
+            .ToArrayAsync(token);
 
-        if (!notesWithRappel.Any())
+        if (notesWithRappel.Length == 0)
         {
-            return NoContent();
+            return Ok(notesWithRappel);
         }
 
         UpdateNoteWithRappel(notesWithRappel);
@@ -459,7 +458,7 @@ public class NotesController : ControllerBase
         return Ok(rappel);
     }
 
-    private void UpdateNoteWithRappel(List<Note> notesWithRappel)
+    private void UpdateNoteWithRappel(Note[] notesWithRappel)
     {
         foreach (var note in notesWithRappel)
         {
