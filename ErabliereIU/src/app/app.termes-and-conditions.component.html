@@ -57,7 +57,7 @@
             <a class="btn btn-info" href="/">Continuer sans accepter</a>
         </div>
         }
-        @else if (isLoggedIn) {
+        @else if (isLoggedIn && authEnable) {
             <p>Vous avez accepter les termes en date du {{ acceptTermsDate | date: 'yyyy-MM-dd' }}.</p>
         }
     </div>
