@@ -2,7 +2,7 @@
   <h4 class="card-header">{{ note.title }}</h4>
   <div class="card-body">
     <div class="row">
-      <div class="col-md-{{ note.fileExtension ? '5' : '10' }}">
+      <div class="col-md-{{ note.file ? '5' : '10' }}">
         <p class="noteDescription card-text">{{ note.text }}</p>
 
         @if (note.fileExtension === 'csv') {
