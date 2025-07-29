@@ -1,5 +1,6 @@
 ﻿using ErabliereApi.Extensions;
 using ErabliereApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErabliereApi.Controllers;
@@ -69,6 +70,7 @@ public class CheckoutController : ControllerBase
     /// </summary>
     [HttpGet]
     [Route("[action]")]
+    [Authorize]
     public async Task<IActionResult> GetBalance(CancellationToken token)
     {
         if (!_configuration.StripeIsEnabled())

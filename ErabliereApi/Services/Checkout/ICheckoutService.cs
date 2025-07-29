@@ -1,20 +1,20 @@
 ﻿using ErabliereApi.Donnees;
-using Stripe;
+using ErabliereApi.Donnees.Action.Post;
 
 namespace ErabliereApi.Services;
 
 /// <summary>
-/// 
+/// Interface for the checkout service
 /// </summary>
 public interface ICheckoutService
 {
     /// <summary>
-    /// 
+    /// Create a checkout session
     /// </summary>
-    Task<object> CreateSessionAsync(CancellationToken token);
+    Task<PostCheckoutObjResponse> CreateSessionAsync(CancellationToken token);
 
     /// <summary>
-    /// 
+    /// Handle the webhook events from Stripe
     /// </summary>
     Task Webhook(string json);
 

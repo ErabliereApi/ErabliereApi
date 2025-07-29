@@ -5,6 +5,7 @@ using AutoMapper;
 using ErabliereApi.Donnees;
 using ErabliereApi.StripeIntegration;
 using ErabliereApi.Services.Users;
+using ErabliereApi.Donnees.Action.Post;
 
 namespace ErabliereApi.Services;
 
@@ -52,7 +53,7 @@ public class StripeCheckoutService : ICheckoutService
     /// Implémentation de ICheckoutService permettan d'initialiser une session avec Stripe
     /// </summary>
     /// <returns></returns>
-    public async Task<object> CreateSessionAsync(CancellationToken token)
+    public async Task<PostCheckoutObjResponse> CreateSessionAsync(CancellationToken token)
     {
         StripeConfiguration.ApiKey = _options.Value.ApiKey;
 
@@ -74,7 +75,10 @@ public class StripeCheckoutService : ICheckoutService
         var service = new SessionService();
         var session = await service.CreateAsync(options, cancellationToken: token);
 
-        return session;
+        return new PostCheckoutObjResponse
+        {
+            Url = session.Url,
+        };
     }
 
     /// <summary>
