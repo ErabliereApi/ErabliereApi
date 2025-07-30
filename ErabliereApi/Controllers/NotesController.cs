@@ -397,7 +397,7 @@ public class NotesController : ControllerBase
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPut("PeriodiciteNotes")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(200, Type = typeof(Note[]))]
     [ValiderOwnership("id")]
     public async Task<IActionResult> UpdateRappels(Guid id, CancellationToken token)
     {
