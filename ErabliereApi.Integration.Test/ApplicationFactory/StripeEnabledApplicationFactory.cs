@@ -2,6 +2,7 @@
 using AutoMapper;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Services;
 using ErabliereApi.Services.Users;
 using ErabliereApi.Test.Autofixture;
@@ -69,7 +70,10 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
 
                 checkoutService.CreateSessionAsync(Arg.Any<CancellationToken>()).Returns(session =>
                 {
-                    return new Stripe.ReviewSession();
+                    return new PostCheckoutObjResponse
+                    {
+                        Url = "https://example.com/checkout/session",
+                    };
                 });
 
                 checkoutService.Webhook(Arg.Any<string>()).Returns(callInfo =>
