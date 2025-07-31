@@ -495,6 +495,57 @@ namespace ErabliereAPI.Proxy
         System.Threading.Tasks.Task CapteurImagePOSTAsync(System.Guid id, PostCapteurImage? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Get current balance for a customer
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task GetBalanceAsync();
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get current balance for a customer
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task GetBalanceAsync(System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Point de terminaison pour récupérer le profil de l'utilisateur authentifié.
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Customer> MeAsync();
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Point de terminaison pour récupérer le profil de l'utilisateur authentifié.
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Customer> MeAsync(System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Point de terminaison pour vérifier si l'utilisateur a accepté les conditions d'utilisation.
+        /// <br/>Si l'utilisateur n'existe pas, un code 404 est retourné.
+        /// <br/>Si l'utilisateur a accepté les conditions, un code 200 est retourné avec la date d'acceptation.
+        /// <br/>Si l'utilisateur n'a pas accepté les conditions, un code 200 est retourné avec un champ `hasAcceptedTerms` à false.
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<object> HasAcceptedTermsAsync();
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Point de terminaison pour vérifier si l'utilisateur a accepté les conditions d'utilisation.
+        /// <br/>Si l'utilisateur n'existe pas, un code 404 est retourné.
+        /// <br/>Si l'utilisateur a accepté les conditions, un code 200 est retourné avec la date d'acceptation.
+        /// <br/>Si l'utilisateur n'a pas accepté les conditions, un code 200 est retourné avec un champ `hasAcceptedTerms` à false.
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<object> HasAcceptedTermsAsync(System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Permet de lister les utilisateurs en exposant un minimum d'information.
         /// </summary>
         /// <returns>OK</returns>
@@ -905,11 +956,17 @@ namespace ErabliereAPI.Proxy
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Message>> MessagesAsync(System.Guid id, string? select, string? filter, int? top, int? skip, string? expand, string? orderby, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Récupérer une conversation publique
+        /// </summary>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Message>> PublicAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Récupérer une conversation publique
+        /// </summary>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Message>> PublicAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
@@ -1168,27 +1225,25 @@ namespace ErabliereAPI.Proxy
         /// <summary>
         /// Action permettant de mettre à jour l'image d'une note
         /// </summary>
+        /// <param name="id">L'id de l'érablière</param>
         /// <param name="noteId">L'id de la note</param>
-        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
-        /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="fileExtension">L'extension du fichier</param>
         /// <param name="file">Fichier obtenu depuis le multipart</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ImagePUTAsync(System.Guid noteId, System.Guid id, System.Guid? idErabliere, string? fileExtension, FileParameter file);
+        System.Threading.Tasks.Task ImagePUTAsync(System.Guid id, System.Guid noteId, string? fileExtension, FileParameter file);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Action permettant de mettre à jour l'image d'une note
         /// </summary>
+        /// <param name="id">L'id de l'érablière</param>
         /// <param name="noteId">L'id de la note</param>
-        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
-        /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="fileExtension">L'extension du fichier</param>
         /// <param name="file">Fichier obtenu depuis le multipart</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ImagePUTAsync(System.Guid noteId, System.Guid id, System.Guid? idErabliere, string? fileExtension, FileParameter file, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ImagePUTAsync(System.Guid id, System.Guid noteId, string? fileExtension, FileParameter file, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Retourne la liste des rapports sauvegardés
@@ -1325,6 +1380,38 @@ namespace ErabliereAPI.Proxy
         System.Threading.Tasks.Task WebhookAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Point de terminaison pour qu'un utilisateur accepte les conditions d'utilisation.
+        /// <br/>Si l'utilisateur a déjà accepté les conditions, un code 400 est retourné.
+        /// </summary>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task AcceptTermsAsync();
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Point de terminaison pour qu'un utilisateur accepte les conditions d'utilisation.
+        /// <br/>Si l'utilisateur a déjà accepté les conditions, un code 400 est retourné.
+        /// </summary>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task AcceptTermsAsync(System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Permet a un administrateur de consentir aux termes d'utilisation pour un appareil spécifique.
+        /// </summary>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ConsentForDeviceAsync(System.Guid deviceId);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Permet a un administrateur de consentir aux termes d'utilisation pour un appareil spécifique.
+        /// </summary>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task ConsentForDeviceAsync(System.Guid deviceId, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Action permetant de créer plusieurs données capteurs
         /// </summary>
         /// <returns>OK</returns>
@@ -1389,7 +1476,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ImagesAsync(PostImagesGenerationModel? body);
+        System.Threading.Tasks.Task<PostImageGenerationResponse> ImagesAsync(PostImagesGenerationModel? body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -1397,7 +1484,7 @@ namespace ErabliereAPI.Proxy
         /// </summary>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ImagesAsync(PostImagesGenerationModel? body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PostImageGenerationResponse> ImagesAsync(PostImagesGenerationModel? body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Importer des érablières
@@ -1548,8 +1635,6 @@ namespace ErabliereAPI.Proxy
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
-        /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
         /// <param name="file">Fichier obtenu depuis le multipart</param>
@@ -1558,15 +1643,13 @@ namespace ErabliereAPI.Proxy
         /// <param name="noteDate">La date de la note</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? idNote, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate);
+        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Action permettant de créer une note en utilisant Content-Type: multipart/form-data
         /// </summary>
         /// <param name="id">Id de l'érablière</param>
-        /// <param name="idNote">L'id de la note si le client désire l'initialiser</param>
-        /// <param name="idErabliere">L'id de l'érablière</param>
         /// <param name="title">Le titre de la note</param>
         /// <param name="text">Le text de la note</param>
         /// <param name="file">Fichier obtenu depuis le multipart</param>
@@ -1575,7 +1658,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="noteDate">La date de la note</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, System.Guid? idNote, System.Guid? idErabliere, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PostNoteMultipartResponse> MultipartAsync(System.Guid id, string? title, string? text, FileParameter file, string? fileExtension, System.DateTimeOffset? created, System.DateTimeOffset? noteDate, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Effectue le rapport de degré jour pour une érablière
@@ -2114,7 +2197,7 @@ namespace ErabliereAPI.Proxy
         /// <param name="id">L'id de l'érablière</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Note> PeriodiciteNotesAsync(System.Guid id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Note>> PeriodiciteNotesAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -2123,7 +2206,22 @@ namespace ErabliereAPI.Proxy
         /// <param name="id">L'id de l'érablière</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Note> PeriodiciteNotesAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Note>> PeriodiciteNotesAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Action permettant de rappeler la prochaine période pour les notes avec un rappel actif
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Rappel> RappelProchainePeriodeAsync(System.Guid id, System.Guid idNote);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Action permettant de rappeler la prochaine période pour les notes avec un rappel actif
+        /// </summary>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Rappel> RappelProchainePeriodeAsync(System.Guid id, System.Guid idNote, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Supprimer une alerte
@@ -2166,7 +2264,7 @@ namespace ErabliereAPI.Proxy
         /// <summary>
         /// Permet de supprimer une clé d'API.
         /// </summary>
-        /// <returns>OK</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiKeyDELETEAsync(System.Guid id);
 
@@ -2174,7 +2272,7 @@ namespace ErabliereAPI.Proxy
         /// <summary>
         /// Permet de supprimer une clé d'API.
         /// </summary>
-        /// <returns>OK</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiKeyDELETEAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
@@ -2393,6 +2491,9 @@ namespace ErabliereAPI.Proxy
 
         [System.Text.Json.Serialization.JsonPropertyName("subscriptionId")]
         public string? SubscriptionId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastUsage")]
+        public System.DateTimeOffset? LastUsage { get; set; } = default!;
 
     }
 
@@ -2722,6 +2823,14 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("timeZone")]
         [System.ComponentModel.DataAnnotations.StringLength(25)]
         public string? TimeZone { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("language")]
+        [System.ComponentModel.DataAnnotations.StringLength(10)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-z]{2}(-[A-Z]{2})?$")]
+        public string? Language { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("acceptTermsAt")]
+        public System.DateTimeOffset? AcceptTermsAt { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("creationTime")]
         public System.DateTimeOffset? CreationTime { get; set; } = default!;
@@ -3933,8 +4042,29 @@ namespace ErabliereAPI.Proxy
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PostImageGenerationResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("images")]
+        public System.Collections.Generic.ICollection<PostImageGenerationResponseImage>? Images { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PostImageGenerationResponseImage
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string? Url { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class PostImagesGenerationModel
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("deploymentName")]
+        public string? DeploymentName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("imageCount")]
         public int? ImageCount { get; set; } = default!;
@@ -3945,6 +4075,14 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("size")]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^(1024x1024|1792x1024|1024x1792)$")]
         public string? Size { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("quality")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^(Standard|Hd)$")]
+        public string? Quality { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("style")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^(Natural|Vivid)$")]
+        public string? Style { get; set; } = default!;
 
     }
 
