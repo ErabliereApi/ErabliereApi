@@ -149,7 +149,7 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
         {
             return -1;
         }
-        else if (other?.IndiceOrdre.HasValue == true && IndiceOrdre.HasValue == false)
+        else if (other?.IndiceOrdre.HasValue == true && !IndiceOrdre.HasValue)
         {
             return 1;
         }

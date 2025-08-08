@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using ErabliereApi.Donnees.Interfaces;
 
 namespace ErabliereApi.Donnees.Action.Post
 {
     /// <summary>
     /// Modèle d'ajout d'une érablière
     /// </summary>
-    public class PostErabliere
+    public class PostErabliere : ILocalizable
     {
         /// <summary>
         /// La clé primaire de l'érablière. Paramètre optionnel. Si absent
@@ -57,5 +58,11 @@ namespace ErabliereApi.Donnees.Action.Post
         /// Indiquateur permettant une accès en lecture à l'érablière sans authentification
         /// </summary>
         public bool IsPublic { get; set; }
+
+        /// <inheritdoc />
+        public double Latitude { get; set; }
+
+        /// <inheritdoc />
+        public double Longitude { get; set; }
     }
 }

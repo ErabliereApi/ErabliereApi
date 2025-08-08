@@ -1788,6 +1788,33 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Import",
+			"item": [
+				{
+					"name": "Import Erablieres Région Administrative",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  {\r\n    \"nom\": \"Bas-Saint-Laurent\",\r\n    \"indiceOrdre\": 10000,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 48.36384517524865,\r\n    \"longitude\": -68.49591878281669\r\n  },\r\n  {\r\n    \"nom\": \"Capitale-Nationale\",\r\n    \"indiceOrdre\": 10003,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 47.38496339934989,\r\n    \"longitude\": -71.20556190781137\r\n  },\r\n  {\r\n    \"nom\": \"Mauricie\",\r\n    \"indiceOrdre\": 10004,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 47.656906464339954,\r\n    \"longitude\": -73.42317856046826\r\n  },\r\n  {\r\n    \"nom\": \"Estrie\",\r\n    \"indiceOrdre\": 10005,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 45.465261544340066,\r\n    \"longitude\": -71.73525922794931\r\n  },\r\n  {\r\n    \"nom\": \"Outaouais\",\r\n    \"indiceOrdre\": 10007,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 46.39509195843295,\r\n    \"longitude\": -76.58804870447105\r\n  },\r\n  {\r\n    \"nom\": \"Gaspésie Îles-de-la-Madeleine\",\r\n    \"indiceOrdre\": 10011,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 48.688585475401105,\r\n    \"longitude\": -65.54566637637208\r\n  },\r\n  {\r\n    \"nom\": \"Chaudière-Appalaches\",\r\n    \"indiceOrdre\": 10012,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 46.35581133702958,\r\n    \"longitude\": -70.76374995636235\r\n  },\r\n  {\r\n    \"nom\": \"Lanaudière\",\r\n    \"indiceOrdre\": 10014,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 46.46027211444612,\r\n    \"longitude\": -74.00210845020332\r\n  },\r\n  {\r\n    \"nom\": \"Laurentides\",\r\n    \"indiceOrdre\": 10015,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 46.60991985872497,\r\n    \"longitude\": -75.01340031700434\r\n  },\r\n  {\r\n    \"nom\": \"Montérégie\",\r\n    \"indiceOrdre\": 10016,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 45.36942683363112,\r\n    \"longitude\": -73.20176262217262\r\n  },\r\n  {\r\n    \"nom\": \"Centre du Québec\",\r\n    \"indiceOrdre\": 10017,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 46.0352188124743,\r\n    \"longitude\": -72.06344256021812\r\n  },\r\n  {\r\n    \"nom\": \"Autres région productrice\",\r\n    \"indiceOrdre\": 10018,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 0,\r\n    \"longitude\": 0\r\n  },\r\n  {\r\n    \"nom\": \"ErabliereAPI\",\r\n    \"indiceOrdre\": null,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"isPublic\": true,\r\n    \"latitude\": 0,\r\n    \"longitude\": 0\r\n  }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/import",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"import"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
