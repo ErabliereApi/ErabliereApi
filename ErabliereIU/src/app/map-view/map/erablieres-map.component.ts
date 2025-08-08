@@ -4,6 +4,7 @@ import * as mapboxgl from 'mapbox-gl';
 import { FormsModule } from '@angular/forms';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
+import { EnvironmentService } from 'src/environments/environment.service';
 
 @Component({
     selector: 'app-erablieres-map',
@@ -30,13 +31,15 @@ export class ErablieresMapComponent implements OnInit {
 
     private readonly _authService: IAuthorisationSerivce
 
-    constructor(authFactoryService: AuthorisationFactoryService, private readonly _api: ErabliereApi) { 
+    constructor(authFactoryService: AuthorisationFactoryService, private readonly _api: ErabliereApi, private readonly _env: EnvironmentService) { 
         this._authService = authFactoryService.getAuthorisationService();
 
         this._authService.loginChanged.subscribe(isLoggedIn => {
             this.isAuthenticated = isLoggedIn;
             this.myErablieresFilter = isLoggedIn ? 'yes' : 'no';
         });
+
+        this.authEnable = this._env.authEnable ?? false;
     }
 
     map: mapboxgl.Map | undefined;
@@ -50,6 +53,7 @@ export class ErablieresMapComponent implements OnInit {
     error?: string;
 
     isAuthenticated = false;
+    authEnable = true;
 
     ngOnInit(): void {
         this._authService.isLoggedIn().then(isLoggedIn => {

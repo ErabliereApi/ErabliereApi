@@ -11,7 +11,7 @@
                         <option value="no">Non</option>
                     </select>
                 </div>
-                @if (isAuthenticated) {
+                @if (isAuthenticated && authEnable) {
                     <div class="col-md-2">
                         <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
                         <select class="form-select" id="myErablieresFilter" (change)="updateMyFilter($event)" name="myErablieresFilter">
