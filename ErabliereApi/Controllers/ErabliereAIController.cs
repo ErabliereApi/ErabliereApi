@@ -125,7 +125,7 @@ public class ErabliereAIController : ControllerBase
         // if the convesation id is null, create a new conversation
         Conversation? conversation = await GetOrCreateConversation(prompt, defaultSystemPhrase, cancellationToken);
 
-        string aiResponse = "Aucune réponse";
+        string aiResponse;
 
         var _client = new AzureOpenAIClient(
             new Uri(_configuration["AzureOpenAIUri"] ?? ""),
