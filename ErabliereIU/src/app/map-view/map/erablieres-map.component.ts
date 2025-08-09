@@ -58,7 +58,7 @@ export class ErablieresMapComponent implements OnInit {
     ngOnInit(): void {
         this._authService.isLoggedIn().then(isLoggedIn => {
             this.isAuthenticated = isLoggedIn;
-            this.myErablieresFilter = isLoggedIn ? 'yes' : 'no';
+            this.myErablieresFilter = isLoggedIn && this.authEnable ? 'yes' : 'no';
         });
 
         this.reInitMap();
