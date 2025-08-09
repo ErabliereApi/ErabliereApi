@@ -1,20 +1,21 @@
 using Azure;
-using OpenAI;
+using Azure.AI.OpenAI;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Patch;
 using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Extensions;
 using ErabliereApi.Services.Users;
 using ErabliereModel.Action.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
-using System.Text.Json;
+using OpenAI;
 using OpenAI.Chat;
 using OpenAI.Images;
-using ErabliereApi.Extensions;
+using System.Text;
+using System.Text.Json;
 
 namespace ErabliereApi.Controllers;
 
@@ -39,13 +40,9 @@ public class ErabliereAIController : ControllerBase
     {
         _depot = depot;
         _configuration = configuration;
-        _client = new OpenAIClient(
-            //new Uri(_configuration["AzureOpenAIUri"] ?? ""),
-            new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? ""),
-            new OpenAIClientOptions
-            {
-                Endpoint = new Uri(_configuration["AzureOpenAIUri"] ?? ""),
-            }
+        _client = new AzureOpenAIClient(
+            new Uri(_configuration["AzureOpenAIUri"] ?? ""),
+            new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? "")
         );
     }
 
