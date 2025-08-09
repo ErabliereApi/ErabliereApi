@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace ErabliereApi.Donnees.Action.Post;
 
 /// <summary>
@@ -10,7 +8,7 @@ public class PostImageGenerationResponse
     /// <summary>
     /// Liste des images générées
     /// </summary>
-    public List<PostImageGenerationResponseImage> Images { get; set; } = new List<PostImageGenerationResponseImage>();
+    public PostImageGenerationResponseImage[] Images { get; set; } = [];
 }
 
 /// <summary>
