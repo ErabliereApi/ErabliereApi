@@ -7,6 +7,7 @@ describe('Graph pannel test', { testIsolation: false }, () => {
 
     it('Check the base value of "Taux de sucre" pannel', () => {
         homePage.visit()
+                .searchErabliere("Érablière A")
                 .getGraphPannel(tauxSucreId)
                 .find('h3')
                 .should($t => {

@@ -28,4 +28,10 @@ export class HomePage {
     getGraphPannel(guidId: string): GraphPannelCompoenent {
         return new GraphPannelCompoenent('#graph-pannel-' + guidId);
     }
+
+    searchErabliere(name: string): this {
+        cy.get('input[placeholder="Rechercher une erablière"').type(name);
+        cy.wait(100);
+        return this;
+    }
 }
