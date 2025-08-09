@@ -4,12 +4,16 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Patch;
 using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Extensions;
 using ErabliereApi.Services.Users;
 using ErabliereModel.Action.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
+using OpenAI;
+using OpenAI.Chat;
+using OpenAI.Images;
 using System.Text;
 using System.Text.Json;
 
@@ -21,7 +25,7 @@ namespace ErabliereApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Authorize(Roles = "ErabliereAIUser", Policy = "TenantIdPrincipal")]
-public class ErabliereAIController : ControllerBase 
+public class ErabliereAIController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
     private readonly IConfiguration _configuration;
@@ -66,9 +70,9 @@ public class ErabliereAIController : ControllerBase
         var userId = UsersUtils.GetUniqueName(scope, HttpContext.User);
 
 #nullable disable
-        return Ok(_depot.Messages.Where(m => m.ConversationId == id && 
-                                             m.Conversation.UserId == userId));    
-#nullable enable             
+        return Ok(_depot.Messages.Where(m => m.ConversationId == id &&
+                                             m.Conversation.UserId == userId));
+#nullable enable
     }
 
 
@@ -122,13 +126,14 @@ public class ErabliereAIController : ControllerBase
         // if the convesation id is null, create a new conversation
         Conversation? conversation = await GetOrCreateConversation(prompt, defaultSystemPhrase, cancellationToken);
 
-        // Ensuite ont envoie le prompt à l'IA
-        var client = new OpenAIClient(
+        string aiResponse = "Aucune réponse";
+
+        var _client = new AzureOpenAIClient(
             new Uri(_configuration["AzureOpenAIUri"] ?? ""),
             new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? "")
         );
 
-        string aiResponse = "Aucune réponse";
+        var client = _client.GetChatClient(_configuration["AzureOpenAIDeploymentChatModelName"]);
 
         switch (prompt.PromptType)
         {
@@ -139,57 +144,58 @@ public class ErabliereAIController : ControllerBase
                     .OrderBy(m => m.CreatedAt)
                     .ToListAsync(cancellationToken);
 
-                var chatCompletionsOptions = new ChatCompletionsOptions()
+                var chatCompletionsOptions = new ChatCompletionOptions()
                 {
-                    DeploymentName = _configuration["AzureOpenAIDeploymentChatModelName"],
-                    Temperature = (float)0.7,
-                    MaxTokens = 800,
-                    NucleusSamplingFactor = (float)0.95,
+                    //DeploymentName = _configuration["AzureOpenAIDeploymentChatModelName"],
+                    Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
+                    //MaxTokens = 800,
+                    //NucleusSamplingFactor = (float)0.95,
                     FrequencyPenalty = 0,
                     PresencePenalty = 0
                 };
 
-                chatCompletionsOptions.Messages.Add(
-                    new ChatRequestSystemMessage(
+                var messagesPrompt = new List<ChatMessage>();
+
+                messagesPrompt.Add(
+                    new SystemChatMessage(
                         !string.IsNullOrWhiteSpace(conversation?.SystemMessage) ?
                             conversation.SystemMessage :
                             defaultSystemPhrase));
 
                 foreach (var message in messages)
                 {
-                    chatCompletionsOptions.Messages.Add(message.IsUser ?
-                        new ChatRequestUserMessage(message.Content) :
-                        new ChatRequestAssistantMessage(message.Content));
+                    messagesPrompt.Add(message.IsUser ?
+                        new UserChatMessage(message.Content) :
+                        new AssistantChatMessage(message.Content));
                 }
 
-                chatCompletionsOptions.Messages.Add(new ChatRequestUserMessage(prompt.Prompt));
+                messagesPrompt.Add(new UserChatMessage(prompt.Prompt));
 
-                Response<ChatCompletions> responseWithoutStream = await client.GetChatCompletionsAsync(
+                var responseWithoutStream = await client.CompleteChatAsync(
+                    messagesPrompt,
                     chatCompletionsOptions,
                     cancellationToken
                 );
 
-                ChatCompletions responseChat = responseWithoutStream.Value;
-                aiResponse = responseChat?.Choices?.FirstOrDefault()?.Message?.Content ?? "Aucune réponse";
+                var responseChat = responseWithoutStream.Value;
+                aiResponse = responseChat?.Content?.FirstOrDefault()?.Text ?? "Aucune réponse";
                 break;
             default:
-                var completionResponse = await client.GetCompletionsAsync(
-                    new CompletionsOptions
+                var completionResponse = await client.CompleteChatAsync(
+                    [prompt.Prompt],
+                    new ChatCompletionOptions
                     {
-                        DeploymentName = _configuration["AzureOpenAIDeploymentModelName"],
-                        Prompts = { prompt.Prompt },
-                        Temperature = 1,
-                        MaxTokens = 800,
-                        NucleusSamplingFactor = 0.5f,
+                        Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
+                        //MaxTokens = 800,
+                        //NucleusSamplingFactor = (float)0.95,
                         FrequencyPenalty = 0,
-                        PresencePenalty = 0,
-                        GenerationSampleCount = 1,
+                        PresencePenalty = 0
                     },
                     cancellationToken
                 );
                 var completion = completionResponse.Value;
 
-                var localText = completion?.Choices?.FirstOrDefault()?.Text;
+                var localText = completion?.Content?.FirstOrDefault()?.Text ?? "Aucune réponse";
                 if (localText != null)
                 {
                     aiResponse = localText;
@@ -276,7 +282,7 @@ public class ErabliereAIController : ControllerBase
         string textToTranslate = traduction.Text ?? "";
         object[] body = [new { Text = textToTranslate }];
         var requestBody = JsonSerializer.Serialize(body);
- 
+
         using (var client = new HttpClient())
         using (var request = new HttpRequestMessage())
         {
@@ -287,10 +293,10 @@ public class ErabliereAIController : ControllerBase
             request.Headers.Add("Ocp-Apim-Subscription-Key", key);
             // location required if you're using a multi-service or regional (not global) resource.
             request.Headers.Add("Ocp-Apim-Subscription-Region", location);
- 
+
             // Send the request and get response.
             HttpResponseMessage response = await client.SendAsync(request, token).ConfigureAwait(false);
-            
+
             // Read response as a object
             var responseBody = await response.Content.ReadAsStringAsync();
 
@@ -303,45 +309,59 @@ public class ErabliereAIController : ControllerBase
     /// <summary>
     /// Post a image generation request
     /// </summary>
-    /// <param name="model"></param>
+    /// <param name="request"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPost("Images")]
     [ProducesResponseType(200, Type = typeof(PostImageGenerationResponse))]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> Images([FromBody] PostImagesGenerationModel model, CancellationToken token)
+    public async Task<IActionResult> Images([FromBody] PostImagesGenerationModel request, CancellationToken token)
     {
-        var client = new OpenAIClient(
-            new Uri(_configuration["AzureOpenAIUri"] ?? ""),
-            new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? "")
+        var _client = new AzureOpenAIClient(
+            new Uri(_configuration["AzureOpenAIImagesUri"] ?? _configuration["AzureOpenAIUri"] ?? ""),
+            new AzureKeyCredential(_configuration["AzureOpenAIImagesKey"] ?? _configuration["AzureOpenAIKey"] ?? "")
         );
 
-        var images = await client.GetImageGenerationsAsync(new ImageGenerationOptions
+        var client = _client.GetImageClient(_configuration["AzureOpenAIDeploymentImageModelName"] ?? "Dalle3");
+
+        var imagesResult = new List<GeneratedImage>();
+
+        for (int i = 0; i < (request.ImageCount ?? 1); i++)
         {
-            DeploymentName = model.DeploymentName ?? "Dalle3",
-            ImageCount = model.ImageCount ?? 1,
-            Prompt = model.Prompt,
-            Quality = model.Quality == null ? ImageGenerationQuality.Standard : model.Quality switch
+            if (i >= 10)
             {
-                "Standard" => ImageGenerationQuality.Standard,
-                "Hd" => ImageGenerationQuality.Hd,
-                _ => throw new ArgumentException("Invalid quality value")
-            },
-            Size = new ImageSize(model.Size ?? "1024x1024"),
-            Style = model.Style == null ? ImageGenerationStyle.Natural : model.Style switch
-            {
-                "Natural" => ImageGenerationStyle.Natural,
-                "Vivid" => ImageGenerationStyle.Vivid,
-                _ => throw new ArgumentException("Invalid style value")
+                break;
             }
-        }, token);
+
+            var images = await client.GenerateImageAsync(
+                request.Prompt,
+                new ImageGenerationOptions
+                {
+                    Quality = request.Quality == null ? GeneratedImageQuality.Standard : request.Quality switch
+                    {
+                        "Standard" => GeneratedImageQuality.Standard,
+                        "Hd" => GeneratedImageQuality.High,
+                        "High" => GeneratedImageQuality.High,
+                        _ => throw new ArgumentException("Invalid quality value")
+                    },
+                    Size = request.Size?.ToGeneratedImageSize(),
+                    Style = request.Style == null ? GeneratedImageStyle.Natural : request.Style switch
+                    {
+                        "Natural" => GeneratedImageStyle.Natural,
+                        "Vivid" => GeneratedImageStyle.Vivid,
+                        _ => throw new ArgumentException("Invalid style value")
+                    }
+                }, token);
+
+            imagesResult.Add(images.Value);
+        }
 
         return Ok(new PostImageGenerationResponse
         {
-            Images = images.Value.Data.Select(i => new PostImageGenerationResponseImage
+            Images = imagesResult.Select(ir => new PostImageGenerationResponseImage
             {
-                Url = i.Url.ToString()
-            }).ToList()
+                Url = ir.ImageUri.ToString()
+            }).ToArray()
         });
     }
 
