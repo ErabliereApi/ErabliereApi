@@ -29,7 +29,6 @@ public class ErabliereAIController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
     private readonly IConfiguration _configuration;
-    private readonly OpenAIClient _client;
 
     /// <summary>
     /// Constructeur par initialisation
@@ -40,10 +39,6 @@ public class ErabliereAIController : ControllerBase
     {
         _depot = depot;
         _configuration = configuration;
-        _client = new AzureOpenAIClient(
-            new Uri(_configuration["AzureOpenAIUri"] ?? ""),
-            new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? "")
-        );
     }
 
     /// <summary>
@@ -133,6 +128,11 @@ public class ErabliereAIController : ControllerBase
 
         string aiResponse = "Aucune réponse";
 
+        var _client = new AzureOpenAIClient(
+            new Uri(_configuration["AzureOpenAIUri"] ?? ""),
+            new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? "")
+        );
+
         var client = _client.GetChatClient(_configuration["AzureOpenAIDeploymentChatModelName"]);
 
         switch (prompt.PromptType)
@@ -147,7 +147,7 @@ public class ErabliereAIController : ControllerBase
                 var chatCompletionsOptions = new ChatCompletionOptions()
                 {
                     //DeploymentName = _configuration["AzureOpenAIDeploymentChatModelName"],
-                    Temperature = (float)0.7,
+                    Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
                     //MaxTokens = 800,
                     //NucleusSamplingFactor = (float)0.95,
                     FrequencyPenalty = 0,
@@ -185,7 +185,7 @@ public class ErabliereAIController : ControllerBase
                     [prompt.Prompt],
                     new ChatCompletionOptions
                     {
-                        Temperature = (float)0.7,
+                        Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
                         //MaxTokens = 800,
                         //NucleusSamplingFactor = (float)0.95,
                         FrequencyPenalty = 0,
@@ -317,6 +317,11 @@ public class ErabliereAIController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> Images([FromBody] PostImagesGenerationModel request, CancellationToken token)
     {
+        var _client = new AzureOpenAIClient(
+            new Uri(_configuration["AzureOpenAIImagesUri"] ?? _configuration["AzureOpenAIUri"] ?? ""),
+            new AzureKeyCredential(_configuration["AzureOpenAIImagesKey"] ?? _configuration["AzureOpenAIKey"] ?? "")
+        );
+
         var client = _client.GetImageClient(_configuration["AzureOpenAIDeploymentImageModelName"] ?? "Dalle3");
 
         var imagesResult = new List<GeneratedImage>();

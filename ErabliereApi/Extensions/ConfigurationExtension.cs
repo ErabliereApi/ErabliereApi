@@ -57,4 +57,17 @@ public static class ConfigurationExtension
     {
         return string.Equals(config["USEMQTT"]?.Trim(), TrueString, OrdinalIgnoreCase);
     }
+
+    /// <summary>
+    /// Obtient un valeur requise de la configuration
+    /// </summary>
+    public static T GetRequiredValue<T>(this IConfiguration config, string key)
+    {
+        var value = config[key];
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException($"La valeur de la clé '{key}' est requise dans la configuration.");
+        }
+        return (T)Convert.ChangeType(value, typeof(T));
+    }
 }
