@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
-using OpenAI;
 using OpenAI.Chat;
 using OpenAI.Images;
 using System.Text;
@@ -146,10 +145,7 @@ public class ErabliereAIController : ControllerBase
 
                 var chatCompletionsOptions = new ChatCompletionOptions()
                 {
-                    //DeploymentName = _configuration["AzureOpenAIDeploymentChatModelName"],
                     Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
-                    //MaxTokens = 800,
-                    //NucleusSamplingFactor = (float)0.95,
                     FrequencyPenalty = 0,
                     PresencePenalty = 0
                 };
@@ -186,8 +182,6 @@ public class ErabliereAIController : ControllerBase
                     new ChatCompletionOptions
                     {
                         Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
-                        //MaxTokens = 800,
-                        //NucleusSamplingFactor = (float)0.95,
                         FrequencyPenalty = 0,
                         PresencePenalty = 0
                     },
@@ -195,11 +189,7 @@ public class ErabliereAIController : ControllerBase
                 );
                 var completion = completionResponse.Value;
 
-                var localText = completion?.Content?.FirstOrDefault()?.Text ?? "Aucune réponse";
-                if (localText != null)
-                {
-                    aiResponse = localText;
-                }
+                aiResponse = completion?.Content?.FirstOrDefault()?.Text ?? "Aucune réponse";
                 break;
         }
 
