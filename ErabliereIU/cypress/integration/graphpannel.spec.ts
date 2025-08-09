@@ -6,8 +6,10 @@ describe('Graph pannel test', { testIsolation: false }, () => {
     let baseValue = "2.3";
 
     it('Check the base value of "Taux de sucre" pannel', () => {
+        const erabliereName = "Érablière A";
         homePage.visit()
-                .searchErabliere("Érablière A")
+                .searchErabliere(erabliereName)
+                .clickOnErabliere(erabliereName)
                 .getGraphPannel(tauxSucreId)
                 .find('h3')
                 .should($t => {

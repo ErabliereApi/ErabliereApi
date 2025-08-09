@@ -34,4 +34,9 @@ export class HomePage {
         cy.wait(100);
         return this;
     }
+
+    clickOnErabliere(name: string): this {
+        cy.get('a[class="list-group-item"]').contains(name).click();
+        return this;
+    }
 }
