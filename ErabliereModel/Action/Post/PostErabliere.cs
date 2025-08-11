@@ -7,7 +7,7 @@ namespace ErabliereApi.Donnees.Action.Post
     /// <summary>
     /// Modèle d'ajout d'une érablière
     /// </summary>
-    public class PostErabliere : ILocalizable
+    public class PostErabliere : ILocalizable, IAltitude
     {
         /// <summary>
         /// La clé primaire de l'érablière. Paramètre optionnel. Si absent
@@ -21,6 +21,18 @@ namespace ErabliereApi.Donnees.Action.Post
         [MaxLength(100, ErrorMessage = "Le nom de l'érablière ne peut pas dépasser 100 caractères.")]
         [Required(ErrorMessage = "Le nom de l'érablière ne peut pas être vide.")]
         public string? Nom { get; set; }
+
+        /// <summary>
+        /// La description de l'érablière
+        /// </summary>
+        [MaxLength(500, ErrorMessage = "La description de l'érablière ne peut pas dépasser 500 caractères.")]
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// L'adresse de l'érablière
+        /// </summary>
+        [MaxLength(200, ErrorMessage = "L'adresse de l'érablière ne peut pas dépasser 200 caractères.")]
+        public string? Addresse { get; set; }
 
         /// <summary>
         /// Spécifie les ip qui peuvent créer des opérations d'alimentation pour cette érablière.
@@ -64,5 +76,11 @@ namespace ErabliereApi.Donnees.Action.Post
 
         /// <inheritdoc />
         public double Longitude { get; set; }
+
+        /// <inheritdoc />
+        public double? Base { get; set; }
+
+        /// <inheritdoc />
+        public double? Sommet { get; set; }
     }
 }

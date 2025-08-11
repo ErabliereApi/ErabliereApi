@@ -7,7 +7,7 @@ namespace ErabliereApi.Donnees.Action.Put;
 /// <summary>
 /// Modèle de modification d'une erablière
 /// </summary>
-public class PutErabliere
+public class PutErabliere : IAltitude
 {
     /// <summary>
     /// L'id de l'érablière à modifier.
@@ -20,6 +20,18 @@ public class PutErabliere
     /// </summary>
     [MaxLength(100, ErrorMessage = "Le nom de l'érablière ne peut pas dépasser 100 caractères.")]
     public string? Nom { get; set; }
+
+    /// <summary>
+    /// La description de l'érablière
+    /// </summary>
+    [MaxLength(500, ErrorMessage = "La description de l'érablière ne peut pas dépasser 500 caractères.")]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// L'adresse de l'érablière
+    /// </summary>
+    [MaxLength(200, ErrorMessage = "L'adresse de l'érablière ne peut pas dépasser 200 caractères.")]
+    public string? Addresse { get; set; }
 
     /// <summary>
     /// Spécifie les ip qui peuvent créer des opérations d'alimentation pour cette érablière. Doivent être séparé par des ';'
@@ -83,4 +95,10 @@ public class PutErabliere
     /// Latitude
     /// </summary>
     public double? Latitude { get; set; }
+
+    /// <inheritdoc />
+    public double? Base { get; set; }
+
+    /// <inheritdoc />
+    public double? Sommet { get; set; }
 }
