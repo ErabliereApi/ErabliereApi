@@ -4,6 +4,8 @@ import {CustomerAccess} from "./customerAccess";
 export class Erabliere {
     id?: any;
     nom?: string;
+    description?: string;
+    addresse?: string;
     ipRule?: string;
     indiceOrdre?: number;
     codePostal?: string;
@@ -18,6 +20,8 @@ export class Erabliere {
     dimensionPanneauImage?: number;
     longitude?: number;
     latitude?: number;
+    base?: number;
+    sommet?: number;
 
     /* La date de création de l'érablière */
     dc?: string;
