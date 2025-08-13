@@ -7,39 +7,41 @@ namespace Depot.Sql.Migrations
     /// <inheritdoc />
     public partial class BonifierEntiteErabliere : Migration
     {
+        const string tableName = "Erabliere";
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
                 name: "Addresse",
-                table: "Erabliere",
+                table: tableName,
                 type: "nvarchar(200)",
                 maxLength: 200,
                 nullable: true);
 
             migrationBuilder.AddColumn<double>(
                 name: "Base",
-                table: "Erabliere",
+                table: tableName,
                 type: "float",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "Description",
-                table: "Erabliere",
+                table: tableName,
                 type: "nvarchar(500)",
                 maxLength: 500,
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "RegionAdministrative",
-                table: "Erabliere",
+                table: tableName,
                 type: "nvarchar(100)",
                 maxLength: 100,
                 nullable: true);
 
             migrationBuilder.AddColumn<double>(
                 name: "Sommet",
-                table: "Erabliere",
+                table: tableName,
                 type: "float",
                 nullable: true);
         }
@@ -49,23 +51,23 @@ namespace Depot.Sql.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "Addresse",
-                table: "Erabliere");
+                table: tableName);
 
             migrationBuilder.DropColumn(
                 name: "Base",
-                table: "Erabliere");
+                table: tableName);
 
             migrationBuilder.DropColumn(
                 name: "Description",
-                table: "Erabliere");
+                table: tableName);
 
             migrationBuilder.DropColumn(
                 name: "RegionAdministrative",
-                table: "Erabliere");
+                table: tableName);
 
             migrationBuilder.DropColumn(
                 name: "Sommet",
-                table: "Erabliere");
+                table: tableName);
         }
     }
 }

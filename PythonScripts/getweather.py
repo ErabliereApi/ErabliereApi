@@ -1,4 +1,5 @@
 from proxy.erabliere_api_proxy import ErabliereApiProxy
+from utils.redacted import redacted
 import requests
 import os
 import sys
@@ -15,7 +16,7 @@ if os.path.isfile(apiKeyFilePath):
 
 url = "http://dataservice.accuweather.com/currentconditions/v1/" + locationKey + "?apikey=" + apiKey + "&language=fr"
 
-print("Requesting " + url)
+print("Requesting " + redacted(url, [apiKey]))
 response = requests.get(url)
 
 # Print information and body of the response
