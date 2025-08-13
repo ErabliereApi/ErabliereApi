@@ -36,8 +36,6 @@ response = proxy.envoyer_donnee_capteur_v2(idCapteur, int(data[0]["Temperature"]
 
 # Print the response
 print(response.status_code)
-print(response.headers)
-print(response.text)
 
 # If the program failed, return an error code
 if response.status_code != 200:
