@@ -7,7 +7,7 @@ namespace ErabliereApi.Donnees.Interfaces;
 /// </summary>
 /// <typeparam name="Tid"></typeparam>
 /// <typeparam name="Tcomp"></typeparam>
-public interface IIdentifiable<Tid, Tcomp> : IComparable<Tcomp>
+public interface IIdentifiable<Tid, in Tcomp> : IComparable<Tcomp>
 {
     /// <summary>
     /// Identifiant unique

@@ -4,14 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 
 namespace ErabliereApi.Donnees;
 
 /// <summary>
 /// Modèle représentant une érablière
 /// </summary>
-public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocalizable, IDatesInfo, IIsPublic
+public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocalizable, IDatesInfo, IIsPublic, IAltitude
 {
     /// <summary>
     /// L'id de l'érablière
@@ -24,6 +23,24 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
     [Required(ErrorMessage = "Le nom de l'érablière est requis.")]
     [MaxLength(100, ErrorMessage = "Le nom de l'érablière ne peut pas dépasser 100 caractères.")]
     public string? Nom { get; set; }
+
+    /// <summary>
+    /// La description de l'érablière
+    /// </summary>
+    [MaxLength(500, ErrorMessage = "La description de l'érablière ne peut pas dépasser 500 caractères.")]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// L'adresse de l'érablière
+    /// </summary>
+    [MaxLength(200, ErrorMessage = "L'adresse de l'érablière ne peut pas dépasser 200 caractères.")]
+    public string? Addresse { get; set; }
+
+    /// <summary>
+    /// La région administrative de l'érablière
+    /// </summary>
+    [MaxLength(100, ErrorMessage = "La région administrative de l'érablière ne peut pas dépasser 100 caractères.")]
+    public string? RegionAdministrative { get; set; }
 
     /// <summary>
     /// Addresse IP alloué à faire des opération d'écriture
@@ -141,6 +158,12 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
 
     /// <inheritdoc />
     public DateTimeOffset? DC { get; set; }
+
+    /// <inheritdoc />
+    public double? Base { get; set; }
+
+    /// <inheritdoc />
+    public double? Sommet { get; set; }
 
     /// <inheritdoc />
     public int CompareTo([AllowNull] Erabliere other)

@@ -502,6 +502,16 @@ public class ErablieresController : ControllerBase
             entity.Nom = erabliere.Nom;
         }
 
+        if (!string.IsNullOrWhiteSpace(erabliere.Description))
+        {
+            entity.Description = erabliere.Description;
+        }
+
+        if (!string.IsNullOrWhiteSpace(erabliere.Addresse))
+        {
+            entity.Addresse = erabliere.Addresse;
+        }
+
         if (!string.IsNullOrWhiteSpace(erabliere.IpRule))
         {
             entity.IpRule = erabliere.IpRule;
@@ -552,6 +562,11 @@ public class ErablieresController : ControllerBase
             entity.DimensionPanneauImage = (byte)erabliere.DimensionPanneauImage;
         }
 
+        MapEntityLongLatAndAltitude(erabliere, entity);
+    }
+
+    private static void MapEntityLongLatAndAltitude(PutErabliere erabliere, Erabliere entity)
+    {
         if (erabliere.Longitude.HasValue)
         {
             entity.Longitude = erabliere.Longitude.Value;
@@ -560,6 +575,16 @@ public class ErablieresController : ControllerBase
         if (erabliere.Latitude.HasValue)
         {
             entity.Latitude = erabliere.Latitude.Value;
+        }
+
+        if (erabliere.Base.HasValue)
+        {
+            entity.Base = erabliere.Base.Value;
+        }
+
+        if (erabliere.Sommet.HasValue)
+        {
+            entity.Sommet = erabliere.Sommet.Value;
         }
     }
 

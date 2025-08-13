@@ -5,82 +5,118 @@
     <div class="form-group">
         <label class="form-label" for="nom">Nom de l'érablière</label>
         <input type="text" class="form-control" id="nom" name="nom" placeholder="Nom de l'erablière"
-               [(ngModel)]="erabliere.nom">
+            [(ngModel)]="erabliere.nom">
         <input-error [errorObj]="errorObj" [controlName]="'nom'"></input-error>
     </div>
-    <div [hidden]="!plusdOptions">
+    <div class="form-group">
+        <label class="form-label" for="codePostal">Code Postal</label>
+        <input type="text" class="form-control" id="codePostal" name="codePostal" rows="3" placeholder="Code Postal"
+            [(ngModel)]="erabliere.codePostal">
+        <span class="form-text">Le code postal permet d'activer la fonction des prévisions météo dans le tableau de
+            bord.</span>
+        <input-error [errorObj]="errorObj" [controlName]="'codePostal'"></input-error>
+    </div>
+    <div [hidden]="!plusdOptions" class="row">
         <div class="form-group">
-            <label class="form-label" for="codePostal">Code Postal</label>
-            <input type="text" class="form-control" id="codePostal" name="codePostal" rows="3" placeholder="Code Postal"
-                   [(ngModel)]="erabliere.codePostal">
-            <input-error [errorObj]="errorObj" [controlName]="'codePostal'"></input-error>
+            <label class="form-label" for="description">Description</label>
+            <input type="text" class="form-control" id="description" name="description" rows="3"
+                placeholder="Description" [(ngModel)]="erabliere.description">
+            <input-error [errorObj]="errorObj" [controlName]="'description'"></input-error>
         </div>
         <div class="form-group">
+            <label class="form-label" for="addresse">Adresse</label>
+            <input type="text" class="form-control" id="addresse" name="addresse" rows="3" placeholder="Adresse"
+                [(ngModel)]="erabliere.addresse">
+            <input-error [errorObj]="errorObj" [controlName]="'addresse'"></input-error>
+        </div>
+        <hr />
+        <h4>Topographie</h4>
+        <div class="col-md-6 form-group">
             <label class="form-label" for="longitude">Longitude</label>
             <input type="text" class="form-control" id="longitude" name="longitude" rows="3" placeholder="Longitude"
-                   [(ngModel)]="erabliere.longitude">
+                [(ngModel)]="erabliere.longitude">
             <input-error [errorObj]="errorObj" [controlName]="'longitude'"></input-error>
         </div>
-        <div class="form-group">
+        <div class="col-md-6 form-group">
             <label class="form-label" for="latitude">Latitude</label>
             <input type="text" class="form-control" id="latitude" name="latitude" rows="3" placeholder="Latitude"
-                   [(ngModel)]="erabliere.latitude">
+                [(ngModel)]="erabliere.latitude">
             <input-error [errorObj]="errorObj" [controlName]="'latitude'"></input-error>
         </div>
-        <div class="form-group">
-            <label class="form-label" for="ipRule">Règle IP</label>
-            <input type="text" class="form-control" id="ipRule" name="ipRule" rows="3" placeholder="Règle IP"
-                   [(ngModel)]="erabliere.ipRule">
-            <input-error [errorObj]="errorObj" [controlName]="'ipRule'"></input-error>
+        <div class="col-md-6 form-group">
+            <label class="form-label" for="base">Base</label>
+            <input type="text" class="form-control" id="base" name="base" rows="3" placeholder="Base"
+                [(ngModel)]="erabliere.base">
+            <input-error [errorObj]="errorObj" [controlName]="'base'"></input-error>
         </div>
-        <div class="form-group">
+        <div class="col-md-6 form-group">
+            <label class="form-label" for="sommet">Sommet</label>
+            <input type="text" class="form-control" id="sommet" name="sommet" rows="3" placeholder="Sommet"
+                [(ngModel)]="erabliere.sommet">
+            <input-error [errorObj]="errorObj" [controlName]="'sommet'"></input-error>
+        </div>
+        <hr />
+        <h4>Option d'affichage</h4>
+        <div class="form-group col-md-6">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoJour"
+                    name="afficherPredictionMeteoJour" [(ngModel)]="erabliere.afficherPredictionMeteoJour">
+                <label for="afficherPredictionMeteoJour" class="form-check-label">Afficher des prédictions météos par
+                    jour</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoHeure"
+                    name="afficherPredictionMeteoHeure" [(ngModel)]="erabliere.afficherPredictionMeteoHeure">
+                <label for="afficherPredictionMeteoHeure" class="form-check-label">Afficher des prédictions météos par
+                    heure</label>
+            </div>
+            <div class="form-check">
+                <input class="form-label" type="checkbox" class="form-check-input" id="afficherSectionBaril"
+                    name="afficherSectionBaril" [(ngModel)]="erabliere.afficherSectionBaril">
+                <label for="afficherSectionBaril" class="form-check-label">Afficher section barils</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherTrioDonnees" name="afficherTrioDonnees"
+                    [(ngModel)]="erabliere.afficherTrioDonnees">
+                <label for="afficherTrioDonnees" class="form-check-label">Afficher trio données</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherSectionDompeux"
+                    name="afficherSectionDompeux" [(ngModel)]="erabliere.afficherSectionDompeux">
+                <label for="afficherSectionDompeux" class="form-check-label">Afficher section dompeux</label>
+            </div>
+        </div>
+        <div class="col-md-6 form-group">
             <label class="form-label" for="indiceOrdre">Numéro ordre</label>
             <input type="text" class="form-control" id="indiceOrdre" name="indiceOrdre" placeholder="0"
-            [(ngModel)]="erabliere.indiceOrdre">
+                [(ngModel)]="erabliere.indiceOrdre">
             <input-error [errorObj]="errorObj" [controlName]="'indiceOrdre'"></input-error>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoJour" name="afficherPredictionMeteoJour"
-            [(ngModel)]="erabliere.afficherPredictionMeteoJour">
-            <label for="afficherPredictionMeteoJour" class="form-check-label">Afficher des prédictions météos par jour</label>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoHeure" name="afficherPredictionMeteoHeure"
-            [(ngModel)]="erabliere.afficherPredictionMeteoHeure">
-            <label for="afficherPredictionMeteoHeure" class="form-check-label">Afficher des prédictions météos par heure</label>
-        </div>
-        <div class="form-check">
-            <input class="form-label" type="checkbox" class="form-check-input" id="afficherSectionBaril" name="afficherSectionBaril"
-            [(ngModel)]="erabliere.afficherSectionBaril">
-            <label for="afficherSectionBaril" class="form-check-label">Afficher section barils</label>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherTrioDonnees" name="afficherTrioDonnees"
-            [(ngModel)]="erabliere.afficherTrioDonnees">
-            <label for="afficherTrioDonnees" class="form-check-label">Afficher trio données</label>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherSectionDompeux" name="afficherSectionDompeux"
-            [(ngModel)]="erabliere.afficherSectionDompeux">
-            <label for="afficherSectionDompeux" class="form-check-label">Afficher section dompeux</label>
-        </div>
-        <div class="form-group">
+
             <label class="form-label" for="codePostal">Dimension panneau image</label>
             <input type="number" class="form-control" id="dimensionPanneauImage" name="dimensionPanneauImage" rows="3"
-                   [(ngModel)]="erabliere.dimensionPanneauImage">
+                [(ngModel)]="erabliere.dimensionPanneauImage">
             <input-error [errorObj]="errorObj" [controlName]="'dimensionPanneauImage'"></input-error>
         </div>
         <hr />
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="indiquateurIsPublic" name="indiquateurIsPublic"
-            [(ngModel)]="erabliere.isPublic">
-            <label for="indiquateurIsPublic" class="form-check-label">Érablière publique</label>
+        <h4>Visibilité</h4>
+        <div class="form-group col-md-6">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="indiquateurIsPublic" name="indiquateurIsPublic"
+                    [(ngModel)]="erabliere.isPublic">
+                <label for="indiquateurIsPublic" class="form-check-label">Érablière publique</label>
+            </div>
+            <span class="text-muted">Rendre l'érablière accessible à tous</span>
+        </div>
+        <div class="col-md-6 form-group">
+            <label class="form-label" for="ipRule">Règle IP</label>
+            <input type="text" class="form-control" id="ipRule" name="ipRule" rows="3" placeholder="Règle IP"
+                [(ngModel)]="erabliere.ipRule">
+            <input-error [errorObj]="errorObj" [controlName]="'ipRule'"></input-error>
         </div>
     </div>
     <div class="form-group">
-        <button type="button"
-                class="btn btn-sm mt-3"
-                [ngClass]="plusdOptions ? 'btn-sm btn-secondary' : 'btn-sm btn-success'"
-                (click)="afficherPlusOptions()">{{ plusOptionsButtonText }}</button>
+        <button type="button" class="btn btn-sm mt-3"
+            [ngClass]="plusdOptions ? 'btn-sm btn-secondary' : 'btn-sm btn-success'" (click)="afficherPlusOptions()">{{
+            plusOptionsButtonText }}</button>
     </div>
 </form>
