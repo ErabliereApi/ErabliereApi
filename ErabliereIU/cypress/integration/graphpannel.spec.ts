@@ -9,7 +9,7 @@ describe('Graph pannel test', { testIsolation: false }, () => {
         const erabliereName = "Érablière A";
         homePage.visit()
                 .searchErabliere(erabliereName)
-                .clickOnErabliere(erabliereName)
+                .clickOnLink(erabliereName)
                 .getGraphPannel(tauxSucreId)
                 .find('h3')
                 .should($t => {

@@ -35,8 +35,8 @@ export class HomePage {
         return this;
     }
 
-    clickOnErabliere(name: string): this {
-        cy.get('a[class="list-group-item"]').contains(name).click();
+    clickOnLink(name: string): this {
+        cy.get('a').contains(name).click();
         return this;
     }
 }
