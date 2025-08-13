@@ -29,6 +29,8 @@
                 [(ngModel)]="erabliere.addresse">
             <input-error [errorObj]="errorObj" [controlName]="'addresse'"></input-error>
         </div>
+        <hr />
+        <h4>Topographie</h4>
         <div class="col-md-6 form-group">
             <label class="form-label" for="longitude">Longitude</label>
             <input type="text" class="form-control" id="longitude" name="longitude" rows="3" placeholder="Longitude"
@@ -53,50 +55,57 @@
                 [(ngModel)]="erabliere.sommet">
             <input-error [errorObj]="errorObj" [controlName]="'sommet'"></input-error>
         </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoJour"
-                name="afficherPredictionMeteoJour" [(ngModel)]="erabliere.afficherPredictionMeteoJour">
-            <label for="afficherPredictionMeteoJour" class="form-check-label">Afficher des prédictions météos par
-                jour</label>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoHeure"
-                name="afficherPredictionMeteoHeure" [(ngModel)]="erabliere.afficherPredictionMeteoHeure">
-            <label for="afficherPredictionMeteoHeure" class="form-check-label">Afficher des prédictions météos par
-                heure</label>
-        </div>
-        <div class="form-check">
-            <input class="form-label" type="checkbox" class="form-check-input" id="afficherSectionBaril"
-                name="afficherSectionBaril" [(ngModel)]="erabliere.afficherSectionBaril">
-            <label for="afficherSectionBaril" class="form-check-label">Afficher section barils</label>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherTrioDonnees" name="afficherTrioDonnees"
-                [(ngModel)]="erabliere.afficherTrioDonnees">
-            <label for="afficherTrioDonnees" class="form-check-label">Afficher trio données</label>
-        </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="afficherSectionDompeux" name="afficherSectionDompeux"
-                [(ngModel)]="erabliere.afficherSectionDompeux">
-            <label for="afficherSectionDompeux" class="form-check-label">Afficher section dompeux</label>
+        <hr />
+        <h4>Option d'affichage</h4>
+        <div class="form-group col-md-6">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoJour"
+                    name="afficherPredictionMeteoJour" [(ngModel)]="erabliere.afficherPredictionMeteoJour">
+                <label for="afficherPredictionMeteoJour" class="form-check-label">Afficher des prédictions météos par
+                    jour</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherPredictionMeteoHeure"
+                    name="afficherPredictionMeteoHeure" [(ngModel)]="erabliere.afficherPredictionMeteoHeure">
+                <label for="afficherPredictionMeteoHeure" class="form-check-label">Afficher des prédictions météos par
+                    heure</label>
+            </div>
+            <div class="form-check">
+                <input class="form-label" type="checkbox" class="form-check-input" id="afficherSectionBaril"
+                    name="afficherSectionBaril" [(ngModel)]="erabliere.afficherSectionBaril">
+                <label for="afficherSectionBaril" class="form-check-label">Afficher section barils</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherTrioDonnees" name="afficherTrioDonnees"
+                    [(ngModel)]="erabliere.afficherTrioDonnees">
+                <label for="afficherTrioDonnees" class="form-check-label">Afficher trio données</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="afficherSectionDompeux"
+                    name="afficherSectionDompeux" [(ngModel)]="erabliere.afficherSectionDompeux">
+                <label for="afficherSectionDompeux" class="form-check-label">Afficher section dompeux</label>
+            </div>
         </div>
         <div class="col-md-6 form-group">
             <label class="form-label" for="indiceOrdre">Numéro ordre</label>
             <input type="text" class="form-control" id="indiceOrdre" name="indiceOrdre" placeholder="0"
                 [(ngModel)]="erabliere.indiceOrdre">
             <input-error [errorObj]="errorObj" [controlName]="'indiceOrdre'"></input-error>
-        </div>
-        <div class="col-md-6 form-group">
+
             <label class="form-label" for="codePostal">Dimension panneau image</label>
             <input type="number" class="form-control" id="dimensionPanneauImage" name="dimensionPanneauImage" rows="3"
                 [(ngModel)]="erabliere.dimensionPanneauImage">
             <input-error [errorObj]="errorObj" [controlName]="'dimensionPanneauImage'"></input-error>
         </div>
         <hr />
-        <div class="col-md-6 form-check">
-            <input type="checkbox" class="form-check-input" id="indiquateurIsPublic" name="indiquateurIsPublic"
-                [(ngModel)]="erabliere.isPublic">
-            <label for="indiquateurIsPublic" class="form-check-label">Érablière publique</label>
+        <h4>Visibilité</h4>
+        <div class="form-group col-md-6">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="indiquateurIsPublic" name="indiquateurIsPublic"
+                    [(ngModel)]="erabliere.isPublic">
+                <label for="indiquateurIsPublic" class="form-check-label">Érablière publique</label>
+            </div>
+            <span class="text-muted">Rendre l'érablière accessible à tous</span>
         </div>
         <div class="col-md-6 form-group">
             <label class="form-label" for="ipRule">Règle IP</label>
