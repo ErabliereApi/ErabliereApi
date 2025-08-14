@@ -35,6 +35,12 @@ namespace ErabliereApi.Donnees.Action.Post
         public string? Addresse { get; set; }
 
         /// <summary>
+        /// La région administrative de l'érablière
+        /// </summary>
+        [MaxLength(100, ErrorMessage = "La région administrative de l'érablière ne peut pas dépasser 100 caractères.")]
+        public string? RegionAdministrative { get; set; }
+
+        /// <summary>
         /// Spécifie les ip qui peuvent créer des opérations d'alimentation pour cette érablière.
         /// </summary>
         [MaxLength(50, ErrorMessage = "L'adresse IP ne peut pas dépasser 50 caractères.")]

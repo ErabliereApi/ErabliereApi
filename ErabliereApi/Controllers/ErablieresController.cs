@@ -512,6 +512,11 @@ public class ErablieresController : ControllerBase
             entity.Addresse = erabliere.Addresse;
         }
 
+        if (!string.IsNullOrWhiteSpace(erabliere.RegionAdministrative))
+        {
+            entity.RegionAdministrative = erabliere.RegionAdministrative;
+        }
+
         if (!string.IsNullOrWhiteSpace(erabliere.IpRule))
         {
             entity.IpRule = erabliere.IpRule;

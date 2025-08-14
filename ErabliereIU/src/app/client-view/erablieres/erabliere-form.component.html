@@ -29,6 +29,12 @@
                 [(ngModel)]="erabliere.addresse">
             <input-error [errorObj]="errorObj" [controlName]="'addresse'"></input-error>
         </div>
+        <div class="form-group">
+            <label class="form-label" for="regionAdministrative">Région Administrative</label>
+            <input type="text" class="form-control" id="regionAdministrative" name="regionAdministrative" rows="3" placeholder="Région Administrative"
+                [(ngModel)]="erabliere.regionAdministrative">
+            <input-error [errorObj]="errorObj" [controlName]="'regionAdministrative'"></input-error>
+        </div>
         <hr />
         <h4>Topographie</h4>
         <div class="col-md-6 form-group">

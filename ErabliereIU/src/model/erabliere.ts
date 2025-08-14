@@ -6,6 +6,7 @@ export class Erabliere {
     nom?: string;
     description?: string;
     addresse?: string;
+    regionAdministrative?: string;
     ipRule?: string;
     indiceOrdre?: number;
     codePostal?: string;
