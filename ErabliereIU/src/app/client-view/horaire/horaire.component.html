@@ -1,25 +1,26 @@
-<!-- Suggestion for HoraireComponent HTML -->
-<form>
-  <div>
-    <einput [arialabel]="'Lundi:'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'lundi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
+<form (ngSubmit)="onSubmit()" class="row">
+  <div class="form-group col-md-2">
+    <einput [arialabel]="'Lundi'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'lundi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <div>
-    <einput [arialabel]="'Mardi:'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'mardi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
+  <div class="form-group col-md-2">
+    <einput [arialabel]="'Mardi'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'mardi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <div>
-    <einput [arialabel]="'Mercredi:'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'mercredi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
+  <div class="form-group col-md-2">
+    <einput [arialabel]="'Mercredi'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'mercredi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <div>
-    <einput [arialabel]="'Jeudi:'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'jeudi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
+  <div class="form-group col-md-2">
+    <einput [arialabel]="'Jeudi'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'jeudi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <div>
-    <einput [arialabel]="'Vendredi:'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'vendredi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
+  <div class="form-group col-md-2">
+    <einput [arialabel]="'Vendredi'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'vendredi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <div>
-    <einput [arialabel]="'Samedi:'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'samedi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
+  <div class="form-group col-md-2">
+    <einput [arialabel]="'Samedi'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'samedi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <div>
-    <einput [arialabel]="'Dimanche:'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'dimanche'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
+  <div class="form-group col-md-2">
+    <einput [arialabel]="'Dimanche'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'dimanche'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <button type="submit">Enregistrer</button>
+  <div class="btn-group">
+    <button class="btn btn-primary" type="submit">Enregistrer</button>
+  </div>
 </form>
