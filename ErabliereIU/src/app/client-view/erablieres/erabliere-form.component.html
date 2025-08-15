@@ -119,6 +119,9 @@
                 [(ngModel)]="erabliere.ipRule">
             <input-error [errorObj]="errorObj" [controlName]="'ipRule'"></input-error>
         </div>
+        <hr />
+        <h4>Horaire</h4>
+        <horaire [horaire]="erabliere.horaire != null && erabliere.horaire.length > 0 ? erabliere.horaire[0] : undefined"></horaire>
     </div>
     <div class="form-group">
         <button type="button" class="btn btn-sm mt-3"

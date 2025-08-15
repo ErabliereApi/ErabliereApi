@@ -1,5 +1,6 @@
 import { Capteur } from "./capteur";
 import {CustomerAccess} from "./customerAccess";
+import { Horaire } from "./horaire";
 
 export class Erabliere {
     id?: any;
@@ -23,6 +24,7 @@ export class Erabliere {
     latitude?: number;
     base?: number;
     sommet?: number;
+    horaire?: Array<Horaire>;
 
     /* La date de création de l'érablière */
     dc?: string;
