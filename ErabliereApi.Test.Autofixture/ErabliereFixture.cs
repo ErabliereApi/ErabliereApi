@@ -19,6 +19,9 @@ public static class ErabliereFixture
 {
     public static readonly Random random = new();
 
+    public static readonly DateTime MinDate = new(new DateOnly(2023, 1, 1), new TimeOnly(0, 0), DateTimeKind.Utc);
+    public static readonly DateTime MaxDate = new(new DateOnly(2023, 12, 31), new TimeOnly(23, 59, 59), DateTimeKind.Utc);
+
     /// <summary>
     /// Create and instance of <see cref="IFixture"/> with ErabliereAPI configuration.
     /// </summary>
@@ -29,14 +32,15 @@ public static class ErabliereFixture
         var fixture = new Fixture();
 
         fixture.Customize<ActionDescriptor>(c => c.OmitAutoProperties());
-        fixture.Customize<ControllerContext>(c => {
+        fixture.Customize<ControllerContext>(c =>
+        {
             return c.OmitAutoProperties().With(c => c.HttpContext, new DefaultHttpContext());
         });
         fixture.Customize(new AutoNSubstituteCustomization());
 
         fixture.Customize<PostErabliere>(c => c.With(e => e.IpRules, () => fixture.CreateRandomIPAddress().ToString())
                                                .With(e => e.IsPublic, () => true));
-        
+
         fixture.Customize<Erabliere>(c => c.With(e => e.IpRule, () => fixture.CreateRandomIPAddress().ToString())
                                            .Without(e => e.Donnees)
                                            .Without(e => e.Dompeux)
@@ -47,9 +51,10 @@ public static class ErabliereFixture
                                            .Without(e => e.Rapports)
                                            .Without(e => e.Capteurs)
                                            .Without(e => e.Inspections)
-                                           .Without(e => e.CustomerErablieres));
+                                           .Without(e => e.CustomerErablieres)
+                                           .Without(e => e.Horaires));
 
-        fixture.Customize<Donnee>(c => c.With(d => d.D, RandomDate(from: new DateTime(2023, 1, 1), to: new DateTime(2023, 12, 31)))
+        fixture.Customize<Donnee>(c => c.With(d => d.D, RandomDate(from: MinDate, to: MaxDate))
                                         .Without(d => d.Erabliere)
                                         .Without(d => d.IdErabliere));
 
@@ -58,8 +63,8 @@ public static class ErabliereFixture
                                          .Without(cc => cc.Appareil)
                                          .Without(cc => cc.CapteurStyle));
 
-        fixture.Customize<DonneeCapteur>(c => c.With(cc => cc.D, RandomDate(from: new DateTime(2023, 1, 1), to: new DateTime(2023, 12, 31)))
-                                               .Without(cc => cc.Capteur)             
+        fixture.Customize<DonneeCapteur>(c => c.With(cc => cc.D, RandomDate(from: MinDate, to: MaxDate))
+                                               .Without(cc => cc.Capteur)
                                                .Without(cc => cc.IdCapteur));
 
         fixture.Customize<CapteurImage>(ci => ci.Without(cc => cc.Erabliere));
@@ -75,7 +80,7 @@ public static class ErabliereFixture
             c.With(c => c.Email, RandomEmail)
              .Without(c => c.ApiKeys)
              .Without(c => c.CustomerErablieres));
-        
+
         if (!modelOnly)
         {
             var builder = GetServicesProvider();
