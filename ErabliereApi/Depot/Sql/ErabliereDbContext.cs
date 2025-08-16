@@ -120,6 +120,11 @@ namespace ErabliereApi.Depot.Sql
         /// Table des données de rapports
         /// </summary>
         public DbSet<RapportDonnees> DonneesRapports { get; private set; }
+
+        /// <summary>
+        /// Table des horaires
+        /// </summary>
+        public DbSet<Horaire> Horaires { get; private set; }
 #pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />

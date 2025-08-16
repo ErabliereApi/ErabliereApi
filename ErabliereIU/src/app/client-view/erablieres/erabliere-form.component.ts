@@ -5,16 +5,18 @@ import { Erabliere } from 'src/model/erabliere';
 import { NgClass } from '@angular/common';
 import { InputErrorComponent } from 'src/generic/input-error.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HoraireComponent } from "../horaire/horaire.component";
 
 @Component({
     selector: 'erabliere-form',
     templateUrl: './erabliere-form.component.html',
     imports: [
-        ReactiveFormsModule,
-        FormsModule,
-        InputErrorComponent,
-        NgClass,
-    ],
+    ReactiveFormsModule,
+    FormsModule,
+    InputErrorComponent,
+    NgClass,
+    HoraireComponent
+],
     styles: [
         `
             .form-group {
