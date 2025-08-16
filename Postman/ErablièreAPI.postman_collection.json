@@ -1850,6 +1850,396 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Mont Tremblant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('idErabliere', json[0].id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/erablieres?$filter=nom eq 'Mont Tremblant'",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres"
+							],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "nom eq 'Mont Tremblant'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Capteur nombre de piste 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('idCapteur', json.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nom\": \"Nombre de pistes\",\r\n  \"afficherCapteurDashboard\": true,\r\n  \"ajouterDonneeDepuisInterface\": true,\r\n  \"idErabliere\": \"{{idErabliere}}\",\r\n  \"displayType\": \"Tableau\",\r\n  \"taille\": 12\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/{{idErabliere}}/capteurs",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"{{idErabliere}}",
+								"capteurs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post piste Mont Tremblant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"v\": 102,\r\n  \"idCapteur\": \"{{idCapteur}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/capteurs/{{idCapteur}}/DonneesCapteurV2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"capteurs",
+								"{{idCapteur}}",
+								"DonneesCapteurV2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Le Massif de Charlevoix",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('idErabliere', json[0].id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/erablieres?$filter=nom eq 'Le Massif de Charlevoix'",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres"
+							],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "nom eq 'Le Massif de Charlevoix'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Capteur nombre de piste 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('idCapteur', json.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nom\": \"Nombre de pistes\",\r\n  \"afficherCapteurDashboard\": true,\r\n  \"ajouterDonneeDepuisInterface\": true,\r\n  \"idErabliere\": \"{{idErabliere}}\",\r\n  \"displayType\": \"Tableau\",\r\n  \"taille\": 12\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/{{idErabliere}}/capteurs",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"{{idErabliere}}",
+								"capteurs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post piste Le Massif de Charlevoix",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"v\": 53,\r\n  \"idCapteur\": \"{{idCapteur}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/capteurs/{{idCapteur}}/DonneesCapteurV2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"capteurs",
+								"{{idCapteur}}",
+								"DonneesCapteurV2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stoneham",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('idErabliere', json[0].id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/erablieres?$filter=nom eq 'Stoneham'",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres"
+							],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "nom eq 'Stoneham'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Capteur nombre de piste 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('idCapteur', json.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nom\": \"Nombre de pistes\",\r\n  \"afficherCapteurDashboard\": true,\r\n  \"ajouterDonneeDepuisInterface\": true,\r\n  \"idErabliere\": \"{{idErabliere}}\",\r\n  \"displayType\": \"Tableau\",\r\n  \"taille\": 12\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/{{idErabliere}}/capteurs",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"{{idErabliere}}",
+								"capteurs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post piste Stoneham",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"v\": 42,\r\n  \"idCapteur\": \"{{idCapteur}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/capteurs/{{idCapteur}}/DonneesCapteurV2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"capteurs",
+								"{{idCapteur}}",
+								"DonneesCapteurV2"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
