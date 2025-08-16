@@ -24,7 +24,7 @@ export class Erabliere {
     latitude?: number;
     base?: number;
     sommet?: number;
-    horaire?: Array<Horaire>;
+    horaires?: Array<Horaire>;
 
     /* La date de création de l'érablière */
     dc?: string;
