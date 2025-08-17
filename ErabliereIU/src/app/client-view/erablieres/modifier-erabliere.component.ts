@@ -1,9 +1,14 @@
 // This a component that allows to add a new erabliere
-import {Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ErabliereFormComponent } from '../erablieres/erabliere-form.component'
 import { ErabliereAccessListComponent } from 'src/app/admin-view/access/erabliere-access-list/erabliere-access-list.component';
 import { Erabliere } from "src/model/erabliere";
+import { HoraireComponent } from '../horaire/horaire-form.component';
+import { HoraireTableComponent } from '../horaire/horaire-table.component';
+import { Horaire } from 'src/model/horaire';
+import { EModalComponent } from 'src/generic/modal/emodal.component';
+import { EButtonComponent } from 'src/generic/ebutton.component';
 
 @Component({
     selector: 'modifier-erabliere',
@@ -11,6 +16,10 @@ import { Erabliere } from "src/model/erabliere";
     imports: [
         ErabliereFormComponent,
         ErabliereAccessListComponent,
+        HoraireComponent,
+        HoraireTableComponent,
+        EModalComponent,
+        EButtonComponent
     ]
 })
 export class ModifierErabliereComponent implements OnInit, OnChanges {
@@ -25,11 +34,14 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
     afficherSectionDeleteErabliere: boolean = false;
     afficherSectionAcces: boolean = false;
 
+    displayHoraireForm: boolean = false;
+    horaire: Horaire = new Horaire();
+
     constructor(private readonly _api: ErabliereApi) { }
 
     ngOnInit() {
         if (this.erabliereForm) {
-            this.erabliereForm.erabliere = {...this.erabliere};
+            this.erabliereForm.erabliere = { ...this.erabliere };
         }
         this.afficherSectionDeleteErabliere = false;
         this.afficherSectionAcces = false;
@@ -38,20 +50,20 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (changes['erabliere']?.currentValue) {
             if (this.erabliereForm) {
-                this.erabliereForm.erabliere = {...this.erabliere};
+                this.erabliereForm.erabliere = { ...this.erabliere };
             }
             this.afficherSectionDeleteErabliere = false;
             this.afficherSectionAcces = false;
         }
     }
 
-    modifierErabliere() {
-        if (this.erabliereForm != undefined) {
-            if (this.erabliereForm.erabliere != undefined) {
+    modifierErabliere(): Promise<void> {
+        if (this.erabliereForm != null) {
+            if (this.erabliereForm.erabliere != null) {
                 let erabliere = this.erabliereForm.erabliere;
 
-                this._api.putErabliere(erabliere).then(() => {
-                    if (this.erabliereForm != undefined) {
+                return this._api.putErabliere(erabliere).then(() => {
+                    if (this.erabliereForm != null) {
                         this.erabliereForm.generalError = undefined;
                         this.erabliereForm.errorObj = undefined;
                     }
@@ -69,6 +81,8 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
                 })
             }
         }
+        
+        return Promise.reject(new Error("Erabliere Form non initialisé"));
     }
 
     showDeleteErabliere() {
@@ -83,7 +97,7 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
             if (erabliere != undefined) {
                 this._api.deleteErabliere(this.erabliere?.id, erabliere).then(() => {
                     this.afficherSectionDeleteErabliere = true;
-                    this.shouldReloadErablieres.emit({event: 'delete'});
+                    this.shouldReloadErablieres.emit({ event: 'delete' });
 
                     // Hide the modal with the ID modifierErabliereFormModal
                     let modal = document.getElementById("modifierErabliereFormModal");

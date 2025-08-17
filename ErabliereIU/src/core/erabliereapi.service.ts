@@ -30,10 +30,11 @@ import { GetMapAccessToken } from 'src/model/getMapAccessToken';
 import { ApiKey } from 'src/model/apikey';
 import { Rapport } from 'src/model/rapport';
 import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
+import { Horaire } from 'src/model/horaire';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
-    
+       
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -755,6 +756,11 @@ export class ErabliereApi {
     async adminAcceptTermsForDevices(deviceUniqueName: any) {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.post<void>(this._environmentService.apiUrl + '/Admin/Customer/ConsentForDevice/' + deviceUniqueName, {}, { headers: headers }));
+    }
+
+    async putHoraire(erabliereId: any, value: Horaire) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/Erablieres/' + erabliereId + '/Horaire', value, { headers: headers }));
     }
 }
 

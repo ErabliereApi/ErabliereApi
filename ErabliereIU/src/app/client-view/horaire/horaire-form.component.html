@@ -1,4 +1,4 @@
-<form (ngSubmit)="onSubmit()" class="row">
+<form class="row">
   <div class="form-group col-md-2">
     <einput [arialabel]="'Lundi'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'lundi'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
@@ -20,7 +20,7 @@
   <div class="form-group col-md-2">
     <einput [arialabel]="'Dimanche'" [placeholder]="'HH:mm-HH:mm'" [formGroup]="horaireForm" [name]="'dimanche'" [pattern]="'^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'" [maxlength]="12"></einput>
   </div>
-  <div class="btn-group">
-    <button class="btn btn-primary" type="submit">Enregistrer</button>
+  <div class="form-group">
+    <ebutton type="primary" [click]="putHoraire">Enregistrer</ebutton>
   </div>
 </form>

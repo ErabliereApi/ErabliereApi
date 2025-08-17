@@ -1,0 +1,19 @@
+<div class="modal" style="display: block;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{title}}</h5>
+                <button type="button" class="btn-close" aria-label="Close" (click)="closeModal.emit(true)"></button>
+            </div>
+            <div class="modal-body">
+                <ng-content></ng-content>
+            </div>
+            <div class="modal-footer">
+                @if (error) {
+                    <div class="alert alert-danger" style="width: 100%;">{{error}}</div>
+                }
+                <ebutton type="secondary" [click]="closeModalFn" tooltip="Fermer la modal">Fermer</ebutton>
+            </div>
+        </div>
+    </div>
+</div>

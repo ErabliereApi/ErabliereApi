@@ -119,23 +119,6 @@
                 [(ngModel)]="erabliere.ipRule">
             <input-error [errorObj]="errorObj" [controlName]="'ipRule'"></input-error>
         </div>
-        <hr />
-        <h4>Horaire</h4>
-        @if (displayHoraireForm)
-        {
-        <horaire-form
-            [horaire]="erabliere.horaires != null && erabliere.horaires.length > 0 ? erabliere.horaires[0] : undefined"></horaire-form>
-        }
-        @else
-        {
-            <div class="form-group">
-                <button type="button" class="btn btn-sm btn-secondary mt-3" (click)="displayHoraireForm = true">Modifier
-            horaire</button>
-            </div>
-        
-        }
-
-        <horaire-table [horaire]="horaire"></horaire-table>
     </div>
     <div class="form-group">
         <button type="button" class="btn btn-sm mt-3"

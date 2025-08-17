@@ -2,18 +2,21 @@ import { Component, Input, OnInit } from "@angular/core";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Horaire } from "src/model/horaire";
 import { EinputComponent } from "src/generic/einput.component";
+import { EButtonComponent } from "src/generic/ebutton.component";
+import { ErabliereApi } from "src/core/erabliereapi.service";
 
 @Component({
     selector: "horaire-form",
     templateUrl: "./horaire-form.component.html",
-    imports: [FormsModule, EinputComponent, ReactiveFormsModule]
+    imports: [FormsModule, EinputComponent, ReactiveFormsModule, EButtonComponent]
 })
 export class HoraireComponent implements OnInit
 {
+    @Input() erabliereId?: any;
     @Input() horaire?: Horaire;
     horaireForm: FormGroup;
 
-    constructor() {
+    constructor(private readonly api: ErabliereApi) {
         this.horaireForm = new FormGroup({
             lundi: new FormControl(this.horaire?.lundi || '', [Validators.pattern('^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'), Validators.maxLength(12)]),
             mardi: new FormControl(this.horaire?.mardi || '', [Validators.pattern('^\\d{2}:\\d{2}-\\d{2}:\\d{2}$'), Validators.maxLength(12)]),
@@ -29,8 +32,11 @@ export class HoraireComponent implements OnInit
         this.horaire ??= new Horaire();
     }
 
-    onSubmit() {
-        // Handle form submission logic here
-        console.log("Horaire submitted:", this.horaire);
+    putHoraire() {
+        return this.api.putHoraire(this.erabliereId, this.horaireForm.value).then(() => {
+            // Handle successful form submission
+        }).catch(error => {
+            console.error("Error submitting horaire:", error);
+        });
     }
 }
