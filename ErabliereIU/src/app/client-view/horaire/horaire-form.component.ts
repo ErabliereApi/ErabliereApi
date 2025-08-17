@@ -4,8 +4,8 @@ import { Horaire } from "src/model/horaire";
 import { EinputComponent } from "src/generic/einput.component";
 
 @Component({
-    selector: "horaire",
-    templateUrl: "./horaire.component.html",
+    selector: "horaire-form",
+    templateUrl: "./horaire-form.component.html",
     imports: [FormsModule, EinputComponent, ReactiveFormsModule]
 })
 export class HoraireComponent implements OnInit

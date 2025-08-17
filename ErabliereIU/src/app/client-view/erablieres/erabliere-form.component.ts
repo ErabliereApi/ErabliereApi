@@ -5,7 +5,9 @@ import { Erabliere } from 'src/model/erabliere';
 import { NgClass } from '@angular/common';
 import { InputErrorComponent } from 'src/generic/input-error.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { HoraireComponent } from "../horaire/horaire.component";
+import { HoraireComponent } from "../horaire/horaire-form.component";
+import { Horaire } from 'src/model/horaire';
+import { HoraireTableComponent } from '../horaire/horaire-table.component';
 
 @Component({
     selector: 'erabliere-form',
@@ -15,7 +17,8 @@ import { HoraireComponent } from "../horaire/horaire.component";
     FormsModule,
     InputErrorComponent,
     NgClass,
-    HoraireComponent
+    HoraireComponent,
+    HoraireTableComponent
 ],
     styles: [
         `
@@ -39,6 +42,8 @@ export class ErabliereFormComponent implements OnInit {
     erabliere: Erabliere = this.getDefaultErabliere();
     plusdOptions: boolean = false;
     plusOptionsButtonText: string = "Plus d'options";
+    displayHoraireForm: boolean = false;
+    horaire: Horaire = new Horaire();
     @Input() errorObj?: any
     @Input() generalError?: string
 
