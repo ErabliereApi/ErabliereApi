@@ -67,4 +67,16 @@ public class PostCapteur
     /// Affichage maximal lors de l'affichage des données dans les graphiques
     /// </summary>
     public double? DisplayMax { get; set; }
+
+    /// <summary>
+    /// Type d'affichage lors de l'affichage des données dans les graphiques
+    /// </summary>
+    [MaxLength(50)]
+    public string? DisplayType { get; set; }
+
+    /// <summary>
+    /// Taille de l'affichage en colonnes, 1 à 12
+    /// </summary>
+    [Range(1, 12, ErrorMessage = "La taille du graphique doit être comprise entre 1 et 12")]
+    public byte? Taille { get; set; }
 }

@@ -1,12 +1,12 @@
 import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ErabliereFormComponent } from 'src/app/client-view/erablieres/erabliere-form.component'
-import { ErabliereFormComponent as ErabliereFormComponent_1 } from './erabliere-form.component';
+import { EButtonComponent } from 'src/generic/ebutton.component';
 
 @Component({
     selector: 'ajouter-erabliere',
     templateUrl: './ajouter-erabliere.component.html',
-    imports: [ErabliereFormComponent_1]
+    imports: [ErabliereFormComponent, EButtonComponent]
 })
 export class AjouterErabliereComponent {
     @ViewChild(ErabliereFormComponent) erabliereForm?: ErabliereFormComponent
@@ -38,5 +38,7 @@ export class AjouterErabliereComponent {
                 }
             });
         }
+
+        console.log(this.erabliereForm);
     }
 }

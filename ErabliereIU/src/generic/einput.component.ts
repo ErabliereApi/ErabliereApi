@@ -13,7 +13,9 @@ import { InputErrorComponent } from "./input-error.component";
             type="{{ type }}"
             formControlName="{{ name }}"
             name="{{ name }}"
-            placeholder="{{ placeholder }}">
+            placeholder="{{ placeholder }}"
+            [pattern]="pattern ?? ''"
+            [maxlength]="maxlength ?? null">
             @if (symbole) {
               <div class="input-group-append">
                 <span class="input-group-text">{{ symbole }}</span>
@@ -49,6 +51,8 @@ export class EinputComponent {
   @Input() spChar: string[] = []
   @Input() type: "text" | "number" | "date" | "checkbox" = "text"
   @Input() errorObj?: any;
+  @Input() pattern?: string;
+  @Input() maxlength?: number;
 
   constructor() {
 

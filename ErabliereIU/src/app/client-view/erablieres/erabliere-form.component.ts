@@ -13,15 +13,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
         ReactiveFormsModule,
         FormsModule,
         InputErrorComponent,
-        NgClass,
+        NgClass
     ],
-    styles: [
-        `
-            .form-group {
-                margin-bottom: 7px;
-            }
-        `
-    ]
 })
 export class ErabliereFormComponent implements OnInit {
     getDefaultErabliere() {

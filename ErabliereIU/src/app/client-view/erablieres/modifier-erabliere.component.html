@@ -1,8 +1,5 @@
-<div class="modal fade"
-     id="modifierErabliereFormModal"
-     tabindex="-1"
-     aria-labelledby="modifierErabliereFormModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="modifierErabliereFormModal" tabindex="-1" aria-labelledby="modifierErabliereFormModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -13,18 +10,37 @@
             </div>
             <div class="modal-body">
                 <erabliere-form></erabliere-form>
+                <hr />
+                <h4>Horaire</h4>
+                @if (displayHoraireForm)
+                {
+                <emodal
+                    [title]="'Modifier Horaire'"
+                    (closeModal)="displayHoraireForm = false">
+                    <horaire-form
+                        [horaire]="erabliere != null && erabliere.horaires != null && erabliere.horaires.length > 0 ? erabliere.horaires[0] : undefined"></horaire-form>
+                </emodal>
+                }
+                @else
+                {
+                <div class="form-group">
+                    <button type="button" class="btn btn-sm btn-secondary mt-3"
+                        (click)="displayHoraireForm = true">Modifier
+                        horaire</button>
+                </div>
+
+                }
+
+                <horaire-table [horaire]="horaire"></horaire-table>
                 @if(authEnabled) {
                 <div class="container">
                     <hr />
-                        @if(!afficherSectionAcces) {
-                        <button
-                            type="button"
-                            class="btn btn-outline-secondary"
-                            (click)="changerAffichageAcces()">
-                            Afficher les accès
-                        </button>
-                        } @else {
-                        <h5>Accès</h5>
+                    @if(!afficherSectionAcces) {
+                    <button type="button" class="btn btn-outline-secondary" (click)="changerAffichageAcces()">
+                        Afficher les accès
+                    </button>
+                    } @else {
+                    <h5>Accès</h5>
                     <erabliere-access-list [idErabliere]="erabliere?.id"></erabliere-access-list>
                     }
                 </div>
@@ -33,21 +49,25 @@
                     @if(!afficherSectionDeleteErabliere) {
                     <div>
                         <hr />
-                        <button type="button" class="btn btn-outline-danger btn-sm" (click)="showDeleteErabliere()">Supprimer</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm"
+                            (click)="showDeleteErabliere()">Supprimer</button>
                     </div>
                     } @else {
                     <div>
                         <hr />
                         <h5 class="text-danger">Supprimer l'érablière</h5>
-                        <p class="text-danger">Cette action entrainera la suppression de l'érablère et de tout ses données liées. Les données ne pourront pas être récupérées.</p>
-                        <button type="button" class="btn btn-outline-danger btn-sm" (click)="deleteErabliere()">Supprimer</button>
+                        <p class="text-danger">Cette action entrainera la suppression de l'érablère et de tout ses
+                            données liées. Les données ne pourront pas être récupérées.</p>
+                        <button type="button" class="btn btn-outline-danger btn-sm"
+                            (click)="deleteErabliere()">Supprimer</button>
                     </div>
                     }
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="onHideModal()">Annuler</button>
-                <button type="button" class="btn btn-primary" (click)="modifierErabliere()">Modifier</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    (click)="onHideModal()">Annuler</button>
+                <ebutton type="primary" (clicked)="modifierErabliere()">Modifier</ebutton>
             </div>
         </div>
     </div>
