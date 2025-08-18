@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 
 @Component({
     selector: 'ebutton',
@@ -16,28 +16,13 @@ export class EButtonComponent {
     @Input() text: string = "";
     @Input() disabled: boolean = false;
     @Input() type: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" = "primary";
-    @Input() click?: () => void | Promise<void>;
+    @Output() clicked = new EventEmitter<void>();
     @Input() tooltip?: string;
 
     async onClick() {
-        this.inProgress = true;
-
-        if (typeof this.click === "function") {
-            console.log("Button clicked is function");
-            this.click();
-        } else if (this.click) {
-            console.log("Button clicked is promise");
-            const clickPromise = this.click as Promise<void>;
-
-            if (!clickPromise) {
-                console.log("Button clicked is not a promise");
-            }
-
-            clickPromise.finally(() => {
-                this.inProgress = false;
-            });
-
-            await clickPromise;
+        if (this.disabled || this.inProgress) {
+            return;
         }
+        this.clicked.emit();
     }
 }

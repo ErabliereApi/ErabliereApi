@@ -12,7 +12,7 @@
                 @if (error) {
                     <div class="alert alert-danger" style="width: 100%;">{{error}}</div>
                 }
-                <ebutton type="secondary" [click]="closeModalFn" tooltip="Fermer la modal">Fermer</ebutton>
+                <ebutton type="secondary" (clicked)="closeModalFn()" tooltip="Fermer la modal">Fermer</ebutton>
             </div>
         </div>
     </div>

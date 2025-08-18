@@ -81,6 +81,8 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
                 })
             }
         }
+
+        console.log(this.erabliereForm);
         
         return Promise.reject(new Error("Erabliere Form non initialisé"));
     }
