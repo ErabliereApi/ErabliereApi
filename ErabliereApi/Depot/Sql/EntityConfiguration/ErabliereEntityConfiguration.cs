@@ -58,5 +58,9 @@ public class ErabliereEntityConfiguration : IEntityTypeConfiguration<Erabliere>
         erabliere.HasMany(u => u.CustomerErablieres)
                .WithOne(a => a.Erabliere)
                .HasForeignKey(a => a.IdErabliere);
+
+        erabliere.HasMany(u => u.Horaires)
+                 .WithOne(a => a.Erabliere)
+                 .HasForeignKey(a => a.IdErabliere);
     }
 }

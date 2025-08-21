@@ -2003,7 +2003,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"lundi\": \"08:30-16:00\",\r\n    \"mardi\": \"08:30-16:00\",\r\n    \"mercredi\": \"08:30-16:00\",\r\n    \"jeudi\": \"08:30-16:00\",\r\n    \"vendredi\": \"08:30-16:00\",\r\n    \"samedi\": \"08:30-16:00\",\r\n    \"dimanche\": \"08:30-16:00\"\r\n}",
+							"raw": "{\r\n    \"idErabliere\": \"{{idErabliere}}\",\r\n    \"lundi\": \"08:30-16:00\",\r\n    \"mardi\": \"08:30-16:00\",\r\n    \"mercredi\": \"08:30-16:00\",\r\n    \"jeudi\": \"08:30-16:00\",\r\n    \"vendredi\": \"08:30-16:00\",\r\n    \"samedi\": \"08:30-16:00\",\r\n    \"dimanche\": \"08:30-16:00\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2155,6 +2155,49 @@
 					"response": []
 				},
 				{
+					"name": "Horaire Le Massif de Charlevoix",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idErabliere\": \"{{idErabliere}}\",\r\n    \"lundi\": \"08:30-15:30\",\r\n    \"mardi\": \"08:30-15:30\",\r\n    \"mercredi\": \"08:30-15:30\",\r\n    \"jeudi\": \"08:30-15:30\",\r\n    \"vendredi\": \"08:30-15:30\",\r\n    \"samedi\": \"08:30-15:30\",\r\n    \"dimanche\": \"08:30-15:30\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/{{idErabliere}}/horaire",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"{{idErabliere}}",
+								"horaire"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Stoneham",
 					"event": [
 						{
@@ -2178,7 +2221,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/erablieres?$filter=nom eq 'Stoneham'",
+							"raw": "{{url}}/erablieres?$filter=nom eq 'Stoneham'&$expand=horaires",
 							"host": [
 								"{{url}}"
 							],
@@ -2189,6 +2232,10 @@
 								{
 									"key": "$filter",
 									"value": "nom eq 'Stoneham'"
+								},
+								{
+									"key": "$expand",
+									"value": "horaires"
 								}
 							]
 						}
@@ -2279,6 +2326,49 @@
 								"capteurs",
 								"{{idCapteur}}",
 								"DonneesCapteurV2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Horaire Stoneham",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idErabliere\": \"{{idErabliere}}\",\r\n    \"lundi\": \"08:30-21:00\",\r\n    \"mardi\": \"08:30-21:00\",\r\n    \"mercredi\": \"08:30-21:00\",\r\n    \"jeudi\": \"08:30-21:00\",\r\n    \"vendredi\": \"08:30-21:00\",\r\n    \"samedi\": \"08:30-21:00\",\r\n    \"dimanche\": \"08:30-21:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/erablieres/{{idErabliere}}/Horaire",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres",
+								"{{idErabliere}}",
+								"Horaire"
 							]
 						}
 					},

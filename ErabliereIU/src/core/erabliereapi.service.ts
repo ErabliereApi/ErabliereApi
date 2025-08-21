@@ -43,13 +43,21 @@ export class ErabliereApi {
         this._authService = authFactoryService.getAuthorisationService();
     }
 
-    async getErabliere(idErabliereSelectionee: any, withoutCapteur: boolean = false): Promise<Erabliere> {
+    async getErabliere(idErabliereSelectionee: any, withoutCapteur: boolean = false, withoutHoraire: boolean = false): Promise<Erabliere> {
         const headers = await this.getHeaders();
 
         let url = this._environmentService.apiUrl + '/erablieres?$filter=id eq ' + idErabliereSelectionee
 
         if (!withoutCapteur) {
             url += '&$expand=Capteurs($filter=afficherCapteurDashboard eq true;$orderby=indiceOrdre)';
+
+            if (!withoutHoraire) {
+                url += ',Horaires';
+            }
+        }
+
+        if (withoutCapteur && !withoutHoraire) {
+            url += '&$expand=Horaires';
         }
 
         const req = this._httpClient.get<Erabliere[]>(url, { headers: headers });

@@ -66,8 +66,6 @@ public class ErablieresController : ControllerBase
         _logger = logger;
     }
 
-    private const int TakeErabliereNbMax = 20;
-
     /// <summary>
     /// Liste les érablières
     /// </summary>
@@ -77,7 +75,7 @@ public class ErablieresController : ControllerBase
     /// <param name="token">Jeton d'annulation de la requête</param>
     /// <returns>Une liste d'érablière</returns>
     [HttpGet]
-    [SecureEnableQuery(MaxTop = TakeErabliereNbMax)]
+    [SecureEnableQuery(MaxTop = QueryableExtensions.TakeErabliereNbMax)]
     [AllowAnonymous]
     public async Task<IQueryable<Erabliere>> ListerAsync(
         [FromQuery(Name = "$orderby")] string? orderby,
@@ -113,34 +111,7 @@ public class ErablieresController : ControllerBase
             }
         }
 
-        query = await AddOrderAndPageInfo(orderby, filter, top, query, token);
-
-        return query;
-    }
-
-    private async Task<IQueryable<Erabliere>> AddOrderAndPageInfo(string? orderby, string? filter, int? top, IQueryable<Erabliere> query, CancellationToken token)
-    {
-        HttpContext.Response.Headers.Append("X-ErabliereTotal", (await query.CountAsync(token)).ToString());
-
-        if (string.IsNullOrWhiteSpace(orderby))
-        {
-            query = query.OrderBy(e => e.IndiceOrdre ?? int.MaxValue).ThenBy(e => e.Nom);
-        }
-
-        if (string.IsNullOrWhiteSpace(filter))
-        {
-            if (top.HasValue)
-            {
-                if (top > TakeErabliereNbMax)
-                {
-                    query = query.Take(TakeErabliereNbMax);
-                }
-            }
-            else
-            {
-                query = query.Take(TakeErabliereNbMax);
-            }
-        }
+        query = await query.AddOrderAndPageInfoAsync(orderby: orderby, filter: filter, top: top, httpContext: HttpContext, token: token);
 
         return query;
     }

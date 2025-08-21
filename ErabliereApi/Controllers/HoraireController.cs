@@ -28,6 +28,22 @@ public class HoraireController : ControllerBase
     }
 
     /// <summary>
+    /// Récupère l'horaire d'une érablière
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ValiderOwnership("id")]
+    [ProducesResponseType(typeof(Horaire[]), 200)]
+    public async Task<IActionResult> GetHoraire(Guid id, CancellationToken token)
+    {
+        var horaire = await _dbContext.Horaires.AsNoTracking().Where(h => h.IdErabliere == id).ToArrayAsync(token);
+
+        return Ok(horaire);
+    }
+
+    /// <summary>
     /// Ajout ou modification de l'horaire d'une éralière
     /// </summary>
     /// <param name="id"></param>
@@ -48,7 +64,7 @@ public class HoraireController : ControllerBase
         if (horaire == null)
         {
             // Ajouter une nouvelle horaire
-            horaire = new Horaire
+            var newHoraire = new Horaire
             {
                 IdErabliere = id,
                 Lundi = putHoraire.Lundi,
@@ -60,7 +76,7 @@ public class HoraireController : ControllerBase
                 Dimanche = putHoraire.Dimanche
             };
 
-            await _dbContext.Horaires.AddAsync(horaire, token);
+            await _dbContext.Horaires.AddAsync(newHoraire, token);
         }
         else
         {

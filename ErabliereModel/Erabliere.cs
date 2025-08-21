@@ -146,6 +146,11 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
     public List<Inspection>? Inspections { get; set; }
 
     /// <summary>
+    /// Les horaires d'ouverture de l'érablière
+    /// </summary>
+    public List<Horaire>? Horaires { get; set; }
+
+    /// <summary>
     /// Liste de jonction entre l'utilisateurs et ses érablières
     /// </summary>
     public List<CustomerErabliere>? CustomerErablieres { get; set; }
@@ -164,11 +169,6 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
 
     /// <inheritdoc />
     public double? Sommet { get; set; }
-
-    /// <summary>
-    /// Les horaires d'ouverture de l'érablière
-    /// </summary>
-    public List<Horaire>? Horaires { get; set; }
 
     /// <inheritdoc />
     public int CompareTo([AllowNull] Erabliere other)
