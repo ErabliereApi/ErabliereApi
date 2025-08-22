@@ -73,7 +73,7 @@ export class ErabliereApi {
     async getErablieres(top?: number, search?: string): Promise<Erabliere[]> {
         const headers = await this.getHeaders();
         top ??= 10;
-        let url = this._environmentService.apiUrl + '/erablieres?$top=' + top;
+        let url = this._environmentService.apiUrl + '/erablieres?$top=' + top + '&$expand=Horaires';
         if (search) {
             url += "&$filter=contains(nom, '" + search + "') or contains(codePostal, '" + search + "')";
         }

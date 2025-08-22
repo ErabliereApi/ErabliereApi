@@ -42,6 +42,8 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
     ngOnInit() {
         if (this.erabliereForm) {
             this.erabliereForm.erabliere = { ...this.erabliere };
+            this.horaire = this.erabliere?.horaires != null && this.erabliere?.horaires.length > 0 ? this.erabliere.horaires[0] : new Horaire();
+            this.horaire.idErabliere = this.erabliere?.id;
         }
         this.afficherSectionDeleteErabliere = false;
         this.afficherSectionAcces = false;
@@ -51,6 +53,8 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
         if (changes['erabliere']?.currentValue) {
             if (this.erabliereForm) {
                 this.erabliereForm.erabliere = { ...this.erabliere };
+                this.horaire = this.erabliere?.horaires != null && this.erabliere?.horaires.length > 0 ? this.erabliere.horaires[0] : new Horaire();
+                this.horaire.idErabliere = this.erabliere?.id;
             }
             this.afficherSectionDeleteErabliere = false;
             this.afficherSectionAcces = false;
@@ -81,8 +85,6 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
                 })
             }
         }
-
-        console.log(this.erabliereForm);
         
         return Promise.reject(new Error("Erabliere Form non initialisé"));
     }

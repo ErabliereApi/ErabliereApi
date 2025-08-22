@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { Horaire } from "src/model/horaire";
 
 @Component({
@@ -44,12 +44,14 @@ import { Horaire } from "src/model/horaire";
         </table>
     `
 })
-export class HoraireTableComponent implements OnInit {
+export class HoraireTableComponent implements OnChanges {
     @Input() horaire?: Horaire;
 
     constructor() { }
-
-    ngOnInit(): void {
-        // Initialization logic can go here
+    
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['horaire']) {
+            this.horaire = changes['horaire'].currentValue;
+        }
     }
 }

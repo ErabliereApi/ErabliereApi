@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Horaire } from "src/model/horaire";
 import { EinputComponent } from "src/generic/einput.component";
@@ -10,7 +10,7 @@ import { ErabliereApi } from "src/core/erabliereapi.service";
     templateUrl: "./horaire-form.component.html",
     imports: [FormsModule, EinputComponent, ReactiveFormsModule, EButtonComponent]
 })
-export class HoraireComponent implements OnInit
+export class HoraireComponent implements OnInit, OnChanges
 {
     @Input() erabliereId?: any;
     @Input() horaire?: Horaire;
@@ -32,8 +32,29 @@ export class HoraireComponent implements OnInit
         this.horaire ??= new Horaire();
     }
 
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['horaire']?.currentValue) {
+            this.horaire = changes['horaire'].currentValue;
+            if (this.horaire) {
+                this.horaireForm.patchValue({
+                    lundi: this.horaire.lundi,
+                    mardi: this.horaire.mardi,
+                    mercredi: this.horaire.mercredi,
+                    jeudi: this.horaire.jeudi,
+                    vendredi: this.horaire.vendredi,
+                    samedi: this.horaire.samedi,
+                    dimanche: this.horaire.dimanche
+                });
+            }
+        }
+    }
+
     putHoraire() {
-        return this.api.putHoraire(this.erabliereId, this.horaireForm.value).then(() => {
+        this.horaire = { ...this.horaireForm.value, idErabliere: this.erabliereId };
+        if (!this.horaire) {
+            return Promise.reject(new Error("Horaire non initialisé"));
+        }
+        return this.api.putHoraire(this.erabliereId, this.horaire).then(() => {
             // Handle successful form submission
         }).catch(error => {
             console.error("Error submitting horaire:", error);

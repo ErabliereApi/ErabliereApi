@@ -18,7 +18,8 @@
                     [title]="'Modifier Horaire'"
                     (closeModal)="displayHoraireForm = false">
                     <horaire-form
-                        [horaire]="erabliere != null && erabliere.horaires != null && erabliere.horaires.length > 0 ? erabliere.horaires[0] : undefined"></horaire-form>
+                        [horaire]="horaire"
+                        [erabliereId]="erabliere?.id"></horaire-form>
                 </emodal>
                 }
                 @else
