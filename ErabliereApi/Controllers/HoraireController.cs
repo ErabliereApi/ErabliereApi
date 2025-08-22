@@ -52,6 +52,7 @@ public class HoraireController : ControllerBase
     /// <returns></returns>
     [HttpPut]
     [ValiderOwnership("id")]
+    [ProducesResponseType(204)]
     public async Task<IActionResult> UpdateHoraire(Guid id, [FromBody] PutHoraire putHoraire, CancellationToken token)
     {
         if (id != putHoraire.IdErabliere)

@@ -162,7 +162,7 @@ export class ErablieresMapComponent implements OnInit {
                     if (props?.capteur != null) {
                         const caps = JSON.parse(props.capteur);
                         for (let capt of caps) {
-                            captsText += `<p>${capt.nom}: ${capt.valeur} ${capt.symbole}</p>`;
+                            captsText += `<p>${capt.nom}: ${capt.valeur} ${capt.symbole ?? ''}</p>`;
                         }
                     }
 
