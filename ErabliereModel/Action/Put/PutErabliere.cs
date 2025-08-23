@@ -88,7 +88,12 @@ public class PutErabliere : IAltitude
     public bool? AfficherSectionDompeux { get; set; }
 
     /// <summary>
-    /// Indiuateur permettant une accès en lecture à l'érablière sans authentifications
+    /// Indicateur permettant de déterminer si la section des horaires sera affichée par l'érablière
+    /// </summary>
+    public bool? AfficherSectionHoraire { get; set; }
+
+    /// <summary>
+    /// Indicateur permettant une accès en lecture à l'érablière sans authentification
     /// </summary>
     public bool? IsPublic { get; set; }
 

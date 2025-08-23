@@ -35,7 +35,10 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
     afficherSectionAcces: boolean = false;
 
     displayHoraireForm: boolean = false;
+    displayHoraire: boolean = false;
     horaire: Horaire = new Horaire();
+
+    modifierErablierePutCallInProgress: boolean = false;
 
     constructor(private readonly _api: ErabliereApi) { }
 
@@ -65,6 +68,7 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
         if (this.erabliereForm != null) {
             if (this.erabliereForm.erabliere != null) {
                 let erabliere = this.erabliereForm.erabliere;
+                this.modifierErablierePutCallInProgress = true;
 
                 return this._api.putErabliere(erabliere).then(() => {
                     if (this.erabliereForm != null) {
@@ -82,7 +86,9 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
                             this.erabliereForm.generalError = "Une erreur est survenue lors de la modification de l'érablière. Veuillez réessayer plus tard."
                         }
                     }
-                })
+                }).finally(() => {
+                    this.modifierErablierePutCallInProgress = false;
+                });
             }
         }
         

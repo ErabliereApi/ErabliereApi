@@ -12,39 +12,40 @@
                 <erabliere-form></erabliere-form>
                 <hr />
                 <h4>Horaire</h4>
-                @if (displayHoraireForm)
+                @if (!displayHoraire)
                 {
-                <emodal
-                    [title]="'Modifier Horaire'"
-                    (closeModal)="displayHoraireForm = false">
-                    <horaire-form
-                        [horaire]="horaire"
-                        [erabliereId]="erabliere?.id"></horaire-form>
-                </emodal>
+                    <ebutton type="outline-secondary" (clicked)="displayHoraire = true">Afficher les horaires</ebutton>
                 }
                 @else
                 {
-                <div class="form-group">
-                    <button type="button" class="btn btn-sm btn-secondary mt-3"
-                        (click)="displayHoraireForm = true">Modifier
-                        horaire</button>
-                </div>
-
+                    @if (displayHoraireForm)
+                    {
+                    <emodal [title]="'Modifier Horaire'" (closeModal)="displayHoraireForm = false">
+                        <horaire-form [horaire]="horaire" [erabliereId]="erabliere?.id"></horaire-form>
+                    </emodal>
+                    }
+                    @else
+                    {
+                    <div class="form-group">
+                        <ebutton class="me-2" type="outline-primary" (clicked)="displayHoraireForm = true">Modifier horaire</ebutton>
+                        <ebutton type="outline-secondary" (clicked)="displayHoraire = false">Masquer les horaires</ebutton>
+                    </div>
+                    }
+                    <horaire-table [horaire]="horaire"></horaire-table>
                 }
-
-                <horaire-table [horaire]="horaire"></horaire-table>
                 @if(authEnabled) {
-                <div class="container">
                     <hr />
+                    <h4>Accès</h4>
                     @if(!afficherSectionAcces) {
                     <button type="button" class="btn btn-outline-secondary" (click)="changerAffichageAcces()">
                         Afficher les accès
                     </button>
                     } @else {
-                    <h5>Accès</h5>
+                    <button type="button" class="btn btn-outline-secondary" (click)="changerAffichageAcces()">
+                        Masquer les accès
+                    </button>
                     <erabliere-access-list [idErabliere]="erabliere?.id"></erabliere-access-list>
                     }
-                </div>
                 }
                 <div class="container">
                     @if(!afficherSectionDeleteErabliere) {
@@ -68,7 +69,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                     (click)="onHideModal()">Annuler</button>
-                <ebutton type="primary" (clicked)="modifierErabliere()">Modifier</ebutton>
+                <ebutton type="primary" (clicked)="modifierErabliere()" [inProgress]="modifierErablierePutCallInProgress">Modifier</ebutton>
             </div>
         </div>
     </div>

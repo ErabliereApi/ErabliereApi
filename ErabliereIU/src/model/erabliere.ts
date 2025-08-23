@@ -15,6 +15,7 @@ export class Erabliere {
     afficherSectionBaril?: boolean;
     afficherTrioDonnees?: boolean;
     afficherSectionDompeux?: boolean;
+    afficherSectionHoraire?: boolean;
     capteurs?: Array<Capteur>;
     customerErablieres?: Array<CustomerAccess>;
     afficherPredictionMeteoJour?: boolean;

@@ -12,10 +12,10 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
     `,
 })
 export class EButtonComponent {
-    inProgress: boolean = false;
+    @Input() inProgress: boolean = false;
     @Input() text: string = "";
     @Input() disabled: boolean = false;
-    @Input() type: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" = "primary";
+    @Input() type: "primary" | "outline-primary" | "secondary" | "outline-secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" = "primary";
     @Output() clicked = new EventEmitter<void>();
     @Input() tooltip?: string;
 

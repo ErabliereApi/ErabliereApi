@@ -91,6 +91,11 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
     public bool? AfficherSectionDompeux { get; set; }
 
     /// <summary>
+    /// Indicateur permettant de déterminer si la section des horaires sera affichée par l'érablière
+    /// </summary>
+    public bool? AfficherSectionHoraire { get; set; }
+
+    /// <summary>
     /// Indique si une érablière est publique ou une authentification est requise
     /// </summary>
     public bool IsPublic { get; set; }

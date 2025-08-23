@@ -10,11 +10,11 @@ import { ErabliereApi } from "src/core/erabliereapi.service";
     templateUrl: "./horaire-form.component.html",
     imports: [FormsModule, EinputComponent, ReactiveFormsModule, EButtonComponent]
 })
-export class HoraireComponent implements OnInit, OnChanges
-{
+export class HoraireComponent implements OnInit, OnChanges {
     @Input() erabliereId?: any;
     @Input() horaire?: Horaire;
     horaireForm: FormGroup;
+    modifierHorairePutCallInProgress = false;
 
     constructor(private readonly api: ErabliereApi) {
         this.horaireForm = new FormGroup({
@@ -54,10 +54,13 @@ export class HoraireComponent implements OnInit, OnChanges
         if (!this.horaire) {
             return Promise.reject(new Error("Horaire non initialisé"));
         }
+        this.modifierHorairePutCallInProgress = true;
         return this.api.putHoraire(this.erabliereId, this.horaire).then(() => {
             // Handle successful form submission
         }).catch(error => {
             console.error("Error submitting horaire:", error);
+        }).finally(() => {
+            this.modifierHorairePutCallInProgress = false;
         });
     }
 }
