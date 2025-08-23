@@ -518,6 +518,11 @@ public class ErablieresController : ControllerBase
             entity.AfficherTrioDonnees = erabliere.AfficherTrioDonnees;
         }
 
+        if (erabliere.AfficherSectionHoraire.HasValue)
+        {
+            entity.AfficherSectionHoraire = erabliere.AfficherSectionHoraire.Value;
+        }
+
         if (erabliere.IsPublic.HasValue)
         {
             entity.IsPublic = erabliere.IsPublic.Value;

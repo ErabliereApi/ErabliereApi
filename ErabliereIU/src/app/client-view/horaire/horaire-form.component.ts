@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Horaire } from "src/model/horaire";
 import { EinputComponent } from "src/generic/einput.component";
@@ -15,6 +15,7 @@ export class HoraireComponent implements OnInit, OnChanges {
     @Input() horaire?: Horaire;
     horaireForm: FormGroup;
     modifierHorairePutCallInProgress = false;
+    @Output() onHoraireSaved = new EventEmitter<void>();
 
     constructor(private readonly api: ErabliereApi) {
         this.horaireForm = new FormGroup({
@@ -56,7 +57,7 @@ export class HoraireComponent implements OnInit, OnChanges {
         }
         this.modifierHorairePutCallInProgress = true;
         return this.api.putHoraire(this.erabliereId, this.horaire).then(() => {
-            // Handle successful form submission
+            this.onHoraireSaved.emit();
         }).catch(error => {
             console.error("Error submitting horaire:", error);
         }).finally(() => {

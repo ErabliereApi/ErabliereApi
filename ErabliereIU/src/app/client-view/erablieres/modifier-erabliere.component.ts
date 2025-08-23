@@ -91,7 +91,7 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
                 });
             }
         }
-        
+
         return Promise.reject(new Error("Erabliere Form non initialisé"));
     }
 
@@ -136,5 +136,12 @@ export class ModifierErabliereComponent implements OnInit, OnChanges {
     onHideModal() {
         this.afficherSectionAcces = false;
         this.afficherSectionDeleteErabliere = false;
+    }
+
+    onHoraireSaved() {
+        this.displayHoraireForm = false;
+        this._api.getHoraires(this.erabliere?.id).then(horaires => {
+            this.horaire = horaires != null && horaires.length > 0 ? horaires[0] : new Horaire();
+        });
     }
 }

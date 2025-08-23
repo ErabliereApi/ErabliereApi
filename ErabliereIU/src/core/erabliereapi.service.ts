@@ -33,8 +33,7 @@ import { PostImageGenerationResponse } from 'src/model/postImageGenerationRespon
 import { Horaire } from 'src/model/horaire';
 
 @Injectable({ providedIn: 'root' })
-export class ErabliereApi {
-       
+export class ErabliereApi {       
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -769,6 +768,11 @@ export class ErabliereApi {
     async putHoraire(erabliereId: any, value: Horaire) {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/Erablieres/' + erabliereId + '/Horaire', value, { headers: headers }));
+    }
+
+    async getHoraires(id: any) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<Horaire[]>(this._environmentService.apiUrl + '/Erablieres/' + id + '/Horaire', { headers: headers }));
     }
 }
 

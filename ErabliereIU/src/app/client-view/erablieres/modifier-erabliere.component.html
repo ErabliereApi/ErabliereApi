@@ -21,7 +21,7 @@
                     @if (displayHoraireForm)
                     {
                     <emodal [title]="'Modifier Horaire'" (closeModal)="displayHoraireForm = false">
-                        <horaire-form [horaire]="horaire" [erabliereId]="erabliere?.id"></horaire-form>
+                        <horaire-form [horaire]="horaire" [erabliereId]="erabliere?.id" (onHoraireSaved)="onHoraireSaved()"></horaire-form>
                     </emodal>
                     }
                     @else
