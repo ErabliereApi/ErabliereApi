@@ -9,11 +9,13 @@ import { TablePanelComponent } from './table-panel.component';
 import { Rapport } from 'src/model/rapport';
 import { RapportPanelComponent } from './rapport-panel.component';
 import { ActivatedRoute } from '@angular/router';
+import { HoraireTableComponent } from "../../horaire/horaire-table.component";
+import { Horaire } from 'src/model/horaire';
 
 @Component({
     selector: 'capteur-panels',
     templateUrl: './capteur-panels.component.html',
-    imports: [GraphPanelComponent, TablePanelComponent, RapportPanelComponent, NgClass]
+    imports: [GraphPanelComponent, TablePanelComponent, RapportPanelComponent, NgClass, HoraireTableComponent]
 })
 export class CapteurPanelsComponent implements OnInit, OnChanges {
     @Input() capteurs?: Capteur[] = []
@@ -86,5 +88,13 @@ export class CapteurPanelsComponent implements OnInit, OnChanges {
         if (event.key == "Enter") {
             this.changerDimension(taille);
         }
+    }
+
+    getFirstHoraire(): Horaire | undefined {
+        const horaires = this.erabliere?.horaires;
+        if (horaires && horaires.length > 0) {
+            return horaires[0];
+        }
+        return undefined;
     }
 }

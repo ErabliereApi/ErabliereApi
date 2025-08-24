@@ -1831,7 +1831,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n  {\r\n    \"nom\": \"Mont Tremblant\",\r\n    \"codePostal\": \"J8E 1T1\",\r\n    \"description\": \"Une station populaire avec 102 pistes, un village animé et une vue spectaculaire.\",\r\n    \"addresse\": \"1000 Chemin des Voyageurs, Mont-Tremblant, QC\",\r\n    \"regionAdministrative\": \"Laurentides\",\r\n    \"latitude\": 46.209129869485636,\r\n    \"longitude\": -74.58567254048866,\r\n    \"base\": 230,\r\n    \"sommet\": 875,\r\n    \"isPublic\": true,\r\n    \"indiceOrdre\": 50,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false\r\n  },\r\n  {\r\n    \"nom\": \"Le Massif de Charlevoix\",\r\n    \"codePostal\": \"G0A 2L0\",\r\n    \"description\": \"Réputée pour ses vues spectaculaires sur le fleuve Saint-Laurent et son grand dénivelé.\",\r\n    \"addresse\": \"1350 Rue Principale, Petite-Rivière-Saint-François, QC\",\r\n    \"regionAdministrative\": \"Capitale-Nationale\",\r\n    \"latitude\": 47.27739412875612,\r\n    \"longitude\": -70.57492727420376,\r\n    \"base\": 36,\r\n    \"sommet\": 806,\r\n    \"isPublic\": true,\r\n    \"indiceOrdre\": 51,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false\r\n  },\r\n  {\r\n    \"nom\": \"Stoneham\",\r\n    \"codePostal\": \"G3C 1T3\",\r\n    \"description\": \"Offre des pistes éclairées pour le ski de soirée et une variété pour tous les niveaux.\",\r\n    \"addresse\": \"600 Chemin du Hibou, Stoneham-et-Tewkesbury, QC\",\r\n    \"regionAdministrative\": \"Capitale-Nationale\",\r\n    \"latitude\": 47.02703295011956,\r\n    \"longitude\": -71.38289084536765,\r\n    \"base\": 240,\r\n    \"sommet\": 593,\r\n    \"isPublic\": true,\r\n    \"indiceOrdre\": 52,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false\r\n  }\r\n]",
+							"raw": "[\r\n  {\r\n    \"nom\": \"Mont Tremblant\",\r\n    \"codePostal\": \"J8E 1T1\",\r\n    \"description\": \"Une station populaire avec 102 pistes, un village animé et une vue spectaculaire.\",\r\n    \"addresse\": \"1000 Chemin des Voyageurs, Mont-Tremblant, QC\",\r\n    \"regionAdministrative\": \"Laurentides\",\r\n    \"latitude\": 46.209129869485636,\r\n    \"longitude\": -74.58567254048866,\r\n    \"base\": 230,\r\n    \"sommet\": 875,\r\n    \"isPublic\": true,\r\n    \"indiceOrdre\": 50,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"afficherSectionHoraire\": true\r\n  },\r\n  {\r\n    \"nom\": \"Le Massif de Charlevoix\",\r\n    \"codePostal\": \"G0A 2L0\",\r\n    \"description\": \"Réputée pour ses vues spectaculaires sur le fleuve Saint-Laurent et son grand dénivelé.\",\r\n    \"addresse\": \"1350 Rue Principale, Petite-Rivière-Saint-François, QC\",\r\n    \"regionAdministrative\": \"Capitale-Nationale\",\r\n    \"latitude\": 47.27739412875612,\r\n    \"longitude\": -70.57492727420376,\r\n    \"base\": 36,\r\n    \"sommet\": 806,\r\n    \"isPublic\": true,\r\n    \"indiceOrdre\": 51,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"afficherSectionHoraire\": true\r\n  },\r\n  {\r\n    \"nom\": \"Stoneham\",\r\n    \"codePostal\": \"G3C 1T3\",\r\n    \"description\": \"Offre des pistes éclairées pour le ski de soirée et une variété pour tous les niveaux.\",\r\n    \"addresse\": \"600 Chemin du Hibou, Stoneham-et-Tewkesbury, QC\",\r\n    \"regionAdministrative\": \"Capitale-Nationale\",\r\n    \"latitude\": 47.02703295011956,\r\n    \"longitude\": -71.38289084536765,\r\n    \"base\": 240,\r\n    \"sommet\": 593,\r\n    \"isPublic\": true,\r\n    \"indiceOrdre\": 52,\r\n    \"afficherSectionBaril\": false,\r\n    \"afficherTrioDonnees\": false,\r\n    \"afficherSectionDompeux\": false,\r\n    \"afficherSectionHoraire\": true\r\n  }\r\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2019,6 +2019,55 @@
 								"erablieres",
 								"{{idErabliere}}",
 								"Horaire"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Mont Tremblant Horaire",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.collectionVariables.set('idErabliere', json[0].id);\r",
+									"\r",
+									"pm.test(\"Horaire is initialize\", () => {\r",
+									"    pm.expect(json[0].horaires.length).to.eq(1);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/erablieres?$filter=nom eq 'Mont Tremblant'&$expand=horaires",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"erablieres"
+							],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "nom eq 'Mont Tremblant'"
+								},
+								{
+									"key": "$expand",
+									"value": "horaires"
+								}
 							]
 						}
 					},

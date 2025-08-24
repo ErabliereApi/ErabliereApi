@@ -4,7 +4,7 @@ import { Horaire } from "src/model/horaire";
 @Component({
     selector: "horaire-table",
     template: `
-        <table class="table table-striped">
+        <table class="table table-striped table-sm">
             <thead>
                 <tr>
                     <th>Jour</th>

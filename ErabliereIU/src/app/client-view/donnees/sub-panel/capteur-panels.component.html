@@ -32,6 +32,12 @@
     </div>
 </div>
 <div class="row pb-2">
+    @if (erabliere?.afficherSectionHoraire) 
+    {
+        <div [ngClass]="'col-md-' + tailleGraphiques">
+            <horaire-table [horaire]="getFirstHoraire()"></horaire-table>
+        </div>
+    }
     @for (rapport of rapports; track rapport.id)
     {
         <div [ngClass]="'col-md-' + tailleGraphiques">

@@ -87,7 +87,7 @@ export class ErabliereComponent implements OnInit {
     this._api.getErabliere(this.idErabliereSelectionee).then((erabliere) => {
         this.erabliere = erabliere;
         this.resetErabliere.next(erabliere);
-        this.displayCapteurs = !!(this.erabliere.capteurs?.find(capteur => capteur.afficherCapteurDashboard));
+        this.displayCapteurs = !!this.erabliere.capteurs?.find(capteur => capteur.afficherCapteurDashboard) || !!this.erabliere.afficherSectionHoraire;
       }).catch((error) => {
         console.error('Error fetching erabliere:', error)
         this.erabliere = undefined;
