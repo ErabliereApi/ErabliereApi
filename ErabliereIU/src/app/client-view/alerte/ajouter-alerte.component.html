@@ -53,9 +53,9 @@
           <einput [formGroup]="alerteForm" type="number" name="niveauBassinMax" symbole="%" />
         </div>
       </div>
-      <button id="creer-alerte-donnees-btn" class="btn btn-primary mt-2 me-2 mb-3"
-        (click)="onButtonCreerClick()">Créer</button>
-      <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
+      <ebutton id="creer-alerte-donnees-btn" type="primary" class="mt-2 me-2 mb-3"
+        (clicked)="onButtonCreerClick()" [inProgress]="onButtonCreerClickInProgress">Créer</ebutton>
+      <ebutton type="secondary" class="mt-2 mb-3" (clicked)="onButtonAnnuleClick()">Annuler</ebutton>
       <div>
         <span class="text-danger">{{generalError}}</span>
       </div>
@@ -91,9 +91,9 @@
           <einput [formGroup]="alerteCapteurForm" type="number" name="max" symbole={{capteurSymbole()}} />
         </div>
       </div>
-      <button id="creer-alerte-capteur-btn" class="btn btn-primary mt-2 me-2 mb-3"
-        (click)="onButtonCreerAlerteCapteurClick()">Créer</button>
-      <button class="btn btn-secondary mt-2 mb-3" (click)="onButtonAnnuleClick()">Annuler</button>
+      <ebutton id="creer-alerte-capteur-btn" type="primary" class="mt-2 me-2 mb-3"
+        (clicked)="onButtonCreerAlerteCapteurClick()" [inProgress]="onButtonCreerAlerteCapteurClickInProgress">Créer</ebutton>
+      <ebutton type="secondary" class="mt-2 mb-3" (clicked)="onButtonAnnuleClick()">Annuler</ebutton>
       <div>
         <span class="text-danger">{{generalError}}</span>
       </div>

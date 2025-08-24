@@ -9,11 +9,12 @@ import { EinputComponent } from "src/generic/einput.component";
 
 import { Erabliere } from "src/model/erabliere";
 import { ActivatedRoute } from "@angular/router";
+import { EButtonComponent } from "src/generic/ebutton.component";
 
 @Component({
     selector: 'ajouter-alerte-modal',
     templateUrl: 'ajouter-alerte.component.html',
-    imports: [ReactiveFormsModule, EinputComponent]
+    imports: [ReactiveFormsModule, EinputComponent, EButtonComponent]
 })
 export class AjouterAlerteComponent implements OnInit {
     typeAlerteSelectListForm: UntypedFormGroup
@@ -21,7 +22,9 @@ export class AjouterAlerteComponent implements OnInit {
     alerteCapteur:AlerteCapteur
     display:boolean
     generalError?: string
-    
+    onButtonCreerClickInProgress: boolean = false;
+    onButtonCreerAlerteCapteurClickInProgress: boolean = false;
+
     constructor(
         private readonly _api: ErabliereApi, 
         private readonly fb: UntypedFormBuilder,
@@ -120,6 +123,7 @@ export class AjouterAlerteComponent implements OnInit {
 
     onButtonCreerClick() {
         if (this.alerte != undefined) {
+            this.generalError = "";
             this.alerte.idErabliere = this.idErabliereSelectionee;
             this.alerte.nom = this.alerteForm.controls['nom'].value;
             this.alerte.envoyerA = this.alerteForm.controls['destinataireCourriel'].value;
@@ -130,6 +134,7 @@ export class AjouterAlerteComponent implements OnInit {
             this.alerte.vacciumThresholdHight = convertTenthToNormale(this.alerteForm.controls['vacciumMin'].value)
             this.alerte.niveauBassinThresholdLow = this.alerteForm.controls['niveauBassinMax'].value;
             this.alerte.niveauBassinThresholdHight = this.alerteForm.controls['niveauBassinMin'].value;
+            this.onButtonCreerClickInProgress = true;
             this._api.postAlerte(this.idErabliereSelectionee, this.alerte)
                      .then(r => {
                          this.display = false;
@@ -139,16 +144,25 @@ export class AjouterAlerteComponent implements OnInit {
                      })
                      .catch(e => {
                         this.generalError = "Erreur lors de la modification de l'alerte";
+                    })
+                    .finally(() => {
+                        this.onButtonCreerClickInProgress = false;
                     });
         }
         else {
             console.log("this.alerte is undefined");
+            this.generalError = "L'alerte n'est pas défini";
         }
     }
 
     onButtonCreerAlerteCapteurClick() {
         if (this.alerteCapteur != undefined) {
+            this.generalError = "";
             this.alerteCapteur.idCapteur = this.alerteCapteurForm.controls['idCapteur'].value;
+            if (this.alerteCapteur.idCapteur == null || this.alerteCapteur.idCapteur == "") {
+                this.generalError = "Le capteur doit être sélectionné";
+                return;
+            }
             this.alerteCapteur.nom = this.alerteCapteurForm.controls['nom'].value;
             this.alerteCapteur.envoyerA = this.alerteCapteurForm.controls['destinataireCourriel'].value;
             this.alerteCapteur.texterA = this.alerteCapteurForm.controls['destinataireSMS'].value;
@@ -162,6 +176,7 @@ export class AjouterAlerteComponent implements OnInit {
             } else {
                 this.alerteCapteur.maxValue = undefined;
             }
+            this.onButtonCreerAlerteCapteurClickInProgress = true;
             this._api.postAlerteCapteur(this.alerteCapteur.idCapteur, this.alerteCapteur)
                      .then(r => {
                          this.display = false;
@@ -171,10 +186,14 @@ export class AjouterAlerteComponent implements OnInit {
                      })
                      .catch(e => {
                         this.generalError = "Erreur lors de la modification de l'alerte";
+                     })
+                     .finally(() => {
+                         this.onButtonCreerAlerteCapteurClickInProgress = false;
                      });
         }
         else {
             console.log("this.alerteCapteur is undefined");
+            this.generalError = "L'alerte n'est pas défini";
         }
     }
 }
