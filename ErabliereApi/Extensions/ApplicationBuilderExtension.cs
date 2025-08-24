@@ -47,11 +47,11 @@ public static class ApplicationBuilderExtensions
     /// <returns></returns>
     public static IApplicationBuilder AddSemaphoreOnInMemoryDatabase(this IApplicationBuilder app, IConfiguration config)
     {
-        var semaphore = new SemaphoreSlim(1, 1);
-
         if (!config.UseSql())
         {
             Console.WriteLine("Using in-memory database, semaphore added");
+
+            var semaphore = new SemaphoreSlim(1, 1);
 
             app.Use(async (context, next) =>
             {
