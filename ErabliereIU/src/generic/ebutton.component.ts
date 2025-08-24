@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Output, Input } from "@angular/core";
 
 @Component({
     selector: 'ebutton',
     template: `
-        <button class="btn btn-{{type}}" type="button" (click)="onClick()" [disabled]="disabled || inProgress" [title]="tooltip">
+        <button id="{{buttonId}}" class="btn btn-{{type}}" type="button" (click)="onClick()" [disabled]="disabled || inProgress" [title]="tooltip ?? ''">
             <ng-content></ng-content>
             @if (inProgress) {
                 <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
@@ -12,6 +12,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
     `,
 })
 export class EButtonComponent {
+    @Input() buttonId: string = "";
     @Input() inProgress: boolean = false;
     @Input() text: string = "";
     @Input() disabled: boolean = false;

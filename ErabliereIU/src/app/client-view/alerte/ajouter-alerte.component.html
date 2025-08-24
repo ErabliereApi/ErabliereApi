@@ -1,6 +1,6 @@
 @if (!display) {
 <div>
-  <button id="ajouter-alerte-btn" class="btn btn-primary mb-2" (click)="onButtonAjouterClick()">Ajouter</button>
+  <ebutton buttonId="ajouter-alerte-btn" class="mb-2" type="primary" (clicked)="onButtonAjouterClick()">Ajouter</ebutton>
 </div>
 }
 @if (display) {
@@ -53,7 +53,7 @@
           <einput [formGroup]="alerteForm" type="number" name="niveauBassinMax" symbole="%" />
         </div>
       </div>
-      <ebutton id="creer-alerte-donnees-btn" type="primary" class="mt-2 me-2 mb-3"
+      <ebutton buttonId="creer-alerte-donnees-btn" type="primary" class="mt-2 me-2 mb-3"
         (clicked)="onButtonCreerClick()" [inProgress]="onButtonCreerClickInProgress">Créer</ebutton>
       <ebutton type="secondary" class="mt-2 mb-3" (clicked)="onButtonAnnuleClick()">Annuler</ebutton>
       <div>
@@ -91,7 +91,7 @@
           <einput [formGroup]="alerteCapteurForm" type="number" name="max" symbole={{capteurSymbole()}} />
         </div>
       </div>
-      <ebutton id="creer-alerte-capteur-btn" type="primary" class="mt-2 me-2 mb-3"
+      <ebutton buttonId="creer-alerte-capteur-btn" type="primary" class="mt-2 me-2 mb-3"
         (clicked)="onButtonCreerAlerteCapteurClick()" [inProgress]="onButtonCreerAlerteCapteurClickInProgress">Créer</ebutton>
       <ebutton type="secondary" class="mt-2 mb-3" (clicked)="onButtonAnnuleClick()">Annuler</ebutton>
       <div>
