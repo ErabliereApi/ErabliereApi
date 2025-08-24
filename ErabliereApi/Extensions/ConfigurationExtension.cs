@@ -70,4 +70,12 @@ public static class ConfigurationExtension
         }
         return (T)Convert.ChangeType(value, typeof(T));
     }
+
+    /// <summary>
+    /// Indique si l'utilisation de SQL est activée
+    /// </summary>
+    public static bool UseSql(this IConfiguration config)
+    {
+        return string.Equals(config["USE_SQL"]?.Trim(), TrueString, OrdinalIgnoreCase);
+    }
 }

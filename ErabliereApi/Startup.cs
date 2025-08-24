@@ -133,7 +133,7 @@ public class Startup
         }
 
         // Prometheus
-        services.AddSingleton<CollectorRegistry>(Metrics.DefaultRegistry);
+        services.AddSingleton(Metrics.DefaultRegistry);
 
         // Stripe
         services.AddScoped<ApiKeyAuthorizationContext>();
@@ -200,26 +200,7 @@ public class Startup
     {
         var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
 
-        if (string.Equals(Configuration["USE_SQL"], TrueString, OrdinalIgnoreCase) &&
-            string.Equals(Configuration["SQL_USE_STARTUP_MIGRATION"], TrueString, OrdinalIgnoreCase))
-        {
-            var database = serviceProvider.GetRequiredService<ErabliereDbContext>();
-
-            var defaultMigrationTimeout = database.Database.GetCommandTimeout();
-
-            Console.WriteLine("Default migration timeout: " + defaultMigrationTimeout);
-
-            var migrationTimeout = Configuration["SQL_STARTUP_MIGRATION_TIMEOUT"];
-
-            if (migrationTimeout != null)
-            {
-                database.Database.SetCommandTimeout(int.Parse(migrationTimeout));
-
-                Console.WriteLine("Migration timeout: " + migrationTimeout);
-            }
-
-            database.Database.Migrate();
-        }
+        app.MigrateDatabase(Configuration, serviceProvider);
 
         if (env.IsDevelopment())
         {
@@ -253,6 +234,8 @@ public class Startup
                 option.WithOrigins(Configuration["CORS_ORIGINS"]?.Split(',') ?? ["*"]);
             });
         }
+
+        app.AddSemaphoreOnInMemoryDatabase(Configuration);
 
         if (Configuration.StripeIsEnabled())
         {

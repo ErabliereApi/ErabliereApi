@@ -128,7 +128,11 @@ public static class ServiceCollectionExtension
     /// </summary>
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration config)
     {
-        if (string.Equals(config["USE_SQL"], TrueString, OrdinalIgnoreCase))
+        var useSql = config.UseSql();
+
+        Console.WriteLine("Configuration de la base de donnée... USE_SQL: " + useSql);
+
+        if (useSql)
         {
             services.AddDbContext<ErabliereDbContext>(options =>
             {

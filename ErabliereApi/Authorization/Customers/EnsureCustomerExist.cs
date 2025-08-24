@@ -3,6 +3,7 @@ using ErabliereApi.Donnees;
 using ErabliereApi.Extensions;
 using ErabliereApi.Services.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace ErabliereApi.Authorization.Customers;
