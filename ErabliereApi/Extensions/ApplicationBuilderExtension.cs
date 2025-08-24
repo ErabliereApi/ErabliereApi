@@ -58,19 +58,18 @@ public static class ApplicationBuilderExtensions
                 try
                 {
                     await semaphore.WaitAsync(context.RequestAborted);
+
+                    await next();
                 }
                 catch (OperationCanceledException e)
                 {
                     var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
                     logger.LogWarning(e, "Operation was canceled while waiting for semaphore");
-                    return;
                 }
                 finally
                 {
                     semaphore.Release();
                 }
-
-                await next();
             });
         }
 
