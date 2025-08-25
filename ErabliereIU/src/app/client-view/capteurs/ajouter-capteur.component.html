@@ -1,59 +1,54 @@
-<form [formGroup]="ajoutCapteurForm" class="mb-3" novalidate>
+<form [formGroup]="ajoutCapteurForm" class="row mb-3" novalidate>
     <!-- ajouter la section des erreurs général -->
     @if (generalError) {
-        <div class="alert alert-danger" role="alert">
-            {{ generalError }}
-        </div>
+    <span class="text-danger">
+        {{ generalError }}
+    </span>
     }
-    <div [class]="'mb-3' + (ajoutCapteurForm.controls['nom'].touched ? ' was-validated' : '')">
-        <label for="nom" class="form-label">Nom</label>
-        <input type="text" class="form-control" id="nom" name="nom" formControlName="nom"
-               placeholder="Nom du capteur"
-               maxlength="200"
-               required>
-        <input-error [errorObj]="errorObj" [controlName]="'nom'"></input-error>
-        @if(ajoutCapteurForm.controls['nom'].hasError('maxlength')) {
-            <div class="invalid-feedback">Le nom est trop long.</div>
-        } @else if(ajoutCapteurForm.controls['nom'].hasError('required')) {
-            <div class="invalid-feedback">Le nom est obligatoire.</div>
-        }
-
+    <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['nom'].touched ? ' was-validated' : '')">
+        <einput [id]="'nom'" [name]="'nom'" [placeholder]="'Nom du capteur'" [formGroup]="ajoutCapteurForm"
+            [maxlength]="200" />
     </div>
 
-    <div [class]="'mb-3' + (ajoutCapteurForm.controls['symbole'].touched ? ' was-validated' : '')">
-        <label for="symbole" class="form-label">Symbole</label>
-        <input type="text" class="form-control" id="symbole" name="symbole" formControlName="symbole"
-               placeholder="°C"
-               maxlength="7">
-        <input-error [errorObj]="errorObj" [controlName]="'symbole'"></input-error>
+    <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['symbole'].touched ? ' was-validated' : '')">
+        <einput [id]="'symbole'" [name]="'symbole'" [arialabel]="'Symbole'" [placeholder]="'Symbole du capteur'"
+            [formGroup]="ajoutCapteurForm" [maxlength]="7" />
     </div>
 
-    <div class="form-check form-switch">
-        <label for="afficherCapteurDashboard" class="form-label">Afficher dans les graphiques:</label>
-        <input type="checkbox" class="form-check-input" id="afficherCapteurDashboard" formControlName="affichageDashboard">
-        <input-error [errorObj]="errorObj" [controlName]="'afficherCapteurDashboard'"></input-error>
+    <div class="col-md-6">
+        <div class="form-check form-switch">
+            <label for="afficherCapteurDashboard" class="form-label">Afficher dans les graphiques:</label>
+            <input type="checkbox" class="form-check-input" id="afficherCapteurDashboard"
+                formControlName="affichageDashboard">
+            <input-error [errorObj]="errorObj" [controlName]="'afficherCapteurDashboard'"></input-error>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+            <label for="ajouterDonneeDepuisInterface" class="form-check-label">Saisie manuelle</label>
+            <input type="checkbox" class="form-check-input" id="ajouterDonneeDepuisInterface"
+                formControlName="saisieManuelle">
+            <input-error [errorObj]="errorObj" [controlName]="'ajouterDonneeDepuisInterface'"></input-error>
+        </div>
     </div>
 
-    <div class="form-check form-switch mb-3">
-        <label for="ajouterDonneeDepuisInterface" class="form-check-label">Saisie manuelle</label>
-        <input type="checkbox" class="form-check-input" id="ajouterDonneeDepuisInterface" formControlName="saisieManuelle">
-        <input-error [errorObj]="errorObj" [controlName]="'ajouterDonneeDepuisInterface'"></input-error>
+    <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['type'].touched ? ' was-validated' : '')">
+        <einput [id]="'type'" [name]="'type'" [arialabel]="'Type'" [placeholder]="'Type du capteur'"
+            [formGroup]="ajoutCapteurForm" [maxlength]="100" [title]="'Indiquer un type de capteur uniquement pour information, par exemple Senscap, PLC, etc.'" />
     </div>
 
-    <div [class]="'mb-3' + (ajoutCapteurForm.controls['type'].touched ? ' was-validated' : '')">
-        <label for="symbole" class="form-label" title="Permet d'indiquer le type du capteur. Par exemple si les données provienne d'un système externe comme Senscap. Le champs est optionnel">Type</label>
-        <input type="text" class="form-control" id="type" name="type" formControlName="type"
-               placeholder="">
-        <input-error [errorObj]="errorObj" [controlName]="'type'"></input-error>
+    <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['externalId'].touched ? ' was-validated' : '')">
+        <einput [id]="'externalId'" [name]="'externalId'" [arialabel]="'Id externe'"
+            [placeholder]="'Id externe du capteur'" [formGroup]="ajoutCapteurForm" [maxlength]="50" [title]="'Indiquer un identifiant externe uniquement pour information, par exemple un ID de capteur dans un système tiers.'" />
     </div>
 
-    <div [class]="'mb-3' + (ajoutCapteurForm.controls['externalId'].touched ? ' was-validated' : '')">
-        <label for="externalId" class="form-label" title="L'id du capteur dans un autre sytème. Le champs est optionnel.">Id externe</label>
-        <input type="text" class="form-control" id="externalId" name="externalId" formControlName="externalId"
-               placeholder="">
-        <input-error [errorObj]="errorObj" [controlName]="'externalId'"></input-error>
+    <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['displayType'].touched ? ' was-validated' : '')">
+        <einput [id]="'displayType'" [name]="'displayType'" arialabel="Type d'affichage"
+            placeholder="Type d'affichage du capteur" [formGroup]="ajoutCapteurForm" [maxlength]="50" title="Indiquer un type d'affichage uniquement, par exemple Graphique, Tableau, etc." />
     </div>
 
-    <button class="btn btn-primary me-2" (click)="ajouterCapteur()">Ajouter</button>
-    <button type="button" class="btn btn-secondary" (click)="buttonAnnuler()">Annuler</button>
+    <div class="btn-group">
+        <ebutton type="primary" class="me-2" (clicked)="ajouterCapteur()" [inProgress]="ajoutInProgress">Ajouter
+        </ebutton>
+        <ebutton type="secondary" (clicked)="buttonAnnuler()">Annuler</ebutton>
+    </div>
 </form>

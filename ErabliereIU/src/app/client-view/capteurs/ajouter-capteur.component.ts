@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { PutCapteur } from "src/model/putCapteur";
-import { InputErrorComponent } from "src/generic/input-error.component";
 import {
     ReactiveFormsModule,
     FormsModule,
@@ -10,11 +9,14 @@ import {
     FormControl,
     Validators
 } from "@angular/forms";
+import { EinputComponent } from "src/generic/einput.component";
+import { InputErrorComponent } from "src/generic/input-error.component";
+import { EButtonComponent } from "src/generic/ebutton.component";
 
 @Component({
     selector: 'ajouter-capteur',
     templateUrl: 'ajouter-capteur.component.html',
-    imports: [ReactiveFormsModule, FormsModule, InputErrorComponent]
+    imports: [ReactiveFormsModule, FormsModule, EinputComponent, InputErrorComponent, EButtonComponent]
 })
 export class AjouterCapteurComponent {
     ajoutCapteurForm: UntypedFormGroup;
@@ -26,6 +28,8 @@ export class AjouterCapteurComponent {
 
     errorObj: any;
     generalError: string | undefined;
+
+    ajoutInProgress: boolean = false;
 
     constructor(private readonly erabliereApi: ErabliereApi,
                 private readonly formBuilder: UntypedFormBuilder) {
@@ -63,11 +67,23 @@ export class AjouterCapteurComponent {
                     validators: [Validators.maxLength(50)],
                     updateOn: 'blur'
                 }
+            ),
+            displayType: new FormControl(
+                '',
+                {
+                    validators: [Validators.maxLength(50)],
+                    updateOn: 'blur'
+                }
             )
         })
     }
 
     ajouterCapteur() {
+        // Check if the forms is valid before processing
+        if (this.ajoutCapteurForm.invalid) {
+            this.ajoutCapteurForm.markAllAsTouched();
+            return;
+        }
         this.capteur.idErabliere = this.idErabliere;
         this.capteur.nom = this.ajoutCapteurForm.controls['nom'].value;
         this.capteur.symbole = this.ajoutCapteurForm.controls['symbole'].value;
@@ -75,6 +91,8 @@ export class AjouterCapteurComponent {
         this.capteur.ajouterDonneeDepuisInterface = this.ajoutCapteurForm.controls['saisieManuelle'].value;
         this.capteur.type = this.ajoutCapteurForm.controls['type'].value;
         this.capteur.externalId = this.ajoutCapteurForm.controls['externalId'].value;
+        this.capteur.displayType = this.ajoutCapteurForm.controls['displayType'].value;
+        this.ajoutInProgress = true;
         this.erabliereApi.postCapteur(this.idErabliere, this.capteur).then(() => {
             this.shouldReloadCapteurs.emit();
             this.ajoutCapteurForm.reset({
@@ -88,6 +106,8 @@ export class AjouterCapteurComponent {
             else {
                 this.generalError = "Une erreur est survenue lors de l'ajout du capteur. Veuillez réessayer plus tard."
             }
+        }).finally(() => {
+            this.ajoutInProgress = false;
         });
     }
 

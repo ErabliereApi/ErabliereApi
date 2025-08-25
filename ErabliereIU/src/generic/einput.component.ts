@@ -6,7 +6,7 @@ import { InputErrorComponent } from "./input-error.component";
 @Component({
   selector: 'einput',
   template: `
-        <label for="nom" class="form-label">{{ arialabel ?? smartName(name) }}:</label>
+        <label for="{{ name }}" class="form-label">{{ arialabel ?? smartName(name) }}:</label>
         <div [formGroup]="formGroup" class="input-group">
           <input
             class="form-control"
@@ -25,7 +25,7 @@ import { InputErrorComponent } from "./input-error.component";
           @if (formGroup.controls[name].errors && formGroup.controls[name].touched) {
             <div>
               @if (formGroup.controls[name].errors!.required) {
-              <small class="text-danger">{{ arialabel ?? name }} obligatoire.</small>
+              <small class="text-danger">{{ arialabel ?? smartName(name) }} obligatoire.</small>
               }
               @if (formGroup.controls[name].errors!.maxlength) {
               <small class="text-danger">Taille maximal dépassée.</small>

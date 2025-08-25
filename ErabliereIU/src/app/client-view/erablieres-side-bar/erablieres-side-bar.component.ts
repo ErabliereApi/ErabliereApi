@@ -65,7 +65,7 @@ export class ErabliereSideBarComponent implements OnInit {
     this.errorDetails = "";
 
     if (this.etat == titreChargement) {
-      return new Promise<void>((resolve, reject) => { });
+      return Promise.resolve();
     }
 
     this.etat = titreChargement;

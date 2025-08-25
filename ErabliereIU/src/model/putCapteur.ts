@@ -13,4 +13,5 @@ export class PutCapteur {
     lastMessageTime?: string;
     online?: boolean;
     reportFrequency?: number;
+    displayType?: string;
 }
