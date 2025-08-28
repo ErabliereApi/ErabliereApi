@@ -7,7 +7,7 @@ import { InputErrorComponent } from "./input-error.component";
   selector: 'einput',
   template: `
         <label for="{{ name }}" class="form-label">{{ arialabel ?? smartName(name) }}:</label>
-        <div [formGroup]="formGroup" class="input-group">
+        <div [formGroup]="formGroup" [class]="'input-group' + (formGroup.controls[name].touched ? ' was-validated' : '')">
           <input
             class="form-control"
             type="{{ type }}"

@@ -5,14 +5,14 @@
         {{ generalError }}
     </span>
     }
-    <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['nom'].touched ? ' was-validated' : '')">
+    <div class="col-md-6 mb-3">
         <einput [id]="'nom'" [name]="'nom'" [placeholder]="'Nom du capteur'" [formGroup]="ajoutCapteurForm"
-            [maxlength]="200" />
+            [maxlength]="200" [errorObj]="errorObj" />
     </div>
 
     <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['symbole'].touched ? ' was-validated' : '')">
         <einput [id]="'symbole'" [name]="'symbole'" [arialabel]="'Symbole'" [placeholder]="'Symbole du capteur'"
-            [formGroup]="ajoutCapteurForm" [maxlength]="7" />
+            [formGroup]="ajoutCapteurForm" [maxlength]="7" [errorObj]="errorObj" />
     </div>
 
     <div class="col-md-6">
@@ -33,17 +33,23 @@
 
     <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['type'].touched ? ' was-validated' : '')">
         <einput [id]="'type'" [name]="'type'" [arialabel]="'Type'" [placeholder]="'Type du capteur'"
-            [formGroup]="ajoutCapteurForm" [maxlength]="100" [title]="'Indiquer un type de capteur uniquement pour information, par exemple Senscap, PLC, etc.'" />
+            [formGroup]="ajoutCapteurForm" [maxlength]="100" 
+            [errorObj]="errorObj"
+            [title]="'Indiquer un type de capteur uniquement pour information, par exemple Senscap, PLC, etc.'" />
     </div>
 
     <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['externalId'].touched ? ' was-validated' : '')">
         <einput [id]="'externalId'" [name]="'externalId'" [arialabel]="'Id externe'"
-            [placeholder]="'Id externe du capteur'" [formGroup]="ajoutCapteurForm" [maxlength]="50" [title]="'Indiquer un identifiant externe uniquement pour information, par exemple un ID de capteur dans un système tiers.'" />
+            [placeholder]="'Id externe du capteur'" [formGroup]="ajoutCapteurForm" [maxlength]="50" 
+            [errorObj]="errorObj"
+            [title]="'Indiquer un identifiant externe uniquement pour information, par exemple un ID de capteur dans un système tiers.'" />
     </div>
 
     <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['displayType'].touched ? ' was-validated' : '')">
         <einput [id]="'displayType'" [name]="'displayType'" arialabel="Type d'affichage"
-            placeholder="Type d'affichage du capteur" [formGroup]="ajoutCapteurForm" [maxlength]="50" title="Indiquer un type d'affichage uniquement, par exemple Graphique, Tableau, etc." />
+            placeholder="Type d'affichage du capteur" [formGroup]="ajoutCapteurForm" [maxlength]="50" 
+            [errorObj]="errorObj"
+            title="Indiquer un type d'affichage uniquement, par exemple Graphique, Tableau, etc." />
     </div>
 
     <div class="btn-group">
