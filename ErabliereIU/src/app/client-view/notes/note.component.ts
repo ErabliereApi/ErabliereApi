@@ -5,11 +5,12 @@ import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
+import { EButtonComponent } from "src/generic/ebutton.component";
 
 @Component({
     selector: 'note',
     templateUrl: 'note.component.html',
-    imports: [DatePipe]
+    imports: [DatePipe, EButtonComponent]
 })
 
 export class NoteComponent implements OnInit {
@@ -21,6 +22,7 @@ export class NoteComponent implements OnInit {
     isAIUser: boolean = false;
     progressionText: string | null = null;
     displayImageModal: boolean = false;
+    isDeletingNote: boolean = false;
 
     constructor(private readonly _api: ErabliereApi, private readonly authSvcFactory: AuthorisationFactoryService) {
         this.note = new Note();
@@ -120,11 +122,17 @@ export class NoteComponent implements OnInit {
 
     deleteNote() {
         if (confirm("Êtes-vous sûr de vouloir supprimer la note " + this.note.title + " ?")) {
+            this.isDeletingNote = true;
             this._api.deleteNote(this.note.idErabliere, this.note.id).then(
                 (data) => {
                     this.needToUpdate.emit();
                 }
-            );
+            ).catch(err => {
+                console.error('Erreur lors de la suppression de la note:', err);
+                this.actionError = 'Erreur lors de la suppression de la note. Veuillez réessayer.';
+            }).finally(() => {
+                this.isDeletingNote = false;
+            });
         }
     }
 
