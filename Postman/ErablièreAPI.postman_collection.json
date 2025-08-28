@@ -35,7 +35,7 @@
 									"        method: 'GET',\r",
 									"        header: {\r",
 									"            'accept': 'application/json',\r",
-									"            'authorization': request.headers[\"authorization\"]\r",
+									"            'authorization': pm.request.headers[\"authorization\"]\r",
 									"        }\r",
 									"    };\r",
 									"\r",
@@ -110,7 +110,7 @@
 									"        method: 'GET',\r",
 									"        header: {\r",
 									"            'accept': 'application/json',\r",
-									"            'authorization': request.headers[\"authorization\"]\r",
+									"            'authorization': pm.request.headers[\"authorization\"]\r",
 									"        }\r",
 									"    };\r",
 									"\r",
@@ -186,7 +186,7 @@
 									"        method: 'GET',\r",
 									"        header: {\r",
 									"            'accept': 'application/json',\r",
-									"            'authorization': request.headers[\"authorization\"]\r",
+									"            'authorization': pm.request.headers[\"authorization\"]\r",
 									"        }\r",
 									"    };\r",
 									"\r",
@@ -257,7 +257,7 @@
 									"        method: 'GET',\r",
 									"        header: {\r",
 									"            'accept': 'application/json',\r",
-									"            'authorization': request.headers[\"authorization\"]\r",
+									"            'authorization': pm.request.headers[\"authorization\"]\r",
 									"        }\r",
 									"    };\r",
 									"\r",
@@ -412,6 +412,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"if (pm.response.code == 400) {\r",
+									"    console.log(pm.response.text())\r",
+									"}\r",
+									"\r",
 									"pm.test(\"Vérifier status réponse.\", () => {\r",
 									"    pm.expect(pm.response.code).to.eq(200);\r",
 									"});\r",
@@ -434,7 +438,8 @@
 									"    console.log(\"Id de l'érablière : \" + pm.collectionVariables.get(\"idErabliere\"));\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -751,6 +756,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"if (pm.response.code == 400) {\r",
+									"    console.log(pm.response.text())\r",
+									"}\r",
+									"\r",
 									"pm.test(\"Vérifier status réponse.\", () => {\r",
 									"    pm.expect(pm.response.code).to.eq(200);\r",
 									"});\r",
@@ -769,7 +778,8 @@
 									"    pm.expect(erabliere).to.eq(undefined);\r",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
