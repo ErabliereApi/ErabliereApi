@@ -100,8 +100,8 @@
         }
       </div>
     </div>
-    <button id="modifierNote" class="btn btn-primary me-2" (click)="onButtonModifierClick()">Modifier</button>
-    <button id="annulerModifierNote" class="btn btn-secondary" (click)="onButtonAnnuleClick()">Annuler</button>
+    <ebutton [buttonId]="'modifierNote'" type="primary" class="me-2" (clicked)="onButtonModifierClick()" [inProgress]="modifierNoteInProgress">Modifier</ebutton>
+    <ebutton [buttonId]="'annulerModifierNote'" type="secondary" (clicked)="onButtonAnnuleClick()">Annuler</ebutton>
     <div class="row"><span class="text-danger">
         {{generalError}}
       </span>

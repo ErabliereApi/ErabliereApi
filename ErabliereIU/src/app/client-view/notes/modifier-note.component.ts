@@ -6,11 +6,12 @@ import { InputErrorComponent } from "src/generic/input-error.component";
 import { Subject } from "rxjs";
 import { Rappel } from "src/model/Rappel";
 import { reminderValidator } from "./note.custom-validators";
+import { EButtonComponent } from "src/generic/ebutton.component";
 
 @Component({
     selector: 'modifier-note',
     templateUrl: 'modifier-note.component.html',
-    imports: [ReactiveFormsModule, InputErrorComponent]
+    imports: [ReactiveFormsModule, InputErrorComponent, EButtonComponent]
 })
 export class ModifierNoteComponent implements OnInit {
     @Input() noteSubject?: Subject<Note | null>;
@@ -24,6 +25,7 @@ export class ModifierNoteComponent implements OnInit {
     errorObj: any;
     fileToLargeErrorMessage?: string | null;
     generalError?: string | null;
+    modifierNoteInProgress: boolean = false;
 
     constructor(private readonly _api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.noteForm = this.fb.group({});
@@ -153,7 +155,7 @@ export class ModifierNoteComponent implements OnInit {
                     this.note.rappel.periodicite = this.noteForm.controls['rappel.periodicite'].value;
                 }
                 this.note.rappel.isActive = !!this.noteForm.controls['isActive'].value;
-
+                this.modifierNoteInProgress = true;
                 this._api.putNote(this.idErabliereSelectionee, this.note)
                     .then(r => {
                         this.errorObj = null;
@@ -189,6 +191,8 @@ export class ModifierNoteComponent implements OnInit {
                             this.fileToLargeErrorMessage = null;
                             this.generalError = "Une erreur est survenue."
                         }
+                    }).finally(() => {
+                        this.modifierNoteInProgress = false;
                     });
             }
         } else {
