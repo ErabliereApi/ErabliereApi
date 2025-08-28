@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.Chat;
 using OpenAI.Images;
+using System.ClientModel;
 using System.Text;
 using System.Text.Json;
 
@@ -28,16 +29,22 @@ public class ErabliereAIController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<ErabliereAIController> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="depot"></param>
     /// <param name="configuration"></param>
-    public ErabliereAIController(ErabliereDbContext depot, IConfiguration configuration)
+    /// <param name="logger"></param>
+    /// <param name="httpClientFactory"></param>
+    public ErabliereAIController(ErabliereDbContext depot, IConfiguration configuration, ILogger<ErabliereAIController> logger, IHttpClientFactory httpClientFactory)
     {
         _depot = depot;
         _configuration = configuration;
+        _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     /// <summary>
@@ -273,27 +280,26 @@ public class ErabliereAIController : ControllerBase
         object[] body = [new { Text = textToTranslate }];
         var requestBody = JsonSerializer.Serialize(body);
 
-        using (var client = new HttpClient())
-        using (var request = new HttpRequestMessage())
-        {
-            // Build the request.
-            request.Method = HttpMethod.Post;
-            request.RequestUri = new Uri(endpoint + route);
-            request.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-            request.Headers.Add("Ocp-Apim-Subscription-Key", key);
-            // location required if you're using a multi-service or regional (not global) resource.
-            request.Headers.Add("Ocp-Apim-Subscription-Region", location);
+        var client = _httpClientFactory.CreateClient("AITranslator");
+        using var request = new HttpRequestMessage();
 
-            // Send the request and get response.
-            HttpResponseMessage response = await client.SendAsync(request, token).ConfigureAwait(false);
+        // Build the request.
+        request.Method = HttpMethod.Post;
+        request.RequestUri = new Uri(endpoint + route);
+        request.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+        request.Headers.Add("Ocp-Apim-Subscription-Key", key);
+        // location required if you're using a multi-service or regional (not global) resource.
+        request.Headers.Add("Ocp-Apim-Subscription-Region", location);
 
-            // Read response as a object
-            var responseBody = await response.Content.ReadAsStringAsync();
+        // Send the request and get response.
+        HttpResponseMessage response = await client.SendAsync(request, token).ConfigureAwait(false);
 
-            var obj = JsonSerializer.Deserialize<List<object?>>(responseBody);
+        // Read response as a object
+        var responseBody = await response.Content.ReadAsStringAsync();
 
-            return Ok(obj);
-        }
+        var obj = JsonSerializer.Deserialize<List<object?>>(responseBody);
+
+        return Ok(obj);
     }
 
     /// <summary>
@@ -304,7 +310,6 @@ public class ErabliereAIController : ControllerBase
     /// <returns></returns>
     [HttpPost("Images")]
     [ProducesResponseType(200, Type = typeof(PostImageGenerationResponse))]
-    [ProducesResponseType(400)]
     public async Task<IActionResult> Images([FromBody] PostImagesGenerationModel request, CancellationToken token)
     {
         var _client = new AzureOpenAIClient(
@@ -323,7 +328,9 @@ public class ErabliereAIController : ControllerBase
                 break;
             }
 
-            var images = await client.GenerateImageAsync(
+            try
+            {
+                var images = await client.GenerateImageAsync(
                 request.Prompt,
                 new ImageGenerationOptions
                 {
@@ -343,15 +350,25 @@ public class ErabliereAIController : ControllerBase
                     }
                 }, token);
 
-            imagesResult.Add(images.Value);
+                imagesResult.Add(images.Value);
+            }
+            catch (ClientResultException ex)
+            {
+                if (ex.Message.Contains("Your request was rejected as a result of our safety system. Your prompt may contain text that is not allowed by our safety system."))
+                {
+                    return BadRequest("Le système de sécurité a rejeté votre demande. Votre prompt peut contenir du texte qui n'est pas autorisé par notre système de sécurité.");
+                }
+
+                throw;
+            }
         }
 
         return Ok(new PostImageGenerationResponse
         {
-            Images = imagesResult.Select(ir => new PostImageGenerationResponseImage
+            Images = [.. imagesResult.Select(ir => new PostImageGenerationResponseImage
             {
                 Url = ir.ImageUri.ToString()
-            }).ToArray()
+            })]
         });
     }
 

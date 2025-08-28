@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { EButtonComponent } from "src/generic/ebutton.component";
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'note',
@@ -112,7 +113,17 @@ export class NoteComponent implements OnInit {
                 });
         }).catch(err => {
             console.error('Erreur lors de la génération de l\'image par IA:', err);
-            this.actionError = 'Erreur lors de la génération de l\'image par IA. Veuillez réessayer.';
+            if (err instanceof HttpErrorResponse && err.error) {
+                if (err.status === 400) {
+                    this.actionError = err.error;
+                }
+                else {
+                    this.actionError = 'Erreur lors de la génération de l\'image par IA. Veuillez réessayer.';
+                }
+            }
+            else {
+                this.actionError = 'Erreur lors de la génération de l\'image par IA. Veuillez réessayer.';
+            }
             this.isGeneratingImage = false;
             this.progressionText = null;
         }).finally(() => {

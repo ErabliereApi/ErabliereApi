@@ -9,6 +9,11 @@ public class PostImageGenerationResponse
     /// Liste des images générées
     /// </summary>
     public PostImageGenerationResponseImage[] Images { get; set; } = [];
+
+    /// <summary>
+    /// Message d'erreur, s'il y en a un
+    /// </summary>
+    public string? Erreur { get; set; }
 }
 
 /// <summary>
@@ -20,4 +25,9 @@ public class PostImageGenerationResponseImage
     /// URL de l'image générée
     /// </summary>
     public string Url { get; set; } = "";
+
+    /// <summary>
+    /// Message d'erreur, s'il y en a un
+    /// </summary>
+    public string? Erreur { get; set; }
 }
