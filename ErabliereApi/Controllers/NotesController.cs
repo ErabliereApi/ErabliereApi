@@ -299,7 +299,27 @@ public class NotesController : ControllerBase
             }
         }
 
-        var entity = await _depot.Notes.FindAsync([noteId], token);
+        var entity = await _depot.Notes
+            .AsNoTracking()
+            .Select(n => new Note
+            {
+            Id = n.Id,
+            IdErabliere = n.IdErabliere,
+            Title = n.Title,
+            Text = n.Text,
+            NoteDate = n.NoteDate,
+            FileExtension = n.FileExtension,
+            ExternalStorageType = n.ExternalStorageType,
+            ExternalStorageUrl = n.ExternalStorageUrl,
+            Rappel = n.Rappel
+            })
+            .FirstOrDefaultAsync(n => n.Id == noteId, token);
+
+        if (entity != null)
+        {
+            // Attach the entity to the context so it can be updated
+            _depot.Notes.Attach(entity);
+        }
 
         if (entity == null || entity.IdErabliere != id)
         {
@@ -329,31 +349,36 @@ public class NotesController : ControllerBase
         // Update rappel si le rappel est présent
         if (putNote.Rappel != null)
         {
-            var rappel = await _depot.Rappels.FirstOrDefaultAsync(r => r.NoteId == entity.Id, token);
-            if (rappel != null)
-            {
-                rappel.DateRappel = putNote.Rappel.DateRappel;
-                rappel.DateRappelFin = putNote.Rappel.DateRappelFin;
-                rappel.Periodicite = putNote.Rappel.Periodicite;
-                rappel.IsActive = putNote.Rappel.IsActive;
-            }
-            else
-            {
-                entity.Rappel = new Rappel
-                {
-                    NoteId = entity.Id,
-                    IdErabliere = id,
-                    IsActive = putNote.Rappel.IsActive,
-                    DateRappel = putNote.Rappel.DateRappel,
-                    DateRappelFin = putNote.Rappel.DateRappelFin,
-                    Periodicite = putNote.Rappel.Periodicite
-                };
-            }
+            await UpdateRappelAsync(id, putNote.Rappel, entity, token);
         }
 
         await _depot.SaveChangesAsync(token);
 
         return Ok(entity);
+    }
+
+    private async Task UpdateRappelAsync(Guid id, PutRappel putRappel, Note entity, CancellationToken token)
+    {
+        var rappel = await _depot.Rappels.FirstOrDefaultAsync(r => r.NoteId == entity.Id, token);
+        if (rappel != null)
+        {
+            rappel.DateRappel = putRappel.DateRappel;
+            rappel.DateRappelFin = putRappel.DateRappelFin;
+            rappel.Periodicite = putRappel.Periodicite;
+            rappel.IsActive = putRappel.IsActive;
+        }
+        else
+        {
+            entity.Rappel = new Rappel
+            {
+                NoteId = entity.Id,
+                IdErabliere = id,
+                IsActive = putRappel.IsActive,
+                DateRappel = putRappel.DateRappel,
+                DateRappelFin = putRappel.DateRappelFin,
+                Periodicite = putRappel.Periodicite
+            };
+        }
     }
 
     /// <summary>

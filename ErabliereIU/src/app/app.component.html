@@ -20,8 +20,8 @@
         </div>
       </div>
     </div>
-    @if (erabliereAIEnable && erabliereAIUserRole) {
-    <app-chat-widget></app-chat-widget>
+    @if (erabliereAIEnable && erabliereAIUserRole && !isAIPage) {
+    <app-chat-widget [isModal]="true"></app-chat-widget>
     }
   </footer>
 </div>

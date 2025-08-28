@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ErabliereAiWindowComponent } from './window/erabliereai-window.component';
 
 @Component({
@@ -9,6 +9,7 @@ import { ErabliereAiWindowComponent } from './window/erabliereai-window.componen
 })
 export class ErabliereAIComponent {
     chatOpen = false;
+    @Input() isModal = false;
 
     openChat() {
         this.chatOpen = true;

@@ -7,6 +7,6 @@
 
 @if (chatOpen) {
   <div class="chat-window">
-    <app-erabliereai-window (closeChatWindowEvent)="closeChat()"></app-erabliereai-window>
+    <app-erabliereai-window (closeChatWindowEvent)="closeChat()" [isModal]="isModal"></app-erabliereai-window>
   </div>
 }

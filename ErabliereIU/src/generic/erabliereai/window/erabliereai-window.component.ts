@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -21,6 +21,7 @@ export class ErabliereAiWindowComponent implements OnInit {
     displaySearch = false;
     search = '';
     lastSearch = '';
+    @Input() isModal = false;
 
     constructor(private readonly api: ErabliereApi) {
         this.conversations = [];
@@ -263,10 +264,28 @@ export class ErabliereAiWindowComponent implements OnInit {
 
         const shareLink = `${window.location.origin}/ai/public/${this.currentConversation.id}`;
         navigator.clipboard.writeText(shareLink).then(() => {
-            
+
         }).catch((error) => {
             console.error(error);
             alert('Erreur lors de la copie du lien de partage ' + JSON.stringify(error));
         });
+    }
+
+    keyUpSelectConversation($event: KeyboardEvent, _t24: Conversation) {
+        if ($event.key === 'Enter') {
+            this.selectConversation(_t24);
+        }
+    }
+
+    keyUpDeleteConversation($event: KeyboardEvent, _t24: Conversation) {
+        if ($event.key === 'Enter') {
+            this.deleteConversation(_t24);
+        }
+    }
+
+    keyDownLoadMore($event: KeyboardEvent) {
+        if ($event.key === 'Enter') {
+            this.loadMore();
+        }
     }
 }

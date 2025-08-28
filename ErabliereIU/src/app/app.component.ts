@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EntraRedirectComponent } from './entra-redirect.component';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { ErabliereAIComponent } from 'src/generic/erabliereai/erabliereai-chat.component';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { MsalBroadcastService, MsalModule, MsalService } from '@azure/msal-angular';
@@ -25,17 +25,22 @@ export class AppComponent implements OnInit, OnDestroy {
   authService: IAuthorisationSerivce;
   private readonly _destroying$ = new Subject<void>();
   msalEncryptionInitialize: boolean = false;
+  isAIPage: boolean = false;
 
   constructor(private readonly api: ErabliereApi,
     authServiceFactory: AuthorisationFactoryService,
     private readonly msalService: MsalService,
-    private readonly msalBroadcastService: MsalBroadcastService) {
+    private readonly msalBroadcastService: MsalBroadcastService,
+    private readonly router: Router) {
     this.authService = authServiceFactory.getAuthorisationService();
     if (this.authService.type == "AzureAD") {
       this.authService.loginChanged.subscribe(() => {
         this.checkRoleErabliereAI();
       });
     }
+    this.router.events.subscribe((val) => {
+      this.isAIPage = this.router.url.startsWith('/ai');
+    });
   }
 
   ngOnInit(): void {
