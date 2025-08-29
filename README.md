@@ -5,6 +5,8 @@ L'application est accessible à l'url: https://erabliereapi.freddycoder.com/ une
 
 Un démo est accessible à l'url: https://erabliereapi-demo.azurewebsites.net/ qui ne nécessite pas d'authentification.
 
+Page de présentation: https://erabliereapi.webflow.io/
+
 ## But
 Le but de ce projet est d'analyser, lever des alertes et automatiser certain mecanisme. Basé sur les données receuillis et de façon centralisé.
 
@@ -34,15 +36,21 @@ Les informations enregistré peuvent être :
 - Érablière. Noeud racine de la structure de donnée
 - Capteurs. Représente un capteur
 - DonneeCapteur. Une donnée d'une capteur
-- Temperature, Vaccium, Niveau du bassin (Données extraire par un script depuis un image d'un HMI)
-- Les dompeux (Capturer à l'aide d'un capteur de mouvenement)
-- Informations sur les barils (Entré manuellement depuis un ordinateur client)
+- Temperature, Vaccium, Niveau du bassin
+- Les dompeux
+- Informations sur les barils
+- Alertes
+- Rapports
+- Notes
+- Documentations
+- Conversations avec ErabliereAI
+- 
 
 ## Utilisation
 
 Ce projet est utilisable de différente manière :
 1. Rouler directement dans un environnement de développement.
-2. Déployer sur un PC avec le .net 7 runtime d'installé
+2. Déployer sur un PC avec le .net 9 runtime d'installé
 2. Utilisation avec Docker
 3. Utilisation avec Kubernetes
 
@@ -53,22 +61,7 @@ docker pull erabliereapi/erabliereapi
 docker run -d -p 9001:80 erabliereapi/erabliereapi
 ```
 
-Une librairie proxy est disponible sur nuget.org:
-
-.NET 8
-```
-<PackageReference Include="ErabliereAPI.Proxy" Version="3.1.1" />
-```
-
-.NET 7
-```
-<PackageReference Include="ErabliereAPI.Proxy" Version="2.0.1" />
-```
-
-.NET 6
-```
-<PackageReference Include="ErabliereAPI.Proxy" Version="1.1.1" />
-```
+Une librairie proxy est disponible sur nuget.org: ```ErabliereAPI.Proxy```.
 
 ## Persistance des données
 
