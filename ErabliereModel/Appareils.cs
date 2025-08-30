@@ -21,6 +21,28 @@ public class Appareil : IIdentifiable<Guid?, Appareil>, IErabliereOwnable, ILoca
     public string? Name { get; set; }
 
     /// <summary>
+    /// Statut de l'appareil
+    /// </summary>
+    public AppareilStatut? Statut { get; set; }
+
+    /// <summary>
+    /// Liste des adresses de l'appareil
+    /// </summary>
+    public List<AppareilAdresse> Adresses { get; set; } = new();
+
+    /// <summary>
+    /// Liste des noms d'hôtes de l'appareil
+    /// </summary>
+    public List<NomHostAppareil> NomsHost { get; set; } = new();
+
+    /// <summary>
+    /// Ports de l'appareil
+    /// </summary>
+    public List<PortAppareil> Ports { get; set; } = new();
+
+    public AppareilTempsInfo Temps { get; set; } = new();
+
+    /// <summary>
     /// Description de l'appareil
     /// </summary>
     public string? Description { get; set; }

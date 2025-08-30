@@ -1,23 +1,24 @@
-using System.Globalization;
 using ErabliereApi.ControllerFeatureProviders;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.OData;
-using System.Text.Json.Serialization;
-using MQTTnet.AspNetCore;
-using static System.Boolean;
-using static System.StringComparison;
-using System.Text.Json;
 using ErabliereApi.Depot.Sql;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
-using System.Data.Common;
-using StackExchange.Profiling;
+using ErabliereApi.Formaters;
 using ErabliereApi.Services;
 using ErabliereApi.Services.Emails;
-using Microsoft.Extensions.Options;
-using MailKit.Net.Smtp;
-using MailKit;
 using ErabliereApi.Services.SMS;
+using MailKit;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.OData;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MQTTnet.AspNetCore;
+using StackExchange.Profiling;
+using System.Data.Common;
+using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using static System.Boolean;
+using static System.StringComparison;
 
 namespace ErabliereApi.Extensions;
 
@@ -77,6 +78,8 @@ public static class ServiceCollectionExtension
             {
                 o.Filters.Add<MiniProfilerAsyncLogger>();
             }
+
+            o.InputFormatters.Insert(0, new PlainTextInputFormatter());
         })
         .ConfigureApplicationPartManager(manager =>
         {
