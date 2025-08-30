@@ -31,9 +31,11 @@ import { ApiKey } from 'src/model/apikey';
 import { Rapport } from 'src/model/rapport';
 import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
 import { Horaire } from 'src/model/horaire';
+import { Appareil } from 'src/model/appareil';
 
 @Injectable({ providedIn: 'root' })
-export class ErabliereApi {       
+export class ErabliereApi {
+         
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -773,6 +775,11 @@ export class ErabliereApi {
     async getHoraires(id: any) {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.get<Horaire[]>(this._environmentService.apiUrl + '/Erablieres/' + id + '/Horaire', { headers: headers }));
+    }
+
+    async getAppareils(id: any) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<Appareil[]>(this._environmentService.apiUrl + '/Erablieres/' + id + '/Appareil?$expand=Adresses,Ports,NomsHost,Statut', { headers: headers }));
     }
 }
 

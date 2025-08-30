@@ -64,4 +64,27 @@ public class AppareilController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Supprimer tout les appareils de l'érablière
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    [ValiderOwnership("id")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> Supprimer(Guid id, CancellationToken token)
+    {
+        var appareil = await _context.Appareils.Where(a => a.IdErabliere == id).ToListAsync(token);
+        if (appareil == null || appareil.Count == 0)
+        {
+            return NotFound();
+        }
+
+        _context.Appareils.RemoveRange(appareil);
+        await _context.SaveChangesAsync(token);
+
+        return NoContent();
+    }
 }

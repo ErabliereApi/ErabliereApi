@@ -73,14 +73,20 @@ public class NmapService
                 IdErabliere = idErabliere,
                 Name = address,
                 Description = "Ajouté par scan nmap",
-                Adresses = new List<AppareilAdresse>
-                        {
-                            new AppareilAdresse
-                            {
-                                Addr = address
-                            }
-                        }
             };
+            var addresses = host.SelectNodes("address");
+            if (addresses != null)
+            {
+                foreach (XmlNode addr in addresses)
+                {
+                    appareil.Adresses.Add(new AppareilAdresse
+                    {
+                        Addr = addr.Attributes?["addr"]?.Value ?? "",
+                        Addrtype = addr.Attributes?["addrtype"]?.Value ?? "",
+                        Vendeur = addr.Attributes?["vendor"]?.Value ?? ""
+                    });
+                }
+            }
             await _context.Appareils.AddAsync(appareil, token);
             existingDevices.Add(appareil);
         }
@@ -103,16 +109,22 @@ public class NmapService
 
     private void ParseHost(List<Appareil> existingDevices, XmlNode host)
     {
-        var address = host.SelectSingleNode("address")?.Attributes?["addr"]?.Value;
-        if (string.IsNullOrWhiteSpace(address))
+        var address = host.SelectSingleNode("address");
+        if (address == null)
         {
             _logger.LogWarning("No address found for host");
             return;
         }
-        var appareil = existingDevices.FirstOrDefault(a => a.Adresses.Any(ad => ad.Addr == address));
+        if (address.Attributes?["addr"] == null)
+        {
+            _logger.LogWarning("No addr attribute found for address");
+            return;
+        }
+        var addr = address.Attributes["addr"]?.Value;
+        var appareil = existingDevices.FirstOrDefault(a => a.Adresses.Any(ad => ad.Addr == addr));
         if (appareil == null)
         {
-            _logger.LogWarning("No device found for address {Address}, skipping host", address);
+            _logger.LogWarning("No device found for address {Address}, skipping host", addr);
             return;
         }
         var ports = host.SelectNodes("ports/port");

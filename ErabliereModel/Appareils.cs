@@ -40,6 +40,9 @@ public class Appareil : IIdentifiable<Guid?, Appareil>, IErabliereOwnable, ILoca
     /// </summary>
     public List<PortAppareil> Ports { get; set; } = new();
 
+    /// <summary>
+    /// Informations temporelles de l'appareil
+    /// </summary>
     public AppareilTempsInfo Temps { get; set; } = new();
 
     /// <summary>

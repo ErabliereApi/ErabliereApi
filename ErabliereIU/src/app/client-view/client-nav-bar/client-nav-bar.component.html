@@ -24,6 +24,11 @@
                 </li>
                 @if (isLoggedIn && thereIsAtLeastOneErabliere) {
                 <li class="nav-item">
+                    <a class="nav-link" routerLink="/e/{{idErabliereSelectionee}}/appareils" routerLinkActive="active"
+                        ariaCurrentWhenActive="page">
+                        Appareils</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" routerLink="/e/{{idErabliereSelectionee}}/capteurs" routerLinkActive="active"
                         ariaCurrentWhenActive="page">
                         Capteurs</a>

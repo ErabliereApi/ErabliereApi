@@ -25,6 +25,7 @@ import { AiViewComponent } from './ai-view/ai-view.component';
 import { UserProfileComponent } from './client-view/user-profile/user-profile.component';
 import { AuthenticatedUserGard } from './guard/authenticated-user.gard';
 import { TermeAndConditionComponent } from './app.termes-and-conditions.component';
+import { AppareilsComponent } from './client-view/appareil/appareils.component';
 
 export const routes: Routes = [
     {
@@ -116,6 +117,11 @@ export const routes: Routes = [
                 path: 'e/:idErabliereSelectionee',
                 redirectTo: 'e/:idErabliereSelectionee/graphiques',
                 pathMatch: 'full'
+            },
+            {
+                path: 'e/:idErabliereSelectionee/appareils',
+                title: 'ÉrablièreIU - Appareils',
+                component: AppareilsComponent
             },
             {
                 path: 'e/:idErabliereSelectionee/graphiques',

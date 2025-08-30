@@ -1,0 +1,48 @@
+@if (appareils.length === 0) {
+    <p>Aucun appareil détecté.</p>
+}
+
+<table class="table table-responsive">
+    <thead>
+        <tr>
+            <th>Appareil ID</th>
+            <th>Nom</th>
+            <th>Statut</th>
+            <th>Adresses</th>
+            <th>Port</th>
+            <th>Nom d'hôte</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (appareil of appareils; track appareil.id) {
+            <tr>
+                <td><copy-id-button [id]="appareil.id"></copy-id-button></td>
+                <td>{{ appareil.name }}</td>
+                <td>
+                    {{ appareil.statut?.etat }} {{ appareil.statut?.raison }}
+                </td>
+                <td>
+                    <ul>
+                        @for (adresse of appareil.adresses; track adresse.id) {
+                            <li>{{ adresse.addr }} ({{ adresse.addrtype }})</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        @for (port of appareil.ports; track port.id) {
+                            <li>{{ port.port }} ({{ port.protocol }})</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        @for (nomHost of appareil.nomsHost; track nomHost.id) {
+                            <li>{{ nomHost.name }} ({{ nomHost.type }})</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
