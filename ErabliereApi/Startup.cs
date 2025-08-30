@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ErabliereApi.StripeIntegration;
 using ErabliereApi.Services;
+using ErabliereApi.Services.Nmap;
 using ErabliereApi.Authorization.Customers;
 using ErabliereApi.Middlewares;
 using ErabliereApi.Models;
@@ -188,6 +189,9 @@ public class Startup
 
         // Weather Service
         services.AddTransient<WeatherService>();
+
+        // Nmap Service
+        services.AddTransient<NmapService>();
     }
 
     /// <summary>
