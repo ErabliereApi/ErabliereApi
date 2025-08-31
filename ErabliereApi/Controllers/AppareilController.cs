@@ -76,13 +76,19 @@ public class AppareilController : ControllerBase
     [ProducesResponseType(204)]
     public async Task<IActionResult> Supprimer(Guid id, CancellationToken token)
     {
-        var appareil = await _context.Appareils.Where(a => a.IdErabliere == id).ToListAsync(token);
-        if (appareil == null || appareil.Count == 0)
+        var appareils = await _context.Appareils
+            .Include(a => a.Statut)
+            .Include(a => a.Adresses)
+            .Include(a => a.Ports)
+            .Include(a => a.NomsHost)
+            .Where(a => a.IdErabliere == id).ToListAsync(token);
+
+        if (appareils == null || appareils.Count == 0)
         {
             return NotFound();
         }
 
-        _context.Appareils.RemoveRange(appareil);
+        _context.Appareils.RemoveRange(appareils);
         await _context.SaveChangesAsync(token);
 
         return NoContent();

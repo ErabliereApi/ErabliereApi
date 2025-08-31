@@ -33,7 +33,12 @@ public class NmapService
     /// <returns></returns>
     public async Task UpdateDevicesFromNmapScanAsync(Guid idErabliere, XmlDocument nmapResult, CancellationToken token)
     {
-        var existingDevices = await _context.Appareils.Where(a => a.IdErabliere == idErabliere).ToListAsync(token);
+        var existingDevices = await _context.Appareils
+            .Include(a => a.Statut)
+            .Include(a => a.Adresses)
+            .Include(a => a.Ports)
+            .Include(a => a.NomsHost)
+            .Where(a => a.IdErabliere == idErabliere).ToListAsync(token);
 
         // On traite les hosthint
         await ParseHostsHintAsync(idErabliere, nmapResult, existingDevices, token);
@@ -87,8 +92,33 @@ public class NmapService
                     });
                 }
             }
+            var statut = host.SelectSingleNode("status");
+            if (statut != null && statut.Attributes != null)
+            {
+                appareil.Statut = new AppareilStatut
+                {
+                    Etat = statut.Attributes["state"]?.Value ?? "",
+                    Raison = statut.Attributes["reason"]?.Value ?? "",
+                    RaisonTTL = statut.Attributes["reason_ttl"]?.Value ?? ""
+                };
+            }
             await _context.Appareils.AddAsync(appareil, token);
             existingDevices.Add(appareil);
+        }
+        else
+        {
+            var statut = host.SelectSingleNode("status");
+            if (statut != null && statut.Attributes != null)
+            {
+                if (appareil.Statut == null)
+                {
+                    appareil.Statut = new AppareilStatut();
+                }
+
+                appareil.Statut.Etat = statut.Attributes["state"]?.Value ?? "";
+                appareil.Statut.Raison = statut.Attributes["reason"]?.Value ?? "";
+                appareil.Statut.RaisonTTL = statut.Attributes["raison_ttl"]?.Value ?? "";
+            }
         }
     }
 

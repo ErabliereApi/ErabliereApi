@@ -34,8 +34,7 @@ import { Horaire } from 'src/model/horaire';
 import { Appareil } from 'src/model/appareil';
 
 @Injectable({ providedIn: 'root' })
-export class ErabliereApi {
-         
+export class ErabliereApi {      
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -780,6 +779,18 @@ export class ErabliereApi {
     async getAppareils(id: any) {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.get<Appareil[]>(this._environmentService.apiUrl + '/Erablieres/' + id + '/Appareil?$expand=Adresses,Ports,NomsHost,Statut', { headers: headers }));
+    }
+
+    async supprimerTousLesAppareils(erabliereId: any) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + erabliereId + '/appareil', { headers: headers }));
+    }
+
+    async importerScanNmap(erabliereId: any, file: File) {
+        let headers = await this.getHeaders();
+        headers = headers.set('Content-Type', 'text/xml');
+        const textXml = await file.text();
+        return firstValueFrom(this._httpClient.put(this._environmentService.apiUrl + '/erablieres/' + erabliereId + '/appareil/nmapscan', textXml, { headers: headers }));
     }
 }
 
