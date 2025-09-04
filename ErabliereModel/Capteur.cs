@@ -120,6 +120,11 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     /// </summary>
     public DateTimeOffset? DC { get; set; }
 
+    /// <summary>
+    /// Date de la dernière modification du capteur
+    /// </summary>
+    public DateTimeOffset? DM { get; set; }
+
     /// <inheritdoc />
     public double Latitude { get; set; }
 

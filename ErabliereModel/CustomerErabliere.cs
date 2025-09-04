@@ -63,6 +63,11 @@ public class CustomerErabliere : IDatesInfo
     /// </summary>
     public DateTimeOffset? DC { get; set; }
 
+    /// <summary>
+    /// La date de modification
+    /// </summary>
+    public DateTimeOffset? DM { get; set; }
+
     /// <inheritdoc />
     public int CompareTo(CustomerErabliere? other)
     {

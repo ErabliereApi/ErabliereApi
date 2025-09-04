@@ -104,6 +104,9 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesI
     /// <inheritdoc />
     public DateTimeOffset? DC { get; set; }
 
+    /// <inheritdoc />
+    public DateTimeOffset? DM { get; set; }
+
     /// <summary>
     /// Compare les rapports par date de création
     /// </summary>

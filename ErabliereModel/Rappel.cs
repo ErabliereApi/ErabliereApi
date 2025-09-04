@@ -54,6 +54,9 @@ public class Rappel : IIdentifiable<Guid?, Rappel>, IDatesInfo
     public DateTimeOffset? DC { get; set; }
 
     /// <inheritdoc />
+    public DateTimeOffset? DM { get; set; }
+
+    /// <inheritdoc />
     public int CompareTo(Rappel? other)
     {
         return 0;

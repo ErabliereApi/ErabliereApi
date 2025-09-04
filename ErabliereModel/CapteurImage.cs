@@ -79,6 +79,9 @@ public class CapteurImage : IIdentifiable<Guid?, CapteurImage>, IErabliereOwnabl
     public DateTimeOffset? DC { get; set; }
 
     /// <inheritdoc />
+    public DateTimeOffset? DM { get; set; }
+
+    /// <inheritdoc />
     public int CompareTo(CapteurImage? other)
     {
         if (other == null)

@@ -11,4 +11,9 @@ public interface IDatesInfo
     /// Date de création
     /// </summary>
     public DateTimeOffset? DC { get; set; }
+
+    /// <summary>
+    /// Date de modification
+    /// </summary>
+    public DateTimeOffset? DM { get; set; }
 }

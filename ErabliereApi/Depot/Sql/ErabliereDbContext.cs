@@ -1,4 +1,5 @@
 ﻿using ErabliereApi.Donnees;
+using ErabliereApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 
@@ -130,6 +131,11 @@ namespace ErabliereApi.Depot.Sql
         /// Table des horaires
         /// </summary>
         public DbSet<Horaire> Horaires { get; private set; }
+
+        /// <summary>
+        /// Table des IP
+        /// </summary>
+        public DbSet<IpInfo> IpInfos { get; private set; }
 #pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />

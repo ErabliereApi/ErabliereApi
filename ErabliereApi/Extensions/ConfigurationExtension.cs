@@ -78,4 +78,13 @@ public static class ConfigurationExtension
     {
         return string.Equals(config["USE_SQL"]?.Trim(), TrueString, OrdinalIgnoreCase);
     }
+
+    /// <summary>
+    /// Indique si le middleware IpInfo est activé
+    /// </summary>
+    public static bool IsIpInfoEnabled(this IConfiguration config)
+    {
+        return string.Equals(config["IpInfoApi:EnableMiddleware"], TrueString, OrdinalIgnoreCase);
+    }
+        
 }

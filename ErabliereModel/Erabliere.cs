@@ -170,6 +170,9 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
     public DateTimeOffset? DC { get; set; }
 
     /// <inheritdoc />
+    public DateTimeOffset? DM { get; set; }
+
+    /// <inheritdoc />
     public double? Base { get; set; }
 
     /// <inheritdoc />

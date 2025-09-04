@@ -1,6 +1,7 @@
 using ErabliereApi.ControllerFeatureProviders;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Formaters;
+using ErabliereApi.Middlewares;
 using ErabliereApi.Services;
 using ErabliereApi.Services.Emails;
 using ErabliereApi.Services.SMS;
@@ -293,6 +294,33 @@ public static class ServiceCollectionExtension
                 }
             }
         });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds IpInfo services and middleware to the service collection.
+    /// This method checks the configuration to determine if the IpInfo middleware is enabled.
+    /// If enabled, it registers the `IpInfoMiddleware` and configures an HTTP client for making requests to the IpInfo API.
+    /// It sets the base address and authorization header for the HTTP client based on the configuration values.
+    /// </summary>
+    public static IServiceCollection AddIpInfoServices(this IServiceCollection services, IConfiguration config)
+    {
+        if (string.Equals(config["IpInfoApi:EnableMiddleware"], TrueString, OrdinalIgnoreCase))
+        {
+            services.AddMemoryCache();
+            services.AddTransient<IpInfoMiddleware>();
+            services.AddHttpClient("IpInfoClient", c =>
+            {
+                c.BaseAddress = new Uri(config.GetValue<string>("IpInfoApi:BaseUrl") ?? throw new InvalidOperationException("La variable d'environnement 'IpInfoApi:BaseUrl' à une valeur null."));
+
+                var token = config["IpInfoApi:Token"];
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    c.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                }
+            });
+        }
 
         return services;
     }

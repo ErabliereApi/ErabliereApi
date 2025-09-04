@@ -46,6 +46,9 @@ public class Inspection : IIdentifiable<Guid?, Inspection>, IErabliereOwnable, I
     /// <inheritdoc />
     public DateTimeOffset? DC { get; set; }
 
+    /// <inheritdoc />
+    public DateTimeOffset? DM { get; set; }
+
     /// <summary>
     /// Compare les inspections par date
     /// </summary>

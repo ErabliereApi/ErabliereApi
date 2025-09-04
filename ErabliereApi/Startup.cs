@@ -192,6 +192,9 @@ public class Startup
 
         // Nmap Service
         services.AddTransient<NmapService>();
+
+        // IpInfo Middleware and Service
+        services.AddIpInfoServices(Configuration);
     }
 
     /// <summary>
@@ -218,6 +221,11 @@ public class Startup
         }
 
         app.UseErabliereAPIForwardedHeadersRules(logger, Configuration);
+
+        if (Configuration.IsIpInfoEnabled())
+        {
+            app.UseMiddleware<IpInfoMiddleware>();
+        }
 
         app.UseDefaultFiles();
         app.UseStaticFiles();

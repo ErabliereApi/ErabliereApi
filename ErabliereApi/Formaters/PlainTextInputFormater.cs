@@ -4,8 +4,14 @@ using Microsoft.Net.Http.Headers;
 
 namespace ErabliereApi.Formaters;
 
+/// <summary>
+/// Formatteur pour lire du texte brut (text/plain) dans les contrôleurs API
+/// </summary>
 public class PlainTextInputFormatter : InputFormatter
 {
+    /// <summary>
+    /// Constructeur par défaut
+    /// </summary>
     public PlainTextInputFormatter()
     {
         SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/plain"));
@@ -13,11 +19,13 @@ public class PlainTextInputFormatter : InputFormatter
         SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("text/xml"));
     }
 
+    /// <inheritdoc />
     protected override bool CanReadType(Type type)
     {
         return type == typeof(string);
     }
 
+    /// <inheritdoc />
     public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
     {
         var request = context.HttpContext.Request;
