@@ -17,6 +17,8 @@ public class IpInfoMiddleware : IMiddleware
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _config;
 
+    private const string CacheKeyPrefix = "IpInfo_";
+
     /// <summary>
     /// Constructeur
     /// </summary>
@@ -44,7 +46,7 @@ public class IpInfoMiddleware : IMiddleware
 
         try
         {
-            await IpLookupInSaves(context, ipAddress);
+            await IpResolutionAsync(context, ipAddress);
         }
         catch (Exception ex)
         {
@@ -54,10 +56,10 @@ public class IpInfoMiddleware : IMiddleware
         await next(context);
     }
 
-    private async Task IpLookupInSaves(HttpContext context, string ipAddress)
+    private async Task IpResolutionAsync(HttpContext context, string ipAddress)
     {
         // Check if the IP information is cached
-        if (!_memoryCache.TryGetValue(ipAddress, out IpInfo? ipInfo))
+        if (!_memoryCache.TryGetValue($"{CacheKeyPrefix}{ipAddress}", out IpInfo? ipInfo))
         {
             // If not cached, retrieve it from the database
             ipInfo = await _context.IpInfos.FirstOrDefaultAsync(i => i.Ip == ipAddress, context.RequestAborted);
@@ -95,7 +97,7 @@ public class IpInfoMiddleware : IMiddleware
                         await _context.SaveChangesAsync(context.RequestAborted);
 
                         // Cache the new IP information
-                        _memoryCache.Set(ipAddress, ipInfo, _config.GetRequiredValue<TimeSpan>("IpInfoApi:CacheDuration"));
+                        _memoryCache.Set($"{CacheKeyPrefix}{ipAddress}", ipInfo, _config.GetRequiredValue<TimeSpan>("IpInfoApi:CacheDuration"));
                     }
                 }
             }

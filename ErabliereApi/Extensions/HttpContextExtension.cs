@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace ErabliereApi.Extensions;
 
 /// <summary>
@@ -24,29 +26,34 @@ public static class HttpContextExtension
     /// <returns></returns>
     public static string GetClientIp(this HttpContext context)
     {
-        var value = ValiderEntente(context, RealIPKey);
-        if (value != null)
+        var remoteIp = context.Connection.RemoteIpAddress;
+
+        if (remoteIp == null || remoteIp.IsPrivateIp())
         {
-            return value;
-        }
-        value = ValiderEntente(context, ForwardedForKey);
-        if (value != null)
-        {
-            return value;
+            var value = ValiderEntente(context, RealIPKey);
+            if (value != null)
+            {
+                return value.ToString();
+            }
+            value = ValiderEntente(context, ForwardedForKey);
+            if (value != null)
+            {
+                return value.ToString();
+            }
         }
 
-        return context.Connection.RemoteIpAddress?.ToString() ?? "";
+        return remoteIp?.ToString() ?? "";
     }
 
-    private static string? ValiderEntente(HttpContext context, string headerName)
+    private static IPAddress? ValiderEntente(HttpContext context, string headerName)
     {
         if (context.Request.Headers.ContainsKey(headerName))
         {
             var ips = context.Request.Headers[headerName];
 
-            if (ips.Count == 1)
+            if (ips.Count == 1 && IPAddress.TryParse(ips.ToString(), out var iPAddress))
             {
-                return ips.ToString();
+                return iPAddress;
             }
             else
             {
