@@ -68,6 +68,10 @@ public static class ConfigurationExtension
         {
             throw new ArgumentException($"La valeur de la clé '{key}' est requise dans la configuration.");
         }
+        if (typeof(T) == typeof(TimeSpan))
+        {
+            return (T)(object)TimeSpan.Parse(value);
+        }
         return (T)Convert.ChangeType(value, typeof(T));
     }
 

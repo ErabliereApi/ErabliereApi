@@ -30,16 +30,15 @@ public static class HttpContextExtension
 
         if (remoteIp == null || remoteIp.IsPrivateIp())
         {
-            var value = ValiderEntente(context, RealIPKey);
-            if (value != null)
+            var realIp = ValiderEntente(context, RealIPKey);
+            var forwardedFor = ValiderEntente(context, ForwardedForKey);
+            
+            if (realIp != null && forwardedFor != null)
             {
-                return value.ToString();
+                throw new InvalidOperationException($"Les deux entêtes {RealIPKey} et {ForwardedForKey} sont présents dans la requête.");
             }
-            value = ValiderEntente(context, ForwardedForKey);
-            if (value != null)
-            {
-                return value.ToString();
-            }
+
+            remoteIp = realIp ?? forwardedFor ?? remoteIp;
         }
 
         return remoteIp?.ToString() ?? "";
