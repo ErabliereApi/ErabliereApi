@@ -64,8 +64,7 @@ public class IpInfoMiddleware : IMiddleware
 
             if (ipInfo != null)
             {
-                // Cache the IP information
-                _memoryCache.Set(ipAddress, ipInfo, TimeSpan.FromMinutes(5));
+                _memoryCache.Set(ipAddress, ipInfo, _config.GetRequiredValue<TimeSpan>("IpInfoApi:CacheDuration"));
             }
             else
             {
