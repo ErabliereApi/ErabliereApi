@@ -45,12 +45,37 @@ public class ValiderIPRulesAttribute : ActionFilterAttribute
 
         if (!string.IsNullOrWhiteSpace(erabliere?.IpRule) && erabliere.IpRule != "-")
         {
-            var ip = context.HttpContext.GetClientIp();
+            var ip = "";
 
-            if (!context.ModelState.ContainsKey(HttpContextExtension.RealIPKey) &&
-                !Array.TrueForAll(erabliere.IpRule.Split(';'), eIp => string.Equals(eIp, ip, StringComparison.OrdinalIgnoreCase)))
+            try
             {
-                context.ModelState.AddModelError("IP", $"L'adresse IP est différente de l'adresse ip aloué pour créer des alimentations à cette érablière. L'adresse IP reçu est {ip}.");
+                ip = context.HttpContext.GetClientIp();
+
+                if (ip == null || string.IsNullOrWhiteSpace(ip))
+                {
+                    throw new InvalidOperationException("Aucune adresse ip distante trouvé.");
+                }
+
+                if (!context.ModelState.ContainsKey(HttpContextExtension.RealIPKey) &&
+                    !Array.TrueForAll(erabliere.IpRule.Split(';'), eIp => string.Equals(eIp, ip, StringComparison.OrdinalIgnoreCase)))
+                {
+                    context.ModelState.AddModelError("IP", $"L'adresse IP est différente de l'adresse ip aloué pour créer des alimentations à cette érablière. L'adresse IP reçu est {ip}.");
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                if (ex.Message.Contains("X-Real-IP"))
+                {
+                    context.ModelState.AddModelError("X-Real-IP", "Une seule entête 'X-Real-IP' doit être trouvé dans la requête.");
+                }
+                else if (ex.Message.Contains("X-Forwarded-For"))
+                {
+                    context.ModelState.AddModelError("X-Forwarded-For", "Une seule entête 'X-Forwarded-For' doit être trouvé dans la requête.");
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 

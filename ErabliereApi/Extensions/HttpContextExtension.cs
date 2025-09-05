@@ -20,10 +20,6 @@ public static class HttpContextExtension
     /// Si l'entête X-Real-IP ou X-Forwarded-For est présent, cette entête sera utilisé. 
     /// Sinon l'adresse ip sera retourner depuis la propriété RemoteIpAddress.
     /// </summary>
-    /// <remarks>
-    /// La présence de plus de une entête X-Real-IP ou X-Forwarded-For ajoutera une erreur dans
-    /// le ModelState.
-    /// </remarks>
     /// <param name="context"></param>
     /// <returns></returns>
     public static string GetClientIp(this HttpContext context)
@@ -39,7 +35,7 @@ public static class HttpContextExtension
             return value;
         }
 
-        return context.Connection.RemoteIpAddress?.ToString() ?? throw new InvalidOperationException("Aucune adresse ip distante trouvé.");
+        return context.Connection.RemoteIpAddress?.ToString() ?? "";
     }
 
     private static string? ValiderEntente(HttpContext context, string headerName)

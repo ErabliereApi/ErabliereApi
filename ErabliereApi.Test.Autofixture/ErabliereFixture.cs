@@ -113,7 +113,7 @@ public static class ErabliereFixture
         var randomDate = from.AddDays(randomDays);
 
         // Pour conserver la cohérence avec DateTimeOffset, on utilise l'heure locale
-        return new DateTimeOffset(randomDate, TimeZoneInfo.Local.GetUtcOffset(randomDate));
+        return new DateTimeOffset(randomDate, TimeSpan.Zero);
     }
 
     private static string RandomEmail()
