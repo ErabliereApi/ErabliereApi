@@ -12,8 +12,6 @@ namespace ErabliereApi.Attributes;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class ValiderIPRulesAttribute : ActionFilterAttribute
 {
-    private const string Key = "X-Real-IP";
-
     /// <summary>
     /// Contructeur par initialisation.
     /// </summary>
@@ -47,9 +45,9 @@ public class ValiderIPRulesAttribute : ActionFilterAttribute
 
         if (!string.IsNullOrWhiteSpace(erabliere?.IpRule) && erabliere.IpRule != "-")
         {
-            var ip = GetClientIp(context);
+            var ip = context.HttpContext.GetClientIp();
 
-            if (!context.ModelState.ContainsKey(Key) &&
+            if (!context.ModelState.ContainsKey(HttpContextExtension.RealIPKey) &&
                 !Array.TrueForAll(erabliere.IpRule.Split(';'), eIp => string.Equals(eIp, ip, StringComparison.OrdinalIgnoreCase)))
             {
                 context.ModelState.AddModelError("IP", $"L'adresse IP est différente de l'adresse ip aloué pour créer des alimentations à cette érablière. L'adresse IP reçu est {ip}.");
@@ -57,37 +55,5 @@ public class ValiderIPRulesAttribute : ActionFilterAttribute
         }
 
         await next();
-    }
-
-    /// <summary>
-    /// Permet d'extraire l'id de l'applant.
-    /// Si l'entête X-Real-IP est présent, cette entête sera utilisé. 
-    /// Sinon l'adresse ip sera retourner depuis la propriété RemoteIpAddress.
-    /// </summary>
-    /// <remarks>
-    /// La présence de plus de une entête X-Real-IP ajoutera une erreur dans 
-    /// le ModelState.
-    /// </remarks>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    private static string GetClientIp(ActionExecutingContext context)
-    {
-        if (context.HttpContext.Request.Headers.ContainsKey(Key))
-        {
-            var ips = context.HttpContext.Request.Headers[Key];
-
-            if (ips.Count == 1)
-            {
-                return ips.ToString();
-            }
-
-            else
-            {
-                context.ModelState.AddModelError(Key, "Une seule entête 'X-Real-IP' doit être trouvé dans la requête.");
-                return "";
-            }
-        }
-
-        return context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? throw new InvalidOperationException("Aucune adresse ip distante trouvé.");
     }
 }

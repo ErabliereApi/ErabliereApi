@@ -37,7 +37,7 @@ public class IpInfoMiddleware : IMiddleware
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var ipAddress = context.GetClientIp();
 
         // Log the IP address
         _logger.LogInformation("Request from IP: {IpAddress}", ipAddress);
