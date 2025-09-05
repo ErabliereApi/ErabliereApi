@@ -32,9 +32,11 @@ import { Rapport } from 'src/model/rapport';
 import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
 import { Horaire } from 'src/model/horaire';
 import { Appareil } from 'src/model/appareil';
+import { IpInfo } from 'src/model/ipinfo';
 
 @Injectable({ providedIn: 'root' })
-export class ErabliereApi {      
+export class ErabliereApi {
+    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -792,6 +794,11 @@ export class ErabliereApi {
         const textXml = await file.text();
         return firstValueFrom(this._httpClient.put(this._environmentService.apiUrl + '/erablieres/' + erabliereId + '/appareil/nmapscan', textXml, { headers: headers }));
     }
+
+    async getIpInfos() {
+        let headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<IpInfo[]>(this._environmentService.apiUrl + '/ipinfo', { headers: headers }));
+    }      
 }
 
 function isNotNullOrWhitespace(search: string | undefined) {

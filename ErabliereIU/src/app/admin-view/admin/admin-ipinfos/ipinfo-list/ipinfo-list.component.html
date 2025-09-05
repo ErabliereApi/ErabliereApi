@@ -1,0 +1,40 @@
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>IP</th>
+            <th>Network</th>
+            <th>Pays</th>
+            <th>Code Pays</th>
+            <th>Continent</th>
+            <th>ASN</th>
+            <th>AS Name</th>
+            <th>AS Domain</th>
+            <th>Is Allowed</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Date de création</th>
+            <th>Date de modification</th>
+        </tr>
+        </thead>
+        <tbody>
+            @for (ipInfo of ipInfos; track ipInfo.id) {
+                <tr>
+                    <td>{{ipInfo.ip}}</td>
+                    <td>{{ipInfo.network}}</td>
+                    <td>{{ipInfo.country}}</td>
+                    <td>{{ipInfo.countryCode}}</td>
+                    <td>{{ipInfo.continent}}</td>
+                    <td>{{ipInfo.asn}}</td>
+                    <td>{{ipInfo.aS_name}}</td>
+                    <td>{{ipInfo.aS_domain}}</td>
+                    <td>{{ipInfo.isAllowed}}</td>
+                    <td>{{ipInfo.latitude}}</td>
+                    <td>{{ipInfo.longitude}}</td>
+                    <td>{{ipInfo.dc}}</td>
+                    <td>{{ipInfo.dm}}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

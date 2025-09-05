@@ -26,6 +26,7 @@ import { UserProfileComponent } from './client-view/user-profile/user-profile.co
 import { AuthenticatedUserGard } from './guard/authenticated-user.gard';
 import { TermeAndConditionComponent } from './app.termes-and-conditions.component';
 import { AppareilsComponent } from './client-view/appareil/appareils.component';
+import { AdminIpinfosComponent } from './admin-view/admin/admin-ipinfos/admin-ipinfos.component';
 
 export const routes: Routes = [
     {
@@ -67,6 +68,11 @@ export const routes: Routes = [
                 path: 'hologram',
                 title: 'Érablière Admin - Hologram',
                 component: AdminHologramComponent
+            },
+            {
+                path: 'ipinfos',
+                title: 'Érablière Admin - Ip Infos',
+                component: AdminIpinfosComponent
             },
             {
                 path: '**',
