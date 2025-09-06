@@ -2,13 +2,15 @@ import { Component, OnInit } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { IpInfo } from "src/model/ipinfo";
 import { IpinfoListComponent } from "./ipinfo-list/ipinfo-list.component";
+import { IpinfoMapComponent } from "./ipinfo-map/ipinfo-map.component";
 
 @Component({
     selector: 'app-admin-ipinfos',
     templateUrl: './admin-ipinfos.component.html',
     imports: [
-        IpinfoListComponent
-    ]
+    IpinfoListComponent,
+    IpinfoMapComponent
+]
 })
 export class AdminIpinfosComponent implements OnInit {
     ipInfos: IpInfo[] = [];

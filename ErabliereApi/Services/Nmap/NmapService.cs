@@ -14,6 +14,16 @@ public class NmapService
     private readonly ILogger<NmapService> _logger;
 
     /// <summary>
+    /// State attribute name in XML
+    /// </summary>
+    public const string STATE = "state";
+
+    /// <summary>
+    /// Reason attribute name in XML
+    /// </summary>
+    public const string REASON = "reason";
+
+    /// <summary>
     /// Constructeur
     /// </summary>
     /// <param name="context"></param>
@@ -38,7 +48,8 @@ public class NmapService
             .Include(a => a.Adresses)
             .Include(a => a.Ports)
             .Include(a => a.NomsHost)
-            .Where(a => a.IdErabliere == idErabliere).ToListAsync(token);
+            .Where(a => a.IdErabliere == idErabliere)
+            .ToListAsync(token);
 
         // On traite les hosthint
         await ParseHostsHintAsync(idErabliere, nmapResult, existingDevices, token);
@@ -97,8 +108,8 @@ public class NmapService
             {
                 appareil.Statut = new AppareilStatut
                 {
-                    Etat = statut.Attributes["state"]?.Value ?? "",
-                    Raison = statut.Attributes["reason"]?.Value ?? "",
+                    Etat = statut.Attributes[STATE]?.Value ?? "",
+                    Raison = statut.Attributes[REASON]?.Value ?? "",
                     RaisonTTL = statut.Attributes["reason_ttl"]?.Value ?? ""
                 };
             }
@@ -115,8 +126,8 @@ public class NmapService
                     appareil.Statut = new AppareilStatut();
                 }
 
-                appareil.Statut.Etat = statut.Attributes["state"]?.Value ?? "";
-                appareil.Statut.Raison = statut.Attributes["reason"]?.Value ?? "";
+                appareil.Statut.Etat = statut.Attributes[STATE]?.Value ?? "";
+                appareil.Statut.Raison = statut.Attributes[REASON]?.Value ?? "";
                 appareil.Statut.RaisonTTL = statut.Attributes["raison_ttl"]?.Value ?? "";
             }
         }
@@ -165,12 +176,40 @@ public class NmapService
                 MapPort(appareil, port);
             }
         }
+        var hostNames = host.SelectNodes("hostnames/hostname");
+        if (hostNames != null)
+        {
+            foreach (XmlNode hostname in hostNames)
+            {
+                MapHostName(appareil, hostname);
+            }
+        }
+    }
+
+    private void MapHostName(Appareil appareil, XmlNode hostname)
+    {
+        var name = hostname?.Attributes?["name"];
+        var type = hostname?.Attributes?["type"];
+
+        var existing = appareil.NomsHost.FirstOrDefault(n => n.Name == name?.Value);
+        if (existing != null)
+        {
+            existing.Type = type?.Value ?? "";
+        }
+        else
+        {
+            appareil.NomsHost.Add(new NomHostAppareil
+            {
+                Name = name?.Value ?? "",
+                Type = type?.Value ?? ""
+            });
+        }
     }
 
     private void MapPort(Appareil appareil, XmlNode port)
     {
         var portIdStr = port.Attributes?["portid"]?.Value;
-        var state = port.SelectSingleNode("state");
+        var state = port.SelectSingleNode(STATE);
         var service = port.SelectSingleNode("service");
         if (!int.TryParse(portIdStr, out int portId))
         {
@@ -184,8 +223,8 @@ public class NmapService
                 existingPort.Protocole = port.Attributes?["protocol"]?.Value ?? "";
                 existingPort.Etat = new PortEtat
                 {
-                    Etat = state?.Attributes?["state"]?.Value ?? "",
-                    Raison = state?.Attributes?["reason"]?.Value ?? "",
+                    Etat = state?.Attributes?[STATE]?.Value ?? "",
+                    Raison = state?.Attributes?[REASON]?.Value ?? "",
                     RaisonTTL = state?.Attributes?["reason_ttl"]?.Value ?? "",
                 };
                 existingPort.PortService = new PortService
@@ -205,8 +244,8 @@ public class NmapService
                 Protocole = port.Attributes?["protocol"]?.Value ?? "",
                 Etat = new PortEtat
                 {
-                    Etat = state?.Attributes?["state"]?.Value ?? "",
-                    Raison = state?.Attributes?["reason"]?.Value ?? "",
+                    Etat = state?.Attributes?[STATE]?.Value ?? "",
+                    Raison = state?.Attributes?[REASON]?.Value ?? "",
                     RaisonTTL = state?.Attributes?["reason_ttl"]?.Value ?? "",
                 },
                 PortService = new PortService

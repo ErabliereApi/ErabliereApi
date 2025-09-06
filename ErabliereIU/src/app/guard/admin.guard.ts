@@ -18,8 +18,12 @@ export class AdminGuard implements CanActivate {
   async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Promise<boolean> {
+    const isLoggedIn = await this.authSvc.isLoggedIn();
+    if (!isLoggedIn) {
+      this.router.navigate(['/page401']);
+      return false;
+    }
     const userHasRole = await this.authSvc.userIsInRole('administrateur');
-    console.log(`Can active ${route.url}, User has role administrateur: `, userHasRole);
     if (!userHasRole) {
       this.router.navigate(['/page401']);
     }

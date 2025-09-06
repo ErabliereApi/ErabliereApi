@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MapNavBarComponent } from './map-nav-bar/map-nav-bar.component';
 
@@ -17,12 +17,8 @@ import { MapNavBarComponent } from './map-nav-bar/map-nav-bar.component';
         MapNavBarComponent
     ]
 })
-export class MapViewComponent implements OnInit {
+export class MapViewComponent {
 
     constructor() { }
-
-    ngOnInit(): void {
-        // Initialization logic here
-    }
 
 }

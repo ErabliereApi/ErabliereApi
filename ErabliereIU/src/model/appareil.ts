@@ -1,6 +1,7 @@
 export class Appareil {
     id: any;
     name?: string;
+    description?: string;
     statut?: AppareilStatut;
     adresses: Array<AdresseAppareil> = [];
     ports: Array<PortAppareil> = [];
