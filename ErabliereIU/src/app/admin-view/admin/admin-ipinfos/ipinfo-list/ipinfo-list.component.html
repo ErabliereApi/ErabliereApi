@@ -15,12 +15,13 @@
                 <th>Longitude</th>
                 <th>Date de création</th>
                 <th>Date de modification</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @for (ipInfo of ipInfos; track ipInfo.id) {
             <tr>
-                <td>{{ipInfo.ip}}</td>
+                <td><a href="https://ipinfo.io/{{ipInfo.ip}}" target="_blank">{{ipInfo.ip}}</a></td>
                 <td>{{ipInfo.network}}</td>
                 <td>{{ipInfo.country}}</td>
                 <td>{{ipInfo.countryCode}}</td>
@@ -33,6 +34,14 @@
                 <td>{{ipInfo.longitude}}</td>
                 <td>{{ipInfo.dc | date:'yyyy-MM-dd'}}</td>
                 <td>{{ipInfo.dm | date:'yyyy-MM-dd'}}</td>
+                <td>
+                    <div class="btn-group">
+                        <ebutton
+                            type="danger"
+                            size="sm"
+                            (clicked)="deleteIpInfo(ipInfo.id)">Supprimer</ebutton>
+                    </div>
+                </td>
             </tr>
             }
         </tbody>

@@ -3,8 +3,35 @@
     <hr />
 
     <div class="container-fluid">
-        <app-ipinfo-list
-            [ipInfos]="ipInfos"
-        ></app-ipinfo-list>
+        @if (generalError) {
+        <div class="alert alert-danger" role="alert">
+            {{ generalError }}
+        </div>
+        }
+
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Pays autorisés</h5>
+                <p>Les utilisateurs provenant de ces pays sont autorisés à accéder à l'application.</p>
+                <ul>
+                    @for (item of authorizeCountries; track $index) {
+                    <li>{{ item }}</li>
+                    }
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Total IPs</h5>
+                <p>Nombre total d'adresses IP ayant effectué des requêtes.</p>
+                <br />
+                <h3>{{ ipInfos.length }}</h3>
+            </div>
+            <div class="col-md-4">
+                <h5>Powered by IPinfo</h5>
+                <p>Les données sur les adresses IP sont fournies par <a href="https://ipinfo.io/" target="_blank">IPinfo</a>.</p>
+                <img src="/assets/ipinfo/ipinfo-logo.svg" alt="IPinfo Logo" style="max-width: 150px;" />
+            </div>
+        </div>
+
+        <app-ipinfo-list [ipInfos]="ipInfos"></app-ipinfo-list>
     </div>
 </div>

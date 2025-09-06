@@ -1,15 +1,12 @@
-﻿using ErabliereApi.Donnees.Interfaces;
-using ErabliereApi.Donnees.Ownable;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
-namespace ErabliereApi.Donnees;
+namespace ErabliereApi.Action.Post;
 
 /// <summary>
-/// Une alerte pour la fonction trio de données
+/// Modèle de création d'une alerte pour le trio de données
 /// </summary>
-public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable, IDatesInfo
+public class PostAlerte
 {
     /// <summary>
     /// L'id de l'alerte
@@ -20,9 +17,6 @@ public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable, IDatesInf
     /// L'id de l'érablière
     /// </summary>
     public Guid? IdErabliere { get; set; }
-
-    /// <inheritdoc />
-    public Erabliere? Erabliere { get; set; }
 
     /// <summary>
     /// Le nom de l'alerte
@@ -86,41 +80,4 @@ public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable, IDatesInf
     /// Indique si l'alerte est activé
     /// </summary>
     public bool IsEnable { get; set; }
-
-    /// <summary>
-    /// Dernière occurence
-    /// </summary>
-    public DateTimeOffset? LastOccurence { get; set; }
-
-    /// <inheritdoc />
-    public DateTimeOffset? DC { get; set; }
-
-    /// <inheritdoc />
-    public DateTimeOffset? DM { get; set; }
-
-    /// <inheritdoc />
-    public int CompareTo([AllowNull] Alerte other)
-    {
-        if (other == null)
-        {
-            return 1;
-        }
-
-        if (Id == null)
-        {
-            return other.Id == null ? 0 : -1;
-        }
-
-        if (Id != null && other.Id == null)
-        {
-            return 1;
-        }
-
-        if (Id == null)
-        {
-            return -1;
-        }
-
-        return Id.Value.CompareTo(other.Id);
-    }
 }

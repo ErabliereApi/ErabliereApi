@@ -36,7 +36,7 @@ import { IpInfo } from 'src/model/ipinfo';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
-    
+  
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -798,7 +798,17 @@ export class ErabliereApi {
     async getIpInfos() {
         let headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.get<IpInfo[]>(this._environmentService.apiUrl + '/ipinfo', { headers: headers }));
-    }      
+    }
+
+    async deleteIpInfo(id: any) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/ipinfo/' + id, { headers: headers }));
+    }
+
+    async getAuthorizedCountries() {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<string[]>(this._environmentService.apiUrl + '/ipinfo/authorized-countries', { headers: headers }));
+    }
 }
 
 function isNotNullOrWhitespace(search: string | undefined) {

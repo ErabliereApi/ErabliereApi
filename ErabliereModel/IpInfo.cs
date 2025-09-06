@@ -81,6 +81,11 @@ public class IpInfo : IIdentifiable<Guid, IpInfo>, ILocalizable, IDatesInfo
     /// <inheritdoc />
     public DateTimeOffset? DM { get; set; }
 
+    /// <summary>
+    /// Date d'expiration de l'information IP
+    /// </summary>
+    public DateTimeOffset? TTL { get; set; }
+
     /// <inheritdoc />
     public int CompareTo(IpInfo? other)
     {

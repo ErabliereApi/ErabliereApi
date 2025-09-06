@@ -51,6 +51,11 @@ public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnab
     public DateTime? DC { get; set; }
 
     /// <summary>
+    /// Date de modification
+    /// </summary>
+    public DateTimeOffset? DM { get; set; }
+
+    /// <summary>
     /// La valeur minimal de ce capteur
     /// </summary>
     public decimal? MinVaue { get; set; }

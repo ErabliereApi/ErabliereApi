@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using ErabliereApi.Action;
+using ErabliereApi.Action.Post;
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
@@ -61,18 +63,33 @@ public class AlertesController : ControllerBase
     /// </summary>
     /// <remarks>Chaque valeur numérique est en dixième. Donc pour représenter 1 degré celcius, il faut inscrire 10.</remarks>
     /// <param name="id">L'identifiant de l'érablière</param>
-    /// <param name="alerte">Les paramètres de l'alerte</param>
+    /// <param name="postAlerte">Les paramètres de l'alerte</param>
     /// <param name="token">Jeton d'annulation de la tâche</param>
     /// <response code="200">L'alerte a été correctement ajouter.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id de l'alerte à ajouter.</response>
     [HttpPost]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Ajouter(Guid id, Alerte alerte, CancellationToken token)
+    [ProducesDefaultResponseType(typeof(Alerte))]
+    public async Task<IActionResult> Ajouter(Guid id, PostAlerte postAlerte, CancellationToken token)
     {
-        if (id != alerte.IdErabliere)
+        if (id != postAlerte.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à ajouter");
         }
+
+        var alerte = new Alerte
+        {
+            Id = postAlerte.Id,
+            IdErabliere = postAlerte.IdErabliere,
+            EnvoyerA = postAlerte.EnvoyerA,
+            IsEnable = postAlerte.IsEnable,
+            Nom = postAlerte.Nom,
+            TexterA = postAlerte.TexterA,
+            TemperatureThresholdHight = postAlerte.TemperatureThresholdHight,
+            TemperatureThresholdLow = postAlerte.TemperatureThresholdLow,
+            VacciumThresholdLow = postAlerte.VacciumThresholdLow,
+            DC = DateTime.UtcNow
+        };
 
         var entity = await _depot.Alertes.AddAsync(alerte, token);
 
@@ -98,6 +115,10 @@ public class AlertesController : ControllerBase
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à modifier.");
         }
+        if (alerte.Erabliere != null)
+        {
+            return BadRequest("L'érablière ne peut pas être modifié via cette route.");
+        }
 
         var entity = _depot.Update(alerte);
 
@@ -122,7 +143,7 @@ public class AlertesController : ControllerBase
     [HttpPut]
     [Route("{idAlerte}/[action]")]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Activer(Guid id, Guid idAlerte, Alerte alerte, CancellationToken token)
+    public async Task<IActionResult> Activer(Guid id, Guid idAlerte, ErabliereOwnableArgs alerte, CancellationToken token)
     {
         if (id != alerte.IdErabliere)
         {
@@ -133,7 +154,7 @@ public class AlertesController : ControllerBase
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à activer.");
         }
 
-        var entity = await _depot.Alertes.FindAsync(new object?[] { alerte.Id }, cancellationToken: token);
+        var entity = await _depot.Alertes.FindAsync([alerte.Id], cancellationToken: token);
 
         if (entity is not null && entity.IdErabliere == id)
         {
@@ -158,7 +179,7 @@ public class AlertesController : ControllerBase
     [HttpPut]
     [Route("{idAlerte}/[action]")]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Desactiver(Guid id, Guid idAlerte, Alerte alerte, CancellationToken token)
+    public async Task<IActionResult> Desactiver(Guid id, Guid idAlerte, ErabliereOwnableArgs alerte, CancellationToken token)
     {
         if (id != alerte.IdErabliere)
         {
@@ -169,7 +190,7 @@ public class AlertesController : ControllerBase
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à désactiver.");
         }
 
-        var entity = await _depot.Alertes.FindAsync(new object?[] { alerte.Id }, cancellationToken: token);
+        var entity = await _depot.Alertes.FindAsync([alerte.Id], cancellationToken: token);
 
         if (entity is not null && entity.IdErabliere == id)
         {
@@ -193,14 +214,26 @@ public class AlertesController : ControllerBase
     /// <response code="400">L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.</response>
     [HttpDelete]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Supprimer(Guid id, Alerte alerte, CancellationToken token)
+    public async Task<IActionResult> Supprimer(Guid id, ErabliereOwnableArgs alerte, CancellationToken token)
     {
         if (id != alerte.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.");
         }
 
-        _depot.Remove(alerte);
+        var alerteEntity = await _depot.Alertes.FindAsync([alerte.Id], cancellationToken: token);
+
+        if (alerteEntity == null)
+        {
+            return NoContent();
+        }
+
+        if (id != alerteEntity.IdErabliere)
+        {
+            return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.");
+        }
+
+        _depot.Remove(alerteEntity);
 
         await _depot.SaveChangesAsync(token);
 
@@ -219,7 +252,7 @@ public class AlertesController : ControllerBase
     [ValiderOwnership("id")]
     public async Task<IActionResult> Supprimer(Guid id, Guid idAlerte, CancellationToken token)
     {
-        var alerte = await _depot.Alertes.FindAsync(new object?[] { idAlerte }, cancellationToken: token);
+        var alerte = await _depot.Alertes.FindAsync([idAlerte], cancellationToken: token);
 
         if (alerte == null)
         {

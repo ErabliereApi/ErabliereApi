@@ -162,6 +162,7 @@ public class AlerteCapteursController : ControllerBase
         alerteCapteur.MaxValue = alerte.MaxValue;
         alerteCapteur.MinVaue = alerte.MinVaue;
         alerteCapteur.Nom = alerte.Nom;
+        alerteCapteur.DM = DateTimeOffset.UtcNow;
 
         var entity = _depot.Update(alerteCapteur);
 

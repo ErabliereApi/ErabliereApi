@@ -12,6 +12,8 @@ import { IpinfoListComponent } from "./ipinfo-list/ipinfo-list.component";
 })
 export class AdminIpinfosComponent implements OnInit {
     ipInfos: IpInfo[] = [];
+    generalError: string | null = null;
+    authorizeCountries: string[] = [];
 
     constructor(private readonly api: ErabliereApi) {
 
@@ -20,6 +22,16 @@ export class AdminIpinfosComponent implements OnInit {
     ngOnInit(): void {
         this.api.getIpInfos().then(infos => {
             this.ipInfos = infos;
+        }).catch(err => {
+            this.generalError = `Erreur lors de la récupération des informations: ${err.message}`
+            console.error("Erreur lors de la récupération des informations", err);
+        });
+
+        this.api.getAuthorizedCountries().then(countries => {
+            this.authorizeCountries = countries;
+        }).catch(err => {
+            this.generalError = `Erreur lors de la récupération des pays autorisés: ${err.message}`
+            console.error("Erreur lors de la récupération des pays autorisés", err);
         });
     }
 }
