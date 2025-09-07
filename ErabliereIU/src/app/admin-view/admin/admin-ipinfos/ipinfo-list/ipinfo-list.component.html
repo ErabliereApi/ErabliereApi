@@ -4,16 +4,14 @@
         <thead>
             <tr>
                 <th>IP</th>
-                <th>Network</th>
+                <th>Réseau</th>
                 <th>Pays</th>
                 <th>Code Pays</th>
                 <th>Continent</th>
                 <th>ASN</th>
                 <th>AS Name</th>
                 <th>AS Domain</th>
-                <th>Is Allowed</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
+                <th>Autorisé</th>
                 <th>Date de création</th>
                 <th>Date de modification</th>
                 <th></th>
@@ -30,9 +28,7 @@
                 <td>{{ipInfo.asn}}</td>
                 <td>{{ipInfo.aS_name}}</td>
                 <td>{{ipInfo.aS_domain}}</td>
-                <td>{{ipInfo.isAllowed}}</td>
-                <td>{{ipInfo.latitude}}</td>
-                <td>{{ipInfo.longitude}}</td>
+                <td>{{ textBloquerParReglePays(ipInfo) }}</td>
                 <td>{{ipInfo.dc | date:'yyyy-MM-dd'}}</td>
                 <td>{{ipInfo.dm | date:'yyyy-MM-dd'}}</td>
                 <td>

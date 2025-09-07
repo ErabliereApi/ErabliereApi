@@ -8,9 +8,9 @@ import { ErabliereApi } from "src/core/erabliereapi.service";
     selector: 'app-ipinfo-list',
     templateUrl: './ipinfo-list.component.html',
     imports: [
-    DatePipe,
-    EButtonComponent
-],
+        DatePipe,
+        EButtonComponent
+    ],
 })
 export class IpinfoListComponent {
     @Input() ipInfos: IpInfo[] = [];
@@ -24,5 +24,17 @@ export class IpinfoListComponent {
         }).catch(err => {
             console.error("Erreur lors de la suppression de l'information IP", err);
         });
+    }
+
+    textBloquerParReglePays(_t21: IpInfo) {
+        if (this.authorizeCountryCode.length === 0) {
+            return _t21.isAllowed ? "Autorisé" : "Bloqué";
+        }
+
+        if (_t21.countryCode && !this.authorizeCountryCode.includes(_t21.countryCode)) {
+            return "Bloqué par règle de pays";
+        }
+
+        return _t21.isAllowed ? "Autorisé" : "Bloqué";
     }
 }

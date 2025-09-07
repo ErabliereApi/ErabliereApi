@@ -107,7 +107,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
 
             // zoom/hover tooltip
             this.map.on('mousemove', 'country-fills', (e) => {
-                const props = e.features && e.features[0].properties;
+                const props = e.features?.[0]?.properties;
                 if (!props) return;
             });
         });
@@ -138,19 +138,18 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
     }
 
     hslToHex(h: number, s: number, l: number) {
-        // h 0-360, s 0-100, l 0-100
         s /= 100;
         l /= 100;
         const c = (1 - Math.abs(2 * l - 1)) * s;
         const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
         const m = l - c / 2;
         let r = 0, g = 0, b = 0;
-        if (0 <= h && h < 60) { r = c; g = x; b = 0; }
-        else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
-        else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
-        else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
-        else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
-        else { r = c; g = 0; b = x; }
+        if (0 <= h && h < 60) { r = c; g = x; }
+        else if (60 <= h && h < 120) { r = x; g = c; }
+        else if (120 <= h && h < 180) { g = c; b = x; }
+        else if (180 <= h && h < 240) { g = x; b = c; }
+        else if (240 <= h && h < 300) { r = x; b = c; }
+        else { r = c; b = x; }
         const R = Math.round((r + m) * 255);
         const G = Math.round((g + m) * 255);
         const B = Math.round((b + m) * 255);
