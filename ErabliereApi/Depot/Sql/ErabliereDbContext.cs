@@ -133,9 +133,14 @@ namespace ErabliereApi.Depot.Sql
         public DbSet<Horaire> Horaires { get; private set; }
 
         /// <summary>
-        /// Table des IP
+        /// Table des IPs des utilisateurs
         /// </summary>
         public DbSet<IpInfo> IpInfos { get; private set; }
+
+        /// <summary>
+        /// Table des IPs et ASN importées de la base de données tierce
+        /// </summary>
+        public DbSet<IpNetworkAsnInfo> IpNetworkAsnInfos { get; private set; }
 #pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />

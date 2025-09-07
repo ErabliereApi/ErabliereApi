@@ -44,6 +44,15 @@ public class IpInfoController : ControllerBase
     }
 
     /// <summary>
+    /// Récupère les informations ASN des réseaux IP stockées dans la base de données
+    /// </summary>
+    [HttpGet("asn/{asn}")]
+    public IQueryable<IpNetworkAsnInfo> GetIpNetworkAsnInfo(string asn)
+    {
+        return _context.IpNetworkAsnInfos.AsNoTracking().Where(info => info.ASN == asn);
+    }
+
+    /// <summary>
     /// Récupère la liste des pays autorisés à accéder à l'API
     /// </summary>
     /// <returns>Liste des codes de pays autorisés</returns>
