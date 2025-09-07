@@ -25,7 +25,26 @@ export class AdresseAppareil {
 export class PortAppareil {
     id: any;
     port?: number;
-    protocol?: string;
+    protocole?: string;
+    etat?: PortEtat;
+    portService?: PortService;
+}
+
+export class PortEtat {
+    id: any;
+    etat?: string;
+    raison?: string;
+    raisonTTL?: string;
+    idPortAppareil?: any;
+}
+
+export class PortService {
+    id: any;
+    name: string = "";
+    produit?: string;
+    extraInfo?: string;
+    methode?: string;
+    cpEs?: string[];
 }
 
 export class NomHost {

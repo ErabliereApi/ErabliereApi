@@ -18,7 +18,7 @@
     </div>
 
     <div class="col-md-6">
-        <ebutton type="primary" size="sm" (clicked)="importerScanNmap()" [inProgress]="loadingNmapResultInProgress">
+        <ebutton type="primary" size="sm" class="me-2" (clicked)="importerScanNmap()" [inProgress]="loadingNmapResultInProgress">
             Importer un fichier nmap
         </ebutton>
 
@@ -67,7 +67,7 @@
             <td>
                 <ul>
                     @for (port of appareil.ports; track port.id) {
-                    <li>{{ port.port }} ({{ port.protocol }})</li>
+                    <li>{{ port.port }} ({{ port.protocole }}) - {{ port.etat?.etat }} {{ port.etat?.raison }} - {{ port.portService?.name }}</li>
                     }
                 </ul>
             </td>

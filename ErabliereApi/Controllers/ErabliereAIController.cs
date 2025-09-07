@@ -29,7 +29,6 @@ public class ErabliereAIController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<ErabliereAIController> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
 
     /// <summary>
@@ -37,13 +36,11 @@ public class ErabliereAIController : ControllerBase
     /// </summary>
     /// <param name="depot"></param>
     /// <param name="configuration"></param>
-    /// <param name="logger"></param>
     /// <param name="httpClientFactory"></param>
-    public ErabliereAIController(ErabliereDbContext depot, IConfiguration configuration, ILogger<ErabliereAIController> logger, IHttpClientFactory httpClientFactory)
+    public ErabliereAIController(ErabliereDbContext depot, IConfiguration configuration, IHttpClientFactory httpClientFactory)
     {
         _depot = depot;
         _configuration = configuration;
-        _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
 

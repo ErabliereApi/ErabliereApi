@@ -9,7 +9,7 @@ import { ApiKey } from 'src/model/apikey';
         <div class="m-3">
             <h3>Clé d'API</h3>
             <hr />
-            <div class="container-fluid">
+            <div>
                 <api-key-list [apiKeys]="apikeys"></api-key-list>
             </div>
         </div>

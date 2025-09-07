@@ -84,37 +84,7 @@ public class NmapService
         var appareil = existingDevices.FirstOrDefault(a => a.Adresses.Any(ad => ad.Addr == address));
         if (appareil == null)
         {
-            appareil = new Appareil
-            {
-                IdErabliere = idErabliere,
-                Name = address,
-                Description = "Ajouté par scan nmap",
-            };
-            var addresses = host.SelectNodes("address");
-            if (addresses != null)
-            {
-                foreach (XmlNode addr in addresses)
-                {
-                    appareil.Adresses.Add(new AppareilAdresse
-                    {
-                        Addr = addr.Attributes?["addr"]?.Value ?? "",
-                        Addrtype = addr.Attributes?["addrtype"]?.Value ?? "",
-                        Vendeur = addr.Attributes?["vendor"]?.Value ?? ""
-                    });
-                }
-            }
-            var statut = host.SelectSingleNode("status");
-            if (statut != null && statut.Attributes != null)
-            {
-                appareil.Statut = new AppareilStatut
-                {
-                    Etat = statut.Attributes[STATE]?.Value ?? "",
-                    Raison = statut.Attributes[REASON]?.Value ?? "",
-                    RaisonTTL = statut.Attributes["reason_ttl"]?.Value ?? ""
-                };
-            }
-            await _context.Appareils.AddAsync(appareil, token);
-            existingDevices.Add(appareil);
+            await AddNewAppareilFromHostHint(idErabliere, existingDevices, host, address, token);
         }
         else
         {
@@ -131,6 +101,42 @@ public class NmapService
                 appareil.Statut.RaisonTTL = statut.Attributes["raison_ttl"]?.Value ?? "";
             }
         }
+    }
+
+    private async Task<Appareil> AddNewAppareilFromHostHint(Guid idErabliere, List<Appareil> existingDevices, XmlNode host, string address, CancellationToken token)
+    {
+        Appareil appareil = new Appareil
+        {
+            IdErabliere = idErabliere,
+            Name = address,
+            Description = "Ajouté par scan nmap",
+        };
+        var addresses = host.SelectNodes("address");
+        if (addresses != null)
+        {
+            foreach (XmlNode addr in addresses)
+            {
+                appareil.Adresses.Add(new AppareilAdresse
+                {
+                    Addr = addr.Attributes?["addr"]?.Value ?? "",
+                    Addrtype = addr.Attributes?["addrtype"]?.Value ?? "",
+                    Vendeur = addr.Attributes?["vendor"]?.Value ?? ""
+                });
+            }
+        }
+        var statut = host.SelectSingleNode("status");
+        if (statut != null && statut.Attributes != null)
+        {
+            appareil.Statut = new AppareilStatut
+            {
+                Etat = statut.Attributes[STATE]?.Value ?? "",
+                Raison = statut.Attributes[REASON]?.Value ?? "",
+                RaisonTTL = statut.Attributes["reason_ttl"]?.Value ?? ""
+            };
+        }
+        await _context.Appareils.AddAsync(appareil, token);
+        existingDevices.Add(appareil);
+        return appareil;
     }
 
     private async Task ParseHostsAsync(XmlDocument nmapResult, List<Appareil> existingDevices, CancellationToken token)
@@ -168,6 +174,7 @@ public class NmapService
             _logger.LogWarning("No device found for address {Address}, skipping host", addr);
             return;
         }
+        MapTimesInfo(host, appareil);
         var ports = host.SelectNodes("ports/port");
         if (ports != null)
         {
@@ -183,6 +190,29 @@ public class NmapService
             {
                 MapHostName(appareil, hostname);
             }
+        }
+    }
+
+    private static void MapTimesInfo(XmlNode host, Appareil appareil)
+    {
+        appareil.Temps.DateDebut = host.Attributes?["starttime"] != null
+            ? long.Parse(host.Attributes["starttime"]?.Value ?? "0")
+            : 0;
+        appareil.Temps.DateFin = host.Attributes?["endtime"] != null
+            ? long.Parse(host.Attributes["endtime"]?.Value ?? "0")
+            : 0;
+        var timeXml = host.SelectSingleNode("times");
+        if (timeXml != null && timeXml.Attributes != null)
+        {
+            appareil.Temps.Strtt = timeXml.Attributes["srtt"] != null
+                ? long.Parse(timeXml.Attributes["srtt"]?.Value ?? "0")
+                : 0;
+            appareil.Temps.Rttvar = timeXml.Attributes["rttvar"] != null
+                ? long.Parse(timeXml.Attributes["rttvar"]?.Value ?? "0")
+                : 0;
+            appareil.Temps.To = timeXml.Attributes["to"] != null
+                ? long.Parse(timeXml.Attributes["to"]?.Value ?? "0")
+                : 0;
         }
     }
 
@@ -251,9 +281,9 @@ public class NmapService
                 PortService = new PortService
                 {
                     Name = service?.Attributes?["name"]?.Value ?? "",
+                    Methode = service?.Attributes?["method"]?.Value ?? "",
                     Produit = service?.Attributes?["product"]?.Value ?? "",
-                    ExtraInfo = service?.Attributes?["extrainfo"]?.Value ?? "",
-                    Methode = service?.Attributes?["method"]?.Value ?? ""
+                    ExtraInfo = service?.Attributes?["extrainfo"]?.Value ?? ""
                 }
             });
         }

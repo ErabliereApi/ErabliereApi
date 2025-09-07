@@ -54,41 +54,61 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
             const agg = this.aggregateByCountry(this.ipInfos);
 
             // 2) charger un GeoJSON world-countries (Topology/GeoJSON)
-            const geoJsonUrl = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
+            const geoJsonUrl = '/assets/countries.geo.json';
             const res = await fetch(geoJsonUrl);
             const world = await res.json();
+            const worldFiltered: any = {
+                type: 'FeatureCollection',
+                features: []
+            };
 
-            // // 3) injecter count et color dans les propriétés des features
+            // 3) injecter count et color dans les propriétés des features
             const counts = Object.values(agg);
             const min = counts.length ? Math.min(...counts) : 0;
             const max = counts.length ? Math.max(...counts) : 1;
 
             for (const f of world.features) {
-                // essayer plusieurs clés possibles pour le code iso 2 lettres
-                const code =
-                    f.properties.ISO_A2 ||
-                    f.properties.iso_a2 ||
-                    f.properties.ISO2 ||
-                    f.properties.ADM0_A3 || // parfois A3
-                    f.properties.iso_a3 || null;
+                const code = f.properties.name;
 
-                // si iso_a3 est present et tu as code A2, il faudra mapper A3->A2 (rare)
-                let c = null;
-                if (code) {
-                    // normaliser en majuscule 2 lettres
-                    const iso2 = String(code).toUpperCase();
-                    c = agg[iso2] ?? 0;
-                } else {
-                    c = 0; // default
+                if (agg.hasOwnProperty(code)) {
+                    f.properties.count = agg[code];
+                    f.properties.color = this.countToColor(agg[code], min, max);
+                    worldFiltered.features.push(f);
                 }
-                f.properties.count = c;
-                f.properties.color = this.countToColor(c, min, max);
             }
 
             // 4) ajouter la source et la couche
             this.map.addSource('countries', {
                 type: 'geojson',
-                data: world
+                data: worldFiltered
+            });
+
+            // couche fill (pays colorés)
+            this.map.addLayer({
+                id: 'country-fills',
+                type: 'fill',
+                source: 'countries',
+                paint: {
+                    'fill-color': ['get', 'color'],
+                    'fill-opacity': 0.8
+                }
+            });
+
+            // bordures
+            this.map.addLayer({
+                id: 'country-borders',
+                type: 'line',
+                source: 'countries',
+                paint: {
+                    'line-color': '#ffffff',
+                    'line-width': 0.5
+                }
+            });
+
+            // zoom/hover tooltip
+            this.map.on('mousemove', 'country-fills', (e) => {
+                const props = e.features && e.features[0].properties;
+                if (!props) return;
             });
         });
     }
@@ -96,15 +116,8 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
     aggregateByCountry(list: IpInfo[]): { [iso2: string]: number } {
         const agg: { [k: string]: number } = {};
         for (const item of list) {
-            let code = item.countryCode || item.country || null;
+            let code = item.country; // nom complet
             if (!code) continue;
-            code = String(code).toUpperCase();
-            // si country contient nom complet (United States) on pourrait map via table si besoin
-            if (code.length !== 2) {
-                // essayer de récupérer un code à partir du nom (optionnel)
-                // pour l'instant on skip
-                continue;
-            }
             agg[code] = (agg[code] || 0) + 1;
         }
         return agg;

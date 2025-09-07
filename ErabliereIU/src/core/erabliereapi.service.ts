@@ -780,7 +780,7 @@ export class ErabliereApi {
 
     async getAppareils(id: any) {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.get<Appareil[]>(this._environmentService.apiUrl + '/Erablieres/' + id + '/Appareil?$expand=Adresses,Ports,NomsHost,Statut', { headers: headers }));
+        return firstValueFrom(this._httpClient.get<Appareil[]>(this._environmentService.apiUrl + '/Erablieres/' + id + '/Appareil?$expand=Adresses,Ports($expand=Etat,PortService),NomsHost,Statut', { headers: headers }));
     }
 
     async supprimerTousLesAppareils(erabliereId: any) {

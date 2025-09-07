@@ -14,6 +14,7 @@ import { ErabliereApi } from "src/core/erabliereapi.service";
 })
 export class IpinfoListComponent {
     @Input() ipInfos: IpInfo[] = [];
+    @Input() authorizeCountryCode: Array<string> = [];
 
     constructor(private readonly api: ErabliereApi) { }
 
