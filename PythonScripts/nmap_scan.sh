@@ -10,4 +10,4 @@ RESULT=$(cat result.xml)
 curl -X PUT \
     -H "Content-Type: text/plain" \
     --data-binary "$RESULT" \
-    https://erabliereapi.freddycoder.com/erablieres/$idErabliere/devices/networkscan
+    https://erabliereapi.freddycoder.com/erablieres/$idErabliere/appareil/nmapscan

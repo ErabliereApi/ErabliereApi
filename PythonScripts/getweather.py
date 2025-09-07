@@ -18,11 +18,7 @@ url = "http://dataservice.accuweather.com/currentconditions/v1/" + locationKey +
 
 print("Requesting " + redacted(url, [apiKey]))
 response = requests.get(url)
-
-# Print information and body of the response
 print(response.status_code)
-print(response.headers)
-print(response.text)
 
 # Parse the json
 data = response.json()
