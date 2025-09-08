@@ -15,5 +15,6 @@ public class IpNetworkAsnInfoEntityConfiguration : IEntityTypeConfiguration<IpNe
     {
         builder.HasIndex(e => e.Network);
         builder.HasIndex(e => e.ASN);
+        builder.HasIndex(e => e.CountryCode);
     }
 }

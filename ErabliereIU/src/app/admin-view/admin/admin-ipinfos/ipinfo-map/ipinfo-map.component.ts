@@ -10,10 +10,11 @@ import { IpInfo } from 'src/model/ipinfo';
     styleUrls: ['./ipinfo-map.component.css']
 })
 export class IpinfoMapComponent implements OnInit, OnDestroy {
-    @Input() ipInfos: IpInfo[] = []; // injecte ta liste ici
+    @Input() ipInfos: IpInfo[] = [];
+    @Input() authorizeCountries: string[] = [];
     map?: mapboxgl.Map;
     style = 'mapbox://styles/mapbox/light-v10';
-    token?: string = 'YOUR_MAPBOX_ACCESS_TOKEN'; // mettre ton token
+    token?: string = 'YOUR_MAPBOX_ACCESS_TOKEN'; 
 
     constructor(private readonly api: ErabliereApi) { }
 
@@ -51,6 +52,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
         this.map.on('load', async () => {
             if (this.map == null) return;
 
+            // 1) agréger les ipInfos par pays
             const agg = this.aggregateByCountry(this.ipInfos);
 
             // 2) charger un GeoJSON world-countries (Topology/GeoJSON)
@@ -63,7 +65,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
             };
 
             // 3) injecter count et color dans les propriétés des features
-            const counts = Object.values(agg);
+            const counts = Object.values(agg).map(v => v.ipCount);
             const min = counts.length ? Math.min(...counts) : 0;
             const max = counts.length ? Math.max(...counts) : 1;
 
@@ -113,28 +115,41 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
         });
     }
 
-    aggregateByCountry(list: IpInfo[]): { [iso2: string]: number } {
-        const agg: { [k: string]: number } = {};
+    aggregateByCountry(list: IpInfo[]) {
+        const agg: { [k: string]: { ipCount: number, countryCode: string } } = {};
         for (const item of list) {
             let code = item.country; // nom complet
             if (!code) continue;
-            agg[code] = (agg[code] || 0) + 1;
+            if (agg.hasOwnProperty(code)) {
+                agg[code].ipCount += 1;
+            }
+            else {
+                agg[code] = {
+                    ipCount: 1,
+                    countryCode: item.countryCode
+                }
+            }
         }
         return agg;
     }
 
-    // simple dégradé bleu (0 -> gris clair, max -> rouge)
-    countToColor(value: number, min: number, max: number): string {
-        if (value <= 0) return '#eeeeee';
+    // Si le code de pays est dans les pays autorisés, on colore en vert, sinon en rouge
+    countToColor(value: { ipCount: number, countryCode: string }, min: number, max: number): string {
+        if (value.ipCount <= 0) return '#eeeeee';
+        let h = 120; // vert
+        let s = 90; // 90% saturation
+        let l = 50; // 50% lightness
+        if (this.authorizeCountries.length > 0 && !this.authorizeCountries.includes(value.countryCode)) {
+            h = 0; // rouge
+        }
         if (max === min) {
             // tout le monde a la même valeur
-            return this.hslToHex(0, 70, 50); // rouge
+            return this.hslToHex(h, s, l); 
         }
-        // normaliser 0..1
-        const t = (value - min) / (max - min);
-        // on veut de bleu (faible) à rouge (fort)
-        const hue = (1 - t) * 220 + t * 0; // 220 = blue, 0 = red
-        return this.hslToHex(hue, 70, 50);
+        const t = (value.ipCount - min) / (max - min);
+        s = Math.min(s * t + 20, 100); // entre 20% et 100%
+        l = Math.min(l * t + 50, 50); // entre 50% et 90%
+        return this.hslToHex(h, s, l);
     }
 
     hslToHex(h: number, s: number, l: number) {
