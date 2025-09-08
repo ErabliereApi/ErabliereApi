@@ -15,6 +15,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
     map?: mapboxgl.Map;
     style = 'mapbox://styles/mapbox/light-v10';
     token?: string = 'YOUR_MAPBOX_ACCESS_TOKEN'; 
+    missingCountries: string[] = [];
 
     constructor(private readonly api: ErabliereApi) { }
 
@@ -63,6 +64,18 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
                 type: 'FeatureCollection',
                 features: []
             };
+
+            // 2.5 vérifier les pays manquants
+            this.missingCountries = [];
+            for (const code of Object.keys(agg)) {
+                const found = world.features.find((f: any) => f.properties.name === code);
+                if (!found) {
+                    this.missingCountries.push(code);
+                }
+            }
+            if (this.missingCountries.length) {
+                console.warn("Missing countries in GeoJSON:", this.missingCountries);
+            }
 
             // 3) injecter count et color dans les propriétés des features
             const counts = Object.values(agg).map(v => v.ipCount);

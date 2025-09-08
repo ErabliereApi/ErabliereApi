@@ -1,4 +1,16 @@
 <div class="mb-3">
     <h5>Carte des IPs</h5>
+    @if (missingCountries.length > 0)
+    {
+        <div class="alert alert-warning" role="alert">
+            <strong>Attention:</strong> Certaines pays n'ont pas pu être placés sur la carte:
+            <ul>
+                @for (country of missingCountries; track country)
+                {
+                    <li>{{country}}</li>
+                }
+            </ul>
+        </div>
+    }
     <div id="mapipinfo" class="match-parent"></div>
 </div>

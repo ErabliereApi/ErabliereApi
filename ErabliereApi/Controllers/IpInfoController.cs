@@ -86,6 +86,69 @@ public class IpInfoController : ControllerBase
     }
 
     /// <summary>
+    /// Une action permettant d'envoyer un fichier csv pour importer des informations IP Réseau et ASN dans la BD.
+    /// </summary>
+    /// <param name="file">Le fichier CSV ou xlsx contenant les informations à importer</param>
+    /// <param name="cancellationToken">Jeton d'annulation pour la requête</param>
+    /// <returns>Résultat de l'opération</returns>
+    [HttpPost("import-asn")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ImportIpNetworkAsnInfo(IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("Le fichier est invalide.");
+        }
+
+        if (!file.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) && !file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Le fichier doit être au format CSV ou XLSX.");
+        }
+
+        var saveEach = 1000;
+        var count = 0;
+
+        if (file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Le format XLSX n'est pas encore supporté.");
+        }
+        else
+        {
+            using var stream = new StreamReader(file.OpenReadStream());
+            string? line;
+            while ((line = await stream.ReadLineAsync()) != null)
+            {
+                var parts = line.Split(',');
+                if (parts.Length >= 4)
+                {
+                    await _context.IpNetworkAsnInfos.AddAsync(new IpNetworkAsnInfo
+                    {
+                        Network = parts[0],
+                        ASN = parts[1],
+                        Country = parts[2],
+                        CountryCode = parts[3]
+                    }, cancellationToken);
+
+                    count++;
+                }
+
+                if (count >= saveEach)
+                {
+                    await _context.SaveChangesAsync(cancellationToken);
+                    count = 0;
+                }
+            }
+        }
+
+        if (count > 0)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Bloque une adresse IP en mettant à jour son statut dans la base de données
     /// </summary>
     /// <param name="id">Identifiant unique de l'information IP à bloquer</param>

@@ -135,7 +135,7 @@ public class IpInfoMiddleware : IMiddleware
                 ipInfo.TTL = DateTimeOffset.UtcNow.Add(_config.GetRequiredValue<TimeSpan>("IpInfoApi:DatabaseIpTTL"));
                 ipInfo.IsAllowed = true;
 
-                if (string.IsNullOrWhiteSpace(ipInfo.Network))
+                if (string.IsNullOrWhiteSpace(ipInfo.Network) && !string.IsNullOrWhiteSpace(ipInfo.ASN) && ipInfo.ASN != "NA")
                 {
                     await AddASNInfoIfPossibleAsync(ipInfo, context.RequestAborted);
                 }
@@ -177,7 +177,10 @@ public class IpInfoMiddleware : IMiddleware
                     IsAllowed = true
                 };
 
-                await AddASNInfoIfPossibleAsync(ipInfo, context.RequestAborted);
+                if (!string.IsNullOrWhiteSpace(ipInfo.ASN) && ipInfo.ASN != "NA")
+                {
+                    await AddASNInfoIfPossibleAsync(ipInfo, context.RequestAborted);
+                }
                 await _context.IpInfos.AddAsync(ipInfo, context.RequestAborted);
                 await _context.SaveChangesAsync(context.RequestAborted);
 
@@ -191,13 +194,13 @@ public class IpInfoMiddleware : IMiddleware
 
     private async Task AddASNInfoIfPossibleAsync(IpInfo ipInfo, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(ipInfo.ASN) || ipInfo.ASN == "NA")
+        {
+            return;
+        }
+
         try
         {
-            if (string.IsNullOrWhiteSpace(ipInfo.ASN) || ipInfo.ASN == "NA")
-            {
-                return;
-            }
-
             var existingAsnInfo = await _context.IpNetworkAsnInfos
                 .AsNoTracking()
                 .Where(a => a.ASN == ipInfo.ASN && a.CountryCode == ipInfo.CountryCode)
