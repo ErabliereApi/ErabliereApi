@@ -91,7 +91,7 @@ public static class ServiceCollectionExtension
         })
         .AddOData(o =>
         {
-            o.Select().Filter().OrderBy().SetMaxTop(100).Expand();
+            o.Select().Filter().OrderBy().SetMaxTop(config.GetValue<int>("OData:MaxTop")).Expand().Count();
         })
         .AddJsonOptions(c =>
         {

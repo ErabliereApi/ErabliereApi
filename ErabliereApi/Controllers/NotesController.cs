@@ -476,7 +476,14 @@ public class NotesController : ControllerBase
             return NotFound("La note ou le rappel n'existe pas");
         }
 
-        UpdateRappelDates(rappel);
+        if (string.IsNullOrWhiteSpace(rappel.Periodicite) || string.Equals(rappel.Periodicite, "Aucun", StringComparison.OrdinalIgnoreCase))
+        {
+            rappel.IsActive = false;
+        }
+        else
+        {
+            UpdateRappelDates(rappel);
+        }
 
         await _depot.SaveChangesAsync(token);
 
