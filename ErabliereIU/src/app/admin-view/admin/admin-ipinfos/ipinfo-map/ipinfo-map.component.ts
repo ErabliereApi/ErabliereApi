@@ -14,7 +14,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
     @Input() authorizeCountries: string[] = [];
     map?: mapboxgl.Map;
     style = 'mapbox://styles/mapbox/light-v10';
-    token?: string = 'YOUR_MAPBOX_ACCESS_TOKEN'; 
+    token?: string = 'YOUR_MAPBOX_ACCESS_TOKEN';
     missingCountries: string[] = [];
 
     constructor(private readonly api: ErabliereApi) { }
@@ -120,10 +120,27 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
                 }
             });
 
+            let popup: mapboxgl.Popup | undefined = undefined;
+
             // zoom/hover tooltip
             this.map.on('mousemove', 'country-fills', (e) => {
+                if (popup) {
+                    popup.remove();
+                    popup = undefined;
+                }
                 const props = e.features?.[0]?.properties;
                 if (!props) return;
+                const coordinates = (e.lngLat).toArray();
+                const name = props.name;
+                const count = agg[name]?.ipCount || 0;
+                const html = `<strong>${name}</strong><br/>Nombre d'adresses IP: ${count}<br/>Long/Lat: ${coordinates[0].toFixed(4)}, ${coordinates[1].toFixed(4)}`;
+                popup = new mapboxgl.Popup({
+                        closeButton: false,
+                        closeOnClick: false
+                    })
+                    .setLngLat(coordinates)
+                    .setHTML(html)
+                    .addTo(this.map!);
             });
         });
     }
@@ -157,7 +174,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
         }
         if (max === min) {
             // tout le monde a la même valeur
-            return this.hslToHex(h, s, l); 
+            return this.hslToHex(h, s, l);
         }
         const t = (value.ipCount - min) / (max - min);
         s = Math.min(s * t + 20, 100); // entre 20% et 100%
