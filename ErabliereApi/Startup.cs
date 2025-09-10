@@ -24,6 +24,7 @@ using Microsoft.Extensions.Options;
 using System.Text;
 using ErabliereApi.Services.Notifications;
 using MQTTnet.AspNetCore;
+using System.Net.Http.Headers;
 
 namespace ErabliereApi;
 
@@ -102,6 +103,20 @@ public class Startup
             {
                 c.BaseAddress = new Uri(Configuration.GetValue<string>("IbmQuantumBaseUrl") ?? throw new InvalidOperationException("La variable d'environnement 'IbmQuantumBaseUrl' à une valeur null."));
                 c.DefaultRequestHeaders.Add("Authorization", $"Bearer {ibmQuantum}");
+            });
+        }
+
+        var weatherBaseUrl = Configuration["AccuWeatherBaseUrl"];
+        if (!string.IsNullOrWhiteSpace(weatherBaseUrl))
+        {
+            services.AddHttpClient("WeatherClient", c =>
+            {
+                c.BaseAddress = new Uri(weatherBaseUrl);
+                var weatherApiKey = Configuration["AccuWeatherApiKey"];
+                if (!string.IsNullOrWhiteSpace(weatherApiKey))
+                {
+                    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", weatherApiKey);
+                }
             });
         }
 

@@ -42,7 +42,7 @@ public class WeatherForecastController : ControllerBase
     [ProducesResponseType(200, Type = typeof(WeatherForecastResponse))]
     [AllowAnonymous]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> GetWeatherForecast(Guid id, string lang = "fr-ca", CancellationToken token = default)
+    public async Task<IActionResult> GetWeatherForecast(Guid id, CancellationToken token, string lang = "fr-ca")
     {
         // Résoudre l'érablière
         var erabliere = await _context.Erabliere.FindAsync([id], token);
@@ -60,7 +60,7 @@ public class WeatherForecastController : ControllerBase
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal);
+        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal, token);
 
         if (code != 200)
         {
@@ -69,7 +69,7 @@ public class WeatherForecastController : ControllerBase
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var weatherForecast = await _weatherService.GetWeatherForecastAsync(locationCode, lang);
+        var weatherForecast = await _weatherService.GetWeatherForecastAsync(locationCode, lang, token);
 
         if (weatherForecast == null)
         {
@@ -86,7 +86,7 @@ public class WeatherForecastController : ControllerBase
     /// </summary>
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="lang">Paramètre de langue, fr-ca par défaut.</param>
-    /// <param name="cancellationToken">Token d'annulation</param>
+    /// <param name="token">Token d'annulation</param>
     /// <returns>Prévisions météo</returns>
     /// <response code="200">Prévisions météo</response>
     /// <response code="401">Non autorisé</response>
@@ -95,10 +95,10 @@ public class WeatherForecastController : ControllerBase
     [ProducesResponseType(200, Type = typeof(HourlyWeatherForecastResponse[]))]
     [AllowAnonymous]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> GetHourlyWeatherForecast(Guid id, string lang = "fr-ca", CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetHourlyWeatherForecast(Guid id, CancellationToken token, string lang = "fr-ca")
     {
         // Résoudre l'érablière
-        var erabliere = await _context.Erabliere.FindAsync([id], cancellationToken);
+        var erabliere = await _context.Erabliere.FindAsync([id], token);
 
         // Vérifier si l'érablière existe
         if (erabliere == null)
@@ -113,7 +113,7 @@ public class WeatherForecastController : ControllerBase
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal);
+        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal, token);
 
         if (code != 200)
         {
@@ -122,7 +122,7 @@ public class WeatherForecastController : ControllerBase
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var weatherForecast = await _weatherService.GetHoulyForecastAsync(locationCode, lang);
+        var weatherForecast = await _weatherService.GetHourlyForecastAsync(locationCode, lang, token);
 
         if (weatherForecast == null)
         {

@@ -10,11 +10,11 @@ namespace ErabliereApi.Services;
 public class MeteoMaticWeaterService : IWeaterService
 {
     /// <inheritdoc />
-    public async Task<(int, string)> GetLocationCodeAsync(string postalCode)
+    public async Task<(int, string)> GetLocationCodeAsync(string postalCode, CancellationToken cancellationToken)
     {
         using var http = new HttpClient();
 
-        var response = await http.GetFromJsonAsync<MeteoMaticLocationResponse>($"https://geocoder.meteomatics.com/api/v1/geocoder/direct/?location={postalCode}&language=en&limit=8");
+        var response = await http.GetFromJsonAsync<MeteoMaticLocationResponse>($"https://geocoder.meteomatics.com/api/v1/geocoder/direct/?location={postalCode}&language=en&limit=8", cancellationToken);
 
         var geo = response?.result?.FirstOrDefault()?.geometry;
 
@@ -27,13 +27,13 @@ public class MeteoMaticWeaterService : IWeaterService
     }
 
     /// <inheritdoc />
-    public ValueTask<WeatherForecastResponse?> GetWeatherForecastAsync(string location, string lang)
+    public ValueTask<WeatherForecastResponse?> GetWeatherForecastAsync(string location, string lang, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public ValueTask<HourlyWeatherForecastResponse[]?> GetHoulyForecastAsync(string location, string lang)
+    public ValueTask<HourlyWeatherForecastResponse[]?> GetHourlyForecastAsync(string location, string lang, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

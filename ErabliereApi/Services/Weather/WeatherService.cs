@@ -9,11 +9,9 @@ namespace ErabliereApi.Services;
 /// </summary>
 public class WeatherService : IWeaterService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IDistributedCache _cache;
     private readonly ILogger<WeatherService> _logger;
-    private readonly string? AccuWeatherApiKey;
-    private readonly string? AccuWeatherBaseUrl;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
@@ -22,21 +20,19 @@ public class WeatherService : IWeaterService
     public WeatherService(
         IDistributedCache memoryCache,
         ILogger<WeatherService> logger,
-        IConfiguration configuration,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory)
     {
-        _httpClient = new HttpClient();
+        _httpClientFactory = httpClientFactory;
         _cache = memoryCache;
         _logger = logger;
-        AccuWeatherApiKey = configuration["AccuWeatherApiKey"];
-        AccuWeatherBaseUrl = configuration["AccuWeatherBaseUrl"];
         _httpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
     /// Obtenir le code de localisation à partir d'un code postal
     /// </summary>
-    public async Task<(int, string)> GetLocationCodeAsync(string postalCode)
+    public async Task<(int, string)> GetLocationCodeAsync(string postalCode, CancellationToken cancellationToken)
     {
         var cacheKey = $"WeatherService.PostalCode.{postalCode}";
         var locationCode = await _cache.GetStringAsync(cacheKey);
@@ -49,9 +45,11 @@ public class WeatherService : IWeaterService
 
         try
         {
-            string url = $"{AccuWeatherBaseUrl}/locations/v1/postalcodes/search?apikey={AccuWeatherApiKey}&q={postalCode}";
+            string url = $"/locations/v1/postalcodes/search?q={postalCode}";
 
-            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            var _httpClient = _httpClientFactory.CreateClient("AccuWeatherClient");
+
+            HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
 
             responseBodyString = await response.Content.ReadAsStringAsync();
 
@@ -80,7 +78,7 @@ public class WeatherService : IWeaterService
     /// <summary>
     /// Obtenir les prévisions météo à partir d'un code de localisation
     /// </summary>
-    public async ValueTask<WeatherForecastResponse?> GetWeatherForecastAsync(string location, string lang)
+    public async ValueTask<WeatherForecastResponse?> GetWeatherForecastAsync(string location, string lang, CancellationToken cancellationToken)
     {
         var cacheKey = $"WeatherService.GetWeatherForecast.{location}";
         var cacheValue = await _cache.GetStringAsync(cacheKey);
@@ -92,9 +90,11 @@ public class WeatherService : IWeaterService
 
         try
         {
-            string url = $"{AccuWeatherBaseUrl}/forecasts/v1/daily/5day/{location}?apikey={AccuWeatherApiKey}&language={lang}";
+            string url = $"/forecasts/v1/daily/5day/{location}?language={lang}";
 
-            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            var _httpClient = _httpClientFactory.CreateClient("AccuWeatherClient");
+
+            HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             if (response.Headers.TryGetValues("RateLimit-Remaining", out var vals))
@@ -125,7 +125,7 @@ public class WeatherService : IWeaterService
     /// <summary>
     /// Obtenir les prévisions météo horaires à partir d'un code de localisation
     /// </summary>
-    public async ValueTask<HourlyWeatherForecastResponse[]?> GetHoulyForecastAsync(string location, string lang)
+    public async ValueTask<HourlyWeatherForecastResponse[]?> GetHourlyForecastAsync(string location, string lang, CancellationToken cancellationToken)
     {
         var cacheKey = $"WeatherService.GetHoulyForecastAsync.{location}";
         var cacheValue = await _cache.GetStringAsync(cacheKey);
@@ -138,9 +138,11 @@ public class WeatherService : IWeaterService
         try
         {
             string url = 
-$"{AccuWeatherBaseUrl}/forecasts/v1/hourly/12hour/{location}?apikey={AccuWeatherApiKey}&language={lang}";
+$"/forecasts/v1/hourly/12hour/{location}?language={lang}";
 
-            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            var _httpClient = _httpClientFactory.CreateClient("AccuWeatherClient");
+
+            HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             if (response.Headers.TryGetValues("RateLimit-Remaining", out var vals))
