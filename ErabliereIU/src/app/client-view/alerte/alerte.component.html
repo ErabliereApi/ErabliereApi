@@ -6,225 +6,232 @@
     <ajouter-alerte-modal [idErabliereSelectionee]="idErabliereSelectionee" [alertes]="alertes"
         [alertesCapteur]="alertesCapteur" [erabliere]="erabliere">
     </ajouter-alerte-modal>
-}
+    }
 </div>
 <div>
     @if (displayEditForm || displayEditAlerteCapteurForm) {
-    <modifier-alerte-modal
-        [idErabliereSelectionee]="idErabliereSelectionee" [displayEditFormSubject]="displayEditFormSubject"
-        [alerteEditFormSubject]="alerteEditFormSubject" [alerte]="alerteEditForm"
-        [alerteCapteurEditFormSubject]="alerteCapteurEditFormSubject" [alerteCapteur]="alerteCapteurEditForm"
-        [editAlerte]="editAlerte" [editAlerteCapteur]="editAlerteCapteur">
+    <modifier-alerte-modal [idErabliereSelectionee]="idErabliereSelectionee"
+        [displayEditFormSubject]="displayEditFormSubject" [alerteEditFormSubject]="alerteEditFormSubject"
+        [alerte]="alerteEditForm" [alerteCapteurEditFormSubject]="alerteCapteurEditFormSubject"
+        [alerteCapteur]="alerteCapteurEditForm" [editAlerte]="editAlerte" [editAlerteCapteur]="editAlerteCapteur">
     </modifier-alerte-modal>
-}
+    }
 </div>
 <div>
     @if (alertes != null && alertes.length == 0 && alertesCapteur != null && alertesCapteur.length == 0) {
     <p>
         Aucune alerte de configuré
     </p>
-}
+    }
 
     @if (alertesCapteur != null && alertesCapteur.length > 0) {
     <div>
         <h4>Alerte capteurs</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>
-                        Id
-                    </th>
-                    <th>
-                        Nom
-                    </th>
-                    <th>
-                        État
-                    </th>
-                    <th>
-                        Envoyer à
-                    </th>
-                    <th>
-                        Texter à
-                    </th>
-                    <th>
-                        Min.
-                    </th>
-                    <th>
-                        Max.
-                    </th>
-                    <th>
-                        Capteur
-                    </th>
-                    <th></th>
-                <tr>
-            </thead>
-            <tbody>
-                @for (alerte of alertesCapteur; track alerte;) {
-                <tr>
-                    <td>
-                        <copy-id-button [text]="alerte.id" title="Copier l'id de l'alerte {{alerte.id}}"></copy-id-button>
-                    </td>
-                    <td>
-                        {{alerte.nom}}
-                    </td>
-                    <td>
-                        @if (alerte.isEnable) {
-                        <span>Activé</span>
-                        } 
-                        @else {
-                        <span>Désactivé</span>
-                        }
-                    </td>
-                    <td>
-                        @for (email of alerte.emails; track email;) {
-                        <span class="feature_desc">{{email}}</span>
-                        }
-                    </td>
-                    <td>
-                        @for (numero of alerte.numeros; track numero;) {
-                        <span class="feature_desc">{{numero}}</span>
-                        }
-                    </td>
-                    <td>
-                        {{formatNumber(alerte.minVaue, alerte.capteur?.symbole, true)}}
-                    </td>
-                    <td>
-                        {{formatNumber(alerte.maxValue, alerte.capteur?.symbole, true)}}
-                    </td>
-                    <td>
-                        {{alerte.capteur?.nom}}
-                    </td>
-                    <td>
-                        <div class="d-grid gap-3">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Id
+                        </th>
+                        <th>
+                            Nom
+                        </th>
+                        <th>
+                            État
+                        </th>
+                        <th>
+                            Envoyer à
+                        </th>
+                        <th>
+                            Texter à
+                        </th>
+                        <th>
+                            Min.
+                        </th>
+                        <th>
+                            Max.
+                        </th>
+                        <th>
+                            Capteur
+                        </th>
+                        <th></th>
+                    <tr>
+                </thead>
+                <tbody>
+                    @for (alerte of alertesCapteur; track alerte;) {
+                    <tr>
+                        <td>
+                            <copy-id-button [text]="alerte.id"
+                                title="Copier l'id de l'alerte {{alerte.id}}"></copy-id-button>
+                        </td>
+                        <td>
+                            {{alerte.nom}}
+                        </td>
+                        <td>
                             @if (alerte.isEnable) {
-                            <button  class="btn btn-outline-warning"
-                                (click)="onButtonDesactiverAlerteCapteurClick(alerte.idCapteur, alerte.id)">désactiver</button>
+                            <span>Activé</span>
                             }
-                            @if (!alerte.isEnable) {
-                            <button class="btn btn-outline-success"
-                                (click)="onButtonActiverAlerteCapteurClick(alerte.idCapteur, alerte.id)">activer</button>
+                            @else {
+                            <span>Désactivé</span>
                             }
-                            <button class="btn btn-info"
-                                (click)="onButtonModifierAlerteCapteurClick(alerte.id)">modifier</button>
-                            <button class="btn btn-danger"
-                                (click)="onButtonDeleteAlerteCapteurClick(alerte.idCapteur, alerte.id)">supprimer</button>
+                        </td>
+                        <td>
+                            @for (email of alerte.emails; track email;) {
+                            <span class="feature_desc">{{email}}</span>
+                            }
+                        </td>
+                        <td>
+                            @for (numero of alerte.numeros; track numero;) {
+                            <span class="feature_desc">{{numero}}</span>
+                            }
+                        </td>
+                        <td>
+                            {{formatNumber(alerte.minVaue, alerte.capteur?.symbole, true)}}
+                        </td>
+                        <td>
+                            {{formatNumber(alerte.maxValue, alerte.capteur?.symbole, true)}}
+                        </td>
+                        <td>
+                            {{alerte.capteur?.nom}}
+                        </td>
+                        <td>
+                            <div class="d-grid gap-3">
+                                @if (alerte.isEnable) {
+                                <button class="btn btn-outline-warning"
+                                    (click)="onButtonDesactiverAlerteCapteurClick(alerte.idCapteur, alerte.id)">désactiver</button>
+                                }
+                                @if (!alerte.isEnable) {
+                                <button class="btn btn-outline-success"
+                                    (click)="onButtonActiverAlerteCapteurClick(alerte.idCapteur, alerte.id)">activer</button>
+                                }
+                                <button class="btn btn-info"
+                                    (click)="onButtonModifierAlerteCapteurClick(alerte.id)">modifier</button>
+                                <button class="btn btn-danger"
+                                    (click)="onButtonDeleteAlerteCapteurClick(alerte.idCapteur, alerte.id)">supprimer</button>
 
-                        </div>
-                    </td>
-                <tr>
-                }
-            </tbody>
-        </table>
+                            </div>
+                        </td>
+                    <tr>
+                        }
+                </tbody>
+            </table>
+        </div>
     </div>
-}
+    }
 
     @if (alertes != null && alertes.length > 0) {
     <div>
         <h4>Alerte trio données</h4>
         @if (alertes != null && alertes.length > 0) {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>
-                        Id
-                    </th>
-                    <th>
-                        Nom
-                    </th>
-                    <th>
-                        État
-                    </th>
-                    <th>
-                        Envoyer à
-                    </th>
-                    <th>
-                        Texter à
-                    </th>
-                    <th>
-                        Temperature min.
-                    </th>
-                    <th>
-                        Temperature max.
-                    </th>
-                    <th>
-                        Vaccium min.
-                    </th>
-                    <th>
-                        Vaccium max.
-                    </th>
-                    <th>
-                        Niveau bassin min.
-                    </th>
-                    <th>
-                        Niveau bassin max.
-                    </th>
-                    <th></th>
-                <tr>
-            </thead>
-            <tbody>
-                @for (alerte of alertes; track alerte;) {
-                <tr>
-                    <td>
-                        <copy-id-button [text]="alerte.id" title="Copier l'id de l'alerte {{alerte.id}}"></copy-id-button>
-                    </td>
-                    <td>
-                        {{alerte.nom}}
-                    </td>
-                    <td>
-                        @if (alerte.isEnable) {
-                        <span>Activé</span>
-                        }
-                        @else {
-                        <span>Désactivé</span>
-                        }
-                    </td>
-                    <td>
-                        @for (email of alerte.emails; track email;) {
-                        <span class="feature_desc">{{email}}</span>
-                        }
-                    </td>
-                    <td>
-                        @for (numero of alerte.numeros; track numero;) {
-                        <span class="feature_desc">{{numero}}</span>
-                        }
-                    </td>
-                    <td>
-                        {{formatStringNumber(alerte.temperatureThresholdHight, "°C")}}
-                    </td>
-                    <td>
-                        {{formatStringNumber(alerte.temperatureThresholdLow, "°C")}}
-                    </td>
-                    <td>
-                        {{formatStringNumber(alerte.vacciumThresholdHight, "HG")}}
-                    </td>
-                    <td>
-                        {{formatStringNumber(alerte.vacciumThresholdLow, "HG")}}
-                    </td>
-                    <td>
-                        {{formatStringNumberBase10(alerte.niveauBassinThresholdHight, "%")}}
-                    </td>
-                    <td>
-                        {{formatStringNumberBase10(alerte.niveauBassinThresholdLow, "%")}}
-                    </td>
-                    <td>
-                        <div class="d-grid gap-3">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Id
+                        </th>
+                        <th>
+                            Nom
+                        </th>
+                        <th>
+                            État
+                        </th>
+                        <th>
+                            Envoyer à
+                        </th>
+                        <th>
+                            Texter à
+                        </th>
+                        <th>
+                            Temperature min.
+                        </th>
+                        <th>
+                            Temperature max.
+                        </th>
+                        <th>
+                            Vaccium min.
+                        </th>
+                        <th>
+                            Vaccium max.
+                        </th>
+                        <th>
+                            Niveau bassin min.
+                        </th>
+                        <th>
+                            Niveau bassin max.
+                        </th>
+                        <th></th>
+                    <tr>
+                </thead>
+                <tbody>
+                    @for (alerte of alertes; track alerte;) {
+                    <tr>
+                        <td>
+                            <copy-id-button [text]="alerte.id"
+                                title="Copier l'id de l'alerte {{alerte.id}}"></copy-id-button>
+                        </td>
+                        <td>
+                            {{alerte.nom}}
+                        </td>
+                        <td>
                             @if (alerte.isEnable) {
-                            <button class="btn btn-outline-warning"
-                                (click)="onButtonDesactiverAlerteClick(alerte.id)">désactiver</button>
+                            <span>Activé</span>
                             }
-                            @if (!alerte.isEnable) {
-                            <button class="btn btn-outline-success"
-                                (click)="onButtonActiverAlerteClick(alerte.id)">activer</button>
+                            @else {
+                            <span>Désactivé</span>
                             }
-                            <button class="btn btn-info" (click)="onButtonModifierClick(alerte.id)">modifier</button>
-                            <button class="btn btn-danger" (click)="onButtonDeleteClick(alerte.id)">supprimer</button>
-                        </div>
-                    </td>
-                <tr>
-                }
-            </tbody>
-        </table>
-    }
+                        </td>
+                        <td>
+                            @for (email of alerte.emails; track email;) {
+                            <span class="feature_desc">{{email}}</span>
+                            }
+                        </td>
+                        <td>
+                            @for (numero of alerte.numeros; track numero;) {
+                            <span class="feature_desc">{{numero}}</span>
+                            }
+                        </td>
+                        <td>
+                            {{formatStringNumber(alerte.temperatureThresholdHight, "°C")}}
+                        </td>
+                        <td>
+                            {{formatStringNumber(alerte.temperatureThresholdLow, "°C")}}
+                        </td>
+                        <td>
+                            {{formatStringNumber(alerte.vacciumThresholdHight, "HG")}}
+                        </td>
+                        <td>
+                            {{formatStringNumber(alerte.vacciumThresholdLow, "HG")}}
+                        </td>
+                        <td>
+                            {{formatStringNumberBase10(alerte.niveauBassinThresholdHight, "%")}}
+                        </td>
+                        <td>
+                            {{formatStringNumberBase10(alerte.niveauBassinThresholdLow, "%")}}
+                        </td>
+                        <td>
+                            <div class="d-grid gap-3">
+                                @if (alerte.isEnable) {
+                                <button class="btn btn-outline-warning"
+                                    (click)="onButtonDesactiverAlerteClick(alerte.id)">désactiver</button>
+                                }
+                                @if (!alerte.isEnable) {
+                                <button class="btn btn-outline-success"
+                                    (click)="onButtonActiverAlerteClick(alerte.id)">activer</button>
+                                }
+                                <button class="btn btn-info"
+                                    (click)="onButtonModifierClick(alerte.id)">modifier</button>
+                                <button class="btn btn-danger"
+                                    (click)="onButtonDeleteClick(alerte.id)">supprimer</button>
+                            </div>
+                        </td>
+                    <tr>
+                        }
+                </tbody>
+            </table>
+        </div>
+        }
     </div>
     }
 </div>
