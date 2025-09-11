@@ -16,7 +16,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <ebutton type="primary" (clicked)="ajouterErabliere()">Ajouter</ebutton>
+                <ebutton type="primary" (clicked)="ajouterErabliere()" [inProgress]="postErabliereInProgress">Ajouter</ebutton>
+                @if (erreurAjout != null) {
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {{ erreurAjout }}
+                    </div>
+                }
             </div>
         </div>
     </div>

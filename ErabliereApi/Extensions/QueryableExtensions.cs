@@ -47,6 +47,6 @@ public static class QueryableExtensions
             }
         }
 
-        return query;
+        return query.AsSingleQuery();
     }
 }

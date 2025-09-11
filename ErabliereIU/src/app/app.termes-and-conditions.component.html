@@ -50,15 +50,15 @@
     <div class="text-center mb-3">
         @if (authEnable && !hasAcceptTerms && isLoggedIn)
         {
-        <div class="btn-group me-2">
+        <div class="btn-group me-2 mb-2">
             <button class="btn btn-info" title="Accepter les conditions" (click)="acceptTerms()">J'accepte les conditions !</button>
         </div>
-        <div class="btn-group">
+        <div class="btn-group me-2 mb-2">
             <a class="btn btn-info" href="/">Continuer sans accepter</a>
         </div>
         }
         @else if (isLoggedIn && authEnable) {
-            <p>Vous avez accepter les termes en date du {{ acceptTermsDate | date: 'yyyy-MM-dd' }}.</p>
+        <p>Vous avez accepter les termes en date du {{ acceptTermsDate | date: 'yyyy-MM-dd' }}.</p>
         }
     </div>
 </div>

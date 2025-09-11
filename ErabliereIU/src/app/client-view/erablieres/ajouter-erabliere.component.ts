@@ -9,9 +9,11 @@ import { EButtonComponent } from 'src/generic/ebutton.component';
     imports: [ErabliereFormComponent, EButtonComponent]
 })
 export class AjouterErabliereComponent {
-    @ViewChild(ErabliereFormComponent) erabliereForm?: ErabliereFormComponent
-    modalTitle: string = "Ajouter une érablière"
-    @Output() shouldReloadErablieres = new EventEmitter()
+    @ViewChild(ErabliereFormComponent) erabliereForm?: ErabliereFormComponent;
+    modalTitle: string = "Ajouter une érablière";
+    @Output() shouldReloadErablieres = new EventEmitter();
+    postErabliereInProgress: boolean = false;
+    erreurAjout?: string = undefined;
 
     constructor(private readonly _api: ErabliereApi) { }
 
@@ -19,6 +21,8 @@ export class AjouterErabliereComponent {
         if (this.erabliereForm?.erabliere != null) {
             let erabliere = this.erabliereForm.erabliere
 
+            this.erreurAjout = undefined;
+            this.postErabliereInProgress = true;
             this._api.postErabliere(erabliere).then(() => {
                 if (this.erabliereForm != undefined) {
                     this.erabliereForm.generalError = undefined
@@ -27,7 +31,8 @@ export class AjouterErabliereComponent {
                 }
                 this.shouldReloadErablieres.emit();
             }).catch(error => {
-                if (this.erabliereForm != undefined) {
+                console.error("Erreur lors de l'ajout de l'érablière", error);
+                if (this.erabliereForm != null) {
                     if (error.status == 400) {
                         this.erabliereForm.errorObj = error
                         this.erabliereForm.generalError = undefined
@@ -36,6 +41,9 @@ export class AjouterErabliereComponent {
                         this.erabliereForm.generalError = "Une erreur est survenue lors de l'ajout de l'érablière. Veuillez réessayer plus tard."
                     }
                 }
+                this.erreurAjout = "Une erreur est survenue lors de l'ajout de l'érablière. Veuillez réessayer plus tard.";
+            }).finally(() => {
+                this.postErabliereInProgress = false
             });
         }
 

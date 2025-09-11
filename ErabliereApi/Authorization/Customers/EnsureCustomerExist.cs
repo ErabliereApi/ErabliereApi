@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Extensions;
+using ErabliereApi.Services.Notifications;
 using ErabliereApi.Services.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -158,6 +159,8 @@ public class EnsureCustomerExist : IMiddleware
                 var customer = customerEntity.Entity;
 
                 await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+
+                await TrySendWelcomeNotification(context, customer);
             }
         }
         else
@@ -176,6 +179,35 @@ public class EnsureCustomerExist : IMiddleware
             }
 
             await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+        }
+    }
+
+    private static async Task TrySendWelcomeNotification(HttpContext context, Customer customer)
+    {
+        try
+        {
+            var _notificationService = context.RequestServices.GetRequiredService<NotificationService>();
+            var _emailConfig = context.RequestServices.GetRequiredService<EmailConfig>();
+
+            await _notificationService.SendNotificationAsync(
+                $"{customer.Name} Bienvenue dans l'application ErabliereApi !",
+                customer.Email,
+                NotificationType.Email,
+                context.RequestAborted
+            );
+
+            await _notificationService.SendNotificationAsync(
+                $"Un nouveau client a été créé avec succès. {customer.UniqueName}",
+                _emailConfig.Sender ?? throw new InvalidOperationException("Email sender is not configured"),
+                NotificationType.Email,
+                context.RequestAborted
+            );
+        }
+        catch (Exception ex)
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>();
+
+            logger.LogError(ex, "Failed to send welcome notification to {Customer}", customer.UniqueName);
         }
     }
 

@@ -275,6 +275,8 @@ public class ErablieresController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Ajouter(PostErabliere postErabliere, CancellationToken token)
     {
+        throw new DbUpdateConcurrencyException("Ajout d'érablière est désactivé temporairement.");
+
         var (isValid, actionResult) = await postErabliere.ValidateAsync(ModelState, _context, _localizer, token);
 
         if (!isValid)

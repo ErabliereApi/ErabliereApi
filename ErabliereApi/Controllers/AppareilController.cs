@@ -41,7 +41,7 @@ public class AppareilController : ControllerBase
     [ValiderOwnership("id")]
     public IQueryable<Appareil> Lister(Guid id)
     {
-        return _context.Appareils.AsNoTracking().Where(a => a.IdErabliere == id);
+        return _context.Appareils.AsNoTracking().Where(a => a.IdErabliere == id).AsSingleQuery();
     }
 
     /// <summary>

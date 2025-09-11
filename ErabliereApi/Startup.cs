@@ -109,7 +109,7 @@ public class Startup
         var weatherBaseUrl = Configuration["AccuWeatherBaseUrl"];
         if (!string.IsNullOrWhiteSpace(weatherBaseUrl))
         {
-            services.AddHttpClient("WeatherClient", c =>
+            services.AddHttpClient("AccuWeatherClient", c =>
             {
                 c.BaseAddress = new Uri(weatherBaseUrl);
                 var weatherApiKey = Configuration["AccuWeatherApiKey"];
