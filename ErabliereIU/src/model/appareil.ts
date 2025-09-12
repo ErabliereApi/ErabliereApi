@@ -6,6 +6,8 @@ export class Appareil {
     adresses: Array<AdresseAppareil> = [];
     ports: Array<PortAppareil> = [];
     nomsHost: Array<NomHost> = [];
+    dc?: string;
+    dm?: string;
 }
 
 export class AppareilStatut {

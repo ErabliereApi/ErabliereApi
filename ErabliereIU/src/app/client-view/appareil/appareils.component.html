@@ -46,6 +46,8 @@
             <th>Adresses</th>
             <th>Port</th>
             <th>Nom d'hôte</th>
+            <th>Date de création</th>
+            <th>Date de modification</th>
         </tr>
     </thead>
     <tbody>
@@ -78,6 +80,8 @@
                     }
                 </ul>
             </td>
+            <td>{{ appareil.dc | date:'yyyy-MM-dd' }}</td>
+            <td>{{ appareil.dm | date:'yyyy-MM-dd' }}</td>
         </tr>
         }
     </tbody>

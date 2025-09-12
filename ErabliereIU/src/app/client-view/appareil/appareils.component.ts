@@ -4,11 +4,12 @@ import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Appareil } from "src/model/appareil";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 import { EButtonComponent } from "src/generic/ebutton.component";
+import { DatePipe } from "@angular/common";
 
 @Component({
     selector: 'appareils',
     templateUrl: './appareils.component.html',
-    imports: [CopyTextButtonComponent, EButtonComponent]
+    imports: [CopyTextButtonComponent, EButtonComponent, DatePipe]
 })
 export class AppareilsComponent implements OnInit {
     appareils?: Appareil[];

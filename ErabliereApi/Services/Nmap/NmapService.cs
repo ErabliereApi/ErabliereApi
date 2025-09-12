@@ -110,6 +110,7 @@ public class NmapService
             IdErabliere = idErabliere,
             Name = address,
             Description = "Ajouté par scan nmap",
+            DC = DateTime.UtcNow
         };
         var addresses = host.SelectNodes("address");
         if (addresses != null)
@@ -174,6 +175,7 @@ public class NmapService
             _logger.LogWarning("No device found for address {Address}, skipping host", addr);
             return;
         }
+        appareil.DM = DateTime.UtcNow;
         MapTimesInfo(host, appareil);
         var ports = host.SelectNodes("ports/port");
         if (ports != null)
