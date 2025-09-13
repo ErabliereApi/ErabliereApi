@@ -6,11 +6,12 @@ import {
     Output,
 } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
+import { EButtonComponent } from 'src/generic/ebutton.component';
 import { Note } from 'src/model/note';
 
 @Component({
     selector: 'app-modal-rappel',
-    imports: [],
+    imports: [EButtonComponent],
     templateUrl: './modal-rappel.component.html'
 })
 export class ModalRappelComponent implements OnInit {
@@ -19,6 +20,9 @@ export class ModalRappelComponent implements OnInit {
     images: any;
     @Output() closeModal = new EventEmitter<boolean>();
     @Output() needToUpdate = new EventEmitter<boolean>();
+
+    deleteNoteInProgress = false;
+    reportRappelInProgress = false;
 
     constructor(private readonly _api: ErabliereApi) {
 
@@ -65,6 +69,7 @@ export class ModalRappelComponent implements OnInit {
     }
 
     reportRappelProchainePeriode() {
+        this.reportRappelInProgress = true;
         this._api.reportRappelProchainePeriode(this.note.idErabliere, this.note.id).then(() => {
             this.error = null;
             console.log('Periodicite due updated successfully');
@@ -73,6 +78,24 @@ export class ModalRappelComponent implements OnInit {
         }).catch(error => {
             console.error('Error updating periodicite due:', error);
             this.error = 'Erreur lors du repport à la prochaine période.';
+        }).finally(() => {
+            this.reportRappelInProgress = false;
         });
+    }
+
+    deleteNote() {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette note? Cette action est irréversible.')) {
+            this.deleteNoteInProgress = true;
+            this._api.deleteNote(this.note.idErabliere, this.note.id).then(() => {
+                this.error = null;
+                this.closeModal.emit(true);
+                this.needToUpdate.emit(true);
+            }).catch(error => {
+                console.error('Error deleting note:', error);
+                this.error = 'Erreur lors de la suppression de la note.';
+            }).finally(() => {
+                this.deleteNoteInProgress = false;
+            });
+        }
     }
 }

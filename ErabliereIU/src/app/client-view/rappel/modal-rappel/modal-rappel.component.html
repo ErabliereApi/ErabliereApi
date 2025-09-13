@@ -16,8 +16,9 @@
                 @if (error) {
                     <div class="alert alert-danger" style="width: 100%;">{{error}}</div>
                 }
-                <button type="button" class="btn btn-info" (click)="reportRappelProchainePeriode()" title="Marquer le rappel comme terminé et passer à la prochaine période.">Terminer</button>
-                <button type="button" class="btn btn-secondary" (click)="closeModal.emit(true)" title="Fermer la modal">Fermer</button>
+                <ebutton type="info" (clicked)="reportRappelProchainePeriode()" tooltip="Marquer le rappel comme terminé et passer à la prochaine période." [inProgress]="reportRappelInProgress">Terminer</ebutton>
+                <ebutton type="danger" (clicked)="deleteNote()" tooltip="Supprimer la note définitivement." [inProgress]="deleteNoteInProgress">Supprimer</ebutton>
+                <ebutton type="secondary" (clicked)="closeModal.emit(true)" tooltip="Fermer la modal">Fermer</ebutton>
             </div>
         </div>
     </div>

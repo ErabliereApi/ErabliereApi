@@ -18,7 +18,8 @@
     </div>
 
     <div class="col-md-6">
-        <ebutton type="primary" size="sm" class="me-2" (clicked)="importerScanNmap()" [inProgress]="loadingNmapResultInProgress">
+        <ebutton type="primary" size="sm" class="me-2" (clicked)="importerScanNmap()"
+            [inProgress]="loadingNmapResultInProgress">
             Importer un fichier nmap
         </ebutton>
 
@@ -36,54 +37,57 @@
 <p>Chargement en cours...</p>
 }
 @else {
-<table class="table table-responsive">
-    <thead>
-        <tr>
-            <th>Appareil ID</th>
-            <th>IP</th>
-            <th>Description</th>
-            <th>Statut</th>
-            <th>Adresses</th>
-            <th>Port</th>
-            <th>Nom d'hôte</th>
-            <th>Date de création</th>
-            <th>Date de modification</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (appareil of appareils; track appareil.id) {
-        <tr>
-            <td><copy-id-button [id]="appareil.id"></copy-id-button></td>
-            <td>{{ appareil.name }}</td>
-            <td>{{ appareil.description }}</td>
-            <td>
-                {{ appareil.statut?.etat }} {{ appareil.statut?.raison }} TTL: {{ appareil.statut?.raisonTTL }}
-            </td>
-            <td>
-                <ul>
-                    @for (adresse of appareil.adresses; track adresse.id) {
-                    <li>{{ adresse.addr }} ({{ adresse.addrtype }}) {{ adresse.vendeur }}</li>
-                    }
-                </ul>
-            </td>
-            <td>
-                <ul>
-                    @for (port of appareil.ports; track port.id) {
-                    <li>{{ port.port }} ({{ port.protocole }}) - {{ port.etat?.etat }} {{ port.etat?.raison }} - {{ port.portService?.name }}</li>
-                    }
-                </ul>
-            </td>
-            <td>
-                <ul>
-                    @for (nomHost of appareil.nomsHost; track nomHost.id) {
-                    <li>{{ nomHost.name }} ({{ nomHost.type }})</li>
-                    }
-                </ul>
-            </td>
-            <td>{{ appareil.dc | date:'yyyy-MM-dd' }}</td>
-            <td>{{ appareil.dm | date:'yyyy-MM-dd' }}</td>
-        </tr>
-        }
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Appareil ID</th>
+                <th>IP</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Adresses</th>
+                <th>Port</th>
+                <th>Nom d'hôte</th>
+                <th>Date de création</th>
+                <th>Date de modification</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (appareil of appareils; track appareil.id) {
+            <tr>
+                <td><copy-id-button [id]="appareil.id"></copy-id-button></td>
+                <td>{{ appareil.name }}</td>
+                <td>{{ appareil.description }}</td>
+                <td>
+                    {{ appareil.statut?.etat }} {{ appareil.statut?.raison }} TTL: {{ appareil.statut?.raisonTTL }}
+                </td>
+                <td>
+                    <ul>
+                        @for (adresse of appareil.adresses; track adresse.id) {
+                        <li>{{ adresse.addr }} ({{ adresse.addrtype }}) {{ adresse.vendeur }}</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        @for (port of appareil.ports; track port.id) {
+                        <li>{{ port.port }} ({{ port.protocole }}) - {{ port.etat?.etat }} {{ port.etat?.raison }} - {{
+                            port.portService?.name }}</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        @for (nomHost of appareil.nomsHost; track nomHost.id) {
+                        <li>{{ nomHost.name }} ({{ nomHost.type }})</li>
+                        }
+                    </ul>
+                </td>
+                <td>{{ appareil.dc | date:'yyyy-MM-dd' }}</td>
+                <td>{{ appareil.dm | date:'yyyy-MM-dd' }}</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
 }
