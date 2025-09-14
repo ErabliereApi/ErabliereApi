@@ -56,6 +56,20 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
         {
             allowAccess = await CheckAllowAccess(context, allowAccess, strId);
         }
+        else
+        {
+            var erabliere = await GetErabliere(
+                context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>(),
+                context.HttpContext.RequestServices.GetRequiredService<IDistributedCache>(),
+                strId,
+                context.HttpContext.RequestAborted);
+
+            if (erabliere == null)
+            {
+                context.Result = new NotFoundObjectResult(new { Message = $"Impossible de trouver '{strId}'." });
+                return;
+            }
+        }
 
         if (allowAccess)
         {
@@ -71,8 +85,8 @@ public class ValiderOwnershipAttribute : ActionFilterAttribute
                 _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderOwnershipAttribute>>();
             }
             using var scope = context.HttpContext.RequestServices.CreateScope();
-            _logger.LogWarning("Access Denied for {Method} {Path} for user {User}", 
-                context.HttpContext.Request.Method.Sanatize(), 
+            _logger.LogWarning("Access Denied for {Method} {Path} for user {User}",
+                context.HttpContext.Request.Method.Sanatize(),
                 context.HttpContext.Request.Path.Value.Sanatize(),
                 UsersUtils.GetUniqueName(scope, context.HttpContext.User));
         }
