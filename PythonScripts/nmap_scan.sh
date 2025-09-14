@@ -3,7 +3,7 @@
 set -euo pipefail
 
 print_usage() {
-  echo "Usage: $0 -network 192.168.1.0/24 -id <erabliere_id>"
+  echo "Usage: $0 -i <erabliere_id> -n 192.168.1.0/24"
   exit 2
 }
 
