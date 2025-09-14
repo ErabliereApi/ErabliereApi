@@ -29,6 +29,9 @@ while getopts ":i:n:h-:" opt; do
   esac
 done
 
+echo "Erabliere ID: $ID_ERABLIERE"
+echo "Network to scan: $NETWORK_TO_SCAN"
+
 [ -n "$ID_ERABLIERE" ] || print_usage
 [ -n "$NETWORK_TO_SCAN" ] || print_usage
 
