@@ -12,6 +12,7 @@ echo "Starting nmap scan script..."
 ID_ERABLIERE=""
 NETWORK_TO_SCAN=""
 while getopts ":i:n:h-:" opt; do
+  echo "Processing option: $opt"
   case "$opt" in
     i) ID_ERABLIERE="$OPTARG" ;;
     n) NETWORK_TO_SCAN="$OPTARG" ;;
