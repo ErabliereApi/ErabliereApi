@@ -102,3 +102,18 @@ Ajouter la ligne suivante obtenir une mise à jour quotidienne à minuit.
 ```bash
 0 0 * * * cd /<path-to-erabliereapi> && git pull
 ```
+
+## nmap_scan.sh
+
+```bash
+nmap_scan.sh -i <id-erabliere> -n 192.168.1.0/24
+```
+
+Crontab
+```bash
+5 4 * * 7 $EAPIPATH/nmap_scan.sh -i <id-erabliere> -n 192.168.1.0/24
+```
+
+Tout les dimanche à 4:05 AM
+
+https://crontab.guru/#5_4_*_*_7
