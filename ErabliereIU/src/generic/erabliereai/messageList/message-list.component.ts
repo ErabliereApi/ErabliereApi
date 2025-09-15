@@ -5,6 +5,8 @@ import { Conversation, Message } from 'src/model/conversation';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
+import { EButtonComponent } from "src/generic/ebutton.component";
+import { marked } from 'marked';
 
 @Component({
     selector: 'erabliereai-message-list',
@@ -16,8 +18,7 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
                 <div class="card-header d-flex justify-content-between p-3"
                   style="border-bottom: 1px solid rgba(255,255,255,.3); min-width: 250px;">
                   <p class="fw-bold mb-0">{{ message.isUser ? "Vous" : "ErabliereAI" }}</p>
-                  <p class="text-light small mb-0"><i class="far fa-clock"></i> {{ formatMessageDate(message.createdAt)
-                }}</p>
+                  <p class="text-light small mb-0"><ebutton class="ms-2 me-2" type="info" size="sm" (clicked)="convertToWord(message.content)">Exporter en .doc</ebutton><i class="far fa-clock"></i> {{ formatMessageDate(message.createdAt)}}</p>
               </div>
               <div class="card-body">
                 <div [className]="message.isUser ? '' : 'mb-5'" style="white-space: pre-wrap; word-wrap: break-word;">
@@ -35,7 +36,7 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
         </ul>
         `,
     standalone: true,
-    imports: [MarkdownRendererComponent],
+    imports: [MarkdownRendererComponent, EButtonComponent],
 })
 export class MessageListComponent implements OnInit, OnChanges {
     @Input() conversation?: Conversation;
@@ -93,5 +94,34 @@ export class MessageListComponent implements OnInit, OnChanges {
         }).catch((error: any) => {
             alert('Error sending message ' + JSON.stringify(error));
         });
+    }
+
+    convertToWord(content?: string, fileName = 'erabliereai-message') {
+        // Enveloppe HTML recommandée pour Word
+        const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+            'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+            'xmlns="http://www.w3.org/TR/REC-html40">';
+        const footer = '';
+        const html = header +
+            '' +
+            '' + marked.parse(content ?? "", {
+                breaks: true,
+                gfm: true
+            }) +
+            '' +
+            footer;
+
+        // Préfixe BOM pour les problèmes d'encodage
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+
+        // Téléchargement (sans dépendance)
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${fileName}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 }

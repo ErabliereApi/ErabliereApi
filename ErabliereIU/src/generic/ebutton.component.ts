@@ -16,7 +16,7 @@ export class EButtonComponent {
     @Input() inProgress: boolean = false;
     @Input() text: string = "";
     @Input() disabled: boolean = false;
-    @Input() type: "primary" | "outline-primary" | "secondary" | "outline-secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" = "primary";
+    @Input() type: "primary" | "outline-primary" | "secondary" | "outline-secondary" | "success" | "danger" | "warning" | "info" | "outline-info" | "light" | "dark" = "primary";
     @Input() size: "sm" | "md" | "lg" = "md";
     @Output() clicked = new EventEmitter<void>();
     @Input() tooltip?: string;
