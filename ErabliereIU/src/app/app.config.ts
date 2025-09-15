@@ -2,14 +2,13 @@ import { provideAppInitializer, ApplicationConfig, provideZoneChangeDetection, i
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvironmentService } from 'src/environments/environment.service';
-import { MsalService, MSAL_INSTANCE, MsalGuard, MsalBroadcastService, MsalInterceptorConfiguration, MsalGuardConfiguration, MSAL_INTERCEPTOR_CONFIG } from '@azure/msal-angular';
+import { MsalService, MSAL_INSTANCE, MsalGuard, MsalBroadcastService, MsalInterceptorConfiguration, MSAL_INTERCEPTOR_CONFIG } from '@azure/msal-angular';
 import { BrowserCacheLocation, Configuration, InteractionType, IPublicClientApplication, LogLevel, PublicClientApplication } from '@azure/msal-browser';
 import { provideNgxMask } from 'ngx-mask';
 import { BrowserModule } from '@angular/platform-browser';
 import 'chartjs-adapter-date-fns';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { env } from 'process';
 
 export function MSALInstanceFactory(envSvc: EnvironmentService): IPublicClientApplication {
     if (!envSvc.authEnable) {
@@ -80,16 +79,6 @@ export function MSALInterceptorConfigFactory(envSvc: EnvironmentService): MsalIn
     return {
         interactionType: InteractionType.Redirect,
         protectedResourceMap,
-    };
-}
-
-export function MSALGuardConfigFactory(): MsalGuardConfiguration {
-    return {
-        interactionType: InteractionType.Redirect,
-        authRequest: {
-            scopes: [env.scopes ?? ""],
-        },
-        loginFailedRoute: '/login-failed',
     };
 }
 
