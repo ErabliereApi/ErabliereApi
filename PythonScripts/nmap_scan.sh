@@ -49,11 +49,13 @@ RESULT=$(cat ~/nmapscan/nmap-scan-result-$EXECUTION_DATE.xml)
 ERABLIEREAPI_KEY=$(awk -F'"' '/"ApiKey"/{print $4}' ~/.erabliereapi/auth.erabliereapi.freddycoder.com.config)
 
 # Send the result via HTTP PUT to erabliereapi
-curl -X PUT \
+curl -X 'PUT' \
+    https://erabliereapi.freddycoder.com/erablieres/$ID_ERABLIERE/appareil/nmapscan \
+    -v \
+    -H 'accept: */*' \
     -H "Content-Type: text/xml" \
     -H "X-ErabliereApi-ApiKey: $ERABLIEREAPI_KEY" \
-    -d $RESULT \
-    https://erabliereapi.freddycoder.com/erablieres/$ID_ERABLIERE/appareil/nmapscan
+    -d "$RESULT"
 
 echo "Nmap scan result sent to ErabliereApi for erabliere ID $ID_ERABLIERE"
 echo "Result saved to ~/nmapscan/nmap-scan-result-$EXECUTION_DATE.xml"
