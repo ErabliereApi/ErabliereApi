@@ -1,6 +1,5 @@
 import { HomePage } from "cypress/pages/home.page";
 import { NotesPage } from "cypress/pages/notes.page";
-import { pad } from "cypress/types/lodash";
 
 describe("Notes page", { testIsolation: false }, () => {
     const homePage = new HomePage();
