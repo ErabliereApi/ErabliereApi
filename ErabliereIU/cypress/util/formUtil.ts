@@ -6,6 +6,13 @@ export class FormUtil {
                 .type(text);
         });
     }
+    static typeTextAreaBaseOnName(text: string, selector: string, name: string, timeout: number = 10000): void {
+        cy.get(selector, { timeout: timeout }).then(element => {
+            cy.wrap(element)
+                .find('textarea[name="' + name + '"]')
+                .type(text);
+        });
+    }
     static typeTextBaseOnFormControlName(text: string, selector: string, formControl: string, timeout: number = 10000): void {
         cy.get(selector, { timeout: timeout }).then(element => {
             cy.wrap(element)

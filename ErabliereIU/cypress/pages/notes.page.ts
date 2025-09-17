@@ -21,7 +21,7 @@ export class NotesPage {
     }
 
     enterNoteDescription(value: string): void {
-        FormUtil.typeTextBaseOnName(value, "notes", "text");
+        FormUtil.typeTextAreaBaseOnName(value, "notes", "text");
     }
 
     enterNoteDate(date: string) {
