@@ -1,5 +1,6 @@
 ﻿using ErabliereApi.Donnees.Interfaces;
 using ErabliereApi.Donnees.Ownable;
+using ErabliereModel.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,7 +9,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Une alerte d'un capteur
 /// </summary>
-public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnable<Capteur>
+public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnable<Capteur>, IAlerteTexte
 {
     /// <summary>
     /// La clé primaire
@@ -85,5 +86,11 @@ public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnab
     public int CompareTo(AlerteCapteur? other)
     {
         return Id.HasValue ? Id.Value.CompareTo(other?.Id) : -1;
+    }
+
+    /// <inheritdoc />
+    public string? GetAlerteTexte()
+    {
+        return string.IsNullOrWhiteSpace(Nom) ? IdCapteur?.ToString() : Nom;
     }
 }

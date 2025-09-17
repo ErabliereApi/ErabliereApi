@@ -18,17 +18,13 @@
           }
           <input-error [errorObj]="errorObj" [controlName]="'title'"></input-error>
         </div>
-        <div [class]="'form-group mb-3' + (noteForm.controls['text'].touched ? ' was-validated' : '')">
-          <label class="form-label" for="modifier-note-text">Texte: </label>
-          <input class="form-control" type="text" formControlName="text" id="modifier-note-text">
-          @if (noteForm.controls['text'].errors && noteForm.controls['text'].touched) {
-          <div>
-            @if (noteForm.controls['text'].errors!.maxlength) {
-            <small class="text-danger">Taille maximal dépassée.</small>
-            }
-          </div>
-          }
-          <input-error [errorObj]="errorObj" [controlName]="'text'"></input-error>
+        <div class="mb-2">
+          <etextarea 
+            arialabel="Text" 
+            [formGroup]="noteForm" 
+            name="text"
+            placeholder="Description"
+            [errorObj]="errorObj"></etextarea>
         </div>
         <div [class]="'form-group mb-3' + (noteForm.controls['noteDate'].touched ? ' was-validated' : '')">
           <label class="form-label" for="modifier-note-noteDate">Date de la note: </label>

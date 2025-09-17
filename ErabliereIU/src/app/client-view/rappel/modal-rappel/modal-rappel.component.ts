@@ -6,12 +6,13 @@ import {
     Output,
 } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
+import { MarkdownRendererComponent } from 'src/generic/eapi-markdown.component';
 import { EButtonComponent } from 'src/generic/ebutton.component';
 import { Note } from 'src/model/note';
 
 @Component({
     selector: 'app-modal-rappel',
-    imports: [EButtonComponent],
+    imports: [EButtonComponent, MarkdownRendererComponent],
     templateUrl: './modal-rappel.component.html'
 })
 export class ModalRappelComponent implements OnInit {

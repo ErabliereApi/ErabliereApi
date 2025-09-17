@@ -1,9 +1,8 @@
-using System.Text.Json;
 using ErabliereApi.Donnees;
 using MimeKit;
 using System.Text;
-using static System.Text.Json.JsonSerializer;
 using ErabliereApi.Donnees.Action.Post;
+using ErabliereModel.Interfaces;
 
 namespace ErabliereApi.Services;
 
@@ -255,20 +254,18 @@ public static class AlerteHelper
         }
     }
 
-    private static string FormatTextMessage<TAlerte, TDonnee>(TAlerte alerte, TDonnee? donnee)
+    private static string FormatTextMessage(IAlerteTexte alerte, IDonneeTexte? donnee)
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine("Alerte : ");
-        sb.AppendLine(Serialize(alerte, _mailSerializerSettings));
+        sb.AppendLine("ErabliereAPI - Alerte");
+        sb.AppendLine(alerte.GetAlerteTexte() ?? "Aucune information d'alerte disponible.");
         sb.AppendLine();
         sb.AppendLine("Donnée reçu : ");
-        sb.AppendLine(Serialize(donnee, _mailSerializerSettings));
+        sb.AppendLine(donnee?.GetDonneeTexte() ?? "Aucune donnée disponible.");
         sb.AppendLine();
         sb.AppendLine($"Date : {DateTimeOffset.UtcNow}");
 
         return sb.ToString();
     }
-
-    private readonly static JsonSerializerOptions _mailSerializerSettings = new() { WriteIndented = true };
 }

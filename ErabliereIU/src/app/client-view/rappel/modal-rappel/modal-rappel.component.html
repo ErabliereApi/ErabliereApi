@@ -7,7 +7,7 @@
                 <button type="button" class="btn-close" aria-label="Close" (click)="closeModal.emit(true)"></button>
             </div>
             <div class="modal-body">
-                {{note.text}}
+                <eapi-markdown [content]="note.text"></eapi-markdown>
             </div>
             <div class="modal-footer">
                 @if (note.file) {

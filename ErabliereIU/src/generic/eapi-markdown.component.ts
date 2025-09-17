@@ -36,6 +36,8 @@ export class MarkdownRendererComponent implements OnInit, OnChanges {
             htmlContent = promiseOrString;
         }
 
-        this.safeHtmlContent = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
+        const sanitizeText = this.sanitizer.sanitize(1, htmlContent) ?? '';
+
+        this.safeHtmlContent = this.sanitizer.bypassSecurityTrustHtml(sanitizeText);
     }
 }

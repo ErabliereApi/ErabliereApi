@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ErabliereModel.Interfaces;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ErabliereApi.Donnees.Action.Post;
@@ -6,7 +7,7 @@ namespace ErabliereApi.Donnees.Action.Post;
 /// <summary>
 /// Modèle d'ajout d'une donnée d'un capteur
 /// </summary>
-public class PostDonneeCapteur
+public class PostDonneeCapteur : IDonneeTexte
 {
     /// <summary>
     /// La valeur
@@ -28,4 +29,10 @@ public class PostDonneeCapteur
     /// L'id du capteur
     /// </summary>
     public Guid? IdCapteur { get; set; }
+
+    /// <inheritdoc />
+    public string? GetDonneeTexte()
+    {
+        return $"Valeur: {V}, Texte: {Text ?? "N/A"}, Date: {D}";
+    }
 }

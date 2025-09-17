@@ -1,5 +1,6 @@
 ﻿using ErabliereApi.Donnees.Interfaces;
 using ErabliereApi.Donnees.Ownable;
+using ErabliereModel.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +10,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Une alerte pour la fonction trio de données
 /// </summary>
-public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable, IDatesInfo
+public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable, IDatesInfo, IAlerteTexte
 {
     /// <summary>
     /// L'id de l'alerte
@@ -58,13 +59,13 @@ public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable, IDatesInf
     public string? TemperatureThresholdHight { get; set; }
 
     /// <summary>
-    /// Pourrait être interprété comme VacciumMaxValue
+    /// Pourrait être interprété comme VacuumMaxValue
     /// </summary>
     [MaxLength(50)]
     public string? VacciumThresholdLow { get; set; }
 
     /// <summary>
-    /// Si un vaccium est reçu et que celui-ci est plus petit que cette valeur, cette validation sera évaluer à vrai.
+    /// Si un vacuum est reçu et que celui-ci est plus petit que cette valeur, cette validation sera évaluer à vrai.
     /// </summary>
     /// <example>200</example>
     [MaxLength(50)]
@@ -122,5 +123,11 @@ public class Alerte : IIdentifiable<Guid?, Alerte>, IErabliereOwnable, IDatesInf
         }
 
         return Id.Value.CompareTo(other.Id);
+    }
+
+    /// <inheritdoc />
+    public string? GetAlerteTexte()
+    {
+        return string.IsNullOrWhiteSpace(Nom) ? Id?.ToString() : Nom;
     }
 }

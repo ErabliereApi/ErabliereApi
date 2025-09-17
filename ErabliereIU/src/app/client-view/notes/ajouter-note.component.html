@@ -6,7 +6,7 @@
   <form [formGroup]="noteForm" id="ajouter-note" novalidate>
     <div class="row">
       <div class="col-md-6">
-        <div [class]="'form-group mb-3' + (noteForm.controls['title'].touched ? ' was-validated' : '')">
+        <div class="mb-2">
           <einput 
             arialabel="Titre" 
             [formGroup]="noteForm" 
@@ -14,13 +14,13 @@
             placeholder="Titre de la note"
             [errorObj]="errorObj"></einput>
         </div>
-        <div [class]="'form-group mb-3' + (noteForm.controls['text'].touched ? ' was-validated' : '')">
-          <einput 
+        <div class="mb-2">
+          <etextarea 
             arialabel="Text" 
             [formGroup]="noteForm" 
             name="text"
             placeholder="Description"
-            [errorObj]="errorObj"></einput>
+            [errorObj]="errorObj"></etextarea>
         </div>
         <div [class]="'form-group mb-3' + (noteForm.controls['file'].touched ? ' was-validated' : '')">
           <label class="form-label" for="ajouter-note-file">Fichier: </label>
@@ -33,7 +33,7 @@
           </span>
           }
         </div>
-        <div [class]="'form-group mb-3' + (noteForm.controls['noteDate'].touched ? ' was-validated' : '')">
+        <div class="mb-3">
           <einput 
             arialabel="Date de la note" 
             [formGroup]="noteForm" 
@@ -44,13 +44,13 @@
         </div>
       </div>
       <div class="col-md-6">
-        <div [class]="'form-group mb-3'">
+        <div class="form-group mb-3">
           <input class="form-check-input me-2" type="checkbox" formControlName="reminderEnabled"
             id="ajouter-note-reminderEnabled" />
           <label class="form-check-label" for="ajouter-note-reminderEnabled">Ajouter un rappel</label>
         </div>
         @if(displayReminder) {
-        <div [class]="'form-group mb-3' + (noteForm.controls['dateRappel'].touched ? ' was-validated' : '')">
+        <div class="mb-3">
           <einput 
             arialabel="Date Rappel" 
             [formGroup]="noteForm" 
@@ -60,7 +60,7 @@
             [errorObj]="errorObj"></einput>
         </div>
 
-        <div [class]="'form-group mb-3' + (noteForm.controls['dateRappelFin'].touched ? ' was-validated' : '')">
+        <div class="mb-3">
           <einput 
             arialabel="Date Rappel Fin" 
             [formGroup]="noteForm" 

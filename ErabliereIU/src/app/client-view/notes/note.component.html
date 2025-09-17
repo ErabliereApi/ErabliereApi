@@ -3,7 +3,9 @@
   <div class="card-body">
     <div class="row">
       <div class="col-md-{{ note.file ? '5' : '10' }}">
-        <p class="noteDescription card-text">{{ note.text }}</p>
+        <p class="noteDescription card-text">
+          <eapi-markdown [content]="note.text"></eapi-markdown>
+        </p>
 
         @if (note.fileExtension === 'csv') {
         <p class="card-text">{{ note.decodedTextFile }}</p>

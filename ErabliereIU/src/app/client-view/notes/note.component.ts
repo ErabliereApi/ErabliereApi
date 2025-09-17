@@ -7,11 +7,12 @@ import { AuthorisationFactoryService } from 'src/core/authorisation/authorisatio
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { EButtonComponent } from "src/generic/ebutton.component";
 import { HttpErrorResponse } from '@angular/common/http';
+import { MarkdownRendererComponent } from "src/generic/eapi-markdown.component";
 
 @Component({
     selector: 'note',
     templateUrl: 'note.component.html',
-    imports: [DatePipe, EButtonComponent]
+    imports: [DatePipe, EButtonComponent, MarkdownRendererComponent]
 })
 
 export class NoteComponent implements OnInit {
