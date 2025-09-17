@@ -31,7 +31,7 @@ describe("Notes page", { testIsolation: false }, () => {
 
         // validate that note is added
         notesPage.getNoteTitle().should('have.text', title);
-        notesPage.getNoteDescription().should('have.text', content);
+        notesPage.getNoteDescription().should('have.text', `${content}\n`);
         notesPage.getNoteDate().should('have.text', `Date de Création: ${pad2(date.getDate())}-${pad2(date.getMonth() + 1)}-${date.getFullYear()}`);
     });
 
