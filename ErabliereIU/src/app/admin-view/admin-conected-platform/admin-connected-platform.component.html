@@ -1,0 +1,29 @@
+<div class="m-3">
+    <h3>Plateformes Connectées</h3>
+    <hr />
+    <div class="row">
+        @for (platform of platforms; track platform.name)
+        {
+        @if (platform.connected)
+        {
+        <div class="col-6 col mb-2">
+            <div class="card">
+                <div class="card-header">
+                    {{ platform.name }}
+                </div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <p><img src="{{ platform.logo }}" alt="{{ platform.name }} logo "
+                                style="max-height: 50px; max-width: 200px;" />{{ platform.description }}</p>
+                        @if (platform.url) {
+                        <p>Pour plus d'informations, visitez le site officiel : <a href="{{ platform.url }}"
+                                target="_blank" rel="noopener noreferrer">{{ platform.url }}</a></p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        }
+    </div>
+</div>

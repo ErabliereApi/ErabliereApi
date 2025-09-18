@@ -6,19 +6,19 @@ import { SignoutRedirectCallbackComponent } from 'src/core/authorisation/signout
 import { DocumentationComponent } from 'src/app/client-view/documentation/documentation.component';
 import { ErabliereComponent } from 'src/app/client-view/erablieres/erabliere.component';
 import { NotesComponent } from 'src/app/client-view/notes/notes.component';
-import { AdminCustomersComponent } from "src/app/admin-view/admin/admin-customers/admin-customers.component";
+import { AdminCustomersComponent } from "src/app/admin-view/admin-customers/admin-customers.component";
 import { Page404Component } from "./page404/page404.component";
 import { AdminViewComponent } from "./admin-view/admin-view.component";
-import { AdminErablieresComponent } from "src/app/admin-view/admin/admin-erablieres/admin-erablieres.component";
+import { AdminErablieresComponent } from "src/app/admin-view/admin-erablieres/admin-erablieres.component";
 import { ClientViewComponent } from "./client-view/client-view.component";
 import { GestionCapteursComponent } from "src/app/client-view/capteurs/gestion-capteurs.component";
 import { ReportsComponent } from 'src/app/client-view/rapport/rapports.component';
-import { AdminAPIKeysComponent } from 'src/app/admin-view/admin/admin-apikeys/admin-apikeys.component';
+import { AdminAPIKeysComponent } from 'src/app/admin-view/admin-apikeys/admin-apikeys.component';
 import { MapViewComponent } from './map-view/map-view.component';
 import { ErablieresMapComponent } from 'src/app/map-view/map/erablieres-map.component';
 import { AdminGuard } from './guard/admin.guard';
 import { Page401Component } from './page401/page401.component';
-import { AdminHologramComponent } from 'src/app/admin-view/admin/admin-hologram/admin-hologram.component';
+import { AdminHologramComponent } from 'src/app/admin-view/admin-hologram/admin-hologram.component';
 import { ErabliereAiWindowComponent } from 'src/generic/erabliereai/window/erabliereai-window.component';
 import { ErabliereAiPublicConversationComponent } from 'src/generic/erabliereai/publicConversation/erabliereai-public-conversation.component';
 import { AiViewComponent } from './ai-view/ai-view.component';
@@ -26,7 +26,8 @@ import { UserProfileComponent } from './client-view/user-profile/user-profile.co
 import { AuthenticatedUserGard } from './guard/authenticated-user.gard';
 import { TermeAndConditionComponent } from './app.termes-and-conditions.component';
 import { AppareilsComponent } from './client-view/appareil/appareils.component';
-import { AdminIpinfosComponent } from './admin-view/admin/admin-ipinfos/admin-ipinfos.component';
+import { AdminIpinfosComponent } from './admin-view/admin-ipinfos/admin-ipinfos.component';
+import { AdminConnectedPlatformComponent } from './admin-view/admin-conected-platform/admin-connected-platform.component';
 
 export const routes: Routes = [
     {
@@ -73,6 +74,11 @@ export const routes: Routes = [
                 path: 'ipinfos',
                 title: 'Érablière Admin - Ip Infos',
                 component: AdminIpinfosComponent
+            },
+            {
+                path: 'connected-platforms',
+                title: 'Érablière Admin - Plateformes connectées',
+                component: AdminConnectedPlatformComponent
             },
             {
                 path: '**',
