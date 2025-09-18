@@ -15,12 +15,13 @@
             [errorObj]="errorObj"></einput>
         </div>
         <div class="mb-2">
-          <etextarea 
+          <einput 
             arialabel="Text" 
+            type="textarea"
             [formGroup]="noteForm" 
             name="text"
             placeholder="Description"
-            [errorObj]="errorObj"></etextarea>
+            [errorObj]="errorObj"></einput>
         </div>
         <div [class]="'form-group mb-3' + (noteForm.controls['file'].touched ? ' was-validated' : '')">
           <label class="form-label" for="ajouter-note-file">Fichier: </label>

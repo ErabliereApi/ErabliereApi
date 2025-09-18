@@ -7,12 +7,12 @@ import { Subject } from "rxjs";
 import { Rappel } from "src/model/Rappel";
 import { reminderValidator } from "./note.custom-validators";
 import { EButtonComponent } from "src/generic/ebutton.component";
-import { ETextAreaComponent } from "src/generic/etextarea.component";
+import { EinputComponent } from "src/generic/einput.component";
 
 @Component({
     selector: 'modifier-note',
     templateUrl: 'modifier-note.component.html',
-    imports: [ReactiveFormsModule, InputErrorComponent, EButtonComponent, ETextAreaComponent]
+    imports: [ReactiveFormsModule, EinputComponent, InputErrorComponent, EButtonComponent]
 })
 export class ModifierNoteComponent implements OnInit {
     @Input() noteSubject?: Subject<Note | null>;

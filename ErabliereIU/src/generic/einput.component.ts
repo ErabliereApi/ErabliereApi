@@ -8,7 +8,18 @@ import { InputErrorComponent } from "./input-error.component";
   template: `
         <label for="{{ name }}" class="form-label">{{ arialabel ?? smartName(name) }}:</label>
         <div [formGroup]="formGroup" [class]="'input-group' + (formGroup.controls[name].touched ? ' was-validated' : '')">
-          <input
+          @if (type === 'textarea') 
+            {
+              <textarea
+            class="form-control"
+            formControlName="{{ name }}"
+            name="{{ name }}"
+            placeholder="{{ placeholder }}"
+            [pattern]="pattern ?? ''"
+            [maxlength]="maxlength ?? null"></textarea>
+            }
+            @else {
+<input
             class="form-control"
             type="{{ type }}"
             formControlName="{{ name }}"
@@ -16,6 +27,8 @@ import { InputErrorComponent } from "./input-error.component";
             placeholder="{{ placeholder }}"
             [pattern]="pattern ?? ''"
             [maxlength]="maxlength ?? null">
+            }
+          
             @if (symbole) {
               <div class="input-group-append">
                 <span class="input-group-text">{{ symbole }}</span>
@@ -49,7 +62,7 @@ export class EinputComponent {
   @Input() decimalMarker: "." | "," | [".", ","] = ".";
   @Input() customPatterns: any
   @Input() spChar: string[] = []
-  @Input() type: "text" | "number" | "date" | "checkbox" = "text"
+  @Input() type: "text" | "textarea"| "number" | "date" | "checkbox" = "text"
   @Input() errorObj?: any;
   @Input() pattern?: string;
   @Input() maxlength?: number;
