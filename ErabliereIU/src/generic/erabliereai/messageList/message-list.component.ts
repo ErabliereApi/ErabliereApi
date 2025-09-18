@@ -102,12 +102,26 @@ export class MessageListComponent implements OnInit, OnChanges {
             'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
             'xmlns="http://www.w3.org/TR/REC-html40">';
         const footer = '';
-        const html = header +
-            '' +
-            '' + marked.parse(content ?? "", {
+
+        const contentHtml = marked.parse(content ?? "", {
                 breaks: true,
                 gfm: true
-            }) +
+            });
+
+        if (contentHtml instanceof Promise) {
+            contentHtml.then(resolvedContent => {
+                this.createAndDownloadDoc(header, resolvedContent, footer, fileName);
+            });
+            return;
+        }
+
+        this.createAndDownloadDoc(header, contentHtml, footer, fileName);
+    }
+
+    private createAndDownloadDoc(header: string, contentHtml: string, footer: string, fileName: string) {
+        const html = header +
+            '' +
+            '' + contentHtml +
             '' +
             footer;
 
