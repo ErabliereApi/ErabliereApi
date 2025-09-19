@@ -51,6 +51,8 @@ public class DocumentationController : ControllerBase
     /// <returns></returns>
     [HttpGet("Quantite")]
     [ProducesResponseType(200, Type = typeof(int))]
+    [Obsolete("Cette action sera supprimée dans une future version. Utiliser le $count de OData à la place.")]
+    [LogObsoleteUsage]
     public async Task<IActionResult> Compter(Guid id, CancellationToken token)
     {
 

@@ -49,7 +49,8 @@ public static class Swagger
                 Extensions = new Dictionary<string, IOpenApiExtension>
                 {
                     { "demoMode", new OpenApiBoolean(config.GetValue<bool>("SWAGGER_DEMO_MODE")) },
-                    { "prodAppUrl", new OpenApiString(config["SWAGGER_PROD_APP_URL"]) }
+                    { "prodAppUrl", new OpenApiString(config["SWAGGER_PROD_APP_URL"]) },
+                    { "x-odatacount-maxpagesize", new OpenApiInteger(config.GetValue<int>("OData:MaxTop", 200)) }
                 }
             });
 

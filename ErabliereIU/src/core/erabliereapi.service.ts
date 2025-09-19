@@ -241,13 +241,13 @@ export class ErabliereApi {
         return rtn ?? new HttpResponse();
     }
 
-    async getDocumentations(idErabliereSelectionnee: any, skip: number = 0, top?: number): Promise<Documentation[]> {
+    async getDocumentations(idErabliereSelectionnee: any, skip: number = 0, top?: number) {
         const headers = await this.getHeaders();
-        let odataOptions = "?$select=id,idErabliere,created,title,text,fileExtension";
+        let odataOptions = "?$count=true&$select=id,idErabliere,created,title,text,fileExtension";
         odataOptions += "&$skip=" + skip;
         odataOptions += top ? "&$top=" + top : "";
-        const rtn = firstValueFrom(this._httpClient.get<Documentation[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation" + odataOptions, { headers: headers }));
-        return rtn ?? [];
+        const rtn = await firstValueFrom(this._httpClient.get<Documentation[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation" + odataOptions, { headers: headers, observe: 'response' }));
+        return { items: rtn.body ?? [], count: rtn.headers.get('x-odatacount') };
     }
 
     async getDocumentationBase64(idErabliereSelectionnee: any, idDocumentation: any): Promise<Documentation[]> {
@@ -257,21 +257,14 @@ export class ErabliereApi {
         return rtn ?? [];
     }
 
-    async getDocumentationCount(idErabliereSelectionnee: any): Promise<number> {
-        let headers = await this.getHeaders();
-        headers = headers.set('Accept', 'application/json');
-        const rtn = firstValueFrom(this._httpClient.get<number>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation/quantite", { headers: headers }));
-        return rtn ?? 0;
-    }
-
     async deleteDocumentation(idErabliereSelectionnee: any, idDocumentation: any): Promise<any> {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/documentation/" + idDocumentation, { headers: headers }));
     }
 
-    async getNotes(idErabliereSelectionnee: any, search?: string, skip: number = 0, top?: number): Promise<Note[]> {
+    async getNotes(idErabliereSelectionnee: any, search?: string, skip: number = 0, top?: number) {
         const headers = await this.getHeaders();
-        let odataOptions = "?$orderby=NoteDate desc";
+        let odataOptions = "?$orderby=NoteDate desc&$count=true";
         odataOptions += "&$skip=" + skip;
         odataOptions += top ? "&$top=" + top : "";
         odataOptions += "&$select=id,idErabliere,noteDate,created,text,title,fileExtension,notificationFilter";
@@ -279,8 +272,8 @@ export class ErabliereApi {
         if (search) {
             odataOptions += "&$filter=contains(text, '" + search + "') or contains(title, '" + search + "')";
         }
-        const rtn = await firstValueFrom(this._httpClient.get<Note[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes" + odataOptions, { headers: headers }));
-        return rtn ?? [];
+        const rtn = await firstValueFrom(this._httpClient.get<Note[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes" + odataOptions, { headers: headers, observe: 'response' }));
+        return { items: rtn.body ?? [], count: rtn.headers.get('x-odatacount') };
     }
 
     async getActiveRappelNotes(idErabliereSelectionee: any): Promise<Note[]> {
@@ -290,16 +283,6 @@ export class ErabliereApi {
             this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionee + '/Notes' + "/ActiveRappelsNotes",
             { headers: headers }));
         return rtn ?? [];
-    }
-
-    async getNotesCount(idErabliereSelectionnee: any, search?: string): Promise<number> {
-        let headers = await this.getHeaders();
-        headers = headers.set('Accept', 'application/json');
-        const rtn = await firstValueFrom(
-            this._httpClient.get<number>(
-                this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/notes/quantite?search=" + search,
-                { headers: headers }));
-        return rtn ?? 0;
     }
 
     async getNoteImage(idErabliere: any, id: any, noCache: boolean = false): Promise<ArrayBuffer> {
@@ -796,8 +779,10 @@ export class ErabliereApi {
     }
 
     async getIpInfos() {
-        let headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.get<IpInfo[]>(this._environmentService.apiUrl + '/ipinfo', { headers: headers }));
+        const headers = await this.getHeaders();
+        const response = await firstValueFrom(this._httpClient.get<IpInfo[]>(this._environmentService.apiUrl + '/ipinfo?$count=true&$orderby=dm desc', { headers: headers, observe: 'response' }));
+        console.log(response.headers);
+        return { items: response.body ?? [], count: response.headers.get('x-odatacount') ?? null };
     }
 
     async deleteIpInfo(id: any) {

@@ -16,6 +16,8 @@ using MQTTnet.AspNetCore;
 using StackExchange.Profiling;
 using System.Data.Common;
 using System.Globalization;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.Boolean;
@@ -98,6 +100,8 @@ public static class ServiceCollectionExtension
             c.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
             c.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
+
+        services.AddSingleton<ODataCountHeaderMiddleware>();
 
         return services;
     }
@@ -322,6 +326,59 @@ public static class ServiceCollectionExtension
             });
         }
 
+        return services;
+    }
+
+    /// <summary>
+    /// Ajout des HTTP clients utilisés par l'api
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="config"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration config)
+    {
+        var emailImageObserverBaseUrl = config["EmailImageObserverUrl"];
+        services.AddHttpClient("EmailImageObserver", c =>
+        {
+            c.BaseAddress = new Uri(emailImageObserverBaseUrl ?? "");
+        });
+
+        var hologramApiKey = config["Hologram_Token"];
+        if (!string.IsNullOrWhiteSpace(hologramApiKey))
+        {
+            services.AddHttpClient("HologramClient", c =>
+            {
+                c.BaseAddress = new Uri(config.GetValue<string>("HologramBaseUrl") ?? throw new InvalidOperationException("La variable d'environnement 'HologramBaseUrl' à une valeur null."));
+                var bearerValue = Convert.ToBase64String(Encoding.UTF8.GetBytes($"apikey:{hologramApiKey}"));
+                c.DefaultRequestHeaders.Add("Authorization", $"Basic {bearerValue}");
+            });
+        }
+
+        var ibmQuantum = config["IQP_API_TOKEN"];
+        if (!string.IsNullOrWhiteSpace(ibmQuantum))
+        {
+            services.AddHttpClient("IbmQuantumClient", c =>
+            {
+                c.BaseAddress = new Uri(config.GetValue<string>("IbmQuantumBaseUrl") ?? throw new InvalidOperationException("La variable d'environnement 'IbmQuantumBaseUrl' à une valeur null."));
+                c.DefaultRequestHeaders.Add("Authorization", $"Bearer {ibmQuantum}");
+            });
+        }
+
+        var weatherBaseUrl = config["AccuWeatherBaseUrl"];
+        if (!string.IsNullOrWhiteSpace(weatherBaseUrl))
+        {
+            services.AddHttpClient("AccuWeatherClient", c =>
+            {
+                c.BaseAddress = new Uri(weatherBaseUrl);
+                var weatherApiKey = config["AccuWeatherApiKey"];
+                if (!string.IsNullOrWhiteSpace(weatherApiKey))
+                {
+                    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", weatherApiKey);
+                }
+            });
+        }
+        
         return services;
     }
 }

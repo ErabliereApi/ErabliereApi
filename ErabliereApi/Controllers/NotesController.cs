@@ -60,6 +60,8 @@ public class NotesController : ControllerBase
     /// <returns></returns>
     [HttpGet("Quantite")]
     [ProducesResponseType(200, Type = typeof(int))]
+    [Obsolete("Cette action sera supprimée dans une future version. Utiliser le $count de OData à la place.")]
+    [LogObsoleteUsage]
     public async Task<IActionResult> Compter(Guid id, [FromQuery] string? search, CancellationToken token)
     {
         if (!string.IsNullOrWhiteSpace(search))

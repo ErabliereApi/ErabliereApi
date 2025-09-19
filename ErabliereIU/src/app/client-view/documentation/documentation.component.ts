@@ -15,14 +15,14 @@ import { DownloadButtonComponent } from "./download-button.component";
     selector: 'documentation',
     templateUrl: "./documentation.component.html",
     imports: [
-    AjouterDocumentationComponent,
-    ModifierDocumentationComponent,
-    PaginationComponent,
-    DownloadButtonComponent
-]
+        AjouterDocumentationComponent,
+        ModifierDocumentationComponent,
+        PaginationComponent,
+        DownloadButtonComponent
+    ]
 })
 export class DocumentationComponent implements OnInit {
-    @Input() idErabliereSelectionee:any
+    @Input() idErabliereSelectionee: any
     imgTypes: Array<string> = ['png', 'jpg', 'jpeg', 'gif', 'bmp'];
 
     @Input() documentations?: Documentation[];
@@ -35,14 +35,14 @@ export class DocumentationComponent implements OnInit {
         return this._nombreTotal;
     }
     set nombreParPage(value: number) {
-        if(value != this._nombreParPage) {
+        if (value != this._nombreParPage) {
             this._nombreParPage = value;
             this.loadDocumentations();
         }
     }
     private _pageActuelle: number = 1;
     set pageActuelle(value: number) {
-        if(value !== this._pageActuelle) {
+        if (value !== this._pageActuelle) {
             this._pageActuelle = value;
             this.loadDocumentations();
         }
@@ -52,7 +52,7 @@ export class DocumentationComponent implements OnInit {
 
     editDocumentationSubject = new Subject<ErabliereApiDocument | undefined>();
 
-    constructor (private readonly _api: ErabliereApi,
+    constructor(private readonly _api: ErabliereApi,
         private readonly _env: EnvironmentService,
         private readonly route: ActivatedRoute) {
     }
@@ -62,7 +62,6 @@ export class DocumentationComponent implements OnInit {
         this.route.paramMap.subscribe(params => {
             this.idErabliereSelectionee = params.get('idErabliereSelectionee');
             if (this.idErabliereSelectionee) {
-                this._api.getDocumentationCount(this.idErabliereSelectionee).then(count => this._nombreTotal = count);
                 this.loadDocumentations();
             }
         });
@@ -70,8 +69,9 @@ export class DocumentationComponent implements OnInit {
     }
 
     loadDocumentations() {
-      this._api.getDocumentations(this.idErabliereSelectionee, (this._pageActuelle - 1) * this._nombreParPage, this._nombreParPage).then(documentations => {
-          this.documentations = documentations;
+        this._api.getDocumentations(this.idErabliereSelectionee, (this._pageActuelle - 1) * this._nombreParPage, this._nombreParPage).then(documentations => {
+            this._nombreTotal = documentations.count ? parseInt(documentations.count) : 0;
+            this.documentations = documentations.items;
         });
     }
 
@@ -95,5 +95,5 @@ export class DocumentationComponent implements OnInit {
         }
     }
 
-  protected readonly console = console;
+    protected readonly console = console;
 }

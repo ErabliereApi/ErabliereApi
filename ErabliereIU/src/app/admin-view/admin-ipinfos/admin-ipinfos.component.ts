@@ -14,6 +14,7 @@ import { IpinfoMapComponent } from "./ipinfo-map/ipinfo-map.component";
 })
 export class AdminIpinfosComponent implements OnInit {
     ipInfos: IpInfo[] = [];
+    totalCount: string| null = null;
     generalError: string | null = null;
     authorizeCountries: string[] = [];
 
@@ -23,8 +24,11 @@ export class AdminIpinfosComponent implements OnInit {
 
     ngOnInit(): void {
         this.api.getIpInfos().then(infos => {
-            this.ipInfos = infos;
+            this.ipInfos = infos.items;
+            this.totalCount = infos.count;
         }).catch(err => {
+            this.totalCount = null;
+            this.ipInfos = [];
             this.generalError = `Erreur lors de la récupération des informations: ${err.message}`
             console.error("Erreur lors de la récupération des informations", err);
         });
@@ -34,6 +38,7 @@ export class AdminIpinfosComponent implements OnInit {
         }).catch(err => {
             this.generalError = `Erreur lors de la récupération des pays autorisés: ${err.message}`
             console.error("Erreur lors de la récupération des pays autorisés", err);
+            this.authorizeCountries = [];
         });
     }
 }

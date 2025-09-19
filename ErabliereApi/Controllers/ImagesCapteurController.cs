@@ -48,7 +48,7 @@ public class ImagesCapteurController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(_configuration["EmailImageObserverUrl"]))
         {
-            _logger.LogWarning("L'URL de l'observateur d'images n'est pas configurée. Une liste vide sera retournée.");
+            _logger.LogInformation("L'URL de l'observateur d'images n'est pas configurée. Une liste vide sera retournée.");
 
             return Ok(new List<GetImageInfo>());
         }

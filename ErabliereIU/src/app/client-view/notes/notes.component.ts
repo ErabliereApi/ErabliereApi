@@ -60,13 +60,13 @@ export class NotesComponent implements OnInit {
     }
 
     loadNotes(noteId?: any) {
-        this._api.getNotesCount(this.idErabliereSelectionee, this.search).then(count => this._nombreTotal = count);
         this._api.getNotes(this.idErabliereSelectionee, this.search, (this._pageActuelle - 1) * this._nombreParPage, this._nombreParPage)
             .then(async notes => {
-                this.notes = notes;
+                this._nombreTotal = notes.count ? parseInt(notes.count) : 0;
+                this.notes = notes.items;
                 this.error = null;
 
-                for (const n of notes) {
+                for (const n of notes.items) {
                     if (n.fileExtension == 'csv') {
                         n.decodedTextFile = atob(n.file ?? "");
                     }

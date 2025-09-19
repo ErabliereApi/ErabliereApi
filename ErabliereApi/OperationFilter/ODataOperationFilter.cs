@@ -26,6 +26,7 @@ public class ODataOperationFilter : IOperationFilter
             AddODataParameter("$filter", examples: GetFilterExamples());
             AddODataParameter("$top", format: "int32", type: "integer", examples: GetTopExamples(), defaultValue: "10");
             AddODataParameter("$skip", format: "int32", type: "integer", examples: GetSkipExamples());
+            AddODataParameter("$count", format: "boolean", type: "boolean", defaultValue: "false");
 
             if (ExpandEnabled(enableQueryAttributes))
             {
@@ -37,6 +38,11 @@ public class ODataOperationFilter : IOperationFilter
 
         void AddODataParameter(string name, string format = "expression", string type = "string", Dictionary<string, OpenApiExample>? examples = default, string? defaultValue = null)
         {
+            if (operation.Parameters.Any(p => p.Name == name))
+            {
+                return;
+            }
+
             operation.Parameters.Add(new OpenApiParameter
             {
                 Name = name,

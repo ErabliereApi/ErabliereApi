@@ -70,17 +70,13 @@ public class ErablieresController : ControllerBase
     /// Liste les érablières
     /// </summary>
     /// <param name="orderby">Ordre de tri</param>
-    /// <param name="filter">Filtre</param>
-    /// <param name="top">Nombre d'érablière à retourner</param>
     /// <param name="token">Jeton d'annulation de la requête</param>
     /// <returns>Une liste d'érablière</returns>
     [HttpGet]
-    [SecureEnableQuery(MaxTop = QueryableExtensions.TakeErabliereNbMax)]
+    [SecureEnableQuery]
     [AllowAnonymous]
     public async Task<IQueryable<Erabliere>> ListerAsync(
         [FromQuery(Name = "$orderby")] string? orderby,
-        [FromQuery(Name = "$filter")] string? filter,
-        [FromQuery(Name = "$top")] int? top,
         CancellationToken token)
     {
         var query = _context.Erabliere.AsNoTracking();
@@ -111,9 +107,12 @@ public class ErablieresController : ControllerBase
             }
         }
 
-        query = await query.AddOrderAndPageInfoAsync(orderby: orderby, filter: filter, top: top, httpContext: HttpContext, token: token);
+        if (string.IsNullOrWhiteSpace(orderby))
+        {
+            query = query.OrderBy(e => e.IndiceOrdre ?? int.MaxValue).ThenBy(e => e.Nom);
+        }
 
-        return query;
+        return query.AsSingleQuery();
     }
 
     /// <summary>
