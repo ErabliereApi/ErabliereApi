@@ -44,12 +44,22 @@ public class ODataCountHeaderMiddleware : IMiddleware
             context.Response.OnStarting(state =>
             {
                 var httpContext = state as HttpContext;
-                var totalCount = httpContext.Request.ODataFeature()?.TotalCount;
+                if (httpContext == null)
+                {
+                    return Task.CompletedTask;
+                }
 
+                var totalCount = httpContext.Request.ODataFeature()?.TotalCount;
                 if (totalCount.HasValue)
                 {
                     // Utiliser InvariantCulture pour sérialiser proprement le nombre
                     httpContext.Response.Headers["X-ODataCount"] = totalCount.Value.ToString(CultureInfo.InvariantCulture);
+                }
+
+                var nextLink = httpContext.Request.ODataFeature()?.NextLink;
+                if (nextLink != null)
+                {
+                    httpContext.Response.Headers["X-ODataNextLink"] = nextLink.ToString();
                 }
 
                 return Task.CompletedTask;

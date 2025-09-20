@@ -35,8 +35,7 @@ import { Appareil } from 'src/model/appareil';
 import { IpInfo } from 'src/model/ipinfo';
 
 @Injectable({ providedIn: 'root' })
-export class ErabliereApi {
-  
+export class ErabliereApi {  
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -778,9 +777,13 @@ export class ErabliereApi {
         return firstValueFrom(this._httpClient.put(this._environmentService.apiUrl + '/erablieres/' + erabliereId + '/appareil/nmapscan', textXml, { headers: headers }));
     }
 
-    async getIpInfos() {
+    async getIpInfos({ skip = 0, top = 50, search = '' }: { skip?: number; top?: number; search?: string; }) {
+        let filter = '';
+        if (isNotNullOrWhitespace(search)) {
+            filter = `&$filter=contains(ipAddress, '${search}')`;
+        }
         const headers = await this.getHeaders();
-        const response = await firstValueFrom(this._httpClient.get<IpInfo[]>(this._environmentService.apiUrl + '/ipinfo?$count=true&$orderby=dm desc', { headers: headers, observe: 'response' }));
+        const response = await firstValueFrom(this._httpClient.get<IpInfo[]>(this._environmentService.apiUrl + '/ipinfo?$count=true&$orderby=dm desc' + filter + `&$skip=${skip}&$top=${top}`, { headers: headers, observe: 'response' }));
         console.log(response.headers);
         return { items: response.body ?? [], count: response.headers.get('x-odatacount') ?? null };
     }
@@ -793,6 +796,11 @@ export class ErabliereApi {
     async getAuthorizedCountries() {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.get<string[]>(this._environmentService.apiUrl + '/ipinfo/authorized-countries', { headers: headers }));
+    }
+
+    async getIpInfosGroupedByCountry() {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<any[]>(this._environmentService.apiUrl + '/ipinfo/group-by-country', { headers: headers }));
     }
 }
 

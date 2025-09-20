@@ -71,7 +71,7 @@
                 @if (mapFeatureEnable) {
                 <button id="zone-carte-button" class="btn btn-primary" routerLink="/map"><span>🗺️ </span>Carte</button>
                 }
-                @if (useAuthentication && isAdminUser) {
+                @if (!useAuthentication || isAdminUser) {
                 <button id="zone-admin-button" class="btn btn-outline-primary" routerLink="/a"><span>⚙️ </span>Admin</button>
                 }
                 @if (useAuthentication) {

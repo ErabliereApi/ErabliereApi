@@ -217,7 +217,9 @@ public class Startup
 
             app.UseCors(option =>
             {
-                option.WithExposedHeaders("x-odatacount");
+                option
+                    .WithExposedHeaders("x-odatacount")
+                    .WithExposedHeaders("x-odatanextlink");
                 option.WithHeaders(Configuration["CORS_HEADERS"]?.Split(',') ?? ["*"]);
                 option.WithMethods(Configuration["CORS_METHODS"]?.Split(',') ?? ["*"]);
                 option.WithOrigins(Configuration["CORS_ORIGINS"]?.Split(',') ?? ["*"]);

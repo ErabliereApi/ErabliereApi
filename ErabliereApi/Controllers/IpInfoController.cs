@@ -52,6 +52,19 @@ public class IpInfoController : ControllerBase
         return _context.IpNetworkAsnInfos.AsNoTracking().Where(info => info.ASN == asn);
     }
 
+    [HttpGet("group-by-country")]
+    public IQueryable<object?> GetIpNetworkAsnInfos()
+    {
+        return _context.IpInfos.AsNoTracking()
+            .GroupBy(info => new { info.Country, info.CountryCode })
+            .Select(g => new
+            {
+                g.Key.Country,
+                g.Key.CountryCode,
+                Count = g.Count()
+            });
+    }
+
     /// <summary>
     /// Récupère la liste des pays autorisés à accéder à l'API
     /// </summary>

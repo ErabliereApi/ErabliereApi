@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
-import { IpInfo } from 'src/model/ipinfo';
 
 
 @Component({
@@ -10,7 +9,6 @@ import { IpInfo } from 'src/model/ipinfo';
     styleUrls: ['./ipinfo-map.component.css']
 })
 export class IpinfoMapComponent implements OnInit, OnDestroy {
-    @Input() ipInfos: IpInfo[] = [];
     @Input() authorizeCountries: string[] = [];
     map?: mapboxgl.Map;
     style = 'mapbox://styles/mapbox/light-v10';
@@ -54,7 +52,8 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
             if (this.map == null) return;
 
             // 1) agréger les ipInfos par pays
-            const agg = this.aggregateByCountry(this.ipInfos);
+            let agg = await this.api.getIpInfosGroupedByCountry();
+            agg = agg.filter(v => v.country && v.countryCode); // enlever les entrées sans pays
 
             // 2) charger un GeoJSON world-countries (Topology/GeoJSON)
             const geoJsonUrl = '/assets/countries.geo.json';
@@ -67,10 +66,10 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
 
             // 2.5 vérifier les pays manquants
             this.missingCountries = [];
-            for (const code of Object.keys(agg)) {
-                const found = world.features.find((f: any) => f.properties.name === code);
+            for (const countryAgg of agg) {
+                const found = world.features.find((f: any) => f.properties.name === countryAgg.country);
                 if (!found) {
-                    this.missingCountries.push(code);
+                    this.missingCountries.push(countryAgg.countryCode);
                 }
             }
             if (this.missingCountries.length) {
@@ -78,16 +77,15 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
             }
 
             // 3) injecter count et color dans les propriétés des features
-            const counts = Object.values(agg).map(v => v.ipCount);
+            const counts = agg.map(v => v.count);
             const min = counts.length ? Math.min(...counts) : 0;
             const max = counts.length ? Math.max(...counts) : 1;
 
-            for (const f of world.features) {
-                const code = f.properties.name;
-
-                if (agg.hasOwnProperty(code)) {
-                    f.properties.count = agg[code];
-                    f.properties.color = this.countToColor(agg[code], min, max);
+            for (const countryAgg of agg) {
+                const f = world.features.find((f: any) => f.properties.name === countryAgg.country);
+                if (f) {
+                    f.properties.count = countryAgg.count;
+                    f.properties.color = this.countToColor(countryAgg, min, max);
                     worldFiltered.features.push(f);
                 }
             }
@@ -132,7 +130,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
                 if (!props) return;
                 const coordinates = (e.lngLat).toArray();
                 const name = props.name;
-                const count = agg[name]?.ipCount || 0;
+                const count = props.count || 0;
                 const html = `<strong>${name}</strong><br/>Nombre d'adresses IP: ${count}<br/>Long/Lat: ${coordinates[0].toFixed(4)}, ${coordinates[1].toFixed(4)}`;
                 popup = new mapboxgl.Popup({
                         closeButton: false,
@@ -145,27 +143,9 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
         });
     }
 
-    aggregateByCountry(list: IpInfo[]) {
-        const agg: { [k: string]: { ipCount: number, countryCode: string } } = {};
-        for (const item of list) {
-            let code = item.country; // nom complet
-            if (!code) continue;
-            if (agg.hasOwnProperty(code)) {
-                agg[code].ipCount += 1;
-            }
-            else {
-                agg[code] = {
-                    ipCount: 1,
-                    countryCode: item.countryCode
-                }
-            }
-        }
-        return agg;
-    }
-
     // Si le code de pays est dans les pays autorisés, on colore en vert, sinon en rouge
-    countToColor(value: { ipCount: number, countryCode: string }, min: number, max: number): string {
-        if (value.ipCount <= 0) return '#eeeeee';
+    countToColor(value: { count: number, countryCode: string }, min: number, max: number): string {
+        if (value.count <= 0) return '#eeeeee';
         let h = 120; // vert
         let s = 90; // 90% saturation
         let l = 50; // 50% lightness
@@ -176,7 +156,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
             // tout le monde a la même valeur
             return this.hslToHex(h, s, l);
         }
-        const t = (value.ipCount - min) / (max - min);
+        const t = (value.count - min) / (max - min);
         s = Math.min(s * t + 20, 100); // entre 20% et 100%
         l = Math.min(l * t + 50, 50); // entre 50% et 90%
         return this.hslToHex(h, s, l);

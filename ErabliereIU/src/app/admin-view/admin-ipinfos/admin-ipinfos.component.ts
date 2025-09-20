@@ -17,13 +17,14 @@ export class AdminIpinfosComponent implements OnInit {
     totalCount: string| null = null;
     generalError: string | null = null;
     authorizeCountries: string[] = [];
+    top: number = 25;
 
     constructor(private readonly api: ErabliereApi) {
 
     }
 
     ngOnInit(): void {
-        this.api.getIpInfos().then(infos => {
+        this.api.getIpInfos({ top: this.top }).then(infos => {
             this.ipInfos = infos.items;
             this.totalCount = infos.count;
         }).catch(err => {
