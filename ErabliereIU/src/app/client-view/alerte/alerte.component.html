@@ -18,6 +18,12 @@
     }
 </div>
 <div>
+    @if (alertesIsLoading) {
+    <p><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Chargement des alertes...</p>
+    }
+    @if (alertesLoadingError) {
+    <p class="text-danger">{{alertesLoadingError}}</p>
+    }
     @if (alertes != null && alertes.length == 0 && alertesCapteur != null && alertesCapteur.length == 0) {
     <p>
         Aucune alerte de configuré
@@ -120,6 +126,12 @@
     </div>
     }
 
+    @if (alertesCapteurIsLoading) {
+    <p><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Chargement des alertes capteurs...</p>
+    }
+    @if (alertesCapteurLoadingError) {
+    <p class="text-danger">{{alertesCapteurLoadingError}}</p>
+    }
     @if (alertes != null && alertes.length > 0) {
     <div>
         <h4>Alerte trio données</h4>

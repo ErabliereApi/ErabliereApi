@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Observable, Subject } from "rxjs";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Alerte } from "src/model/alerte";
@@ -10,15 +10,20 @@ import { Erabliere } from "src/model/erabliere";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 
 @Component({
-    selector: 'alerte-page',
-    templateUrl: './alerte.component.html',
-    styleUrls: ['./alerte.component.css'],
-    imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent]
+  selector: 'alerte-page',
+  templateUrl: './alerte.component.html',
+  styleUrls: ['./alerte.component.css'],
+  imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent]
 })
 export class AlerteComponent implements OnInit {
-  @Input() alertes?: Array<Alerte>;
-  @Input() alertesCapteur?: Array<AlerteCapteur>;
-  @Input() idErabliereSelectionee: any
+  alertes?: Array<Alerte>;
+  alertesIsLoading: boolean = false;
+  alertesLoadingError: string | null = null;
+  alertesCapteur?: Array<AlerteCapteur>;
+  alertesCapteurIsLoading: boolean = false;
+  alertesCapteurLoadingError: string | null = null;
+
+  idErabliereSelectionee: any
   erabliere?: Erabliere;
 
   displayEditFormSubject;
@@ -59,7 +64,7 @@ export class AlerteComponent implements OnInit {
     this.editAlerteCapteur = false;
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit() {
     this.route.paramMap.subscribe(async params => {
       this.idErabliereSelectionee = params.get('idErabliereSelectionee');
 
@@ -68,39 +73,55 @@ export class AlerteComponent implements OnInit {
         this.loadAlertes();
       }
     });
-    
-    this.erabliere = await this._api.getErabliere(this.idErabliereSelectionee);
 
-    this.loadAlertes();
+    this._api.getErabliere(this.idErabliereSelectionee).then(e => {
+      this.erabliere = e;
+      this.loadAlertes();
 
-    this.displayEditFormSubject.subscribe(b => {
-      this.displayEditForm = b == "alerte" || b == "alerteCapteur";
-    });
+      this.displayEditFormSubject.subscribe(b => {
+        this.displayEditForm = b == "alerte" || b == "alerteCapteur";
+      });
 
-    this.alerteEditFormSubject.subscribe(b => {
-      if (this.alertes != undefined) {
-        var i = this.alertes.findIndex(a => a.id == this.alerteEditForm?.id);
+      this.alerteEditFormSubject.subscribe(b => {
+        if (this.alertes != undefined) {
+          const i = this.alertes.findIndex(a => a.id == this.alerteEditForm?.id);
+          this.alertes[i] = b;
+        }
+      });
 
-        this.alertes[i] = b;
-      }
-    });
-
-    this.alerteCapteurEditFormSubject.subscribe(b => {
-      if (this.alertesCapteur != undefined) {
-        var i = this.alertesCapteur.findIndex(a => a.id == this.alerteCapteurEditForm?.id);
-
-        this.alertesCapteur[i] = b;
-      }
+      this.alerteCapteurEditFormSubject.subscribe(b => {
+        if (this.alertesCapteur != undefined) {
+          const i = this.alertesCapteur.findIndex(a => a.id == this.alerteCapteurEditForm?.id);
+          this.alertesCapteur[i] = b;
+        }
+      });
     });
   }
 
   loadAlertes() {
+    this.alertesIsLoading = true;
+    this.alertesCapteurIsLoading = true;
+    this.alertesLoadingError = null;
+    this.alertesCapteurLoadingError = null;
+
     this._api.getAlertes(this.idErabliereSelectionee).then(alertes => {
       this.alertes = alertes;
-    });
+    })
+      .catch(err => {
+        this.alertesLoadingError = "Erreur lors du chargement des alertes : " + err.message;
+      })
+      .finally(() => {
+        this.alertesIsLoading = false;
+      });
+
     this._api.getAlertesCapteur(this.idErabliereSelectionee).then(alertesCapteur => {
       this.alertesCapteur = alertesCapteur;
-    });
+    }).catch(err => {
+      this.alertesCapteurLoadingError = "Erreur lors du chargement des alertes capteurs : " + err.message;
+    })
+      .finally(() => {
+        this.alertesCapteurIsLoading = false;
+      });
   }
 
   onButtonModifierClick(alerteId: any) {

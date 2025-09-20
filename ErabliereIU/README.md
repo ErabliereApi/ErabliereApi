@@ -26,6 +26,18 @@ npm install
 npm start
 ```
 
+## Support i18n
+
+Le projet supporte l'internationalisation. La langue par défaut est le français.
+
+Pour générer les fichiers de traduction:
+
+```
+ng extract-i18n --format=json --out-file=src/assets/i18n/ca-fr.json
+```
+
+Documentation: https://angular.dev/guide/i18n
+
 ## Utiliser les mecanismes d'optimisation en développement
 
 L'api utilise des entêtes http pour optimiser la quantitée de données échanger. Les politiques CORS empêche les entêtes d'être lu par le navigateur lorque là requête vient d'un autre origine. Pour tester les mecanismes en développement, executer la commande suivante :

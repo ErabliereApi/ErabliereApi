@@ -77,6 +77,10 @@ public class IpInfoMiddleware : IMiddleware
                 }
             }
         }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogInformation(ex, "Request for IP information timed out for {IpAddress}", ipAddress);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving IP information for {IpAddress}", ipAddress);

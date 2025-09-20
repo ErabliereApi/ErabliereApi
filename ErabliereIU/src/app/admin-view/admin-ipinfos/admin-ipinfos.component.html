@@ -35,5 +35,7 @@
         <app-ipinfo-map [authorizeCountries]="authorizeCountries"></app-ipinfo-map>
 
         <app-ipinfo-list [ipInfos]="ipInfos" [authorizeCountryCode]="authorizeCountries"></app-ipinfo-list>
+
+        <app-pagination [nombreParPage]="top" [nombreElements]="totalCount" (changementDePageEvent)="nextPage($event)"></app-pagination>
     </div>
 </div>
