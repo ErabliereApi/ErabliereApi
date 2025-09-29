@@ -188,5 +188,9 @@ export const routes: Routes = [
     {
         path: 'page401',
         component: Page401Component
+    },
+    {
+        path: 'page404',
+        component: Page404Component
     }
 ]
