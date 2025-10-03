@@ -28,6 +28,11 @@ public static class UseForwardedHeadersExtension
                     string? network = array[i];
                     var ipInfo = network.Split("/");
 
+                    if (ipInfo.Length != 2)
+                    {
+                        throw new Exception($"Error in KNOW_NETWORKS environment variable at index {i}. Value: {network} is not a valid CIDR notation.");
+                    }
+
                     options.KnownNetworks.Add(new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse(ipInfo[0]), int.Parse(ipInfo[1])));
                 }
             });

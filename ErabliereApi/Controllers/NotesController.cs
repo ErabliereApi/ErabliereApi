@@ -55,27 +55,6 @@ public class NotesController : ControllerBase
     }
 
     /// <summary>
-    /// Récupère la quantité de notes
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("Quantite")]
-    [ProducesResponseType(200, Type = typeof(int))]
-    [Obsolete("Cette action sera supprimée dans une future version. Utiliser le $count de OData à la place.")]
-    [LogObsoleteUsage]
-    public async Task<IActionResult> Compter(Guid id, [FromQuery] string? search, CancellationToken token)
-    {
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-#nullable disable
-            return Ok(await _depot.Notes
-                .CountAsync(n => n.IdErabliere == id && (n.Title.Contains(search) || n.Text.Contains(search)), token));
-#nullable enable
-        }
-
-        return Ok(await _depot.Notes.CountAsync(n => n.IdErabliere == id, token));
-    }
-
-    /// <summary>
     /// Get toutes les notes avec un rappel actif et la périodicité est due
     /// </summary>
     /// <param name="id">Id de l'erabliere</param>
