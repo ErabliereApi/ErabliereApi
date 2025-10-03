@@ -1569,7 +1569,7 @@
 							"response": []
 						},
 						{
-							"name": "Obtenir l'id du capteur",
+							"name": "Obtenir les capteurs",
 							"event": [
 								{
 									"listen": "test",
@@ -1620,7 +1620,9 @@
 											"    pm.response.to.have.status(200);\r",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
 									}
 								}
 							],
@@ -1637,14 +1639,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{url}}/Capteurs/{{idCapteur}}/DonneesCapteur",
+									"raw": "{{url}}/Capteurs/{{idCapteur}}/DonneesCapteurV2",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"Capteurs",
 										"{{idCapteur}}",
-										"DonneesCapteur"
+										"DonneesCapteurV2"
 									]
 								}
 							},
