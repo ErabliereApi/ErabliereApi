@@ -2547,8 +2547,8 @@ namespace ErabliereAPI.Proxy
         [System.Text.Json.Serialization.JsonPropertyName("dm")]
         public System.DateTimeOffset? Dm { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("minVaue")]
-        public double? MinVaue { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonPropertyName("minValue")]
+        public double? MinValue { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("maxValue")]
         public double? MaxValue { get; set; } = default!;
@@ -4886,11 +4886,11 @@ namespace ErabliereAPI.Proxy
         [System.ComponentModel.DataAnnotations.StringLength(200)]
         public string? TexterA { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("minVaue")]
-        public int? MinVaue { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonPropertyName("minValue")]
+        public double? MinValue { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("maxValue")]
-        public int? MaxValue { get; set; } = default!;
+        public double? MaxValue { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnable")]
         public bool? IsEnable { get; set; } = default!;

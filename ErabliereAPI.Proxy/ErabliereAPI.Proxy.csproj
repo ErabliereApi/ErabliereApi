@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>ErabliereAPI.Proxy</PackageId>
-    <Version>3.8.0</Version>
+    <Version>3.9.0</Version>
     <Authors>Frédéric Jacques</Authors>
     <Company>ErabliereAPI</Company>
     <PackageTags>ErabliereAPI;Erabliere</PackageTags>
@@ -17,6 +17,7 @@
       added to handle AzureAD authentication scenario.
     </Description>
     <ReleaseNotes>
+      - Renaming the MinVaue property to MinValue
       - Remove obsolete endpoints
       - Migrate to .NET 9.0
       - Remove my parameter, add new enpoints and properties
