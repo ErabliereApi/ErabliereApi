@@ -46,7 +46,7 @@ public class TriggerAlertV3Attribute : ActionFilterAttribute
         }
         catch (InvalidOperationException e)
         {
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV2Attribute>>();
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV3Attribute>>();
 
             logger.LogCritical(92837485, e, "typeof(PostDonneeCapteurV2) not found in {0}", Serialize(context.ActionArguments.Where(a => a.Value?.GetType() != typeof(CancellationToken))));
 
