@@ -3,6 +3,7 @@ using ErabliereApi.Donnees.Ownable;
 using ErabliereModel.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ErabliereApi.Donnees;
 
@@ -59,7 +60,8 @@ public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnab
     /// <summary>
     /// La valeur minimal de ce capteur
     /// </summary>
-    public decimal? MinVaue { get; set; }
+    [Column("MinValue")]
+    public decimal? MinValue { get; set; }
 
     /// <summary>
     /// La valeur maximal de ce capteur

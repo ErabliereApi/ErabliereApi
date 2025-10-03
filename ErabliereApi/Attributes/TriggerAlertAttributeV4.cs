@@ -133,11 +133,11 @@ public class TriggerAlertV4Attribute : ActionFilterAttribute
         var validationCount = 0;
         var conditionMet = 0;
 
-        if (alerte.MinVaue.HasValue)
+        if (alerte.MinValue.HasValue)
         {
             validationCount++;
 
-            if (_donnee.V <= alerte.MinVaue.Value)
+            if (_donnee.V <= alerte.MinValue.Value)
             {
                 conditionMet++;
             }

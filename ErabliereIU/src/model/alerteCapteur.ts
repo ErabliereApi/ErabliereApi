@@ -6,7 +6,7 @@ export class AlerteCapteur {
   nom?: string;
   envoyerA?: string;
   texterA?: string;
-  minVaue?: number;
+  minValue?: number;
   maxValue?: number;
   dc?: string
   isEnable?: boolean;

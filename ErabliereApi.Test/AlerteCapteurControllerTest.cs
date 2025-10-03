@@ -55,7 +55,7 @@ public class AlerteCapteurControllerTest
                 IdCapteur = alerteCapteur.IdCapteur,
                 IsEnable = alerteCapteur.IsEnable,
                 MaxValue = (short)(alerteCapteur.MaxValue * 10),
-                MinVaue = (short)(alerteCapteur.MinVaue * 10),
+                MinValue = (short)(alerteCapteur.MinValue * 10),
                 Nom = alerteCapteur.Nom
             },
             true,

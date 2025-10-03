@@ -160,7 +160,7 @@ public class AlerteCapteursController : ControllerBase
         alerteCapteur.EnvoyerA = alerte.EnvoyerA;
         alerteCapteur.TexterA = alerte.TexterA;
         alerteCapteur.MaxValue = alerte.MaxValue;
-        alerteCapteur.MinVaue = alerte.MinVaue;
+        alerteCapteur.MinValue = alerte.MinValue;
         alerteCapteur.Nom = alerte.Nom;
         alerteCapteur.DM = DateTimeOffset.UtcNow;
 

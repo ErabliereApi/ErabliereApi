@@ -167,9 +167,9 @@ export class AjouterAlerteComponent implements OnInit {
             this.alerteCapteur.envoyerA = this.alerteCapteurForm.controls['destinataireCourriel'].value;
             this.alerteCapteur.texterA = this.alerteCapteurForm.controls['destinataireSMS'].value;
             if (this.alerteCapteurForm.controls['min'].value != "") {
-                this.alerteCapteur.minVaue = parseFloat(this.alerteCapteurForm.controls['min'].value);
+                this.alerteCapteur.minValue = parseFloat(this.alerteCapteurForm.controls['min'].value);
             } else {
-                this.alerteCapteur.minVaue = undefined;
+                this.alerteCapteur.minValue = undefined;
             }
             if (this.alerteCapteurForm.controls['max'].value != "") {
                 this.alerteCapteur.maxValue = parseFloat(this.alerteCapteurForm.controls['max'].value);

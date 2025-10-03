@@ -154,7 +154,7 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
             IdCapteur = capteur.Id,
             EnvoyerA = "test@test.com",
             MaxValue = max,
-            MinVaue = min,
+            MinValue = min,
             IsEnable = true,
             Nom = "Humidité sous-sol"
         };

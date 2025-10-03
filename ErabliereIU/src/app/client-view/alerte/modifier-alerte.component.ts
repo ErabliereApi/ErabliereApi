@@ -60,7 +60,7 @@ export class ModifierAlerteComponent implements OnInit {
                 nom: alerteCapteur.nom,
                 destinataireCourriel: alerteCapteur.envoyerA,
                 destinataireSMS: alerteCapteur.texterA,
-                min: alerteCapteur.minVaue,
+                min: alerteCapteur.minValue,
                 max: alerteCapteur.maxValue
             });
         }
@@ -126,11 +126,9 @@ export class ModifierAlerteComponent implements OnInit {
         alerte.isEnable = this.alerteCapteur?.isEnable;
         let minInForm = this.alerteCapteurForm.controls['min'].value;
         if (minInForm != null && (minInForm !== "" || minInForm === 0)) {
-            console.log('parseMin')
-            alerte.minVaue = parseFloat(minInForm.toString());
+            alerte.minValue = parseFloat(minInForm.toString());
         } else {
-            console.log('min to undefined')
-            alerte.minVaue = undefined;
+            alerte.minValue = undefined;
         }
         let maxInForm = this.alerteCapteurForm.controls['max'].value;
         if (maxInForm != null && (maxInForm !== "" || maxInForm === 0)) {
