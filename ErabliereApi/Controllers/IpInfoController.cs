@@ -21,15 +21,20 @@ public class IpInfoController : ControllerBase
     private readonly ErabliereDbContext _context;
     private readonly IMemoryCache _memoryCache;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<IpInfoController> _logger;
 
     /// <summary>
     /// Constructeur
     /// </summary>
-    public IpInfoController(ErabliereDbContext context, IMemoryCache memoryCache, IConfiguration configuration)
+    public IpInfoController(ErabliereDbContext context,
+        IMemoryCache memoryCache,
+        IConfiguration configuration,
+        ILogger<IpInfoController> logger)
     {
         _context = context;
         _memoryCache = memoryCache;
         _configuration = configuration;
+        _logger = logger;
     }
 
     /// <summary>
@@ -44,6 +49,16 @@ public class IpInfoController : ControllerBase
     }
 
     /// <summary>
+    /// Liste les informations IP ASN
+    /// </summary>
+    [HttpGet("asn")]
+    [EnableQuery]
+    public IQueryable<IpNetworkAsnInfo> GetIpNetworkAsnInfos()
+    {
+        return _context.IpNetworkAsnInfos.AsNoTracking();
+    }
+
+    /// <summary>
     /// Récupère les informations ASN des réseaux IP stockées dans la base de données
     /// </summary>
     [HttpGet("asn/{asn}")]
@@ -52,8 +67,12 @@ public class IpInfoController : ControllerBase
         return _context.IpNetworkAsnInfos.AsNoTracking().Where(info => info.ASN == asn);
     }
 
+    /// <summary>
+    /// Récupère les nombre d'IP par pays
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("group-by-country")]
-    public IQueryable<object?> GetIpNetworkAsnInfos()
+    public IQueryable<object?> GetIpGroupByCountry()
     {
         return _context.IpInfos.AsNoTracking()
             .GroupBy(info => new { info.Country, info.CountryCode })
@@ -72,7 +91,8 @@ public class IpInfoController : ControllerBase
     [HttpGet("authorized-countries")]
     public IEnumerable<string> GetAuthorizedCountries()
     {
-        return _configuration.GetSection("IpInfoApi:AuthorizeCountries").Get<List<string>>() ?? [];
+        return _configuration.GetSection("IpInfoApi:AuthorizeCountries")
+            .Get<List<string>>() ?? [];
     }
 
     /// <summary>
@@ -99,13 +119,14 @@ public class IpInfoController : ControllerBase
     }
 
     /// <summary>
-    /// Une action permettant d'envoyer un fichier csv pour importer des informations IP Réseau et ASN dans la BD.
+    /// Une action permettant d'envoyer un fichier xlsx pour importer des informations IP Réseau et ASN dans la BD.
     /// </summary>
-    /// <param name="file">Le fichier CSV ou xlsx contenant les informations à importer</param>
+    /// <param name="file">Le fichier xlsx contenant les informations à importer</param>
     /// <param name="cancellationToken">Jeton d'annulation pour la requête</param>
     /// <returns>Résultat de l'opération</returns>
     [HttpPost("import-asn")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [RequestSizeLimit(52428800)] // 50 MB in bytes
     public async Task<IActionResult> ImportIpNetworkAsnInfo(IFormFile file, CancellationToken cancellationToken)
     {
         if (file == null || file.Length == 0)
@@ -113,52 +134,75 @@ public class IpInfoController : ControllerBase
             return BadRequest("Le fichier est invalide.");
         }
 
-        if (!file.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) && !file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+        if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
         {
-            return BadRequest("Le fichier doit être au format CSV ou XLSX.");
+            return BadRequest("Le fichier doit être au format xlsx.");
         }
 
-        var saveEach = 1000;
-        var count = 0;
+        await Console.Out.WriteLineAsync($"{DateTimeOffset.UtcNow} Début de l'importation des informations IP ASN...");
+        using var workbook = new ClosedXML.Excel.XLWorkbook(file.OpenReadStream());
+        await Console.Out.WriteLineAsync($"{DateTimeOffset.UtcNow} Fichier chargé en mémoire.");
+        var worksheet = workbook.Worksheets.First();
+        await Console.Out.WriteLineAsync($"{DateTimeOffset.UtcNow} Feuille de calcul sélectionnée : {worksheet.Name}");
+        var bufferSize = 15000;
+        var buffer = new List<IpNetworkAsnInfo>(bufferSize);
+        var totalSaved = 0;
 
-        if (file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+        var loopHasBegun = false;
+
+        await Console.Out.WriteLineAsync($"{DateTimeOffset.UtcNow} Début du parcourt des lignes network IP ASN...");
+        foreach (var row in worksheet.Rows().Skip(1))
         {
-            return BadRequest("Le format XLSX n'est pas encore supporté.");
-        }
-        else
-        {
-            using var stream = new StreamReader(file.OpenReadStream());
-            string? line;
-            while ((line = await stream.ReadLineAsync()) != null)
+            if (!loopHasBegun)
             {
-                var parts = line.Split(',');
-                if (parts.Length >= 4)
-                {
-                    await _context.IpNetworkAsnInfos.AddAsync(new IpNetworkAsnInfo
-                    {
-                        Network = parts[0],
-                        ASN = parts[1],
-                        Country = parts[2],
-                        CountryCode = parts[3]
-                    }, cancellationToken);
+                loopHasBegun = true;
+                await Console.Out.WriteLineAsync($"{DateTimeOffset.UtcNow} Parcourt des lignes commencé...");
+            }
 
-                    count++;
-                }
+            var cells = row.Cells().ToArray();
 
-                if (count >= saveEach)
-                {
-                    await _context.SaveChangesAsync(cancellationToken);
-                    count = 0;
-                }
+            if (cells.Length <= 2)
+            {
+                _logger.LogWarning("Ligne ignorée en raison d'un nombre insuffisant de colonnes : {RowNumber}", row.RowNumber());
+                continue;
+            }
+
+            var ipNetworkAsnInfo = new IpNetworkAsnInfo
+            {
+                Network = cells.AtIndexOrDefault(0)?.GetString() ?? string.Empty,
+                Country = cells.AtIndexOrDefault(1)?.GetString() ?? string.Empty,
+                CountryCode = cells.AtIndexOrDefault(2)?.GetString() ?? string.Empty,
+                Continent = cells.AtIndexOrDefault(3)?.GetString() ?? string.Empty,
+                ContinentCode = cells.AtIndexOrDefault(4)?.GetString() ?? string.Empty,
+                ASN = cells.AtIndexOrDefault(5)?.GetString() ?? string.Empty,
+                AS_Name = (cells.AtIndexOrDefault(6)?.GetString() ?? string.Empty).Trim(),
+                AS_Domain = cells.AtIndexOrDefault(7)?.GetString() ?? string.Empty,
+            };
+
+            if (ipNetworkAsnInfo.AS_Name.Length > 200)
+            {
+                _logger.LogWarning("Troncature du nom AS pour le réseau {Network} car il dépasse 200 caractères. Text: {AS_Name}", ipNetworkAsnInfo.Network, ipNetworkAsnInfo.AS_Name);
+
+                ipNetworkAsnInfo.AS_Name = ipNetworkAsnInfo.AS_Name[..200];
+            }
+
+            buffer.Add(ipNetworkAsnInfo);
+
+            if (buffer.Count >= bufferSize)
+            {
+                var t = Console.Out.WriteLineAsync($"{DateTimeOffset.UtcNow} Sauvegarde de {buffer.Count} enregistrements...");
+                await _context.IpNetworkAsnInfos.AddRangeAsync(buffer, cancellationToken);
+                totalSaved += await _context.SaveChangesAsync(cancellationToken);
+                buffer.Clear();
+                await t;
             }
         }
 
-        if (count > 0)
-        {
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        totalSaved += await _context.SaveChangesAsync(cancellationToken);
 
-        return NoContent();
+        await Console.Out.WriteLineAsync($"Total des enregistrements sauvegardés : {totalSaved}");
+
+        return Ok(new { totalSaved });
     }
 
     /// <summary>
@@ -240,5 +284,18 @@ public class IpInfoController : ControllerBase
         _memoryCache.Remove($"{IpInfoMiddleware.CacheKeyPrefix}{ipInfo.Ip}");
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Enlève tout les informations IP ASN de la base de données
+    /// </summary>
+    [HttpDelete("asn")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteAllIpNetworkAsnInfo(CancellationToken cancellationToken)
+    {
+        _context.IpNetworkAsnInfos.RemoveRange(_context.IpNetworkAsnInfos);
+        var totalDeleted = await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { totalDeleted });
     }
 }

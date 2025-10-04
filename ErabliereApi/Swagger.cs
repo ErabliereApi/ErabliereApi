@@ -1,12 +1,9 @@
 ﻿using ErabliereApi.Extensions;
 using ErabliereApi.OperationFilter;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Writers;
-using Swashbuckle.AspNetCore.Swagger;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -21,6 +18,10 @@ namespace ErabliereApi;
 public static class Swagger
 {
     static string? SwaggerJsonCache = null;
+
+    /// <summary>
+    /// Constante pour le nom de la variable d'environnement contenant les scopes OIDC
+    /// </summary>
     public const string OIDC_SCOPES = "OIDC_SCOPES";
 
     /// <summary>
@@ -147,44 +148,7 @@ public static class Swagger
     public static IApplicationBuilder UtiliserSwagger(this IApplicationBuilder app, IConfiguration config)
     {
         // add a middleware that will save the first swagger document in cache and then return it for subsequent request
-        app.Use(async (context, next) => {
-            if (context.Request.Path.StartsWithSegments("/api/v1/swagger.json"))
-            {
-                if (SwaggerJsonCache != null)
-                {
-                    context.Response.StatusCode = 200;
-                    context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsync(SwaggerJsonCache ?? "");
-                    return;
-                }
-                else {
-                    // create a memory stream to store the response
-                    var originalBodyStream = context.Response.Body;
-                    using var responseBody = new MemoryStream();
-                    context.Response.Body = responseBody;
-                    await next(context);
-                    if (context.Response.StatusCode == 200 && 
-                        context.Request.Path.StartsWithSegments("/api/v1/swagger.json"))
-                    {
-                        // save the response in cache
-                        responseBody.Seek(0, SeekOrigin.Begin);
-                        var reader = new StreamReader(responseBody);
-                        var swaggerJson = await reader.ReadToEndAsync();
-                        SwaggerJsonCache = swaggerJson;
-
-                        // Transform the SwaggerJsonCache that is an indented JSON string into a compact JSON string
-                        SwaggerJsonCache = JsonSerializer.Serialize(
-                            JsonSerializer.Deserialize<object>(swaggerJson), new JsonSerializerOptions { WriteIndented = false });
-                    }
-                    // copy the response stream to the original stream
-                    context.Response.Body.Seek(0, SeekOrigin.Begin);
-                    await context.Response.Body.CopyToAsync(originalBodyStream);
-                    context.Response.Body = originalBodyStream;
-                    return;
-                }
-            }
-            await next(context);
-        });
+        app.Use(CacheSwaggerJsonResponse);
 
         app.UseSwagger(c =>
         {
@@ -221,5 +185,46 @@ public static class Swagger
         });
 
         return app;
+    }
+
+    private static async Task CacheSwaggerJsonResponse(HttpContext context, RequestDelegate next)
+    {
+        if (context.Request.Path.StartsWithSegments("/api/v1/swagger.json"))
+        {
+            if (SwaggerJsonCache != null)
+            {
+                context.Response.StatusCode = 200;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(SwaggerJsonCache ?? "");
+                return;
+            }
+            else
+            {
+                // create a memory stream to store the response
+                var originalBodyStream = context.Response.Body;
+                using var responseBody = new MemoryStream();
+                context.Response.Body = responseBody;
+                await next(context);
+                if (context.Response.StatusCode == 200 &&
+                    context.Request.Path.StartsWithSegments("/api/v1/swagger.json"))
+                {
+                    // save the response in cache
+                    responseBody.Seek(0, SeekOrigin.Begin);
+                    var reader = new StreamReader(responseBody);
+                    var swaggerJson = await reader.ReadToEndAsync();
+                    SwaggerJsonCache = swaggerJson;
+
+                    // Transform the SwaggerJsonCache that is an indented JSON string into a compact JSON string
+                    SwaggerJsonCache = JsonSerializer.Serialize(
+                        JsonSerializer.Deserialize<object>(swaggerJson), new JsonSerializerOptions { WriteIndented = false });
+                }
+                // copy the response stream to the original stream
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
+                await context.Response.Body.CopyToAsync(originalBodyStream);
+                context.Response.Body = originalBodyStream;
+                return;
+            }
+        }
+        await next(context);
     }
 }
