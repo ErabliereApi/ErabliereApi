@@ -50,8 +50,17 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
+          record: true
+          key: ${{ secrets.CYPRESS_RECORD_KEY }}
           working-directory: ErabliereIU
           config: video=false,baseUrl=https://erabliereapi-demo.azurewebsites.net
+        env:
+          # pass the Cypress Cloud project ID as an environment variable or store it in the Cypress configuration file
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          # pass the Cypress Cloud record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORDING_KEY }}
+          # pass GitHub token to detect new build vs re-run build
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4.2.0

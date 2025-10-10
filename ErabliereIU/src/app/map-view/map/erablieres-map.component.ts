@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
-import * as mapboxgl from 'mapbox-gl';
 import { FormsModule } from '@angular/forms';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
@@ -99,6 +98,9 @@ export class ErablieresMapComponent implements OnInit {
         this.duration = Date.now() - dur;
 
         this.duration = this.duration / 1000;
+
+        // Dynamically import Mapbox GL JS with default export.
+        const mapboxgl = (await import('mapbox-gl')).default;
 
         this.map = new mapboxgl.Map({
             accessToken: accessToken.accessToken,
