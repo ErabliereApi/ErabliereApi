@@ -4,6 +4,7 @@ using ErabliereApi.Formaters;
 using ErabliereApi.Middlewares;
 using ErabliereApi.Services;
 using ErabliereApi.Services.Emails;
+using ErabliereApi.Services.IpInfo;
 using ErabliereApi.Services.SMS;
 using MailKit;
 using MailKit.Net.Smtp;
@@ -325,6 +326,7 @@ public static class ServiceCollectionExtension
                 }
             });
         }
+        services.AddScoped<ImportIpInfoService>();
 
         return services;
     }

@@ -55,4 +55,39 @@ public static class StringExtensions
     {
         return value?.Replace("\n", "")?.Replace("\r", "");
     }
+
+    /// <summary>
+    /// Split a CSV line into multiple lines based on commas, ignoring commas inside quotes
+    /// </summary>
+    /// <param name="line"></param>
+    /// <param name="seperator"></param>
+    /// <returns></returns>
+    public static List<string> SplitCSVLine(this string? line, char seperator = ',')
+    {
+        if (line == null)
+        {
+            return [];
+        }
+        var list = new List<string>();
+        var inQuotes = false;
+        var value = new System.Text.StringBuilder();
+        for (var i = 0; i < line.Length; i++)
+        {
+            var currentChar = line[i];
+            if (currentChar == '\"')
+            {
+                inQuotes = !inQuotes;
+            }
+            else if (currentChar == seperator && !inQuotes)
+            {
+                list.Add(value.ToString());
+                value.Clear();
+            }
+            else
+            {
+                value.Append(currentChar);
+            }
+        }
+        return list;
+    }
 }

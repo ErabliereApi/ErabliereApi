@@ -1,4 +1,5 @@
 using ErabliereApi.Depot.Sql;
+using ErabliereApi.Services.IpInfo;
 using Microsoft.EntityFrameworkCore;
 using static System.Boolean;
 using static System.StringComparison;
@@ -36,7 +37,49 @@ public static class ApplicationBuilderExtensions
             database.Database.Migrate();
         }
 
+        if (config.IsIpInfoEnabled())
+        {
+            ImportIPInfoDatabase(config, serviceProvider);
+        }
+
         return app;
+    }
+
+    private static void ImportIPInfoDatabase(IConfiguration config, IServiceProvider serviceProvider)
+    {
+        var ipInfoService = serviceProvider.GetRequiredService<ImportIpInfoService>();
+
+        var filePath = config["IpInfoApi:DBFilePath"];
+
+        if (!string.IsNullOrWhiteSpace(filePath))
+        {
+            Console.WriteLine("Importing IP info database from file: " + filePath);
+
+            FileStream? stream = null;
+
+            try
+            {
+                stream = File.OpenRead(filePath);
+
+                ipInfoService.ImportIpInfoAsync(stream, importIfNotEmpty: false, CancellationToken.None).Wait();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error importing IP info database: " + ex.Message);
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                    stream.Dispose();
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("No file path provided for IP info database import");
+        }
     }
 
     /// <summary>
