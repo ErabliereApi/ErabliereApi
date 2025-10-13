@@ -33,4 +33,40 @@ public class PostPrompt
     /// Si laisser à null, par défaut 800 sera utilisé
     /// </summary>
     public int? MaxToken { get; set; }
+
+    /// <summary>
+    /// Les pièces jointes du prompt
+    /// </summary>
+    public PromptAttachment[]? Attachments { get; set; }
+}
+
+/// <summary>
+/// 
+/// </summary>
+public class PromptAttachment
+{
+    /// <summary>
+    /// Le nom du fichier
+    /// </summary>
+    public string FileName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Uri publique du fichier
+    /// </summary>
+    public string? PublicUri { get; set; }
+
+    /// <summary>
+    /// Gets or sets the MIME type of the content.
+    /// </summary>
+    public string ContentType { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Le contenu du fichier encodé en base64
+    /// </summary>
+    public string ContentBase64 { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Text content
+    /// </summary>
+    public string? TextContent { get; set; }
 }

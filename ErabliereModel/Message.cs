@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ErabliereApi.Donnees.Interfaces;
 
 namespace ErabliereApi.Donnees;
@@ -27,6 +28,21 @@ public class Message : IIdentifiable<Guid?, Message>
     /// Le contenu du message
     /// </summary>
     public string Content { get; set; } = "";
+
+    /// <summary>
+    /// Message de refus
+    /// </summary>
+    public string? Refusal { get; set; }
+
+    /// <summary>
+    /// Uri de l'image
+    /// </summary>
+    public string? ImageUri { get; set; }
+
+    /// <summary>
+    /// Partie du messages et pièces jointes
+    /// </summary>
+    public List<MessagePart>? MessageParts { get; set; }
 
     /// <summary>
     /// Date de création du message
