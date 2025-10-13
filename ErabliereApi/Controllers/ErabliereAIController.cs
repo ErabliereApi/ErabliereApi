@@ -14,8 +14,10 @@ using Microsoft.EntityFrameworkCore;
 using OpenAI.Chat;
 using OpenAI.Images;
 using System.ClientModel;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using UglyToad.PdfPig;
 
 namespace ErabliereApi.Controllers;
 
@@ -129,7 +131,7 @@ public class ErabliereAIController : ControllerBase
         // if the convesation id is null, create a new conversation
         Conversation? conversation = await GetOrCreateConversation(prompt, defaultSystemPhrase, cancellationToken);
 
-        string aiResponse;
+        ChatMessageContentPart? aiResponse;
 
         var _client = new AzureOpenAIClient(
             new Uri(_configuration["AzureOpenAIUri"] ?? ""),
@@ -151,7 +153,8 @@ public class ErabliereAIController : ControllerBase
                 {
                     Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
                     FrequencyPenalty = 0,
-                    PresencePenalty = 0
+                    PresencePenalty = 0,
+                    EndUserId = MD5Hash(conversation.UserId)
                 };
 
                 var messagesPrompt = new List<ChatMessage>();
@@ -169,16 +172,33 @@ public class ErabliereAIController : ControllerBase
                         new AssistantChatMessage(message.Content));
                 }
 
-                messagesPrompt.Add(new UserChatMessage(prompt.Prompt));
+                messagesPrompt.Add(GetNewPrompt(prompt));
 
-                var responseWithoutStream = await client.CompleteChatAsync(
-                    messagesPrompt,
-                    chatCompletionsOptions,
-                    cancellationToken
-                );
+                try
+                {
+                    var responseWithoutStream = await client.CompleteChatAsync(
+                        messagesPrompt,
+                        chatCompletionsOptions,
+                        cancellationToken
+                    );
 
-                var responseChat = responseWithoutStream.Value;
-                aiResponse = responseChat?.Content?.FirstOrDefault()?.Text ?? "Aucune réponse";
+                    var responseChat = responseWithoutStream.Value;
+                    aiResponse = responseChat?.Content?.FirstOrDefault();
+                }
+                catch (ClientResultException e)
+                {
+                    var error = new ValidationProblemDetails();
+
+                    error.Status = e.Status;
+                    foreach (var d in e.Data.Keys)
+                    {
+                        error.Errors[d.ToString() ?? ""] = [e.Data[d]?.ToString() ?? ""];
+                    }
+                    error.Detail = e.Message;
+
+                    return BadRequest(error);
+                }
+                
                 break;
             default:
                 var completionResponse = await client.CompleteChatAsync(
@@ -187,13 +207,14 @@ public class ErabliereAIController : ControllerBase
                     {
                         Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
                         FrequencyPenalty = 0,
-                        PresencePenalty = 0
+                        PresencePenalty = 0,
+                        EndUserId = MD5Hash(conversation.UserId)
                     },
                     cancellationToken
                 );
                 var completion = completionResponse.Value;
 
-                aiResponse = completion?.Content?.FirstOrDefault()?.Text ?? "Aucune réponse";
+                aiResponse = completion?.Content?.FirstOrDefault();
                 break;
         }
 
@@ -204,14 +225,17 @@ public class ErabliereAIController : ControllerBase
             Content = prompt.Prompt ?? "",
             IsUser = true,
             CreatedAt = DateTime.Now,
+            MessageParts = GetMessagesParts(prompt.Attachments)
         };
 
         var response = new Message
         {
             ConversationId = prompt.ConversationId,
-            Content = aiResponse,
+            Content = aiResponse?.Text ?? "Aucune réponse",
             IsUser = false,
             CreatedAt = DateTime.Now,
+            Refusal = aiResponse?.Refusal,
+            ImageUri = aiResponse?.Kind == ChatMessageContentPartKind.Image ? aiResponse?.ImageUri.ToString() : null
         };
 
         await _depot.Messages.AddAsync(query, cancellationToken);
@@ -220,23 +244,139 @@ public class ErabliereAIController : ControllerBase
 
         return Ok(new PostPromptResponse
         {
-
             Prompt = prompt,
             Conversation = conversation,
             Response = response,
         });
     }
 
-    private async Task<Conversation?> GetOrCreateConversation(PostPrompt prompt, string defaultSystemPhrase, CancellationToken cancellationToken)
+    private List<MessagePart> GetMessagesParts(PromptAttachment[]? attachments)
+    {
+        return [];
+    }
+
+    private string? MD5Hash(string? userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return null;
+        }
+
+        using var md5HashAlgo = MD5.Create();
+
+        var hashBytes = md5HashAlgo.ComputeHash(Encoding.UTF8.GetBytes(userId));
+
+        return BitConverter.ToString(hashBytes);
+    }
+
+    private static UserChatMessage GetNewPrompt(PostPrompt prompt)
+    {
+        List<ChatMessageContentPart> attachments = new List<ChatMessageContentPart>();
+
+        attachments.Add(ChatMessageContentPart.CreateTextPart(prompt.Prompt ?? ""));
+
+        if (prompt.Attachments != null && prompt.Attachments.Length > 0)
+        {
+            foreach (var attachment in prompt.Attachments)
+            {
+                if (IsImage(attachment.ContentType))
+                {
+                    if (!string.IsNullOrWhiteSpace(attachment.PublicUri) && Uri.IsWellFormedUriString(attachment.PublicUri, UriKind.Absolute))
+                    {
+                        attachments.Add(
+                            ChatMessageContentPart.CreateImagePart(
+                                new Uri(attachment.PublicUri)));
+                    }
+                    else
+                    {
+                        using var memStream = new MemoryStream();
+
+                        var b64 = Convert.FromBase64String(attachment.ContentBase64);
+                        memStream.Write(b64, 0, b64.Length);
+
+                        attachments.Add(
+                            ChatMessageContentPart.CreateImagePart(
+                                BinaryData.FromStream(memStream),
+                                attachment.ContentType)
+                            );
+                    }
+                }
+                else if (attachment.ContentType.ToLower() == "text/plain")
+                {
+                    attachments.Add(
+                        ChatMessageContentPart.CreateTextPart(
+                            attachment.TextContent)
+                    );
+                }
+                else if (attachment.ContentType.ToLower() == "text/pdf")
+                {
+                    using var pdfDoc = PdfDocument.Open(Convert.FromBase64String(attachment.ContentBase64));
+
+                    var sb = new StringBuilder();
+
+                    foreach (var page in pdfDoc.GetPages())
+                    {
+                        var text = page.Text;
+
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            sb.AppendLine(text);
+                        }
+                    }
+
+                    attachments.Add(
+                            ChatMessageContentPart.CreateTextPart(
+                                sb.ToString())
+                        );
+                }
+                else
+                {
+                    throw new NotImplementedException($"Le type de contenu {attachment.ContentType} n'est pas supporté pour les pièces jointes.");
+                }
+            }
+        }
+
+        return new UserChatMessage(attachments);
+    }
+
+    private static bool IsImage(string contentType)
+    {
+        switch (contentType.ToLower())
+        {
+            case "image/png":
+            case "image/jpeg":
+            case "image/jpg":
+            case "image/gif":
+            case "image/bmp":
+            case "image/tiff":
+            case "image/webp":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private async Task<Conversation> GetOrCreateConversation(PostPrompt prompt, string defaultSystemPhrase, CancellationToken cancellationToken)
     {
         Conversation? conversation = null;
 
-        if (prompt.ConversationId == null)
+        if (prompt.ConversationId != null)
+        {
+            conversation = await _depot.Conversations.FindAsync([prompt.ConversationId], cancellationToken);
+
+            if (conversation != null)
+            {
+                conversation.LastMessageDate = DateTime.Now;
+            }
+        }
+        
+        if (conversation == null)
         {
             using var scope = HttpContext.RequestServices.CreateScope();
 
             conversation = new Conversation
             {
+                Id = prompt.ConversationId,
                 UserId = UsersUtils.GetUniqueName(scope, HttpContext.User),
                 CreatedOn = DateTime.Now,
                 LastMessageDate = DateTime.Now,
@@ -246,15 +386,6 @@ public class ErabliereAIController : ControllerBase
             _depot.Conversations.Add(conversation);
             await _depot.SaveChangesAsync(cancellationToken);
             prompt.ConversationId = conversation.Id;
-        }
-        else
-        {
-            conversation = await _depot.Conversations.FindAsync([prompt.ConversationId], cancellationToken);
-
-            if (conversation != null)
-            {
-                conversation.LastMessageDate = DateTime.Now;
-            }
         }
 
         return conversation;
@@ -329,23 +460,7 @@ public class ErabliereAIController : ControllerBase
             {
                 var images = await client.GenerateImageAsync(
                 request.Prompt,
-                new ImageGenerationOptions
-                {
-                    Quality = request.Quality == null ? GeneratedImageQuality.Standard : request.Quality switch
-                    {
-                        "Standard" => GeneratedImageQuality.Standard,
-                        "Hd" => GeneratedImageQuality.High,
-                        "High" => GeneratedImageQuality.High,
-                        _ => throw new ArgumentException("Invalid quality value")
-                    },
-                    Size = request.Size?.ToGeneratedImageSize(),
-                    Style = request.Style == null ? GeneratedImageStyle.Natural : request.Style switch
-                    {
-                        "Natural" => GeneratedImageStyle.Natural,
-                        "Vivid" => GeneratedImageStyle.Vivid,
-                        _ => throw new ArgumentException("Invalid style value")
-                    }
-                }, token);
+                GetImageGenerationOptions(request), token);
 
                 imagesResult.Add(images.Value);
             }
@@ -367,6 +482,27 @@ public class ErabliereAIController : ControllerBase
                 Url = ir.ImageUri.ToString()
             })]
         });
+    }
+
+    private static ImageGenerationOptions GetImageGenerationOptions(PostImagesGenerationModel request)
+    {
+        return new ImageGenerationOptions
+        {
+            Quality = request.Quality == null ? GeneratedImageQuality.Standard : request.Quality switch
+            {
+                "Standard" => GeneratedImageQuality.Standard,
+                "Hd" => GeneratedImageQuality.High,
+                "High" => GeneratedImageQuality.High,
+                _ => throw new ArgumentException("Invalid quality value")
+            },
+            Size = request.Size?.ToGeneratedImageSize(),
+            Style = request.Style == null ? GeneratedImageStyle.Natural : request.Style switch
+            {
+                "Natural" => GeneratedImageStyle.Natural,
+                "Vivid" => GeneratedImageStyle.Vivid,
+                _ => throw new ArgumentException("Invalid style value")
+            }
+        };
     }
 
     /// <summary>

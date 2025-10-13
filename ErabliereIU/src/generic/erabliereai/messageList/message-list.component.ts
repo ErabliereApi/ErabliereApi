@@ -17,7 +17,7 @@ import { marked } from 'marked';
               <div class="card mask-custom">
                 <div class="card-header d-flex justify-content-between p-3"
                   style="border-bottom: 1px solid rgba(255,255,255,.3); min-width: 250px;">
-                  <p class="fw-bold mb-0">{{ message.isUser ? "Vous" : "ErabliereAI" }}</p>
+                  <p class="fw-bold mb-0">{{ message.isUser ? isPublicDisplay ? "Utilisateur" : "Vous" : "ErabliereAI" }}</p>
                   <p class="text-light small mb-0"><ebutton class="ms-2 me-2" type="info" size="sm" (clicked)="convertToWord(message.content)">Exporter en .doc</ebutton><i class="far fa-clock"></i> {{ formatMessageDate(message.createdAt)}}</p>
               </div>
               <div class="card-body">
@@ -42,6 +42,7 @@ export class MessageListComponent implements OnInit, OnChanges {
     @Input() conversation?: Conversation;
     @Input() messages?: Message[];
     @Input() enableTranslation: boolean = false;
+    @Input() isPublicDisplay: boolean = false;
 
     constructor(private readonly api: ErabliereApi) { }
 

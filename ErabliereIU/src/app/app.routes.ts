@@ -28,6 +28,7 @@ import { TermeAndConditionComponent } from './app.termes-and-conditions.componen
 import { AppareilsComponent } from './client-view/appareil/appareils.component';
 import { AdminIpinfosComponent } from './admin-view/admin-ipinfos/admin-ipinfos.component';
 import { AdminConnectedPlatformComponent } from './admin-view/admin-conected-platform/admin-connected-platform.component';
+import { AiImagesComponent } from './ai-view/ai-images/ai-images.component';
 
 export const routes: Routes = [
     {
@@ -104,6 +105,10 @@ export const routes: Routes = [
             {
                 path: '',
                 component: ErabliereAiWindowComponent
+            },
+            {
+                path: 'images',
+                component: AiImagesComponent
             }
         ]
     },
