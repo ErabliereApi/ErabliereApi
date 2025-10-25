@@ -4,9 +4,15 @@
     <div class="alert alert-danger" role="alert">
         {{ error.error.errors.id ? error.error.errors.id[0] : error.message }}
     </div>
+    } @else if (!weatherData) {
+    <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+        <output class="spinner-border text-primary">
+            <span class="visually-hidden">Chargement des prévisions météo...</span>
+        </output>
+        <span class="ms-2">Chargement des prévisions météo...</span>
+    </div>
     } @else {
-    <span data-bs-toggle="tooltip" title="{{ weatherData?.headline?.category }}" data-bs-placement="top">{{ text
-        }}</span>
+    <span data-bs-toggle="tooltip" title="{{ weatherData.headline?.category ?? '' }}" data-bs-placement="top">{{ text }}</span>
     <div class="chart-wrapper">
         <canvas id="weatherChart" class="chart">
         </canvas>
