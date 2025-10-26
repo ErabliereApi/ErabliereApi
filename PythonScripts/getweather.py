@@ -1,5 +1,4 @@
 from proxy.erabliere_api_proxy import ErabliereApiProxy
-from utils.redacted import redacted
 import requests
 import os
 import sys
@@ -14,10 +13,15 @@ if os.path.isfile(apiKeyFilePath):
     with open(apiKeyFilePath, 'r') as f:
         apiKey = f.read()
 
-url = "http://dataservice.accuweather.com/currentconditions/v1/" + locationKey + "?apikey=" + apiKey + "&language=fr"
+url = "https://dataservice.accuweather.com/forecasts/v1/daily/5day/" + locationKey + "?language=fr"
 
-print("Requesting " + redacted(url, [apiKey]))
-response = requests.get(url)
+print("Requesting " + url)
+# Send the request to AccuWeather
+authorizeHeader = "Bearer " + apiKey
+headers = {
+    "Authorization": authorizeHeader
+}
+response = requests.get(url, headers=headers)
 print(response.status_code)
 
 # Parse the json
