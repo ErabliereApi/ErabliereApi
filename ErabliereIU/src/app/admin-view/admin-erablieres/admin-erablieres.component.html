@@ -25,4 +25,10 @@
             (erabliereAModifier)="demarrerModifierErabliere($event)"
         ></erabliere-list>
     </div>
+    <div>
+      <app-pagination
+        [nombreParPage]="top"
+        [nombreElements]="totalErabliere"
+        (changementDePageEvent)="onPageChange($event)" />
+    </div>
 </div>

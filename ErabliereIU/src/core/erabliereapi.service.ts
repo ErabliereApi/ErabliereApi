@@ -88,9 +88,9 @@ export class ErabliereApi {
         return rtn ?? [];
     }
 
-    async getErablieresAdminExpandAccess(search?: string, top?: number, skip?: number): Promise<Erabliere[]> {
+    async getErablieresAdminExpandAccess(search?: string, top?: number, skip?: number) {
         const headers = await this.getHeaders();
-        let url = this._environmentService.apiUrl + '/admin/erablieres?$expand=customerErablieres';
+        let url = this._environmentService.apiUrl + '/admin/erablieres?$count=true&$expand=customerErablieres';
         if (top) {
             url += "&$top=" + top;
         }
@@ -100,8 +100,11 @@ export class ErabliereApi {
         if (search) {
             url += "&$filter=contains(nom, '" + search + "') or contains(codePostal, '" + search + "')";
         }
-        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(url, { headers: headers }));
-        return rtn ?? [];
+        const rtn = await firstValueFrom(this._httpClient.get<Erabliere[]>(url, { headers: headers, observe: 'response' }));
+        return {
+            items: rtn.body ?? [],
+            count: Number.parseInt(rtn.headers.get('x-odatacount') ?? '0')
+        }
     }
 
     async getErablieresExpandCapteurs(my: boolean): Promise<Erabliere[]> {
@@ -114,12 +117,12 @@ export class ErabliereApi {
 
     async putErabliere(erabliere: Erabliere): Promise<void> {
         const headers = await this.getHeaders();
-        return await firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/erablieres/' + erabliere.id, erabliere, { headers: headers }));
+        await firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/erablieres/' + erabliere.id, erabliere, { headers: headers }));
     }
 
     async putErabliereAdmin(erabliere: Erabliere): Promise<void> {
         const headers = await this.getHeaders();
-        return await firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/Admin/Erablieres/' + erabliere.id, erabliere, { headers: headers }));
+        await firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/Admin/Erablieres/' + erabliere.id, erabliere, { headers: headers }));
     }
 
     async getAlertes(idErabliereSelectionnee: any): Promise<Alerte[]> {
@@ -390,10 +393,14 @@ export class ErabliereApi {
         return rtn ?? [];
     }
 
-    async getCustomersAdminExpandAccess(): Promise<Customer[]> {
+    async getCustomersAdminExpandAccess(page: number, pageSize: number) {
         const headers = await this.getHeaders();
-        const rtn = firstValueFrom(this._httpClient.get<Customer[]>(this._environmentService.apiUrl + '/admin/customers' + '?$expand=customerErablieres', { headers: headers }));
-        return rtn ?? [];
+        const query = `?$skip=${(page - 1) * pageSize}&$top=${pageSize}&$expand=customerErablieres&$count=true`;
+        const rtn = await firstValueFrom(this._httpClient.get<Customer[]>(this._environmentService.apiUrl + '/admin/customers' + query, { headers: headers, observe: 'response' }));
+        return {
+            items: rtn.body ?? [],
+            count: Number.parseInt(rtn.headers.get('x-odatacount') ?? '0')
+        }
     }
 
     async putCustomer(idCustomer: string, customer: Customer): Promise<any> {

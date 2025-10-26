@@ -58,7 +58,8 @@ export class CapteurListComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if(changes['capteurs']) {
-            this.capteurs.forEach((capteur, key) => {
+            let key = 0;
+            for (const capteur of this.capteurs) {
                 this.formArrayIdToKey.set(capteur.id ?? '', key);
                 const capteurFormGroup = this.fb.group({
                     indice: new FormControl(
@@ -98,7 +99,8 @@ export class CapteurListComponent implements OnChanges {
                 });
                 this.getCapteurs().push(capteurFormGroup);
                 this.displayEdits[capteur.id ?? ''] = false;
-            });
+                key++;
+            }
         }
     }
 
@@ -130,9 +132,7 @@ export class CapteurListComponent implements OnChanges {
     }
 
     modifierCapteur(capteur: Capteur) {
-        if (!capteur.id) {
-            console.error("capteur.id is undefined in modifierCapteur()");
-        } else {
+        if (capteur.id) {
             const formCapteur = this.getCapteur(capteur.id);
             this.validateForm(capteur.id);
             if (formCapteur.valid) {
@@ -161,6 +161,8 @@ export class CapteurListComponent implements OnChanges {
                     alert('Erreur lors de la modification du capteur');
                 });
             }
+        } else {
+            console.error("capteur.id is undefined in modifierCapteur()");
         }
     }
 

@@ -8,12 +8,14 @@
             <div class="modal-body">
                 <ng-content></ng-content>
             </div>
+            @if (displayFooter && !error) {
             <div class="modal-footer">
                 @if (error) {
-                    <div class="alert alert-danger" style="width: 100%;">{{error}}</div>
+                <div class="alert alert-danger" style="width: 100%;">{{error}}</div>
                 }
                 <ebutton type="secondary" (clicked)="closeModalFn()" tooltip="Fermer la modal">Fermer</ebutton>
             </div>
+            }
         </div>
     </div>
 </div>

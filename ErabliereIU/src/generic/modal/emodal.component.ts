@@ -12,6 +12,7 @@ export class EModalComponent {
     @Input() title: string = "";
     @Output() closeModal = new EventEmitter<boolean>();
     @Input() error?: string;
+    @Input() displayFooter: boolean = true;
 
     closeModalFn() {
         this.closeModal.emit(true);

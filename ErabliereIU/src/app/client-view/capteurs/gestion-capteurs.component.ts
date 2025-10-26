@@ -6,11 +6,18 @@ import { AjouterCapteurComponent } from "./ajouter-capteur.component";
 import { AjouterCapteurImageComponent } from "./images/ajouter-capteur-image.component";
 import { CapteurImage } from "src/model/capteurImage";
 import { CapteurImageListComponent } from "./images/capteur-image-list.component";
+import { EModalComponent } from "src/generic/modal/emodal.component";
 
 @Component({
     selector: 'gestion-capteurs',
     templateUrl: 'gestion-capteurs.component.html',
-    imports: [AjouterCapteurComponent, CapteurListComponent, AjouterCapteurImageComponent, CapteurImageListComponent]
+    imports: [
+        AjouterCapteurComponent, 
+        CapteurListComponent, 
+        AjouterCapteurImageComponent, 
+        CapteurImageListComponent,
+        EModalComponent
+    ]
 })
 export class GestionCapteursComponent implements OnChanges {
     @Input() idErabliereSelectionee?: any;
@@ -20,13 +27,13 @@ export class GestionCapteursComponent implements OnChanges {
     afficherSectionAjouterCapteurImage: boolean = false;
 
     constructor(
-        private _api: ErabliereApi) {
+        private readonly _api: ErabliereApi) {
     }
 
-    async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    ngOnChanges(changes: SimpleChanges) {
         if (changes.idErabliereSelectionee) {
-            await this.getCapteurs();
-            await this.getCapteursImage();
+            this.getCapteurs();
+            this.getCapteursImage();
         }
     }
 

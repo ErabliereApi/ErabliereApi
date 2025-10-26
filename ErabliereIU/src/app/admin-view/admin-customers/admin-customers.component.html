@@ -14,4 +14,10 @@
           (customerAModifier)="demarrerModifierCustomer($event)"
         ></customer-list>
     </div>
+    <div>
+      <app-pagination
+        [nombreParPage]="pageSize"
+        [nombreElements]="totalItems"
+        (changementDePageEvent)="onPageChange($event)" />
+    </div>
 </div>

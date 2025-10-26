@@ -3,11 +3,13 @@
 
 <div>
 @if(afficherSectionAjouterCapteur) {
-    <ajouter-capteur
-        [idErabliere]="idErabliereSelectionee"
-        (hideAjouterCapteur)="hideAjouterCapteur()"
-        (shouldReloadCapteurs)="getCapteurs()"
-    />
+    <emodal (closeModal)="hideAjouterCapteur()" title="Ajouter un capteur" [displayFooter]="false">
+        <ajouter-capteur
+            [idErabliere]="idErabliereSelectionee"
+            (hideAjouterCapteur)="hideAjouterCapteur()"
+            (shouldReloadCapteurs)="getCapteurs()"
+        />
+    </emodal>
 } @else {
     <button
         type="button"

@@ -3,12 +3,14 @@ import { Erabliere } from "src/model/erabliere";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { ErabliereListComponent } from "./erabliere-list/erabliere-list.component";
 import { ModifierErabliereComponent } from './modifier-erabliere/modifier-erabliere.component';
+import { PaginationComponent } from 'src/generic/pagination/pagination.component';
 
 @Component({
     selector: 'admin-erablieres',
     imports: [
         ErabliereListComponent,
-        ModifierErabliereComponent
+        ModifierErabliereComponent,
+        PaginationComponent
     ],
     templateUrl: './admin-erablieres.component.html'
 })
@@ -28,7 +30,8 @@ export class AdminErablieresComponent implements OnInit {
 
     chargerErablieres() {
         this._api.getErablieresAdminExpandAccess(this.search, this.top, this.skip).then(erablieres => {
-            this.erablieres = erablieres;
+            this.erablieres = erablieres.items;
+            this.totalErabliere = erablieres.count ?? 0;
         }).catch(error => {
             this.erablieres = [];
             throw error;
@@ -57,6 +60,11 @@ export class AdminErablieresComponent implements OnInit {
 
     rechercher($event: any) {
         this.search = $event.target.value;
+        this.chargerErablieres();
+    }
+
+    onPageChange($event: number) {
+        this.skip = $event * this.top;
         this.chargerErablieres();
     }
 }
