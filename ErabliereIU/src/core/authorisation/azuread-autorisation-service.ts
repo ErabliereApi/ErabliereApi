@@ -113,8 +113,8 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
         this.completeLogin();
       }
       return authResult?.accessToken ?? null;
-    }).catch(reason => {
-      console.log(reason);
+    }).catch(error_ => {
+      console.log(error_);
       this._isLoggedIn = false;
       this._msalInstance.instance.setActiveAccount(null);
       this._loginChangedSubject.next(false);
@@ -159,15 +159,15 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
   getUserInfo(): Promise<AppUser> {
     const user = this.getUser();
 
-    if (user != null) {
+    if (user == null) {
+      return Promise.reject(new Error("User not logged in"));
+    } else {
       return Promise.resolve({
         id: user.localAccountId ?? null,
         name: user.name ?? null,
         email: user.username ?? null,
         roles: user.idTokenClaims?.roles ?? []
       } as AppUser);
-    } else {
-      return Promise.reject(new Error("User not logged in"));
     }
   }
 }
