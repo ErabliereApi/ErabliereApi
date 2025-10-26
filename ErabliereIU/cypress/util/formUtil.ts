@@ -1,4 +1,7 @@
 export class FormUtil {
+    static selectValueFromDropdown(selector: string, value: string) {
+        cy.get(selector).select(value);
+    }
     static typeTextBaseOnName(text: string, selector: string, name: string, timeout: number = 10000): void {
         cy.get(selector, { timeout: timeout }).then(element => {
             cy.wrap(element)

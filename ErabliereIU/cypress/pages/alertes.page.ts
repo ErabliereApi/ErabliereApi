@@ -8,6 +8,10 @@ export class AlertesPage {
         FormUtil.clickButton("alerte-page", "ajouter-alerte-btn");
         return this;
     }
+    selectAlerteTrioDonnees(): this {
+        FormUtil.selectValueFromDropdown("select[id=typeAlerteSelect]", "1");
+        return this;
+    }
     typeEmail(email: string): this {
         FormUtil.typeTextBaseOnName(email, "alerte-page", "destinataireCourriel");
         return this;

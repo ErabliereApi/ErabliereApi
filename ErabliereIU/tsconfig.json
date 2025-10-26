@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
@@ -23,7 +22,8 @@
     ],
     "useDefineForClassFields": true,
     "paths": {
-      "chart.js/dist/types/utils": ["node_modules/chart.js/dist/types/utils.d.ts"]
+      "chart.js/dist/types/utils": ["./node_modules/chart.js/dist/types/utils.d.ts"],
+      "*": ["./*"]
     }
   },
   "angularCompilerOptions": {
