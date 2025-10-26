@@ -1,4 +1,4 @@
-import { FormUtil } from "cypress/util/formUtil"
+import { FormUtil } from "../util/formUtil"
 
 export class AlertesPage {
     getPageTitle(): Cypress.Chainable<JQuery<HTMLElement>> {

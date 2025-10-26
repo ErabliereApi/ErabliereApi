@@ -1,4 +1,4 @@
-import { MapPage } from "cypress/pages/map.page";
+import { MapPage } from "../pages/map.page";
 
 describe("Map page", { testIsolation: false }, () => {
     const mapPage = new MapPage();

@@ -1,4 +1,4 @@
-import { FixtureUtil } from 'cypress/util/fixtureUtil';
+import { FixtureUtil } from '../util/fixtureUtil';
 import { HomePage } from '../pages/home.page';
 
 describe('Alerte functionnality', { testIsolation: false }, () => {
@@ -20,7 +20,7 @@ describe('Alerte functionnality', { testIsolation: false }, () => {
                   .typeEmail(email)
                   .clickOnCreateButton();
 
-        cy.wait(10000);
+        cy.wait(8000);
 
         alertePage.getLastAlerteDonneesEmail().should('have.text', email);
     });

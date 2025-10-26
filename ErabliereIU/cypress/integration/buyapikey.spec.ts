@@ -1,4 +1,4 @@
-import { HomePage } from "cypress/pages/home.page";
+import { HomePage } from "../pages/home.page";
 
 describe('Buy an api key', function () {
     const homePage = new HomePage();

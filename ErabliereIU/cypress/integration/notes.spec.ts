@@ -1,5 +1,5 @@
-import { HomePage } from "cypress/pages/home.page";
-import { NotesPage } from "cypress/pages/notes.page";
+import { HomePage } from "../pages/home.page";
+import { NotesPage } from "../pages/notes.page";
 
 describe("Notes page", { testIsolation: false }, () => {
     const homePage = new HomePage();
@@ -60,8 +60,8 @@ describe("Notes page", { testIsolation: false }, () => {
         notesPage.getNoteTitle().should('have.text', title);
         notesPage.getNoteDescription().should('have.text', `${content}\n`);
     });
-
-    function pad2(number: number) {
-        return (number < 10 ? '0' : '') + number;
-    }
 });
+
+function pad2(number: number) {
+    return (number < 10 ? '0' : '') + number;
+}
