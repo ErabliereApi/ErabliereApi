@@ -23,8 +23,8 @@ on:
     branches: [ master ]
     paths:
       - Infrastructure/**
-  schedule:
-    - cron: '37 3 * * 2'
+  # schedule:
+  #   - cron: '37 3 * * 2'
 
 jobs:
   snyk:
@@ -41,6 +41,7 @@ jobs:
           # More details in https://github.com/snyk/actions#getting-your-snyk-token
           # or you can signup for free at https://snyk.io/login
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
         with:
           # Scan the whole repository
           file: Infrastructure/.
