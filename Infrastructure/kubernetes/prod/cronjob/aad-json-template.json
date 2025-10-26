@@ -1,9 +1,0 @@
-[
-    {
-        "TenantId": "<tenantId>",
-        "ClientId": "<clientId>",
-        "ClientSecret": "<clientSecret>",
-        "Authority": "https://login.microsoftonline.com",
-        "Scopes": "api://<api-clientId>/.default"
-    }
-]
