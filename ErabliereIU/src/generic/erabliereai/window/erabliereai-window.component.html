@@ -115,9 +115,9 @@
 
 
           <div class="form-outline form-white">
-            <textarea class="form-control" id="textAreaExample3" rows="4"
+            <textarea class="form-control" id="textAreaMessage" rows="4"
               (change)="updateNewMessage($event)"></textarea>
-            <label class="form-label text-white" for="textAreaExample3">Message</label>
+            <label class="form-label text-white" for="textAreaMessage">Message</label>
           </div>
 
           <div class="row">
@@ -144,8 +144,8 @@
             </div>
             @if (chatConfig) {
             <div class="form-outline form-white">
-              <label class="form-label text-white" for="textAreaExample3">Phrase système</label>
-              <textarea class="form-control" id="textAreaExample3" rows="4" (change)="updateChatConfig($event)"
+              <label class="form-label text-white" for="textAreaSystemPhrase">Phrase système</label>
+              <textarea class="form-control" id="textAreaSystemPhrase" rows="4" (change)="updateChatConfig($event)"
                 [value]="currentSystemPhrase">
                 </textarea>
               <!-- Ajouter un bouton pour remettre la phrase par défaut -->

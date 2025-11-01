@@ -4,28 +4,22 @@
             <form class="row g-3 mb-2">
                 <div class="col-md-2">
                     <label for="publicFilter" class="form-label">Publique:</label>
-                    <select class="form-select" id="publicFilter" (change)="updatePublicFilter($event)" name="publicFilter">
+                    <select class="form-select" id="publicFilter" (change)="updatePublicFilter($event)"
+                        name="publicFilter">
                         <option value="yes">Oui</option>
                         <option value="no">Non</option>
                     </select>
                 </div>
-                @if (isAuthenticated && authEnable) {
-                    <div class="col-md-2">
-                        <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
-                        <select class="form-select" id="myErablieresFilter" (change)="updateMyFilter($event)" name="myErablieresFilter">
-                            <option value="yes">Oui</option>
-                            <option value="no">Non</option>
-                        </select>
-                    </div>
-                }
-                @else {
-                    <div class="col-md-2">
-                        <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
-                        <select class="form-select" id="myErablieresFilter" name="myErablieresFilter" disabled>
-                            <option value="no">Non</option>
-                        </select>
-                    </div>
-                }
+                <div class="col-md-2">
+                    <label for="myErablieresFilter" class="form-label">Mes érablières:</label>
+                    <select class="form-select" id="myErablieresFilter" (change)="updateMyFilter($event)"
+                        name="myErablieresFilter" disabled="{{!(isAuthenticated && authEnable)}}">
+                        @if (isAuthenticated && authEnable) {
+                        <option value="yes">Oui</option>
+                        }
+                        <option value="no">Non</option>
+                    </select>
+                </div>
                 <div class="col-md-4">
                     <label for="sensorFilter" class="form-label">Filtre capteurs:</label>
                     <input type="text" class="form-control" id="sensorFilter" [(ngModel)]="sensorFilter"
@@ -38,8 +32,8 @@
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100" (click)="applyFilters()">Appliquer les filtres
-                        @if (loadingInProgress) { 
-                            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        @if (loadingInProgress) {
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
                         }
                     </button>
                 </div>
