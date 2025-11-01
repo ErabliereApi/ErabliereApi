@@ -17,7 +17,8 @@ namespace ErabliereApi.Test;
 
 public class ValiderIPRulesAttributeTest
 {
-    public static ActionExecutionDelegate ExecutionDelegate => new(() => Task.FromResult<ActionExecutedContext>(default));
+    public static ActionExecutionDelegate ExecutionDelegate => new(() => 
+        Task.FromResult<ActionExecutedContext>(default));
 
     [Theory, AutoApiData]
     public void ValiderIPRulesAttributes_SetOrder_OrderIsSet(int order)
@@ -28,9 +29,10 @@ public class ValiderIPRulesAttributeTest
     }
 
     [Theory, AutoApiData]
-    public async Task OnActionExecuting_AucuneAdresseIp_InvalidOperationException(ValiderIPRulesAttribute attribute,
-                                                                                ActionExecutingContext context,
-                                                                                ErabliereDbContext dbContext)
+    public async Task OnActionExecuting_AucuneAdresseIp_InvalidOperationException(
+        ValiderIPRulesAttribute attribute,
+        ActionExecutingContext context,
+        ErabliereDbContext dbContext)
     {
         var erabliere = dbContext.Erabliere.First();
         context.ActionArguments["id"] = erabliere.Id;
@@ -42,10 +44,11 @@ public class ValiderIPRulesAttributeTest
     }
 
     [Theory, AutoApiData]
-    public async Task OnActionExecuting_SelfHostedInvalidIP_ValidationCOnfigAutofixture(ValiderIPRulesAttribute attribute,
-                                                                                ActionExecutingContext context,
-                                                                                ErabliereDbContext dbContext,
-                                                                                IFixture fixture)
+    public async Task OnActionExecuting_SelfHostedInvalidIP_ValidationCOnfigAutofixture(
+        ValiderIPRulesAttribute attribute,
+        ActionExecutingContext context,
+        ErabliereDbContext dbContext,
+        IFixture fixture)
     {
         var erabliere = dbContext.Erabliere.First();
         context.ActionArguments["id"] = erabliere.Id;
@@ -57,10 +60,11 @@ public class ValiderIPRulesAttributeTest
     }
 
     [Theory, AutoApiData]
-    public async Task OnActionExecuting_ExecutionDeriereReverseProxy_ValidationCOnfigAutofixture(ValiderIPRulesAttribute attribute,
-                                                                                           ActionExecutingContext context,
-                                                                                           ErabliereDbContext dbContext,
-                                                                                           IPAddress adresse)
+    public async Task OnActionExecuting_ExecutionDeriereReverseProxy_ValidationCOnfigAutofixture(
+        ValiderIPRulesAttribute attribute,
+        ActionExecutingContext context,
+        ErabliereDbContext dbContext,
+        IPAddress adresse)
     {
         var erabliere = dbContext.Erabliere.First();
         context.ActionArguments["id"] = erabliere.Id;
@@ -73,10 +77,11 @@ public class ValiderIPRulesAttributeTest
     }
 
     [Theory, AutoApiData]
-    public async Task OnActionExecuting_ExecutionDeriereReverseProxyPlusieursREALIP_ValidationCOnfigAutofixture(ValiderIPRulesAttribute attribute,
-                                                                                                          ActionExecutingContext context,
-                                                                                                          ErabliereDbContext dbContext,
-                                                                                                          List<IPAddress> adresses)
+    public async Task OnActionExecuting_ExecutionDeriereReverseProxyPlusieursREALIP_ValidationCOnfigAutofixture(
+        ValiderIPRulesAttribute attribute,
+        ActionExecutingContext context,
+        ErabliereDbContext dbContext,
+        List<IPAddress> adresses)
     {
         var erabliere = dbContext.Erabliere.First();
         context.ActionArguments["id"] = erabliere.Id;
@@ -86,7 +91,9 @@ public class ValiderIPRulesAttributeTest
         await attribute.OnActionExecutionAsync(context, ExecutionDelegate);
 
         context.ModelState.ErrorCount.ShouldBe(1);
-        context.ModelState["X-Real-IP"].Errors.Single().ErrorMessage.ShouldBe("Une seule entête 'X-Real-IP' doit être trouvé dans la requête.");
+        var xrealIpError = context.ModelState["X-Real-IP"];
+        xrealIpError.ShouldNotBeNull();
+        xrealIpError.Errors.Single().ErrorMessage.ShouldBe("Une seule entête 'X-Real-IP' doit être trouvé dans la requête.");
     }
 
     [Theory, AutoApiData]
@@ -96,6 +103,10 @@ public class ValiderIPRulesAttributeTest
         ErabliereDbContext dbContext)
     {
         var erabliere = dbContext.Erabliere.First();
+        if (erabliere.IpRule == null)
+        {
+            throw new InvalidOperationException("L'érablière de test doit avoir une IpRule valide.");
+        }
         context.ActionArguments["id"] = erabliere.Id;
         context.HttpContext.Connection.RemoteIpAddress = new IPAddress(erabliere.IpRule.Split('.').Select(b => byte.Parse(b)).ToArray());
 
@@ -105,7 +116,7 @@ public class ValiderIPRulesAttributeTest
     }
 
     [Theory, AutoApiData]
-    public async Task OnActionExecuting_ExecutionDeriereReverseREALIPIdentique_ValidationCOnfigAutofixture(
+    public async Task OnActionExecuting_ExecutionDeriereReverseREALIPIdentique_ValidationConfigAutofixture(
         ValiderIPRulesAttribute attribute,
         ActionExecutingContext context,
         ErabliereDbContext dbContext)

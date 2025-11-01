@@ -9,7 +9,7 @@ public class HttpContextExtensionTest
     [Theory]
     [InlineData(null, "")]
     [InlineData("127.0.0.1", "127.0.0.1")]
-    public void GetClientIp_ShouldReturn_WhenNoXForwardedForHeader(string ipInContext, string expectedValue)
+    public void GetClientIp_ShouldReturn_WhenNoXForwardedForHeader(string? ipInContext, string expectedValue)
     {
         // Arrange
         var context = new DefaultHttpContext();

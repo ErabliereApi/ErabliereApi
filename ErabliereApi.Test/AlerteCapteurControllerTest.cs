@@ -23,6 +23,7 @@ public class AlerteCapteurControllerTest
     {
         var erabliere = context.Erabliere.GetRandom();
 
+        Assert.NotNull(erabliere.Id);
         var response = await controller.ListerAlerteCapteurErabliere(
             erabliere.Id.Value,
             additionnalProperties: true,
@@ -32,8 +33,10 @@ public class AlerteCapteurControllerTest
 
         var alerteCapteurs = Assert.IsType<GetAlerteCapteur[]>(response);
 
-        Assert.NotNull(alerteCapteurs[0].Capteur);
-        Assert.NotEmpty(alerteCapteurs[0].Capteur.Symbole);
+        var capteur = alerteCapteurs[0].Capteur;
+        Assert.NotNull(capteur);
+        Assert.NotNull(capteur.Symbole);
+        Assert.NotEmpty(capteur.Symbole);
     }
 
     [Theory, AutoApiData]
@@ -42,6 +45,11 @@ public class AlerteCapteurControllerTest
     {
         var alerteCapteur = context.AlerteCapteurs.GetRandom();
 
+        Assert.NotNull(alerteCapteur.IdCapteur);
+        Assert.NotNull(alerteCapteur.EnvoyerA);
+        Assert.NotNull(alerteCapteur.TexterA);
+        Assert.NotNull(alerteCapteur.MaxValue);
+        Assert.NotNull(alerteCapteur.MinValue);
         Assert.Single(alerteCapteur.EnvoyerA.Split(';'));
         Assert.Single(alerteCapteur.TexterA.Split(';'));
 

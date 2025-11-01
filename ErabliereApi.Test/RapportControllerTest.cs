@@ -18,6 +18,7 @@ public class RapportControllerTest
     {
         var erabliere = context.Erabliere.GetRandom();
 
+        Assert.NotNull(erabliere.Id);
         var response = controller.GetSaveReports(
             erabliere.Id.Value
         );
@@ -31,8 +32,12 @@ public class RapportControllerTest
     [Theory, AutoApiData]
     public async Task CreateRapportSurCapteur(RapportsController controller, ErabliereDbContext context)
     {
+#nullable disable
         var erabliere = context.Erabliere.Include(e => e.Capteurs).Where(e => e.Capteurs.Count > 0 && e.Capteurs.Any(c => c.DonneesCapteur.Count > 0)).GetRandom();
-        
+#nullable enable
+
+        Assert.NotNull(erabliere.Id);
+        Assert.NotNull(erabliere.Capteurs);
         var response = await controller.RapportDegreeJour(
             erabliere.Id.Value,
             new Donnees.Action.Post.PostRapportDegreeJourRequest
@@ -62,8 +67,11 @@ public class RapportControllerTest
     [Theory, AutoApiData]
     public async Task CreateRapportSurTrioDonnees(RapportsController controller, ErabliereDbContext context)
     {
+#nullable disable
         var erabliere = context.Erabliere.Include(e => e.Capteurs).Where(e => e.Capteurs.Count > 0 && e.Capteurs.Any(c => c.DonneesCapteur.Count > 0)).GetRandom();
+#nullable enable
 
+        Assert.NotNull(erabliere.Id);
         var response = await controller.RapportDegreeJour(
             erabliere.Id.Value,
             new Donnees.Action.Post.PostRapportDegreeJourRequest

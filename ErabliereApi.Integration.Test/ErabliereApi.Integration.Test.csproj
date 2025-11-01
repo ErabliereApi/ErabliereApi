@@ -26,6 +26,9 @@
     <Folder Include="StripeWebhookJson\StripeWebhookTest\NominalFlow\" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="NmapXml\Basic.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="StripeWebhookJson\StripeWebhookTest\NominalFlow\checkout.session.completed.body.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

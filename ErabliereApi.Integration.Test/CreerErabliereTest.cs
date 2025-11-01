@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ public class CreerErabliereTest : IClassFixture<StripeEnabledApplicationFactory<
         // EA: ErabliereAnnonyme
         string nomErabliere = $"EA-{Guid.NewGuid()}";
 
-        using var content = new StringContent(JsonSerializer.Serialize(new PostErabliere
+        var response = await client.PostAsJsonAsync("/Erablieres", new PostErabliere
         {
             Nom = nomErabliere,
             AfficherSectionBaril = true,
@@ -49,10 +50,8 @@ public class CreerErabliereTest : IClassFixture<StripeEnabledApplicationFactory<
             AfficherTrioDonnees = true,
             IndiceOrdre = 0,
             IpRules = "-",
-            IsPublic= true,
-        }), Encoding.UTF8, "application/json");
-
-        var response = await client.PostAsync("/Erablieres", content);
+            IsPublic = true,
+        });
 
         response.StatusCode
             .ShouldBe(HttpStatusCode.OK,

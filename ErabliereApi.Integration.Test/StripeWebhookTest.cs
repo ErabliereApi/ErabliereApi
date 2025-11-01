@@ -125,7 +125,7 @@ public class StripeWebhookTest : IClassFixture<StripeEnabledApplicationFactory<S
             await response.Content.ReadAsStringAsync());
     }
 
-    public static string GetBody(string step)
+    private static string GetBody(string step)
     {
         return File.ReadAllText(Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
@@ -133,15 +133,5 @@ public class StripeWebhookTest : IClassFixture<StripeEnabledApplicationFactory<S
             "StripeWebhookTest",
             "NominalFlow",
             step + ".body.json"));
-    }
-
-    public static string GetEvent(string step)
-    {
-        return File.ReadAllText(Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "StripeWebhookJson",
-            "StripeWebhookTest",
-            "NominalFlow",
-            step + ".json"));
     }
 }

@@ -18,9 +18,12 @@ public class DonnesCapteurV2Test
     public async Task GetDonnesCapteurs(
         DonneesCapteurV2Controller controller, ErabliereDbContext context)
     {
+#nullable disable
         var erabliere = context.Erabliere.Include(e => e.Capteurs).ThenInclude(c => c.DonneesCapteur).Where(e => e.Capteurs.Count > 0 && e.Capteurs.Any(c => c.DonneesCapteur.Count > 0)).GetRandom();
         var capteur = erabliere.Capteurs.First(c => c.DonneesCapteur.Count > 0);
-        
+#nullable enable
+
+        Assert.NotNull(capteur.Id);
         var response = await controller.Lister(
             capteur.Id.Value,
             ddr: null,
