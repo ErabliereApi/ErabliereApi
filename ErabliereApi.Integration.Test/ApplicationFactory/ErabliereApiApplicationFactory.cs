@@ -19,7 +19,8 @@ public class ErabliereApiApplicationFactory<TStartup> : WebApplicationFactory<TS
             { "Stripe.ApiKey", "" },
             { "StripeUsageReccord.SkipRecord", "true" },
             { "ErabliereApiUserService.TestMode", "true" },
-            { "USE_SQL", "false" }
+            { "USE_SQL", "false" },
+            { "IpInfoApi:DBFilePath", "" },
         };
 
         var configuration = new ConfigurationBuilder()

@@ -90,9 +90,10 @@ public class ValiderIPRulesAttributeTest
     }
 
     [Theory, AutoApiData]
-    public async Task OnActionExecuting_ExecutionNominale_ValidationCOnfigAutofixture(ValiderIPRulesAttribute attribute,
-                                                                                ActionExecutingContext context,
-                                                                                ErabliereDbContext dbContext)
+    public async Task OnActionExecuting_ExecutionNominale_ValidationCOnfigAutofixture(
+        ValiderIPRulesAttribute attribute,
+        ActionExecutingContext context,
+        ErabliereDbContext dbContext)
     {
         var erabliere = dbContext.Erabliere.First();
         context.ActionArguments["id"] = erabliere.Id;
@@ -104,9 +105,10 @@ public class ValiderIPRulesAttributeTest
     }
 
     [Theory, AutoApiData]
-    public async Task OnActionExecuting_ExecutionDeriereReverseREALIPIdentique_ValidationCOnfigAutofixture(ValiderIPRulesAttribute attribute,
-                                                                                                          ActionExecutingContext context,
-                                                                                                          ErabliereDbContext dbContext)
+    public async Task OnActionExecuting_ExecutionDeriereReverseREALIPIdentique_ValidationCOnfigAutofixture(
+        ValiderIPRulesAttribute attribute,
+        ActionExecutingContext context,
+        ErabliereDbContext dbContext)
     {
         var erabliere = dbContext.Erabliere.First();
         context.ActionArguments["id"] = erabliere.Id;
@@ -117,6 +119,4 @@ public class ValiderIPRulesAttributeTest
 
         context.ModelState.ErrorCount.ShouldBe(0);
     }
-
-    // TODO : Ajouter des tests pour le cas ou il y a plusieurs ip séparé par des ';'
 }

@@ -28,12 +28,13 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
     {
         base.ConfigureWebHost(builder);
 
-        var config = new Dictionary<string, string>
+        var config = new Dictionary<string, string?>
         {
             { "Stripe.ApiKey", "abcd" },
             { "StripeUsageReccord.SkipRecord", "true" },
             { "ErabliereApiUserService.TestMode", "true" },
-            { "USE_SQL", "false" }
+            { "USE_SQL", "false" },
+            { "IpInfoApi:DBFilePath", "" },
         };
 
         var configuration = new ConfigurationBuilder()
@@ -82,12 +83,8 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
                     {
                         var json = JsonDocument.Parse(callInfo.Args()[0] as string ?? "");
 
-                        var eventDeserialized = EventUtility.ParseEvent(json.RootElement.ToString());
-
-                        if (eventDeserialized is null)
-                        {
-                            throw new ArgumentNullException(nameof(eventDeserialized));
-                        }
+                        var eventDeserialized = EventUtility.ParseEvent(json.RootElement.ToString())
+                            ?? throw new InvalidOperationException("Event deserialization failed");
 
                         await StripeCheckoutService.WebHookSwitchCaseLogic(
                             eventDeserialized,
@@ -137,7 +134,7 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
             CustomerId = customer.Id.Value
         });
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return (customer, key);
     }
