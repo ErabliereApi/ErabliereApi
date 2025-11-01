@@ -67,3 +67,13 @@ Le projet possède des tests Cypress. Pour les executer:
 ```
 npx cypress run
 ```
+
+## Analyser la taille des bundles
+
+```
+npm build
+```
+
+Aller à l'adresse https://esbuild.github.io/analyze/
+
+Sélectionner le fichier "stats.json" dans le dossier "dist/erabliere-iu"
