@@ -6,6 +6,7 @@ using ErabliereApi.Services.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 
 namespace ErabliereApi.Authorization.Customers;
 
@@ -187,10 +188,10 @@ public class EnsureCustomerExist : IMiddleware
         try
         {
             var _notificationService = context.RequestServices.GetRequiredService<NotificationService>();
-            var _emailConfig = context.RequestServices.GetRequiredService<EmailConfig>();
+            var _emailConfig = context.RequestServices.GetRequiredService<IOptions<EmailConfig>>().Value;
 
             await _notificationService.SendNotificationAsync(
-                $"{customer.Name} Bienvenue dans l'application ErabliereApi !",
+                $"{customer.Name} bienvenue dans l'application ErabliereApi !",
                 customer.Email,
                 NotificationType.Email,
                 context.RequestAborted

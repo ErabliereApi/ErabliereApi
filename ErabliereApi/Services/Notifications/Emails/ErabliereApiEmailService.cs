@@ -37,7 +37,7 @@ public class ErabliereApiEmailService : IEmailService
     }
 
     /// <inheritdoc />
-    public async Task SendEmailAsync(MimeMessage message, CancellationToken token)
+    public async Task SendEmailAsync(MimeMessage mimeMessage, CancellationToken token)
     {
         if (!_smtpClient.IsConnected)
         {
@@ -53,12 +53,12 @@ public class ErabliereApiEmailService : IEmailService
             await _smtpClient.AuthenticateAsync(_config.Email, _config.Password, token);
         }
 
-        await _smtpClient.SendAsync(message, token);
+        await _smtpClient.SendAsync(mimeMessage, token);
         await _smtpClient.DisconnectAsync(true, token);
     }
 
     /// <inheritdoc />
-    public Task SendEmailAsync(string message, string recipient, CancellationToken token)
+    public Task SendEmailAsync(string messageText, string recipient, CancellationToken token)
     {
         throw new NotImplementedException("This method is not implemented. Use SendEmailAsync(MimeMessage message, CancellationToken token) instead.");
     }
@@ -90,10 +90,10 @@ public class ErabliereApiEmailService : IEmailService
         {
             await _smtpClient.AuthenticateAsync(sasl, token);
         }
-        catch
+        catch (Exception ex)
         {
-            _logger.LogWarning($"Authentication unsuccessful with token: {authToken.AccessToken}");
-            throw;
+            _logger.LogWarning(ex, "Authentication unsuccessful with token: {AccessToken}", authToken.AccessToken);
+            throw new InvalidOperationException("SMTP OAuth authentication failed.", ex);
         }
     }
 }
