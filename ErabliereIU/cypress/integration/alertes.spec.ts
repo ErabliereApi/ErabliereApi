@@ -17,6 +17,7 @@ describe('Alerte functionnality', { testIsolation: false }, () => {
         const email = FixtureUtil.getRandomEmail();
 
         alertePage.clickOnAddAlerteButton()
+                  .selectAlerteTrioDonnees()
                   .typeEmail(email)
                   .clickOnCreateButton();
 
