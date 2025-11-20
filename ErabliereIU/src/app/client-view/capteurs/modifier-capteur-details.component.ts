@@ -10,7 +10,6 @@ import { EButtonComponent } from 'src/generic/ebutton.component';
 import { EinputComponent } from 'src/generic/einput.component';
 import { InputErrorComponent } from 'src/generic/input-error.component';
 import { Capteur } from 'src/model/capteur';
-import { ErrorObj } from 'src/model/errorObj';
 
 @Component({
     selector: 'modifier-capteur-details',
@@ -183,7 +182,7 @@ export class ModifierCapteurDetailsComponent implements OnInit {
     capteur: Capteur;
     @Output() needToUpdate = new EventEmitter();
     @Output() closeForm = new EventEmitter();
-    errorObj: ErrorObj | null = null;
+    errorObj: any = null;
     generalError?: string;
     editCapteurForm: UntypedFormGroup;
     editInProgress: boolean = false;
