@@ -2,47 +2,28 @@
 <!-- Component CRUD pour les page-capteurs des érablière -->
 
 <div>
-@if(afficherSectionAjouterCapteur) {
+    @if(afficherSectionAjouterCapteur) {
     <emodal (closeModal)="hideAjouterCapteur()" title="Ajouter un capteur" [displayFooter]="false">
-        <ajouter-capteur
-            [idErabliere]="idErabliereSelectionee"
-            (hideAjouterCapteur)="hideAjouterCapteur()"
-            (shouldReloadCapteurs)="getCapteurs()"
-        />
+        <ajouter-capteur [idErabliere]="idErabliereSelectionee" (hideAjouterCapteur)="hideAjouterCapteur()"
+            (shouldReloadCapteurs)="getCapteurs()" />
     </emodal>
-} @else {
-    <button
-        type="button"
-        class="btn btn-outline-primary btn-sm"
-        (click)="showAjouterCapteur()">Ajouter un capteur</button>
-}
+    } @else {
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="showAjouterCapteur()">Ajouter un
+        capteur</button>
+    }
 </div>
 
-<capteur-list
-            [idErabliere]="idErabliereSelectionee"
-            [capteurs]="capteurs"
-            (shouldRefreshCapteurs)="getCapteurs()"
-/>
+<capteur-list [idErabliere]="idErabliereSelectionee" [capteurs]="capteurs" (shouldRefreshCapteurs)="getCapteurs()" />
 
 <div>
-@if(afficherSectionAjouterCapteurImage) {
-    <ajouter-capteur-image
-        (masquer)="afficherSectionAjouterCapteurImage = false"
-        (rechargerCapteursImage)="getCapteursImage()"
-        [idErabliere]="idErabliereSelectionee"
-    />
-} @else {
-    <button
-        type="button"
-        class="btn btn-outline-primary btn-sm"
+    @if(afficherSectionAjouterCapteurImage) {
+    <ajouter-capteur-image (masquer)="afficherSectionAjouterCapteurImage = false"
+        (rechargerCapteursImage)="getCapteursImage()" [idErabliere]="idErabliereSelectionee" />
+    } @else {
+    <button type="button" class="btn btn-outline-primary btn-sm"
         (click)="afficherSectionAjouterCapteurImage = true">Ajouter un capteur d'image</button>
-}
+    }
 </div>
 
-<app-capteur-image-list
-    [idErabliere]="idErabliereSelectionee"
-    [capteurs]="capteursImage"
-    (shouldRefreshCapteurs)="getCapteursImage()"
-/>
-
-
+<app-capteur-image-list [idErabliere]="idErabliereSelectionee" [capteurs]="capteursImage"
+    (shouldRefreshCapteurs)="getCapteursImage()" />

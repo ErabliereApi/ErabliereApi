@@ -1,16 +1,25 @@
 <!-- Une table qui liste les page-capteurs -->
 @if (displayTooltip) {
-<capteur-detail-tooltip [capteur]="capteurTT" [leftPosition]="leftPosition" [topPosition]="topPosition"
-    (needToUpdate)="closeTooltip()"></capteur-detail-tooltip>
+<emodal (closeModal)="closeTooltip()" title="Détails du capteur" [displayFooter]="false">
+    <capteur-detail-tooltip [capteur]="capteurTT"
+        (needToUpdate)="closeTooltip()"></capteur-detail-tooltip>
+</emodal>
 }
 
 @if (this.displayEditDetailsForm && this.editDetailsCapteurSelected) {
-<modifier-capteur-details [inputCapteur]="editDetailsCapteurSelected" (needToUpdate)="editDetailsNeedToUdate($event)" (closeForm)="closeEditDetailsForm($event)"></modifier-capteur-details>
+<emodal [displayFooter]="false" [title]="editDetailsCapteurSelected.nom ?? ''"
+    (closeModal)="closeEditDetailsForm($event)">
+    <modifier-capteur-details [inputCapteur]="editDetailsCapteurSelected"
+        (needToUpdate)="editDetailsNeedToUdate($event)"
+        (closeForm)="closeEditDetailsForm($event)"></modifier-capteur-details>
+</emodal>
 }
 
 @if (this.displayEditStyleForm && this.editStyleSelected) {
-<app-modifier-capteur-style
- [inputCapteur]="editStyleSelected"></app-modifier-capteur-style>
+<emodal [displayFooter]="false" [title]="'Modifier le style du capteur ' + (editStyleSelected.nom ?? '')"
+    (closeModal)="closeEditStyleForm($event)">
+    <app-modifier-capteur-style [inputCapteur]="editStyleSelected"></app-modifier-capteur-style>
+</emodal>
 }
 <form class="table-responsive" novalidate>
     <table class="table table-striped mb-5">
@@ -29,56 +38,22 @@
         </thead>
         <tbody>
             @for(capteur of capteurs; track capteur.id) {
-            <tr [formGroup]="getCapteur(capteur.id ?? '')" [id]="'capteur-' + capteur.id">
+            <tr [id]="'capteur-' + capteur.id">
                 <td>
                     <copy-id-button [text]="capteur.id" title="Copier l'id du capteur {{capteur.id}}"></copy-id-button>
                 </td>
-                <td [class.was-validated]="getIndice(capteur.id ?? '')?.touched">
-                    @if(isDisplayEditForm(capteur.id)) {
-                    <input formControlName="indice" type="number" class="form-control" min="0" required />
-                    @if(getIndice(capteur.id ?? '')?.errors?.['required']) {
-                    <div class="invalid-feedback">
-                        L'indice est requis
-                    </div>
-                    }
-                    } @else {
+                <td>
                     <span>{{capteur.indiceOrdre}}</span>
-                    }
                 </td>
-                <td [class.was-validated]="getNom(capteur.id ?? '')?.touched">
-                    @if(isDisplayEditForm(capteur.id)) {
-                    <input formControlName="nom" type="text" class="form-control" maxlength="200" required />
-                    @if(getNom(capteur.id ?? '')?.errors?.['maxlength']) {
-                    <div class="invalid-feedback">
-                        Le nom doit être maximum 200 caractères de long
-                    </div>
-                    } @else if(getNom(capteur.id ?? '')?.errors?.['required']) {
-                    <div class="invalid-feedback">
-                        Le nom est requis
-                    </div>
-                    }
-                    } @else {
-                    <span style="text-decoration: underline; cursor: pointer;"
-                        (click)="openTooltip(capteur, $event)"
+                <td>
+                    <span style="text-decoration: underline; cursor: pointer;" (click)="openTooltip(capteur, $event)"
                         (keyup)="keyUpTooltip(capteur, $event)">{{capteur.nom}}</span>
-                    }
                 </td>
-                <td [class.was-validated]="getSymbole(capteur.id ?? '')?.touched">
-                    @if(isDisplayEditForm(capteur.id)) {
-                    <input formControlName="symbole" type="text" class="form-control" maxlength="7" />
-                    <div class="invalid-feedback">
-                        Le symbole peut avoir maximum 7 caractères
-                    </div>
-                    } @else {
+                <td>
                     <span>{{capteur.symbole}}</span>
-                    }
                 </td>
                 <td class="text-center align-middle">
-                    @if(isDisplayEditForm(capteur.id)) {
-                    <div class="form-switch">
-                        <input formControlName="estGraphiqueAffiche" type="checkbox" class="form-check-input" />
-                    </div>
-                    } @else if(capteur.afficherCapteurDashboard) {
+                    @if(capteur.afficherCapteurDashboard) {
                     <span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-check" viewBox="0 0 16 16">
@@ -89,11 +64,7 @@
                     }
                 </td>
                 <td class="text-center align-middle">
-                    @if(isDisplayEditForm(capteur.id)) {
-                    <div class="form-switch">
-                        <input formControlName="estSaisieManuelle" type="checkbox" class="form-check-input" />
-                    </div>
-                    } @else if(capteur.ajouterDonneeDepuisInterface) {
+                    @if(capteur.ajouterDonneeDepuisInterface) {
                     <span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-check" viewBox="0 0 16 16">
@@ -107,14 +78,9 @@
                     {{formatDateJour(capteur.dc)}}
                 </td>
                 <td class="text-lg-end">
-                    @if(isDisplayEditForm(capteur.id)) {
-                    <button type="button" class="btn btn-outline-primary btn-sm"
-                        (click)="modifierCapteur(capteur)">Enregistrer</button>
-                    } @else {
-                    <!-- add a drop down to the button with a single choice, edit details -->
                     <div class="btn-group">
                         <button type="button" class="btn btn-outline-primary btn-sm"
-                            (click)="showModifierCapteur(capteur)">Modifier</button>
+                            (click)="showModifierCapteurDetails(capteur)">Modifier</button>
 
                         <div class="btn-group">
                             <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button"
@@ -124,29 +90,17 @@
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li>
                                     <button class="dropdown-item" type="button"
-                                        (click)="showModifierCapteurDetails(capteur)">
-                                        Modifier les détails
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" type="button"
                                         (click)="showModifierCapteurStyle(capteur)">
                                         Modifier le style
-                                    </button> 
+                                    </button>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    }
                 </td>
                 <td class="text-lg-start min">
-                    @if(isDisplayEditForm(capteur.id)) {
-                    <button type="button" class="btn btn-outline-danger btn-sm"
-                        (click)="hideModifierCapteur(capteur)">Annuler</button>
-                    } @else {
                     <button type="button" class="btn btn-outline-danger btn-sm"
                         (click)="supprimerCapteur(capteur)">Supprimer</button>
-                    }
                 </td>
             </tr>
             }
