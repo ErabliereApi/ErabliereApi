@@ -16,16 +16,18 @@ export class OnlyDigitsDirective implements ControlValueAccessor {
     private value: string;
 
     constructor(
-        private elementRef: ElementRef,
-        private renderer: Renderer2
+        private readonly elementRef: ElementRef,
+        private readonly renderer: Renderer2
     ) {
         this.onChange = () => {};
         this.onTouched = () => {};
         this.value = "";
     }
 
-    @HostListener('input', ['$event.target.value'])
-    onInputChange(value: string) {
+    @HostListener('input', ['$event'])
+    onInputChange(event: Event) {
+        const input = event.target as HTMLInputElement | null;
+        const value = input?.value ?? '';
         const filteredValue: string = filterValue(value);
         this.updateTextInput(filteredValue, this.value !== filteredValue);
     }
@@ -62,6 +64,6 @@ export class OnlyDigitsDirective implements ControlValueAccessor {
     }
 }
 
-function filterValue(value: any): string {
-    return value.replace(/\D*/g, '');
+function filterValue(value: string): string {
+    return value.replaceAll(/\D*/g, '');
 }

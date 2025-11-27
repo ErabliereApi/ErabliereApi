@@ -15,11 +15,6 @@
     "isolatedModules": true,
     "target": "ES2022",
     "module": "es2020",
-    "lib": [
-      "es2018",
-      "dom",
-      "ES2020.Intl"
-    ],
     "useDefineForClassFields": true,
     "paths": {
       "chart.js/dist/types/utils": ["./node_modules/chart.js/dist/types/utils.d.ts"],
