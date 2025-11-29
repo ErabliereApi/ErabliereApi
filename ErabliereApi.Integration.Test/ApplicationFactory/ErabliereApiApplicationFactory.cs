@@ -22,6 +22,7 @@ public class ErabliereApiApplicationFactory<TStartup> : WebApplicationFactory<TS
             { "USE_SQL", "false" },
             { "DbContextOptionsBuilder.EnableSensitiveDataLogging", "true" },
             { "IpInfoApi:DBFilePath", "" },
+            { "OIDC_SCOPES", "erabliere_api_scope" }
         };
 
         var configuration = new ConfigurationBuilder()
