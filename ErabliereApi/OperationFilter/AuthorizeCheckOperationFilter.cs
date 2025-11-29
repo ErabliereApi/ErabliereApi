@@ -1,6 +1,6 @@
 ﻿using ErabliereApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using static System.Boolean;
 using static System.StringComparison;
@@ -36,6 +36,11 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
 
         if (hasAuthorize && oneAuthMethodEnabled)
         {
+            if (operation.Responses == null)
+            {
+                operation.Responses = new();
+            }
+
             operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
             operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
 
@@ -46,15 +51,8 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
                 operation.Security.Add(new OpenApiSecurityRequirement
                 {
                     [
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "oauth2",
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        }
-                    ] = new[] { "api1" }
+                        new OpenApiSecuritySchemeReference("oauth2")
+                    ] = new List<string> { "api1" }
                 });
             }
 
@@ -63,15 +61,8 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
                 operation.Security.Add(new OpenApiSecurityRequirement
                 {
                     [
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "ApiKey",
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        }
-                    ] = new[] { "api1" }
+                        new OpenApiSecuritySchemeReference("ApiKey")
+                    ] = new List<string> { "api1" }
                 });
             }
         }

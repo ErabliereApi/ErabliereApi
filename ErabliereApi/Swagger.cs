@@ -1,9 +1,7 @@
 ﻿using ErabliereApi.Extensions;
 using ErabliereApi.OperationFilter;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Interfaces;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -50,9 +48,9 @@ public static class Swagger
                 },
                 Extensions = new Dictionary<string, IOpenApiExtension>
                 {
-                    { "demoMode", new OpenApiBoolean(config.GetValue<bool>("SWAGGER_DEMO_MODE")) },
-                    { "prodAppUrl", new OpenApiString(config["SWAGGER_PROD_APP_URL"]) },
-                    { "x-odatacount-maxpagesize", new OpenApiInteger(config.GetValue<int>("OData:MaxTop", 200)) }
+                    { "demoMode", new JsonNodeExtension(config.GetValue<bool>("SWAGGER_DEMO_MODE")) },
+                    { "prodAppUrl", new JsonNodeExtension(config["SWAGGER_PROD_APP_URL"] ?? "") },
+                    { "x-odatacount-maxpagesize", new JsonNodeExtension(config.GetValue("OData:MaxTop", 200)) }
                 }
             });
 
@@ -78,16 +76,12 @@ public static class Swagger
                     });
                 }
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
-                        },
-                        new[] { config[OIDC_SCOPES] }
-                    }
-                });
+                // TODO: Enable that later
+                //c.AddSecurityRequirement(openApidoc => new OpenApiSecurityRequirement
+                //{
+                //    [new OpenApiSecuritySchemeReference("oauth2", openApidoc),
+                //    new[] { config[OIDC_SCOPES] }]
+                //});
             }
 
             if (config.StripeIsEnabled())
@@ -99,16 +93,14 @@ public static class Swagger
                     In = ParameterLocation.Header
                 });
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
-                        },
-                        new string[] { }
-                    }
-                });
+                // TODO: Enable that later
+                //c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                //{
+                //    {
+                //        new OpenApiSecuritySchemeReference("ApiKey"),
+                //        new List<string>()
+                //    }
+                //});
             }
 
             c.OperationFilter<AuthorizeCheckOperationFilter>(config);
@@ -152,6 +144,7 @@ public static class Swagger
 
         app.UseSwagger(c =>
         {
+            c.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
             c.RouteTemplate = "api/{documentName}/swagger.json";
         });
 

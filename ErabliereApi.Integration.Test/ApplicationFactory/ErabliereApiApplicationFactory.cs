@@ -14,12 +14,13 @@ public class ErabliereApiApplicationFactory<TStartup> : WebApplicationFactory<TS
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var config = new Dictionary<string, string>
+        var config = new Dictionary<string, string?>
         {
             { "Stripe.ApiKey", "" },
             { "StripeUsageReccord.SkipRecord", "true" },
             { "ErabliereApiUserService.TestMode", "true" },
             { "USE_SQL", "false" },
+            { "DbContextOptionsBuilder.EnableSensitiveDataLogging", "true" },
             { "IpInfoApi:DBFilePath", "" },
         };
 

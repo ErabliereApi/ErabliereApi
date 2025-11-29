@@ -97,7 +97,15 @@ public class CreerErabliereTest : IClassFixture<StripeEnabledApplicationFactory<
         await VerificationBd(response, nomErabliere, isPublic: false, apiKey: apiKey);
 
         // Obtenir l'érablière créer
-        var responseGet = await client.GetAsync("/Erablieres?my=true");
+        var responseGet = await client.GetAsync("/Erablieres");
+
+        if (!responseGet.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException(
+                $"La récupération des érablières a échouée. " +
+                $"Statut: {responseGet.StatusCode}, " +
+                $"Message: {await responseGet.Content.ReadAsStringAsync()}");
+        }
 
         var contentGet = await responseGet.Content.ReadAsStringAsync();
 
@@ -105,7 +113,7 @@ public class CreerErabliereTest : IClassFixture<StripeEnabledApplicationFactory<
         {
             PropertyNameCaseInsensitive = true
         })
-            ?? throw new System.InvalidOperationException("Deserializing contentGet result in null reference.");
+            ?? throw new InvalidOperationException("Deserializing contentGet result in null reference.");
 
         Assert.Single(erablieres);
         Assert.Contains(erablieres, e => e.IsPublic == false && e.Nom == nomErabliere);

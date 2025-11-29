@@ -64,7 +64,13 @@ public class IntegrationTest1 : IClassFixture<ErabliereApiApplicationFactory<Sta
 
         var response = await client.GetAsync("/api/v1/swagger.json");
 
-        response.EnsureSuccessStatusCode();
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Swagger.json is not available. Status code: {response.StatusCode}. Content: {content}");
+        }
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
