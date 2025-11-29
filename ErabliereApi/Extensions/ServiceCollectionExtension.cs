@@ -205,7 +205,7 @@ public static class ServiceCollectionExtension
         {
             var o = sp.GetRequiredService<IOptions<EmailConfig>>().Value;
 
-            if (o.UseMSGraphAPI == true)
+            if (o.UseMSGraphAPI.HasValue && o.UseMSGraphAPI.Value)
             {
                 return sp.GetRequiredService<MSGraphEmailService>();
             }

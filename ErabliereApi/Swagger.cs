@@ -72,16 +72,19 @@ public static class Swagger
                                     { config[OIDC_SCOPES] ?? throw new InvalidOperationException($"Si 'USE_SWAGGER_AUTHORIZATIONCODE_WORKFLOW' est à 'true', vous devez initialiser la variable '{OIDC_SCOPES}'."), "Erabliere Api scope" }
                                 }
                             }
-                        }
+                        },
+                        In = ParameterLocation.Header,
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        Description = "OAuth2 AuthorizationCode flow",
+                        Name = "OAuth2 AuthorizationCode"
                     });
                 }
 
-                // TODO: Enable that later
-                //c.AddSecurityRequirement(openApidoc => new OpenApiSecurityRequirement
-                //{
-                //    [new OpenApiSecuritySchemeReference("oauth2", openApidoc),
-                //    new[] { config[OIDC_SCOPES] }]
-                //});
+                c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string> { "api1" }
+                });
             }
 
             if (config.StripeIsEnabled())
@@ -90,17 +93,15 @@ public static class Swagger
                 {
                     Name = "X-ErabliereApi-ApiKey",
                     Type = SecuritySchemeType.ApiKey,
-                    In = ParameterLocation.Header
+                    In = ParameterLocation.Header,
+                    Scheme = "",
+                    Description = "Clé API pour l'authentification des requêtes via Stripe"
                 });
 
-                // TODO: Enable that later
-                //c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                //{
-                //    {
-                //        new OpenApiSecuritySchemeReference("ApiKey"),
-                //        new List<string>()
-                //    }
-                //});
+                c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("ApiKey", doc)] = new List<string> { "api1" }
+                });
             }
 
             c.OperationFilter<AuthorizeCheckOperationFilter>(config);
