@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using static System.Boolean;
-using static System.StringComparison;
 
 namespace ErabliereApi.OperationFilter;
 
@@ -13,15 +11,15 @@ namespace ErabliereApi.OperationFilter;
 /// </summary>
 public class AuthorizeCheckOperationFilter : IOperationFilter
 {
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _config;
 
     /// <summary>
     /// Constructeur
     /// </summary>
-    /// <param name="configuration"></param>
-    public AuthorizeCheckOperationFilter(IConfiguration configuration)
+    /// <param name="config"></param>
+    public AuthorizeCheckOperationFilter(IConfiguration config)
     {
-        _configuration = configuration;
+        _config = config;
     }
 
     /// <inheritdoc />
@@ -31,8 +29,8 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
                            context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
         var oneAuthMethodEnabled =
-            _configuration.IsAuthEnabled() ||
-            _configuration.StripeIsEnabled();
+            _config.IsAuthEnabled() ||
+            _config.StripeIsEnabled();
 
         if (hasAuthorize && oneAuthMethodEnabled)
         {
@@ -46,23 +44,26 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
 
             operation.Security = new List<OpenApiSecurityRequirement>();
 
-            if (_configuration.IsAuthEnabled())
+            var scopes = _config[ErabliereApi.Swagger.OIDC_SCOPES]
+                ?? throw new InvalidOperationException("OIDC_SCOPES non initialisé");
+
+            if (_config.IsAuthEnabled())
             {
                 operation.Security.Add(new OpenApiSecurityRequirement
                 {
                     [
-                        new OpenApiSecuritySchemeReference("oauth2")
-                    ] = new List<string> { "api1" }
+                        new OpenApiSecuritySchemeReference("oauth2", context.Document)
+                    ] = new List<string> { scopes }
                 });
             }
 
-            if (_configuration.StripeIsEnabled())
+            if (_config.StripeIsEnabled())
             {
                 operation.Security.Add(new OpenApiSecurityRequirement
                 {
                     [
-                        new OpenApiSecuritySchemeReference("ApiKey")
-                    ] = new List<string> { "api1" }
+                        new OpenApiSecuritySchemeReference("ApiKey", context.Document)
+                    ] = new List<string> { "" }
                 });
             }
         }

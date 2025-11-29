@@ -56,6 +56,8 @@ public static class Swagger
 
             if (config.IsAuthEnabled())
             {
+                var scopes = config[OIDC_SCOPES] ?? throw new InvalidOperationException($"Si l'authentification est activé, vous devez initialiser la variable '{OIDC_SCOPES}'.");
+
                 if (string.Equals(config["USE_SWAGGER_AUTHORIZATIONCODE_WORKFLOW"], TrueString, OrdinalIgnoreCase))
                 {
                     c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -69,7 +71,7 @@ public static class Swagger
                                 TokenUrl = new Uri(config["SWAGGER_TOKEN_URL"] ?? throw new InvalidOperationException("Si 'USE_SWAGGER_AUTHORIZATIONCODE_WORKFLOW' est à 'true', vous devez initialiser la variable 'SWAGGER_TOKEN_URL'.")),
                                 Scopes = new Dictionary<string, string>
                                 {
-                                    { config[OIDC_SCOPES] ?? throw new InvalidOperationException($"Si 'USE_SWAGGER_AUTHORIZATIONCODE_WORKFLOW' est à 'true', vous devez initialiser la variable '{OIDC_SCOPES}'."), "Erabliere Api scope" }
+                                    [scopes] = "Erabliere Api scope"
                                 }
                             }
                         },
@@ -83,7 +85,7 @@ public static class Swagger
 
                 c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
                 {
-                    [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string> { "api1" }
+                    [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string> { scopes }
                 });
             }
 
@@ -100,7 +102,7 @@ public static class Swagger
 
                 c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
                 {
-                    [new OpenApiSecuritySchemeReference("ApiKey", doc)] = new List<string> { "api1" }
+                    [new OpenApiSecuritySchemeReference("ApiKey", doc)] = new List<string> { "" }
                 });
             }
 

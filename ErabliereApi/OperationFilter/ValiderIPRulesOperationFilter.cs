@@ -18,6 +18,11 @@ public class ValiderIPRulesOperationFilter : IOperationFilter
 
         if (hasIPRulesValidation)
         {
+            if (operation.Responses == null)
+            {
+                operation.Responses = new OpenApiResponses();
+            }
+
             operation.Responses.Add("400", new OpenApiResponse
             {
                 Description = "Bad Request - IP Invalide"
