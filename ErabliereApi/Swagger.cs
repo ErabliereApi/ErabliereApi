@@ -1,9 +1,7 @@
 ﻿using ErabliereApi.Extensions;
 using ErabliereApi.OperationFilter;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Interfaces;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -50,14 +48,16 @@ public static class Swagger
                 },
                 Extensions = new Dictionary<string, IOpenApiExtension>
                 {
-                    { "demoMode", new OpenApiBoolean(config.GetValue<bool>("SWAGGER_DEMO_MODE")) },
-                    { "prodAppUrl", new OpenApiString(config["SWAGGER_PROD_APP_URL"]) },
-                    { "x-odatacount-maxpagesize", new OpenApiInteger(config.GetValue<int>("OData:MaxTop", 200)) }
+                    { "demoMode", new JsonNodeExtension(config.GetValue<bool>("SWAGGER_DEMO_MODE")) },
+                    { "prodAppUrl", new JsonNodeExtension(config["SWAGGER_PROD_APP_URL"] ?? "") },
+                    { "x-odatacount-maxpagesize", new JsonNodeExtension(config.GetValue("OData:MaxTop", 200)) }
                 }
             });
 
             if (config.IsAuthEnabled())
             {
+                var scopes = config[OIDC_SCOPES] ?? throw new InvalidOperationException($"Si l'authentification est activé, vous devez initialiser la variable '{OIDC_SCOPES}'.");
+
                 if (string.Equals(config["USE_SWAGGER_AUTHORIZATIONCODE_WORKFLOW"], TrueString, OrdinalIgnoreCase))
                 {
                     c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -71,22 +71,21 @@ public static class Swagger
                                 TokenUrl = new Uri(config["SWAGGER_TOKEN_URL"] ?? throw new InvalidOperationException("Si 'USE_SWAGGER_AUTHORIZATIONCODE_WORKFLOW' est à 'true', vous devez initialiser la variable 'SWAGGER_TOKEN_URL'.")),
                                 Scopes = new Dictionary<string, string>
                                 {
-                                    { config[OIDC_SCOPES] ?? throw new InvalidOperationException($"Si 'USE_SWAGGER_AUTHORIZATIONCODE_WORKFLOW' est à 'true', vous devez initialiser la variable '{OIDC_SCOPES}'."), "Erabliere Api scope" }
+                                    [scopes] = "Erabliere Api scope"
                                 }
                             }
-                        }
+                        },
+                        In = ParameterLocation.Header,
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        Description = "OAuth2 AuthorizationCode flow",
+                        Name = "OAuth2 AuthorizationCode"
                     });
                 }
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
-                        },
-                        new[] { config[OIDC_SCOPES] }
-                    }
+                    [new OpenApiSecuritySchemeReference("oauth2", doc)] = new List<string> { scopes }
                 });
             }
 
@@ -96,18 +95,14 @@ public static class Swagger
                 {
                     Name = "X-ErabliereApi-ApiKey",
                     Type = SecuritySchemeType.ApiKey,
-                    In = ParameterLocation.Header
+                    In = ParameterLocation.Header,
+                    Scheme = "",
+                    Description = "Clé API pour l'authentification des requêtes via Stripe"
                 });
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
-                        },
-                        new string[] { }
-                    }
+                    [new OpenApiSecuritySchemeReference("ApiKey", doc)] = new List<string> { "" }
                 });
             }
 
@@ -152,6 +147,7 @@ public static class Swagger
 
         app.UseSwagger(c =>
         {
+            c.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
             c.RouteTemplate = "api/{documentName}/swagger.json";
         });
 

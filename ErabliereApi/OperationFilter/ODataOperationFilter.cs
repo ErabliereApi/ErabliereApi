@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.OData.Query;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text.Json.Nodes;
 
 namespace ErabliereApi.OperationFilter;
 
@@ -10,6 +10,11 @@ namespace ErabliereApi.OperationFilter;
 /// </summary>
 public class ODataOperationFilter : IOperationFilter
 {
+    /// <summary>
+    /// Nom de l'exemple vide
+    /// </summary>
+    public const string EMPTY_EXAMPLE_NAME = "empty";
+
     /// <inheritdoc />
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
@@ -22,22 +27,27 @@ public class ODataOperationFilter : IOperationFilter
 
         if (hasODataAttribute)
         {
-            AddODataParameter("$select", format: "string", type: "string", examples: GetSelectExamples());
+            AddODataParameter("$select", format: "string", type: JsonSchemaType.String, examples: GetSelectExamples());
             AddODataParameter("$filter", examples: GetFilterExamples());
-            AddODataParameter("$top", format: "int32", type: "integer", examples: GetTopExamples(), defaultValue: "10");
-            AddODataParameter("$skip", format: "int32", type: "integer", examples: GetSkipExamples());
-            AddODataParameter("$count", format: "boolean", type: "boolean", defaultValue: "false");
+            AddODataParameter("$top", format: "int32", type: JsonSchemaType.Integer, examples: GetTopExamples(), defaultValue: "10");
+            AddODataParameter("$skip", format: "int32", type: JsonSchemaType.Integer, examples: GetSkipExamples());
+            AddODataParameter("$count", format: "boolean", type: JsonSchemaType.Boolean, defaultValue: "false");
 
             if (ExpandEnabled(enableQueryAttributes))
             {
                 AddODataParameter("$expand", examples: GetExpandExamples());
             }
 
-            AddODataParameter("$orderby", format: "string", type: "string", GetOrderByExamples());
+            AddODataParameter("$orderby", format: "string", type: JsonSchemaType.String, GetOrderByExamples());
         }
 
-        void AddODataParameter(string name, string format = "expression", string type = "string", Dictionary<string, OpenApiExample>? examples = default, string? defaultValue = null)
+        void AddODataParameter(string name, string format = "expression", JsonSchemaType type = JsonSchemaType.String, IDictionary<string, IOpenApiExample>? examples = default, string? defaultValue = null)
         {
+            if (operation.Parameters == null)
+            {
+                operation.Parameters = new List<IOpenApiParameter>();
+            }
+
             if (operation.Parameters.Any(p => p.Name == name))
             {
                 return;
@@ -53,96 +63,96 @@ public class ODataOperationFilter : IOperationFilter
                     Type = type
                 },
                 Examples = examples,
-                Example = defaultValue != null ? new OpenApiString(defaultValue) : null
+                Example = defaultValue != null ? JsonNode.Parse(defaultValue) : null
             });
         }
     }
 
-    private Dictionary<string, OpenApiExample>? GetOrderByExamples()
+    private IDictionary<string, IOpenApiExample>? GetOrderByExamples()
     {
-        var examples = new Dictionary<string, OpenApiExample>
+        var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = new OpenApiString("") } },
-                { "asc", new OpenApiExample { Value = new OpenApiString("propertyName") } },
-                { "desc", new OpenApiExample { Value = new OpenApiString("propertyName desc") } },
-                { "complexe sort", new OpenApiExample { Value = new OpenApiString("propertyOne asc, propertyTwo desc") } }
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { "asc", new OpenApiExample { Value = JsonNode.Parse("\"propertyName\"") } },
+                { "desc", new OpenApiExample { Value = JsonNode.Parse("\"propertyName desc\"") } },
+                { "complexe sort", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne asc, propertyTwo desc\"") } }
             };
 
         return examples;
     }
 
-    private Dictionary<string, OpenApiExample>? GetExpandExamples()
+    private IDictionary<string, IOpenApiExample>? GetExpandExamples()
     {
-        var examples = new Dictionary<string, OpenApiExample>
+        var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = new OpenApiString("") } },
-                { "expand one property", new OpenApiExample { Value = new OpenApiString("propertyName") } },
-                { "expand multiple property", new OpenApiExample { Value = new OpenApiString("propertyOne,propertyTwo") } },
-                { "expand nested property", new OpenApiExample { Value = new OpenApiString("modelSourceProperty/childOneProperty/childTwoProperty") } }
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { "expand one property", new OpenApiExample { Value = JsonNode.Parse("\"propertyName\"") } },
+                { "expand multiple property", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne,propertyTwo\"") } },
+                { "expand nested property", new OpenApiExample { Value = JsonNode.Parse("\"modelSourceProperty/childOneProperty/childTwoProperty\"") } }
             };
 
         return examples;
     }
 
-    private Dictionary<string, OpenApiExample>? GetSkipExamples()
+    private IDictionary<string, IOpenApiExample>? GetSkipExamples()
     {
-        var examples = new Dictionary<string, OpenApiExample>
+        var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = new OpenApiString("") } },
-                { "skip 10", new OpenApiExample { Value = new OpenApiString("10") } }
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { "skip 10", new OpenApiExample { Value = JsonNode.Parse("10") } }
             };
 
         return examples;
     }
 
-    private Dictionary<string, OpenApiExample>? GetTopExamples()
+    private IDictionary<string, IOpenApiExample>? GetTopExamples()
     {
-        var examples = new Dictionary<string, OpenApiExample>
+        var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = new OpenApiString("") } },
-                { "take 10", new OpenApiExample { Value = new OpenApiString("10") } }
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { "take 10", new OpenApiExample { Value = JsonNode.Parse("10") } }
             };
 
         return examples;
     }
 
-    private Dictionary<string, OpenApiExample>? GetFilterExamples()
+    private IDictionary<string, IOpenApiExample>? GetFilterExamples()
     {
-        var examples = new Dictionary<string, OpenApiExample>
+        var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = new OpenApiString("") } },
-                { "equal", new OpenApiExample { Value = new OpenApiString("propertyName eq 'Some value'") } },
-                { "and", new OpenApiExample { Value = new OpenApiString("propertyOne eq 'Some value' and propertyTwo eq 'other Value'") } },
-                { "or", new OpenApiExample { Value = new OpenApiString("propertyOne eq 'Some value' or propertyTwo eq 'other Value'") } },
-                { "less than", new OpenApiExample { Value = new OpenApiString("propertyName lt 610") } },
-                { "greater than", new OpenApiExample { Value = new OpenApiString("propertyName gt 610") } },
-                { "less or equal than", new OpenApiExample { Value = new OpenApiString("propertyName le 610") } },
-                { "greater or equal than", new OpenApiExample { Value = new OpenApiString("propertyName ge 610") } },
-                { "not equal", new OpenApiExample { Value = new OpenApiString("propertyName ne 610") } },
-                { "endswith", new OpenApiExample { Value = new OpenApiString("endwith(propertyName, 'value') eq true") } },
-                { "startswith", new OpenApiExample { Value = new OpenApiString("startswith(propertyName, 'value') eq true") } },
-                { "contains", new OpenApiExample { Value = new OpenApiString("contains(propertyName, 'value') eq true") } },
-                { "indexof", new OpenApiExample { Value = new OpenApiString("indexof(propertyName, 'VALUE') eq 0") } },
-                { "replace", new OpenApiExample { Value = new OpenApiString("replace(propertyName, 'VALUE', 'VALUEREPLACED') eq 'OTHER VALUE'") } },
-                { "substring", new OpenApiExample { Value = new OpenApiString("substring(propertyName, 'OTHERVALUE') eq 'VALUE'") } },
-                { "tolower", new OpenApiExample { Value = new OpenApiString("tolower(propertyName) eq 'VALUE'") } },
-                { "toupper", new OpenApiExample { Value = new OpenApiString("toupper(propertyName) eq 'VALUE'") } },
-                { "trim", new OpenApiExample { Value = new OpenApiString("trim(propertyName) eq 'VALUE'") } },
-                { "concat", new OpenApiExample { Value = new OpenApiString("concat(concat(PropertyText1, ', '), PropertyText2) eq 'value1, value2'") } },
-                { "floor", new OpenApiExample { Value = new OpenApiString("floor(propertyDecimal) eq 1") } },
-                { "ceiling", new OpenApiExample { Value = new OpenApiString("ceiling(propertyDecimal) eq 1") } },
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { "equal", new OpenApiExample { Value = JsonNode.Parse("\"propertyName eq 'Some value'\"") } },
+                { "and", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne eq 'Some value' and propertyTwo eq 'other Value'\"") } },
+                { "or", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne eq 'Some value' or propertyTwo eq 'other Value'\"") } },
+                { "less than", new OpenApiExample { Value = JsonNode.Parse("\"propertyName lt 610\"") } },
+                { "greater than", new OpenApiExample { Value = JsonNode.Parse("\"propertyName gt 610\"") } },
+                { "less or equal than", new OpenApiExample { Value = JsonNode.Parse("\"propertyName le 610\"") } },
+                { "greater or equal than", new OpenApiExample { Value = JsonNode.Parse("\"propertyName ge 610\"") } },
+                { "not equal", new OpenApiExample { Value = JsonNode.Parse("\"propertyName ne 610\"") } },
+                { "endswith", new OpenApiExample { Value = JsonNode.Parse("\"endwith(propertyName, 'value') eq true\"") } },
+                { "startswith", new OpenApiExample { Value = JsonNode.Parse("\"startswith(propertyName, 'value') eq true\"") } },
+                { "contains", new OpenApiExample { Value = JsonNode.Parse("\"contains(propertyName, 'value') eq true\"") } },
+                { "indexof", new OpenApiExample { Value = JsonNode.Parse("\"indexof(propertyName, 'VALUE') eq 0\"") } },
+                { "replace", new OpenApiExample { Value = JsonNode.Parse("\"replace(propertyName, 'VALUE', 'VALUEREPLACED') eq 'OTHER VALUE'\"") } },
+                { "substring", new OpenApiExample { Value = JsonNode.Parse("\"substring(propertyName, 'OTHERVALUE') eq 'VALUE'\"") } },
+                { "tolower", new OpenApiExample { Value = JsonNode.Parse("\"tolower(propertyName) eq 'VALUE'\"") } },
+                { "toupper", new OpenApiExample { Value = JsonNode.Parse("\"toupper(propertyName) eq 'VALUE'\"") } },
+                { "trim", new OpenApiExample { Value = JsonNode.Parse("\"trim(propertyName) eq 'VALUE'\"") } },
+                { "concat", new OpenApiExample { Value = JsonNode.Parse("\"concat(concat(PropertyText1, ', '), PropertyText2) eq 'value1, value2'\"") } },
+                { "floor", new OpenApiExample { Value = JsonNode.Parse("\"floor(propertyDecimal) eq 1\"") } },
+                { "ceiling", new OpenApiExample { Value = JsonNode.Parse("\"ceiling(propertyDecimal) eq 1\"") } },
             };
 
         return examples;
     }
 
-    private Dictionary<string, OpenApiExample>? GetSelectExamples()
+    private IDictionary<string, IOpenApiExample>? GetSelectExamples()
     {
-        var examples = new Dictionary<string, OpenApiExample>
+        var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = new OpenApiString("") } },
-                { "select one property", new OpenApiExample { Value = new OpenApiString("propertyName") } },
-                { "select multiple property", new OpenApiExample { Value = new OpenApiString("propertyOne,propertyTwo") } }
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { "select one property", new OpenApiExample { Value = JsonNode.Parse("\"propertyName\"") } },
+                { "select multiple property", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne,propertyTwo\"") } }
             };
 
         return examples;

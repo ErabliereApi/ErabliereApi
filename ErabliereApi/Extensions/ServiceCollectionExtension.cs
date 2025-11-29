@@ -160,6 +160,11 @@ public static class ServiceCollectionExtension
                     options.UseSqlServer(connectionString, o => o.EnableRetryOnFailure());
                 }
 
+                if (string.Equals(config["DbContextOptionsBuilder.EnableSensitiveDataLogging"], TrueString, OrdinalIgnoreCase))
+                {
+                    options.EnableSensitiveDataLogging();
+                }
+
                 if (string.Equals(config["LOG_SQL"], "Console", OrdinalIgnoreCase))
                 {
                     options.LogTo(Console.WriteLine, LogLevel.Information);
@@ -171,6 +176,11 @@ public static class ServiceCollectionExtension
             services.AddDbContext<ErabliereDbContext>(options =>
             {
                 options.UseInMemoryDatabase(nameof(ErabliereDbContext));
+
+                if (string.Equals(config["DbContextOptionsBuilder.EnableSensitiveDataLogging"], TrueString, OrdinalIgnoreCase))
+                {
+                    options.EnableSensitiveDataLogging();
+                }
 
             }, contextLifetime: ServiceLifetime.Singleton,
                optionsLifetime: ServiceLifetime.Transient);
@@ -195,7 +205,7 @@ public static class ServiceCollectionExtension
         {
             var o = sp.GetRequiredService<IOptions<EmailConfig>>().Value;
 
-            if (o.UseMSGraphAPI == true)
+            if (o.UseMSGraphAPI.HasValue && o.UseMSGraphAPI.Value)
             {
                 return sp.GetRequiredService<MSGraphEmailService>();
             }

@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ErabliereApi.OperationFilter;
@@ -41,6 +41,11 @@ public class MediaTypeOperationFilter : IOperationFilter
 
     private static void CleanupResponseContentType(OpenApiOperation operation)
     {
+        if (operation.Responses == null)
+        {
+            return;
+        }
+
         foreach (var r in operation.Responses.Select(r => r.Value))
         {
             if (r?.Content != null)
