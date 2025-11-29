@@ -25,8 +25,9 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
     /// <inheritdoc />
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var hasAuthorize = context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() == true ||
-                           context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
+        var hasAuthorize = 
+            context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() == true ||
+            context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
         var oneAuthMethodEnabled =
             _config.IsAuthEnabled() ||

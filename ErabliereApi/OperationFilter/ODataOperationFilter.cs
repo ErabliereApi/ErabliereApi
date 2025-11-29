@@ -10,6 +10,11 @@ namespace ErabliereApi.OperationFilter;
 /// </summary>
 public class ODataOperationFilter : IOperationFilter
 {
+    /// <summary>
+    /// Nom de l'exemple vide
+    /// </summary>
+    public const string EMPTY_EXAMPLE_NAME = "empty";
+
     /// <inheritdoc />
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
@@ -67,7 +72,7 @@ public class ODataOperationFilter : IOperationFilter
     {
         var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
                 { "asc", new OpenApiExample { Value = JsonNode.Parse("\"propertyName\"") } },
                 { "desc", new OpenApiExample { Value = JsonNode.Parse("\"propertyName desc\"") } },
                 { "complexe sort", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne asc, propertyTwo desc\"") } }
@@ -80,7 +85,7 @@ public class ODataOperationFilter : IOperationFilter
     {
         var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
                 { "expand one property", new OpenApiExample { Value = JsonNode.Parse("\"propertyName\"") } },
                 { "expand multiple property", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne,propertyTwo\"") } },
                 { "expand nested property", new OpenApiExample { Value = JsonNode.Parse("\"modelSourceProperty/childOneProperty/childTwoProperty\"") } }
@@ -93,7 +98,7 @@ public class ODataOperationFilter : IOperationFilter
     {
         var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
                 { "skip 10", new OpenApiExample { Value = JsonNode.Parse("10") } }
             };
 
@@ -104,7 +109,7 @@ public class ODataOperationFilter : IOperationFilter
     {
         var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
                 { "take 10", new OpenApiExample { Value = JsonNode.Parse("10") } }
             };
 
@@ -115,7 +120,7 @@ public class ODataOperationFilter : IOperationFilter
     {
         var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
                 { "equal", new OpenApiExample { Value = JsonNode.Parse("\"propertyName eq 'Some value'\"") } },
                 { "and", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne eq 'Some value' and propertyTwo eq 'other Value'\"") } },
                 { "or", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne eq 'Some value' or propertyTwo eq 'other Value'\"") } },
@@ -145,7 +150,7 @@ public class ODataOperationFilter : IOperationFilter
     {
         var examples = new Dictionary<string, IOpenApiExample>
             {
-                { "empty", new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
+                { EMPTY_EXAMPLE_NAME, new OpenApiExample { Value = JsonNode.Parse("\"\"") } },
                 { "select one property", new OpenApiExample { Value = JsonNode.Parse("\"propertyName\"") } },
                 { "select multiple property", new OpenApiExample { Value = JsonNode.Parse("\"propertyOne,propertyTwo\"") } }
             };
