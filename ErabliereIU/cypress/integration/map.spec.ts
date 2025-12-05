@@ -10,6 +10,7 @@ describe("Map page", { testIsolation: false }, () => {
     });
 
     it("should not display whitescreen", () => {
+        // Wait for the delay before the #whitescreen can appear
         cy.wait(9000);
         cy.get('#whitescreen').should('have.css', 'display', 'none');
     });

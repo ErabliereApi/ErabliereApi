@@ -17,7 +17,7 @@ describe('Graph pannel test', { testIsolation: false }, () => {
                 
                     expect(text).to.match(/Taux de sucre/);
                     
-                    if (text.indexOf(baseValue) > -1) {
+                    if (text.includes(baseValue)) {
                         baseValue = "2.4";
                     }
                 });
@@ -56,7 +56,7 @@ describe('Graph pannel test', { testIsolation: false }, () => {
     it('Should see that the data is added', () => {
         let graphPannel = homePage.getGraphPannel(tauxSucreId);
 
-        cy.wait(5000);
+        cy.wait(3000);
 
         let title = graphPannel.find('h3');
         title.should('exist');

@@ -28,7 +28,10 @@ jobs:
       - name: Reboot the webapp
         run: |
           az webapp restart --name erabliereapi-demo --resource-group erabliereapi-demo
-          sleep 60
+          for i in {1..6}; do
+            echo "Waiting for webapp to restart... $((i*10))s elapsed"
+            sleep 10
+          done
 
       - uses: actions/checkout@master
       - uses: matt-ball/newman-action@master

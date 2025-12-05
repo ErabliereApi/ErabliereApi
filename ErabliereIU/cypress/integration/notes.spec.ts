@@ -27,7 +27,7 @@ describe("Notes page", { testIsolation: false }, () => {
 
         notesPage.addNote(title, content, dstring);
 
-        cy.wait(1000);
+        cy.wait(500);
 
         // validate that note is added
         notesPage.getNoteTitle().should('have.text', title);
@@ -54,7 +54,7 @@ describe("Notes page", { testIsolation: false }, () => {
 
         notesPage.addNote(title, content);
 
-        cy.wait(1000);
+        cy.wait(500);
 
         // validate that note is added
         notesPage.getNoteTitle().should('have.text', title);
