@@ -23,6 +23,7 @@ export class CustomerListComponent implements OnChanges, OnInit {
     customersFiltred: Customer[] = [];
     @Output() customerASupprimer: EventEmitter<Customer> = new EventEmitter();
     @Output() customerAModifier: EventEmitter<Customer> = new EventEmitter();
+    @Input() listLoading: boolean = false;
 
     showAccess: { [id: string]: boolean } = {}
 

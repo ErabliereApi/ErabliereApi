@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Depot.Sql;
+﻿using System.Collections.Concurrent;
+using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Extensions;
 using ErabliereApi.Services.Notifications;
@@ -42,14 +43,23 @@ public class EnsureCustomerExist : IMiddleware
 
             var customer = await cache.GetAsync<Customer>($"Customer_{uniqueName}", context.RequestAborted);
 
-            if (customer == null)
+            try
             {
-                await HandleCaseCustomerNotInCache(context, uniqueName, cache, logger);
+                if (customer == null)
+                {
+                    await HandleCaseCustomerNotInCache(context, uniqueName, cache, logger);
+                }
+                else
+                {
+                    await HandleCaseCustomerIsInCache(context, uniqueName, cache, customer, logger);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await HandleCaseCustomerIsInCache(context, uniqueName, cache, customer, logger);
+                logger.LogError(ex, "Error while ensuring customer {Customer} exists", uniqueName);
+                throw new InvalidOperationException("Error while ensuring customer exists", ex);
             }
+
 
             var customerAcceptTerms = await EnsureCustomerAcceptTermes(context, uniqueName, cache, logger);
 
@@ -130,56 +140,71 @@ public class EnsureCustomerExist : IMiddleware
         }
     }
 
+    private static ConcurrentDictionary<string, SemaphoreSlim> _customerLocks = new();
+
     private static async Task HandleCaseCustomerNotInCache(HttpContext context, string uniqueName, IDistributedCache cache, ILogger<EnsureCustomerExist> logger)
     {
-        var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
+        _customerLocks.TryAdd(uniqueName, new SemaphoreSlim(1, 1));
 
-        if (!await dbContext.Customers.AnyAsync(c => c.UniqueName == uniqueName, context.RequestAborted))
+        var customerLock = _customerLocks[uniqueName];
+
+        try
         {
-            // Cas spécial ou l'utilisateur aurait été créé précédement
-            // et le uniqueName est vide.
-            if (await dbContext.Customers.AnyAsync(c => c.UniqueName == "", context.RequestAborted))
+            await customerLock.WaitAsync(context.RequestAborted);
+
+            var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
+
+            if (!await dbContext.Customers.AnyAsync(c => c.UniqueName == uniqueName, context.RequestAborted))
             {
-                await HandleSpecialCase(context, uniqueName, cache, dbContext, logger);
+                // Cas spécial ou l'utilisateur aurait été créé précédement
+                // et le uniqueName est vide.
+                if (await dbContext.Customers.AnyAsync(c => c.UniqueName == "", context.RequestAborted))
+                {
+                    await HandleSpecialCase(context, uniqueName, cache, dbContext, logger);
+                }
+                else
+                {
+                    var customerEntity = await dbContext.Customers.AddAsync(new Customer
+                    {
+                        Email = uniqueName,
+                        UniqueName = uniqueName,
+                        Name = context.User.FindFirst("name")?.Value ?? "",
+                        AccountType = "AzureAD"
+                    }, context.RequestAborted);
+
+                    customerEntity.Entity.CreationTime = GetUserDateTimeOffSetNow(customerEntity.Entity, logger);
+                    customerEntity.Entity.LastAccessTime = customerEntity.Entity.CreationTime;
+
+                    await dbContext.SaveChangesAsync(context.RequestAborted);
+
+                    var customer = customerEntity.Entity;
+
+                    await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+
+                    await TrySendWelcomeNotification(context, customer);
+                }
             }
             else
             {
-                var customerEntity = await dbContext.Customers.AddAsync(new Customer
+                var customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
+
+                if (ShouldUpdateLastAccessTime(customer, logger, out var userTime))
                 {
-                    Email = uniqueName,
-                    UniqueName = uniqueName,
-                    Name = context.User.FindFirst("name")?.Value ?? "",
-                    AccountType = "AzureAD"
-                }, context.RequestAborted);
+                    customer.LastAccessTime = userTime;
 
-                customerEntity.Entity.CreationTime = GetUserDateTimeOffSetNow(customerEntity.Entity, logger);
-                customerEntity.Entity.LastAccessTime = customerEntity.Entity.CreationTime;
-
-                await dbContext.SaveChangesAsync(context.RequestAborted);
-
-                var customer = customerEntity.Entity;
+                    await dbContext.TrySaveChangesAsync(context.RequestAborted, context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>());
+                }
+                else
+                {
+                    logger.LogInformation("User {Customer} was not in cache lastAccessTime is today ({Date})", customer.UniqueName, customer.LastAccessTime);
+                }
 
                 await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
-
-                await TrySendWelcomeNotification(context, customer);
             }
         }
-        else
-        {
-            var customer = await dbContext.Customers.FirstAsync(c => c.UniqueName == uniqueName, context.RequestAborted);
-
-            if (ShouldUpdateLastAccessTime(customer, logger, out var userTime))
-            {
-                customer.LastAccessTime = userTime;
-
-                await dbContext.TrySaveChangesAsync(context.RequestAborted, context.RequestServices.GetRequiredService<ILogger<EnsureCustomerExist>>());
-            }
-            else
-            {
-                logger.LogInformation("User {Customer} was not in cache lastAccessTime is today ({Date})", customer.UniqueName, customer.LastAccessTime);
-            }
-
-            await cache.SetAsync($"Customer_{uniqueName}", customer, context.RequestAborted);
+        finally {
+            customerLock.Release();
+            _customerLocks.TryRemove(uniqueName, out _);
         }
     }
 

@@ -20,6 +20,7 @@ export class AdminCustomersComponent implements OnInit {
   page: number = 1;
   totalItems: number = 0;
   pageSize: number = 10;
+  listLoading: boolean = false;
 
   constructor(private readonly _api: ErabliereApi) { }
 
@@ -28,12 +29,15 @@ export class AdminCustomersComponent implements OnInit {
   }
 
   chargerCustomers() {
+    this.listLoading = true;
     this._api.getCustomersAdminExpandAccess(this.page, this.pageSize).then(customers => {
       this.customers = customers.items;
       this.totalItems = customers.count ?? 0;
     }).catch(error => {
       this.customers = [];
       throw error;
+    }).finally(() => {
+      this.listLoading = false;
     });
   }
 
