@@ -21,7 +21,7 @@
   <link rel="apple-touch-icon" sizes="152x152" href="/assets/apple/apple-touch-icon-152x152.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple/apple-touch-icon-180x180.png" />
 
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.css" rel="stylesheet">
 
   <link rel="apple-touch-startup-image" href="/assets/apple/launch.png">
   <meta name="apple-mobile-web-app-title" content="ÉrablièreIU">
@@ -110,14 +110,14 @@
       console.error(error);
       var whitescreen = document.getElementById("whitescreen");
       if (whitescreen.style.display !== "block") {
-        document.getElementById("whitescreen-stack").innerHTML = error?.stack?.replace(/\n/g, '<br/>');
+        document.getElementById("whitescreen-stack").innerHTML = error?.stack?.replaceAll('\n', '<br/>');
         whitescreen.style.display = "block";
         document.body.style.display = "block"; // only for ionic
       }
     }
 
     // Handle global errors
-    window.addEventListener("error", function (event) {
+    globalThis.addEventListener("error", function (event) {
       setTimeout(() => {
         showWhitescreenError(event.error);
       }, WHITESCREEN_ERROR_DELAY);
@@ -130,7 +130,7 @@
       }
     }, WHITESCREEN_EMPTY_APP_ROOT_DELAY);
   </script>
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.js"></script>
 </body>
 
 </html>
