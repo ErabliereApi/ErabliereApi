@@ -1,14 +1,9 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErabliereApi.Attributes;
+﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
-using ErabliereApi.Donnees.Action.Post;
-using ErabliereApi.Donnees.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace ErabliereApi.Controllers;
 
@@ -21,17 +16,14 @@ namespace ErabliereApi.Controllers;
 public class DonneesCapteurController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="depot">Le dépôt des barils</param>
-    /// <param name="mapper">Interface de mapping entre les objets</param>
-    public DonneesCapteurController(ErabliereDbContext depot, IMapper mapper)
+    public DonneesCapteurController(ErabliereDbContext depot)
     {
         _depot = depot;
-        _mapper = mapper;
     }
 
     /// <summary>

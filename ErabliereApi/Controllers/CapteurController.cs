@@ -6,6 +6,7 @@ using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
+using ErabliereApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -22,17 +23,14 @@ namespace ErabliereApi.Controllers;
 public class CapteursController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="depot">Le dépôt des barils</param>
-    /// <param name="mapper">Interface de mapping entre les données</param>
-    public CapteursController(ErabliereDbContext depot, IMapper mapper)
+    public CapteursController(ErabliereDbContext depot)
     {
         _depot = depot;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -44,13 +42,12 @@ public class CapteursController : ControllerBase
     /// <response code="200">Une liste de capteurs.</response>
     [HttpGet]
     [ValiderOwnership("id")]
-    [EnableQuery]
-    public async Task<IEnumerable<GetCapteur>> Lister(Guid id, string? filtreNom, CancellationToken token)
+    [EnableQuery(MaxExpansionDepth = 1)]
+    public async Task<IEnumerable<Capteur>> Lister(Guid id, string? filtreNom, CancellationToken token)
     {
         return await _depot.Capteurs.AsNoTracking()
                             .Where(b => b.IdErabliere == id &&
                                     (filtreNom == null || (b.Nom != null && b.Nom.Contains(filtreNom))))
-                            .ProjectTo<GetCapteur>(_mapper.ConfigurationProvider)
                             .ToArrayAsync(token);
     }
 
@@ -60,15 +57,14 @@ public class CapteursController : ControllerBase
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="idCapteur">Id du capteur présent dans la route</param>
     /// <param name="token">Le jeton d'annulation</param>
-    /// <response code="200">Une liste de capteurs.</response>
+    /// <response code="200">Le capteur.</response>
     [HttpGet("{idCapteur}")]
-    [ProducesResponseType(200, Type = typeof(GetCapteur))]
+    [ProducesResponseType(200, Type = typeof(Capteur))]
     [ValiderOwnership("id")]
     public async Task<IActionResult> Lister(Guid id, Guid idCapteur, CancellationToken token)
     {
         var capteur = await _depot.Capteurs.AsNoTracking()
                             .Where(b => b.IdErabliere == id && b.Id == idCapteur)
-                            .ProjectTo<GetCapteur>(_mapper.ConfigurationProvider)
                             .FirstOrDefaultAsync(token);
 
         if (capteur == null)
@@ -106,7 +102,7 @@ public class CapteursController : ControllerBase
             capteur.DC = DateTimeOffset.Now;
         }
 
-        var entity = await _depot.Capteurs.AddAsync(_mapper.Map<Capteur>(capteur), token);
+        var entity = await _depot.Capteurs.AddAsync(capteur.MapTo<Capteur>(), token);
 
         entity.Entity.IndiceOrdre = await _depot.Capteurs.Where(c => capteur.IdErabliere == c.IdErabliere).CountAsync(token);
 
@@ -154,7 +150,7 @@ public class CapteursController : ControllerBase
             {
                 capteur.IdErabliere = erabliere.Id;
 
-                await _depot.Capteurs.AddAsync(_mapper.Map<Capteur>(capteur), token);
+                await _depot.Capteurs.AddAsync(capteur.MapTo<Capteur>(), token);
             }
         }
 

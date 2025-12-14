@@ -3,6 +3,7 @@ using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
+using ErabliereApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,17 +20,14 @@ namespace ErabliereApi.Controllers;
 public class DompeuxController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="context">Classe de context pour accéder à la base de donnée</param>
-    /// <param name="mapper">Interface de mappagin entre les modèles</param>
-    public DompeuxController(ErabliereDbContext context, IMapper mapper)
+    public DompeuxController(ErabliereDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -67,7 +65,7 @@ public class DompeuxController : ControllerBase
             query = query.Take(q.Value);
         }
 
-        var list = await query.Select(d => _mapper.Map<GetDompeux>(d)).ToArrayAsync();
+        var list = await query.ToArrayAsync();
 
         if (o == "c" && list.Length > 0)
         {
@@ -82,7 +80,7 @@ public class DompeuxController : ControllerBase
             }
         }
 
-        return list;
+        return list.Select(d => d.MapTo<GetDompeux>()).ToArray();
     }
 
     /// <summary>

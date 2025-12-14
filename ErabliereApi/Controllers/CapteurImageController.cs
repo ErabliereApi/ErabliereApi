@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErabliereApi.Attributes;
+﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
@@ -23,17 +21,14 @@ namespace ErabliereApi.Controllers
     public class CapteurImageController : ControllerBase
     {
         private readonly ErabliereDbContext _depot;
-        private readonly IMapper _mapper;
 
         /// <summary>
         /// Constructeur par initialisation
         /// </summary>
         /// <param name="depot">Le dépôt des capteurs d'image</param>
-        /// <param name="mapper">Interface de mapping entre les données</param>
-        public CapteurImageController(ErabliereDbContext depot, IMapper mapper)
+        public CapteurImageController(ErabliereDbContext depot)
         {
             _depot = depot;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -46,13 +41,27 @@ namespace ErabliereApi.Controllers
         [HttpGet]
         [ValiderOwnership("id")]
         [EnableQuery]
-        public async Task<IEnumerable<GetCapteurImage>> Lister(Guid id, string? filtreNom, CancellationToken token)
+        public async Task<IEnumerable<GetCapteurImage>> Lister(
+            Guid id, string? filtreNom, CancellationToken token)
         {
-            return await _depot.CapteurImage.AsNoTracking()
+            var capteurImage = await _depot.CapteurImage
+                                .AsNoTracking()
                                 .Where(b => b.IdErabliere == id &&
-                                        (filtreNom == null || (b.Nom != null && b.Nom.Contains(filtreNom))))
-                                .ProjectTo<GetCapteurImage>(_mapper.ConfigurationProvider)
-                                .ToArrayAsync(token);
+                                           (filtreNom == null || (b.Nom != null && b.Nom.Contains(filtreNom))))
+                                .Select(c =>
+                                    new GetCapteurImage
+                                    {
+                                        Id = c.Id ?? Guid.Empty,
+                                        Identifiant = c.Identifiant,
+                                        MotDePasse = "***",
+                                        Nom = c.Nom,
+                                        Ordre = c.Ordre,
+                                        Port = c.Port,
+                                        Url = c.Url
+                                    }
+                                ).ToArrayAsync(token);
+
+            return capteurImage;
         }
 
 
@@ -67,7 +76,14 @@ namespace ErabliereApi.Controllers
         [ValiderOwnership("id")]
         public async Task<IActionResult> Ajouter(Guid id, PostCapteurImage capteur, CancellationToken token)
         {
-            var capteurImage = _mapper.Map<CapteurImage>(capteur);
+            var capteurImage = new CapteurImage
+            {
+                Nom = capteur.Nom,
+                Url = capteur.Url,
+                Port = capteur.Port,
+                Identifiant = capteur.Identifiant,
+                MotDePasse = capteur.MotDePasse,
+            };
 
             capteurImage.Ordre = await _depot.CapteurImage.Where(c => id == c.IdErabliere).CountAsync(token);
             capteurImage.IdErabliere = id;

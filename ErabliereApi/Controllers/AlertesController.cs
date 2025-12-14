@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ErabliereApi.Action;
+﻿using ErabliereApi.Action;
 using ErabliereApi.Action.Post;
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
@@ -21,17 +20,14 @@ namespace ErabliereApi.Controllers;
 public class AlertesController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="depot"></param>
-    /// <param name="mapper"></param>
-    public AlertesController(ErabliereDbContext depot, IMapper mapper)
+    public AlertesController(ErabliereDbContext depot)
     {
         _depot = depot;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -51,7 +47,10 @@ public class AlertesController : ControllerBase
 
         if (additionalProperties)
         {
-            alertes = _mapper.Map<GetAlerte[]>(alertes);
+            for (int i = 0; i < alertes.Length; i++)
+            {
+                alertes[i] = new GetAlerte(alertes[i]);
+            }
         }
 
         return alertes;
@@ -126,7 +125,7 @@ public class AlertesController : ControllerBase
 
         if (additionalProperties == true) 
         {
-            return Ok(_mapper.Map<GetAlerte>(entity.Entity));
+            return Ok(new GetAlerte(entity.Entity));
         }
 
         return Ok(entity.Entity);
