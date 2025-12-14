@@ -1,5 +1,6 @@
 ﻿using ErabliereApi.Controllers;
 using ErabliereApi.Depot.Sql;
+using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Test.Autofixture;
 using ErabliereApi.Test.EqualityComparer;
@@ -31,7 +32,8 @@ public class AlerteCapteurControllerTest
             System.Threading.CancellationToken.None
         );  
 
-        var alerteCapteurs = Assert.IsType<GetAlerteCapteur[]>(response);
+        Assert.All(response, e => Assert.IsType<GetAlerteCapteur>(e));
+        var alerteCapteurs = Assert.IsAssignableFrom<AlerteCapteur[]>(response);
 
         var capteur = alerteCapteurs[0].Capteur;
         Assert.NotNull(capteur);

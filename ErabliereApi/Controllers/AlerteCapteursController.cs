@@ -19,15 +19,13 @@ namespace ErabliereApi.Controllers;
 public class AlerteCapteursController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
-    public AlerteCapteursController(ErabliereDbContext depot, IMapper mapper)
+    public AlerteCapteursController(ErabliereDbContext depot)
     {
         _depot = depot;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -46,7 +44,10 @@ public class AlerteCapteursController : ControllerBase
 
         if (additionnalProperties)
         {
-            alertes = _mapper.Map<GetAlerteCapteur[]>(alertes);
+            for (int i = 0; i < alertes.Length; i++)
+            {
+                alertes[i] = new GetAlerteCapteur(alertes[i]);
+            }
         }
 
         return alertes;
@@ -87,7 +88,10 @@ public class AlerteCapteursController : ControllerBase
 
         if (additionnalProperties)
         {
-            alertesCapteurs = _mapper.Map<GetAlerteCapteur[]>(alertesCapteurs);
+            for (int i = 0; i < alertesCapteurs.Length; i++)
+            {
+                alertesCapteurs[i] = new GetAlerteCapteur(alertesCapteurs[i]);
+            }
         }
 
         return alertesCapteurs;
@@ -169,7 +173,7 @@ public class AlerteCapteursController : ControllerBase
         await _depot.SaveChangesAsync(token);
 
         if (additionalProperties == true) {
-            return Ok(_mapper.Map<GetAlerteCapteur>(entity.Entity));
+            return Ok(new GetAlerteCapteur(entity.Entity));
         }
 
         return Ok(entity.Entity);
@@ -198,7 +202,7 @@ public class AlerteCapteursController : ControllerBase
             return BadRequest("L'id de l'alerte ne concorde pas avec l'id de l'alerte à modifier.");
         }
 
-        var entity = await _depot.AlerteCapteurs.FindAsync(new object?[] { alerte.Id }, cancellationToken: token);
+        var entity = await _depot.AlerteCapteurs.FindAsync([ alerte.Id ], cancellationToken: token);
 
         if (entity is not null && entity.IdCapteur == id)
         {

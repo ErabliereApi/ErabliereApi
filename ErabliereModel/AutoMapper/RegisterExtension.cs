@@ -30,14 +30,6 @@ public static class RegisterExtension
                                                                 a.TexterA.Split(';', StringSplitOptions.RemoveEmptyEntries) :
                                                                 new string[] { }))
                   .ReverseMap();
-            config.CreateMap<AlerteCapteur, GetAlerteCapteur>()
-                  .ForMember(g => g.Emails, a => a.MapFrom(a => a.EnvoyerA != null ?
-                                                                a.EnvoyerA.Split(';', StringSplitOptions.RemoveEmptyEntries) :
-                                                                new string[] { }))
-                  .ForMember(g => g.Numeros, a => a.MapFrom(a => a.TexterA != null ?
-                                                                a.TexterA.Split(';', StringSplitOptions.RemoveEmptyEntries) :
-                                                                new string[] { }))
-                  .ReverseMap();
             config.CreateMap<CapteurImage, GetCapteurImage>()
                 .ForMember(c => c.MotDePasse, a => a.MapFrom(b => "***")).ReverseMap();
             config.CreateMap<CapteurImage, PutCapteurImage>().ReverseMap();
