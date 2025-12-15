@@ -40,6 +40,7 @@ export class CapteurListComponent {
 
     displayEditStyleForm: boolean = false;
     editStyleSelected?: Capteur;
+    @Input() loading: boolean = false;
 
     constructor(private readonly erabliereApi: ErabliereApi) {
         this.capteurTT = new Capteur();

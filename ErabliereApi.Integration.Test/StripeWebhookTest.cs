@@ -120,9 +120,11 @@ public class StripeWebhookTest : IClassFixture<StripeEnabledApplicationFactory<S
 
         var response = await client.PostAsync("/Checkout/Webhook", content);
 
+        string responseBody = await response.Content.ReadAsStringAsync();
+
         response.StatusCode.ShouldBe(
             HttpStatusCode.OK, 
-            await response.Content.ReadAsStringAsync());
+            $"Error in step {step}: {responseBody}");
     }
 
     private static string GetBody(string step)

@@ -123,12 +123,8 @@ public class StripeCheckoutService : ICheckoutService
             case "customer.subscription.created":
                 logger.LogInformation("Begin create customer.subscription.created");
 
-                var subscription = stripeEvent.Data.Object as Subscription;
-
-                if (subscription is null)
-                {
-                    throw new ArgumentNullException(nameof(stripeEvent), "Stripe.Data.Object event is null");
-                }
+                var subscription = stripeEvent.Data.Object as Subscription
+                    ?? throw new ArgumentNullException(nameof(stripeEvent), "Stripe.Data.Object event is null");
 
                 logger.LogInformation("Begin of create customer");
                 var stripeCustomer = await userService.StripeGetAsync(subscription.CustomerId, token);
