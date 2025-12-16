@@ -95,7 +95,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         var context = scope.ServiceProvider.GetRequiredService<UsageContext>();
 
-        var usageSummary = new Dictionary<string, UsageRecordCreateOptions>(context.Usages.Count);
+        var usageSummary = new Dictionary<string, SubscriptionItemUsageRecordCreateOptions>(context.Usages.Count);
 
         while (context.Usages.TryDequeue(out var usageReccorded))
         {
@@ -110,7 +110,7 @@ public class StripeUsageReccordTaskHost : IHost
             }
             else
             {
-                usageSummary.Add(usageReccorded.SubscriptionId, new UsageRecordCreateOptions
+                usageSummary.Add(usageReccorded.SubscriptionId, new SubscriptionItemUsageRecordCreateOptions
                 {
                     Quantity = usageReccorded.Quantite,
                     Timestamp = DateTimeOffset.Now.UtcDateTime
@@ -124,7 +124,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         foreach (var usageReccord in usageSummary)
         {
-            var service = new UsageRecordService();
+            var service = new SubscriptionItemUsageRecordService();
             await service.CreateAsync(usageReccord.Key, usageReccord.Value);
         }
     }
