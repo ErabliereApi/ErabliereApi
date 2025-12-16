@@ -31,11 +31,12 @@ public static class StripeUsageReccordTaskHostExtensions
 /// <summary>
 /// Décorateur de IHost ajoutant une tâche en arrière pour envoyer l'utilisation à Stripe.
 /// </summary>
-public class StripeUsageReccordTaskHost : IHost 
+public class StripeUsageReccordTaskHost : IHost
 {
     private readonly IHost _host;
     private readonly IConfiguration _config;
     private Task? _task;
+    private bool _disposed = false;
 
     /// <summary>
     /// Initialise une nouvelle instance de la classe <see cref="StripeUsageReccordTaskHost"/>.
@@ -56,7 +57,33 @@ public class StripeUsageReccordTaskHost : IHost
     /// </summary>
     public void Dispose()
     {
-        _host.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Dispose pattern implementation
+    /// </summary>
+    /// <param name="disposing"></param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _task?.Dispose();
+                _host.Dispose();
+            }
+            _disposed = true;
+        }
+    }
+
+    /// <summary>
+    /// Finalizer
+    /// </summary>
+    ~StripeUsageReccordTaskHost()
+    {
+        Dispose(false);
     }
 
     /// <summary>
