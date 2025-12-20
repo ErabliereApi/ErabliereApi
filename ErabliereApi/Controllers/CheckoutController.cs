@@ -34,16 +34,16 @@ public class CheckoutController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checkout(CancellationToken token)
     {
+        if (!_configuration.StripeIsEnabled())
+        {
+            return NotFound();
+        }
+
         try
         {
-            if (!_configuration.StripeIsEnabled())
-            {
-                return NotFound();
-            }
-
             var session = await _checkoutService.CreateSessionAsync(token);
 
-        return Ok(session);
+            return Ok(session);
         }
         catch (StripeException ex)
         {

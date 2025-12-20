@@ -65,7 +65,7 @@ public class StripeCheckoutService : ICheckoutService
             {
                 new SessionLineItemOptions
                 {
-                    Price = _options.Value.BasePlanPriceId
+                    Price = _options.Value.BasePlanPriceId,
                 }
             },
             Mode = "subscription",
