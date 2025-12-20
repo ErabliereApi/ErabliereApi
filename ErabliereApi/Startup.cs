@@ -213,17 +213,26 @@ public class Startup
 
         if (string.Equals(Configuration["USE_CORS"], TrueString, OrdinalIgnoreCase))
         {
-            Console.WriteLine("CORS enabled. Middleware Added.");
+            var corsHeaders = Configuration["CORS_HEADERS"]?.Split(',') ?? ["*"];
+            var corsMethods = Configuration["CORS_METHODS"]?.Split(',') ?? ["*"];
+            var corsOrigins = Configuration["CORS_ORIGINS"]?.Split(',') ?? ["*"];
+
+            Console.WriteLine("CORS enabled. Middleware Added." +
+                $"\n - Headers: {string.Join(", ", corsHeaders)}" +
+                $"\n - Methods: {string.Join(", ", corsMethods)}" +
+                $"\n - Origins: {string.Join(", ", corsOrigins)}");
 
             app.UseCors(option =>
             {
                 option
                     .WithExposedHeaders("x-odatacount")
-                    .WithExposedHeaders("x-odatanextlink");
-                option.WithHeaders(Configuration["CORS_HEADERS"]?.Split(',') ?? ["*"]);
-                option.WithMethods(Configuration["CORS_METHODS"]?.Split(',') ?? ["*"]);
-                option.WithOrigins(Configuration["CORS_ORIGINS"]?.Split(',') ?? ["*"]);
+                    .WithExposedHeaders("x-odatanextlink")
+                    .WithHeaders(corsHeaders)
+                    .WithMethods(corsMethods)
+                    .WithOrigins(corsOrigins);
             });
+
+            //
         }
 
         app.AddSemaphoreOnInMemoryDatabase(Configuration);

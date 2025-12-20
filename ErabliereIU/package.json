@@ -52,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
     "babel-loader": "^10.0.0",
-    "cypress": "^15.7.1",
+    "cypress": "^15.8.1",
     "eslint": "^9.39.2",
     "ts-node": "~10.9.2",
     "typescript": "^5.9.3"

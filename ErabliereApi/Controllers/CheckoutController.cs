@@ -2,6 +2,7 @@
 using ErabliereApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 
 namespace ErabliereApi.Controllers;
 
@@ -33,14 +34,21 @@ public class CheckoutController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checkout(CancellationToken token)
     {
-        if (!_configuration.StripeIsEnabled())
+        try
         {
-            return NotFound();
-        }
+            if (!_configuration.StripeIsEnabled())
+            {
+                return NotFound();
+            }
 
-        var session = await _checkoutService.CreateSessionAsync(token);
+            var session = await _checkoutService.CreateSessionAsync(token);
 
         return Ok(session);
+        }
+        catch (StripeException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>
