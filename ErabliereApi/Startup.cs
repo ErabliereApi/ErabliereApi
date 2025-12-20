@@ -231,8 +231,6 @@ public class Startup
                     .WithMethods(corsMethods)
                     .WithOrigins(corsOrigins);
             });
-
-            //
         }
 
         app.AddSemaphoreOnInMemoryDatabase(Configuration);

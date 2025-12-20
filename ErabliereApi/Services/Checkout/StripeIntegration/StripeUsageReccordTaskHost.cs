@@ -71,7 +71,11 @@ public class StripeUsageReccordTaskHost : IHost
         {
             if (disposing)
             {
-                _task?.Dispose();
+                if (_task != null && _task.Status != TaskStatus.Created)
+                {
+                    _task.Dispose();
+                }
+                
                 _host.Dispose();
             }
             _disposed = true;
@@ -122,7 +126,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         var context = scope.ServiceProvider.GetRequiredService<UsageContext>();
 
-        var usageSummary = new Dictionary<string, SubscriptionItemUsageRecordCreateOptions>(context.Usages.Count);
+        var usageSummary = new Dictionary<string, SubscriptionItemCreateOptions>(context.Usages.Count);
 
         while (context.Usages.TryDequeue(out var usageReccorded))
         {
@@ -137,11 +141,20 @@ public class StripeUsageReccordTaskHost : IHost
             }
             else
             {
-                usageSummary.Add(usageReccorded.SubscriptionId, new SubscriptionItemUsageRecordCreateOptions
+                var createOptions = new SubscriptionItemCreateOptions
                 {
-                    Quantity = usageReccorded.Quantite,
-                    Timestamp = DateTimeOffset.Now.UtcDateTime
-                });
+                    Subscription = usageReccorded.SubscriptionId,
+                    Quantity = usageReccorded.Quantite
+                };
+
+                if (createOptions.Metadata == null)
+                {
+                    createOptions.Metadata = new Dictionary<string, string>();
+                }
+
+                createOptions.Metadata.Add("Timestamp", DateTimeOffset.UtcNow.ToString());
+
+                usageSummary.Add(usageReccorded.SubscriptionId, createOptions);
             }
         }
 
@@ -151,8 +164,8 @@ public class StripeUsageReccordTaskHost : IHost
 
         foreach (var usageReccord in usageSummary)
         {
-            var service = new SubscriptionItemUsageRecordService();
-            await service.CreateAsync(usageReccord.Key, usageReccord.Value);
+            var service = new SubscriptionItemService();
+            await service.CreateAsync(usageReccord.Value);
         }
     }
 
