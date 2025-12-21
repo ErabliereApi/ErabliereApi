@@ -82,12 +82,12 @@ public class ApiKeyController : ControllerBase
 
         return Ok(new
         {
-            Id = apikey.Id,
-            Name = apikey.Name,
+            apikey.Id,
+            apikey.Name,
             HeaderName = ApiKeyMiddleware.XApiKeyHeader,
             Key = originalKey,
-            CreationTime = apikey.CreationTime,
-            CustomerId = apikey.CustomerId
+            apikey.CreationTime,
+            apikey.CustomerId
         });
     }
 

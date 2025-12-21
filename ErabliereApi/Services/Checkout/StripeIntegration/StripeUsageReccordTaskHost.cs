@@ -114,6 +114,14 @@ public class StripeUsageReccordTaskHost : IHost
         return _host.StartAsync(cancellationToken);
     }
 
+
+    /// <summary>
+    /// Clé de la valeur dans le payload.
+    /// Représente la quantité d'utilisation.
+    /// Soit le nombre d'API Key request par clé d'api.
+    /// </summary>
+    private const string PayloadValueKey = "value";
+
     private async Task EnvoyerUtilisationAsync()
     {
         Console.WriteLine("Envoie de l'utilisation à Stripe...");
@@ -143,9 +151,9 @@ public class StripeUsageReccordTaskHost : IHost
 
             if (usageSummary.TryGetValue(usageReccorded.SubscriptionId, out var usage))
             {
-                var actuel = int.Parse(usage.Payload["value"] ?? "0");
+                var actuel = int.Parse(usage.Payload[PayloadValueKey] ?? "0");
                 actuel += usageReccorded.Quantite;
-                usage.Payload["value"] = actuel.ToString();
+                usage.Payload[PayloadValueKey] = actuel.ToString();
             }
             else
             {
@@ -154,7 +162,7 @@ public class StripeUsageReccordTaskHost : IHost
                     EventName = "api_key_request",
                     Payload = new Dictionary<string, string>
                     {
-                        { "value", usageReccorded.Quantite.ToString() },
+                        { PayloadValueKey, usageReccorded.Quantite.ToString() },
                         { "stripe_customer_id", usageReccorded.SubscriptionId }
                     },
                 };
@@ -169,7 +177,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         foreach (var usageReccord in usageSummary)
         {
-            Console.WriteLine($"Envoie de l'utilisation pour la souscription {usageReccord.Key} : {usageReccord.Value.Payload["value"]}");
+            Console.WriteLine($"Envoie de l'utilisation pour la souscription {usageReccord.Key} : {usageReccord.Value.Payload[PayloadValueKey]}");
             var service = new MeterEventService();
             await service.CreateAsync(usageReccord.Value);
         }
