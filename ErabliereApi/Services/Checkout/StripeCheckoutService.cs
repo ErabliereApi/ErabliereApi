@@ -176,4 +176,10 @@ public class StripeCheckoutService : ICheckoutService
 
         return Task.FromResult<object>(balance);
     }
+
+    /// <inheritdoc />
+    public IEnumerable<Usage> GetUsageRecords()
+    {
+        return _usageContext.Usages.ToArray();
+    }
 }

@@ -1,7 +1,4 @@
-﻿using System.Security.Claims;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErabliereApi.Depot.Sql;
+﻿using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Put;
@@ -66,6 +63,7 @@ public class CustomersController : ControllerBase
             DeletionTime = k.DeletionTime,
             RevocationTime = k.RevocationTime,
             SubscriptionId = k.SubscriptionId,
+            LastUsage = k.LastUsage,
             Key = "***", // Masquer la clé pour des raisons de sécurité
             Customer = null // Ne pas inclure le client dans la clé API
         }).ToList();

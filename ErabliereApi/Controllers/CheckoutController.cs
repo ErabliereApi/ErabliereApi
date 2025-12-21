@@ -90,4 +90,22 @@ public class CheckoutController : ControllerBase
 
         return Ok(balance);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("[action]")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    public async Task<IActionResult> GetUsagesQueue(CancellationToken token)
+    {
+        if (!_configuration.StripeIsEnabled())
+        {
+            return NotFound();
+        }
+        var invoices = _checkoutService.GetUsageRecords();
+        return Ok(invoices);
+    }
 }

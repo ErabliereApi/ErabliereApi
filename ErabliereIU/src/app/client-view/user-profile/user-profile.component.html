@@ -29,7 +29,10 @@
     <div class="card col-md-4">
         <h3>Clés API</h3>
         <div class="btn-group mb-3">
-            <button class="btn btn-success" (click)="buyApiKey()">Obtenir une clé d'api</button>
+            <ebutton type="success" (clicked)="buyApiKey()" [inProgress]="buyApiKeyClicked">Obtenir une clé d'api
+            </ebutton>
+            <ebutton class="ms-2" type="info" (clicked)="loadUserProfile()" [inProgress]="loadUserProfileClicked"
+                title="Rafraîchir">⟳</ebutton>
         </div>
         <span class="text-danger">{{errorApiKey}}</span>
         <div>
@@ -44,20 +47,23 @@
                 </thead>
                 <tbody>
                     @if (customer.apiKeys && customer.apiKeys.length > 0) {
-                        @for (apiKey of customer.apiKeys; track apiKey.id) {
-                            <tr>
-                                <td>{{ apiKey.name }}</td>
-                                <td>{{ apiKey.creationTime | date: 'yyyy-MM-dd' }}</td>
-                                <td>{{ apiKey.lastUsage | date: 'yyyy-MM-dd' }}</td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm" (click)="deleteApiKey(apiKey.id)">Supprimer</button>
-                                </td>
-                            </tr>
-                        }
+                    @for (apiKey of customer.apiKeys; track apiKey.id) {
+                    <tr>
+                        <td>{{ apiKey.name }}</td>
+                        <td>{{ apiKey.creationTime | date: 'yyyy-MM-dd' }}</td>
+                        <td>{{ apiKey.lastUsage | date: 'yyyy-MM-dd' }}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm me-2" title="Modifier le nom"
+                                (click)="editApiKeyName(apiKey)">✏️</button>
+                            <button class="btn btn-danger btn-sm" title="Supprimer"
+                                (click)="deleteApiKey(apiKey.id)">🗑</button>
+                        </td>
+                    </tr>
+                    }
                     } @else {
-                        <tr>
-                            <td colspan="4">Aucune clé API disponible.</td>
-                        </tr>
+                    <tr>
+                        <td colspan="4">Aucune clé API disponible.</td>
+                    </tr>
                     }
                 </tbody>
             </table>
@@ -70,9 +76,9 @@
     <div class="col-md-4 card">
         <h3>ErabliereAI</h3>
         @if (user?.roles?.includes('ErabliereAIUser')) {
-            <p>ErabliereAI est activé pour cet utilisateur.</p>
+        <p>ErabliereAI est activé pour cet utilisateur.</p>
         } @else {
-            <p>ErabliereAI n'est pas activé pour cet utilisateur.</p>
+        <p>ErabliereAI n'est pas activé pour cet utilisateur.</p>
         }
     </div>
     <div class="col-md-4 card">
@@ -81,3 +87,19 @@
     </div>
     }
 </div>
+
+@if (editApiKeyNameActive) {
+<emodal [title]="editApiKeyNameModalTitle" [displayFooter]="false" (closed)="closeEditApiKeyNameModal()">
+    <form [formGroup]="editApiKeyNameForm" [class]="'p-3'" novalidate>
+        <div class="mb-3">
+            <einput [id]="'name'" [name]="'name'" [placeholder]="'Nom de la clé API'" [formGroup]="editApiKeyNameForm"
+                [maxlength]="100" [errorObj]="editApiKeyErrorObj"></einput>
+        </div>
+        <div class="text-end">
+            <ebutton type="secondary" class="me-2" (clicked)="closeEditApiKeyNameModal()">Annuler</ebutton>
+            <ebutton type="primary" (clicked)="saveEditedApiKeyName()" [inProgress]="saveEditApiKeyNameInProgress">
+                Enregistrer</ebutton>
+        </div>
+    </form>
+</emodal>
+}

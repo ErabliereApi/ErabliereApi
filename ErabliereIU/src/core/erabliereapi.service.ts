@@ -35,7 +35,8 @@ import { Appareil } from 'src/model/appareil';
 import { IpInfo } from 'src/model/ipinfo';
 
 @Injectable({ providedIn: 'root' })
-export class ErabliereApi {  
+export class ErabliereApi {
+    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -808,6 +809,11 @@ export class ErabliereApi {
     async getIpInfosGroupedByCountry() {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.get<any[]>(this._environmentService.apiUrl + '/ipinfo/group-by-country', { headers: headers }));
+    }
+
+    async updateApiKeyName(id: string | undefined, name: string | undefined) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/access/ApiKey/' + id + '/name', { name: name }, { headers: headers }));
     }
 }
 

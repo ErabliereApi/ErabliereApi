@@ -1,6 +1,7 @@
 using ErabliereApi.Extensions;
 using Microsoft.Extensions.Options;
 using Stripe;
+using Stripe.Billing;
 
 namespace ErabliereApi.StripeIntegration;
 
@@ -115,10 +116,13 @@ public class StripeUsageReccordTaskHost : IHost
 
     private async Task EnvoyerUtilisationAsync()
     {
+        Console.WriteLine("Envoie de l'utilisation à Stripe...");
+
         var skip = _config.GetValue<string>("StripeUsageReccord.SkipRecord");
 
         if (skip == "true")
         {
+            Console.WriteLine("Envoie de l'utilisation à Stripe ignorée.");
             return;
         }
 
@@ -126,7 +130,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         var context = scope.ServiceProvider.GetRequiredService<UsageContext>();
 
-        var usageSummary = new Dictionary<string, SubscriptionItemCreateOptions>(context.Usages.Count);
+        var usageSummary = new Dictionary<string, MeterEventCreateOptions>(context.Usages.Count);
 
         while (context.Usages.TryDequeue(out var usageReccorded))
         {
@@ -135,24 +139,25 @@ public class StripeUsageReccordTaskHost : IHost
                 continue;
             }
 
+            Console.WriteLine($"Utilisation dans la file : {usageReccorded.SubscriptionId} - {usageReccorded.Quantite}");
+
             if (usageSummary.TryGetValue(usageReccorded.SubscriptionId, out var usage))
             {
-                usage.Quantity += usageReccorded.Quantite;
+                var actuel = int.Parse(usage.Payload["value"] ?? "0");
+                actuel += usageReccorded.Quantite;
+                usage.Payload["value"] = actuel.ToString();
             }
             else
             {
-                var createOptions = new SubscriptionItemCreateOptions
+                var createOptions = new MeterEventCreateOptions
                 {
-                    Subscription = usageReccorded.SubscriptionId,
-                    Quantity = usageReccorded.Quantite
+                    EventName = "api_key_request",
+                    Payload = new Dictionary<string, string>
+                    {
+                        { "value", usageReccorded.Quantite.ToString() },
+                        { "stripe_customer_id", usageReccorded.SubscriptionId }
+                    },
                 };
-
-                if (createOptions.Metadata == null)
-                {
-                    createOptions.Metadata = new Dictionary<string, string>();
-                }
-
-                createOptions.Metadata.Add("Timestamp", DateTimeOffset.UtcNow.ToString());
 
                 usageSummary.Add(usageReccorded.SubscriptionId, createOptions);
             }
@@ -164,7 +169,8 @@ public class StripeUsageReccordTaskHost : IHost
 
         foreach (var usageReccord in usageSummary)
         {
-            var service = new SubscriptionItemService();
+            Console.WriteLine($"Envoie de l'utilisation pour la souscription {usageReccord.Key} : {usageReccord.Value.Payload["value"]}");
+            var service = new MeterEventService();
             await service.CreateAsync(usageReccord.Value);
         }
     }
