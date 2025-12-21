@@ -13,7 +13,11 @@
     }
 </div>
 
-<capteur-list [idErabliere]="idErabliereSelectionee" [capteurs]="capteurs" (shouldRefreshCapteurs)="getCapteurs()" />
+<capteur-list 
+    [idErabliere]="idErabliereSelectionee" 
+    [capteurs]="capteurs" 
+    [loading]="loadingCapteurs" 
+    (shouldRefreshCapteurs)="getCapteurs()" />
 
 <div>
     @if(afficherSectionAjouterCapteurImage) {

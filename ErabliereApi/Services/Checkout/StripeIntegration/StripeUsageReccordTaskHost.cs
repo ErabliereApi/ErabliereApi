@@ -1,6 +1,7 @@
 using ErabliereApi.Extensions;
 using Microsoft.Extensions.Options;
 using Stripe;
+using Stripe.Billing;
 
 namespace ErabliereApi.StripeIntegration;
 
@@ -31,11 +32,12 @@ public static class StripeUsageReccordTaskHostExtensions
 /// <summary>
 /// Décorateur de IHost ajoutant une tâche en arrière pour envoyer l'utilisation à Stripe.
 /// </summary>
-public class StripeUsageReccordTaskHost : IHost 
+public class StripeUsageReccordTaskHost : IHost
 {
     private readonly IHost _host;
     private readonly IConfiguration _config;
     private Task? _task;
+    private bool _disposed = false;
 
     /// <summary>
     /// Initialise une nouvelle instance de la classe <see cref="StripeUsageReccordTaskHost"/>.
@@ -56,7 +58,37 @@ public class StripeUsageReccordTaskHost : IHost
     /// </summary>
     public void Dispose()
     {
-        _host.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Dispose pattern implementation
+    /// </summary>
+    /// <param name="disposing"></param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                if (_task != null && _task.Status != TaskStatus.Created)
+                {
+                    _task.Dispose();
+                }
+                
+                _host.Dispose();
+            }
+            _disposed = true;
+        }
+    }
+
+    /// <summary>
+    /// Finalizer
+    /// </summary>
+    ~StripeUsageReccordTaskHost()
+    {
+        Dispose(false);
     }
 
     /// <summary>
@@ -82,12 +114,23 @@ public class StripeUsageReccordTaskHost : IHost
         return _host.StartAsync(cancellationToken);
     }
 
+
+    /// <summary>
+    /// Clé de la valeur dans le payload.
+    /// Représente la quantité d'utilisation.
+    /// Soit le nombre d'API Key request par clé d'api.
+    /// </summary>
+    private const string PayloadValueKey = "value";
+
     private async Task EnvoyerUtilisationAsync()
     {
+        Console.WriteLine("Envoie de l'utilisation à Stripe...");
+
         var skip = _config.GetValue<string>("StripeUsageReccord.SkipRecord");
 
         if (skip == "true")
         {
+            Console.WriteLine("Envoie de l'utilisation à Stripe ignorée.");
             return;
         }
 
@@ -95,7 +138,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         var context = scope.ServiceProvider.GetRequiredService<UsageContext>();
 
-        var usageSummary = new Dictionary<string, UsageRecordCreateOptions>(context.Usages.Count);
+        var usageSummary = new Dictionary<string, MeterEventCreateOptions>(context.Usages.Count);
 
         while (context.Usages.TryDequeue(out var usageReccorded))
         {
@@ -104,17 +147,27 @@ public class StripeUsageReccordTaskHost : IHost
                 continue;
             }
 
+            Console.WriteLine($"Utilisation dans la file : {usageReccorded.SubscriptionId} - {usageReccorded.Quantite}");
+
             if (usageSummary.TryGetValue(usageReccorded.SubscriptionId, out var usage))
             {
-                usage.Quantity += usageReccorded.Quantite;
+                var actuel = int.Parse(usage.Payload[PayloadValueKey] ?? "0");
+                actuel += usageReccorded.Quantite;
+                usage.Payload[PayloadValueKey] = actuel.ToString();
             }
             else
             {
-                usageSummary.Add(usageReccorded.SubscriptionId, new UsageRecordCreateOptions
+                var createOptions = new MeterEventCreateOptions
                 {
-                    Quantity = usageReccorded.Quantite,
-                    Timestamp = DateTimeOffset.Now.UtcDateTime
-                });
+                    EventName = "api_key_request",
+                    Payload = new Dictionary<string, string>
+                    {
+                        { PayloadValueKey, usageReccorded.Quantite.ToString() },
+                        { "stripe_customer_id", usageReccorded.SubscriptionId }
+                    },
+                };
+
+                usageSummary.Add(usageReccorded.SubscriptionId, createOptions);
             }
         }
 
@@ -124,8 +177,9 @@ public class StripeUsageReccordTaskHost : IHost
 
         foreach (var usageReccord in usageSummary)
         {
-            var service = new UsageRecordService();
-            await service.CreateAsync(usageReccord.Key, usageReccord.Value);
+            Console.WriteLine($"Envoie de l'utilisation pour la souscription {usageReccord.Key} : {usageReccord.Value.Payload[PayloadValueKey]}");
+            var service = new MeterEventService();
+            await service.CreateAsync(usageReccord.Value);
         }
     }
 

@@ -1,7 +1,4 @@
-﻿using System.Security.Claims;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErabliereApi.Depot.Sql;
+﻿using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Put;
@@ -23,19 +20,16 @@ namespace ErabliereApi.Controllers;
 public class CustomersController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
-    private readonly IMapper _mapper;
     private readonly IDistributedCache _cache;
 
     /// <summary>
     /// Constructeur avec dépendance
     /// </summary>
     /// <param name="context">La base de données</param>
-    /// <param name="mapper">Le mapper</param>
     /// <param name="cache">Le cache distribué</param>
-    public CustomersController(ErabliereDbContext context, IMapper mapper, IDistributedCache cache)
+    public CustomersController(ErabliereDbContext context, IDistributedCache cache)
     {
         _context = context;
-        _mapper = mapper;
         _cache = cache;
     }
 
@@ -69,6 +63,7 @@ public class CustomersController : ControllerBase
             DeletionTime = k.DeletionTime,
             RevocationTime = k.RevocationTime,
             SubscriptionId = k.SubscriptionId,
+            LastUsage = k.LastUsage,
             Key = "***", // Masquer la clé pour des raisons de sécurité
             Customer = null // Ne pas inclure le client dans la clé API
         }).ToList();
@@ -151,8 +146,7 @@ public class CustomersController : ControllerBase
     [ProducesResponseType(200, Type = typeof(List<GetCustomer>))]
     public async Task<IActionResult> GetCustomers(CancellationToken token)
     {
-        var customers = await _context.Customers.ProjectTo<GetCustomer>(_mapper.ConfigurationProvider)
-                                                .ToListAsync(token);
+        var customers = await _context.Customers.ToListAsync(token);
 
         // Masquer avec des * certains caractères des adresses courriel
         foreach (var customer in customers.Where(c => !string.IsNullOrEmpty(c.Email) && c.Email.Contains('@')))
@@ -311,7 +305,6 @@ public class CustomersController : ControllerBase
 
         var erablieres = await _context.CustomerErablieres.AsNoTracking()
             .Where(c => c.IdCustomer == id)
-            .ProjectTo<GetCustomerAccess>(_mapper.ConfigurationProvider)
             .ToArrayAsync(token);
 
         return Ok(erablieres);

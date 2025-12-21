@@ -10,5 +10,5 @@ public class UsageContext
     /// <summary>
     /// Les utilisations
     /// </summary>
-    public ConcurrentQueue<Usage> Usages = new ConcurrentQueue<Usage>();
+    public ConcurrentQueue<Usage> Usages { get; } = new ConcurrentQueue<Usage>();
 }

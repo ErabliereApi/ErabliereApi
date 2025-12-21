@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 
 namespace ErabliereApi.Controllers;
 
@@ -81,12 +82,12 @@ public class ApiKeyController : ControllerBase
 
         return Ok(new
         {
-            Id = apikey.Id,
-            Name = apikey.Name,
+            apikey.Id,
+            apikey.Name,
             HeaderName = ApiKeyMiddleware.XApiKeyHeader,
             Key = originalKey,
-            CreationTime = apikey.CreationTime,
-            CustomerId = apikey.CustomerId
+            apikey.CreationTime,
+            apikey.CustomerId
         });
     }
 
@@ -94,13 +95,27 @@ public class ApiKeyController : ControllerBase
     /// Permet de modifier le nom d'une clé d'API.
     /// </summary>
     [HttpPut("{id}/name")]
-    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     public async Task<IActionResult> UpdateApiKeyName(Guid id, [FromBody] PutApiKeyName param, CancellationToken token)
     {
+        var user = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), User);
+
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UniqueName == user, token);
+
+        if (customer == null)
+        {
+            return Forbid();
+        }
+
         var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
+
         if (apiKey == null)
         {
             return NotFound();
+        }
+
+        if (apiKey.CustomerId != customer.Id)
+        {
+            return Forbid();
         }
 
         if (string.IsNullOrWhiteSpace(param.Name))

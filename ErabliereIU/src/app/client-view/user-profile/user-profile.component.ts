@@ -6,11 +6,22 @@ import { CopyTextButtonComponent } from "src/generic/copy-text-button.component"
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Customer } from "src/model/customer";
 import { DatePipe } from "@angular/common";
+import { EButtonComponent } from "src/generic/ebutton.component";
+import { ApiKey } from "src/model/apikey";
+import { EModalComponent } from "src/generic/modal/emodal.component";
+import { EinputComponent } from "src/generic/einput.component";
+import {
+    ReactiveFormsModule,
+    FormsModule,
+    UntypedFormBuilder,
+    Validators,
+    FormControl
+} from "@angular/forms";
 
 @Component({
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
-    imports: [CopyTextButtonComponent, DatePipe],
+    imports: [CopyTextButtonComponent, DatePipe, EButtonComponent, EModalComponent, EinputComponent, ReactiveFormsModule, FormsModule],
 })
 export class UserProfileComponent implements OnInit {
     user: AppUser | null = null;
@@ -18,10 +29,20 @@ export class UserProfileComponent implements OnInit {
     errorToken: string | null = null;
     errorCustomer: string | null = null;
     errorApiKey: string | null = null;
+    editApiKeyNameForm: any;
     private readonly authSvc: IAuthorisationSerivce;
 
-    constructor(authSvcFactory: AuthorisationFactoryService, private readonly api: ErabliereApi) {
+    constructor(authSvcFactory: AuthorisationFactoryService, private readonly api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
         this.authSvc = authSvcFactory.getAuthorisationService();
+        this.editApiKeyNameForm = this.fb.group({
+            name: new FormControl(
+                '',
+                {
+                    validators: [Validators.required, Validators.maxLength(100)],
+                    updateOn: 'blur'
+                }
+            )
+        });
     }
 
     ngOnInit(): void {
@@ -31,7 +52,10 @@ export class UserProfileComponent implements OnInit {
         });
     }
 
+    loadUserProfileClicked = false;
+
     loadUserProfile(): void {
+        this.loadUserProfileClicked = true;
         this.authSvc.getUserInfo().then(userInfo => {
             console.log("User profile loaded:", userInfo);
             this.user = userInfo;
@@ -48,6 +72,8 @@ export class UserProfileComponent implements OnInit {
             console.error("Error loading customer profile:", error);
             this.errorCustomer = "Erreur lors du chargement du profil client.";
             this.customer = null;
+        }).finally(() => {
+            this.loadUserProfileClicked = false;
         });
     }
 
@@ -67,9 +93,56 @@ export class UserProfileComponent implements OnInit {
         });
     }
 
+    buyApiKeyClicked = false;
+
     buyApiKey(): void {
+        this.buyApiKeyClicked = true;
         this.api.startCheckoutSession().then(resonse => {
-            window.location.href = resonse.url;
-        });
+            globalThis.location.href = resonse.url;
+        }).catch(error => {
+            console.error("Error starting checkout session:", error);
+            this.errorApiKey = "Erreur lors de la création de la session d'achat de clé API.";
+        })
+            .finally(() => {
+                this.buyApiKeyClicked = false;
+            });
+    }
+
+    editApiKeyNameActive: boolean = false;
+    editApiKeyNameModalTitle: string = "Modifier le nom de la clé API";
+    editedApiKey: ApiKey | null = null;
+
+    editApiKeyName(_t55: ApiKey) {
+        this.editedApiKey = { ..._t55 }; // Create a copy to edit
+        this.editApiKeyNameActive = true;
+    }
+
+    saveEditApiKeyNameInProgress: boolean = false;
+    editApiKeyErrorObj: any = null;
+
+    saveEditedApiKeyName() {
+        if (this.editedApiKey) {
+            this.saveEditApiKeyNameInProgress = true;
+            this.errorApiKey = null;
+            this.editApiKeyErrorObj = null;
+            let name = this.editApiKeyNameForm.controls['name'].value;
+            this.api.updateApiKeyName(this.editedApiKey.id, name).then(() => {
+                console.log("API key name updated successfully.");
+                this.errorApiKey = null;
+                this.loadUserProfile(); // Reload user profile to reflect changes
+                this.editApiKeyNameActive = false;
+            }).catch(error => {
+                console.error("Error updating API key name:", error);
+                this.errorApiKey = "Erreur lors de la mise à jour du nom de la clé API.";
+                this.editApiKeyErrorObj = error.error;
+            }).finally(() => {
+                this.saveEditApiKeyNameInProgress = false;
+            });
+        }
+    }
+
+    closeEditApiKeyNameModal() {
+        this.editApiKeyNameActive = false;
+        this.editedApiKey = null;
     }
 }

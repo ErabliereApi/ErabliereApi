@@ -25,6 +25,7 @@ export class GestionCapteursComponent implements OnChanges {
     capteursImage: CapteurImage[] = [];
     afficherSectionAjouterCapteur: boolean = false;
     afficherSectionAjouterCapteurImage: boolean = false;
+    loadingCapteurs: boolean = false;
 
     constructor(
         private readonly _api: ErabliereApi) {
@@ -47,8 +48,11 @@ export class GestionCapteursComponent implements OnChanges {
 
     async getCapteurs() {
         if (this.idErabliereSelectionee) {
+            this.loadingCapteurs = true;
             this._api.getCapteurs(this.idErabliereSelectionee).then(capteurs => {
                 this.capteurs = capteurs;
+            }).finally(() => {
+                this.loadingCapteurs = false;
             });
         }
     }

@@ -117,7 +117,7 @@ public class AlerteCapteursController : ControllerBase
             return BadRequest("L'id de la route ne concorde pas avec l'id du capteur à ajouter");
         }
 
-        if (await (_depot.Capteurs.FindAsync(new object?[] { id }, cancellationToken: token)) == null)
+        if (await (_depot.Capteurs.FindAsync([ id ], cancellationToken: token)) == null)
         {
             return BadRequest("Le capteur n'existe pas");
         }

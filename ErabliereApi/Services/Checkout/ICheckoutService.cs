@@ -1,5 +1,6 @@
 ﻿using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.StripeIntegration;
 
 namespace ErabliereApi.Services;
 
@@ -29,4 +30,10 @@ public interface ICheckoutService
     /// Get the balance of the Stripe account
     /// </summary>
     Task<object> GetBalanceAsync(CancellationToken token);
+
+    /// <summary>
+    /// Get the current state of usage records.
+    /// Those are not sent to Stripe yet.
+    /// </summary>
+    IEnumerable<Usage> GetUsageRecords();
 }

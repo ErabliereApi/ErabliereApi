@@ -2,6 +2,7 @@
 using ErabliereApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 
 namespace ErabliereApi.Controllers;
 
@@ -38,9 +39,16 @@ public class CheckoutController : ControllerBase
             return NotFound();
         }
 
-        var session = await _checkoutService.CreateSessionAsync(token);
+        try
+        {
+            var session = await _checkoutService.CreateSessionAsync(token);
 
-        return Ok(session);
+            return Ok(session);
+        }
+        catch (StripeException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -81,5 +89,23 @@ public class CheckoutController : ControllerBase
         var balance = await _checkoutService.GetBalanceAsync(token);
 
         return Ok(balance);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("[action]")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    public async Task<IActionResult> GetUsagesQueue(CancellationToken token)
+    {
+        if (!_configuration.StripeIsEnabled())
+        {
+            return NotFound();
+        }
+        var invoices = _checkoutService.GetUsageRecords();
+        return Ok(invoices);
     }
 }

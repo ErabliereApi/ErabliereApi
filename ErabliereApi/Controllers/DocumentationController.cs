@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ErabliereApi.Depot.Sql;
+﻿using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Query;
 using ErabliereApi.Attributes;
 using ErabliereApi.Donnees.Action.Put;
+using ErabliereApi.Extensions;
 
 namespace ErabliereApi.Controllers;
 
@@ -20,17 +20,14 @@ namespace ErabliereApi.Controllers;
 public class DocumentationController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructeur par défaut
     /// </summary>
     /// <param name="depot"></param>
-    /// <param name="mapper"></param>
-    public DocumentationController(ErabliereDbContext depot, IMapper mapper)
+    public DocumentationController(ErabliereDbContext depot)
     {
         _depot = depot;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -102,7 +99,11 @@ public class DocumentationController : ControllerBase
             postDocumentation.Created = DateTimeOffset.Now;
         }
 
-        var entite = await _depot.Documentation.AddAsync(_mapper.Map<Documentation>(postDocumentation), token);
+        var entite = await _depot.Documentation.AddAsync(
+            postDocumentation.MapTo<Documentation>(new Dictionary<string, Func<object?, object?>>
+            {
+                { "File", input => input != null ? Convert.FromBase64String(input as string ?? "") : null }
+            }));
 
         await _depot.SaveChangesAsync(token);
 
