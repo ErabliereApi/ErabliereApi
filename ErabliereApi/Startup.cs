@@ -67,16 +67,7 @@ public class Startup
         }
 
         // Automapper
-        services.AjouterAutoMapperErabliereApiDonnee(config =>
-            {
-                StripeIntegration.AutoMapperExtension.AddCustomersApiKeyMappings(config);
-
-                config.CreateMap<PostNoteMultipart, Note>()
-                  .ForMember(d => d.File, o => o.Ignore())
-                  .ReverseMap()
-                  .ForMember(d => d.File, o => o.Ignore());
-            }
-        );
+        services.AjouterAutoMapperErabliereApiDonnee();
 
         // HttpClient
         services.AddHttpClients(Configuration);

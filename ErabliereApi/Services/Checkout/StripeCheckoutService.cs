@@ -6,6 +6,7 @@ using ErabliereApi.Donnees;
 using ErabliereApi.StripeIntegration;
 using ErabliereApi.Services.Users;
 using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Extensions;
 
 namespace ErabliereApi.Services;
 
@@ -18,7 +19,6 @@ public class StripeCheckoutService : ICheckoutService
     private readonly IHttpContextAccessor _accessor;
     private readonly ILogger<StripeCheckoutService> _logger;
     private readonly IUserService _userService;
-    private readonly IMapper _mapper;
     private readonly IApiKeyService _apiKeyService;
     private readonly UsageContext _usageContext;
 
@@ -29,14 +29,12 @@ public class StripeCheckoutService : ICheckoutService
     /// <param name="accessor"></param>
     /// <param name="logger"></param>
     /// <param name="userService"></param>
-    /// <param name="mapper"></param>
     /// <param name="apiKeyService"></param>
     /// <param name="usageContext"></param>
     public StripeCheckoutService(IOptions<StripeOptions> options,
                                  IHttpContextAccessor accessor,
                                  ILogger<StripeCheckoutService> logger,
                                  IUserService userService,
-                                 IMapper mapper,
                                  IApiKeyService apiKeyService,
                                  UsageContext usageContext)
     {
@@ -44,7 +42,6 @@ public class StripeCheckoutService : ICheckoutService
         _accessor = accessor;
         _logger = logger;
         _userService = userService;
-        _mapper = mapper;
         _apiKeyService = apiKeyService;
         _usageContext = usageContext;
     }
@@ -95,7 +92,6 @@ public class StripeCheckoutService : ICheckoutService
         await WebHookSwitchCaseLogic(
             stripeEvent, 
             _logger,
-            _mapper, 
             _userService,
             _apiKeyService, 
             _accessor.HttpContext?.RequestAborted ?? CancellationToken.None);
@@ -106,14 +102,12 @@ public class StripeCheckoutService : ICheckoutService
     /// </summary>
     /// <param name="stripeEvent"></param>
     /// <param name="logger"></param>
-    /// <param name="mapper"></param>
     /// <param name="userService"></param>
     /// <param name="apiKeyService"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     public static async Task WebHookSwitchCaseLogic(Event stripeEvent,
-        ILogger logger, 
-        IMapper mapper, 
+        ILogger logger,
         IUserService userService, 
         IApiKeyService apiKeyService, 
         CancellationToken token)
@@ -128,7 +122,10 @@ public class StripeCheckoutService : ICheckoutService
 
                 logger.LogInformation("Begin of create customer");
                 var stripeCustomer = await userService.StripeGetAsync(subscription.CustomerId, token);
-                var customerMapped = mapper.Map<Donnees.Customer>(stripeCustomer);
+                var customerMapped = stripeCustomer.MapTo<Stripe.Customer, Donnees.Customer>(customerMappingOption);
+                customerMapped.UniqueName = customerMapped.Email;
+                customerMapped.AccountType = "Stripe.Customer";
+                customerMapped.StripeId = stripeCustomer.Id;
                 var customer = await userService.GetOrCreateCustomerAsync(customerMapped, token);
                 await userService.UpdateEnsureStripeInfoAsync(customer, customerMapped.StripeId, token);
                 logger.LogInformation("End of create customer");
@@ -182,4 +179,9 @@ public class StripeCheckoutService : ICheckoutService
     {
         return _usageContext.Usages.ToArray();
     }
+
+    private static readonly Dictionary<string, Func<Stripe.Customer?, object?>> customerMappingOption = new()
+    {
+        { "Id", _ => null }
+    };
 }

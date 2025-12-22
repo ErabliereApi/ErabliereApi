@@ -72,7 +72,7 @@ public class StripeUsageReccordTaskHost : IHost
         {
             if (disposing)
             {
-                if (_task != null && _task.Status != TaskStatus.Created)
+                if (_task != null && _task.Status != TaskStatus.WaitingForActivation)
                 {
                     _task.Dispose();
                 }

@@ -89,7 +89,6 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
                         await StripeCheckoutService.WebHookSwitchCaseLogic(
                             eventDeserialized,
                             sp.GetRequiredService<ILogger<StripeCheckoutService>>(),
-                            sp.GetRequiredService<IMapper>(),
                             sp.GetRequiredService<IUserService>(),
                             sp.GetRequiredService<IApiKeyService>(),
                             CancellationToken.None);

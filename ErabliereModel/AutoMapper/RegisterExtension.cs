@@ -16,9 +16,8 @@ public static class RegisterExtension
     /// Méthode pour ajouter les mapping entre les modèles exposés et les modèles de la base de données.
     /// </summary>
     /// <param name="services">The ServiceCollection instance to add automapper</param>
-    /// <param name="additionnelConfig">An action to add additionnal mapping rule</param>
     /// <returns></returns>
-    public static IServiceCollection AjouterAutoMapperErabliereApiDonnee(this IServiceCollection services, Action<IMapperConfigurationExpression>? additionnelConfig = null) =>
+    public static IServiceCollection AjouterAutoMapperErabliereApiDonnee(this IServiceCollection services) =>
         services.AddAutoMapper(config =>
         {
             config.CreateMap<Erabliere, GetCustomerAccessErabliere>().ReverseMap();
@@ -41,7 +40,5 @@ public static class RegisterExtension
             config.CreateMap<Note, PostNoteMultipartResponse>()
                   .ReverseMap();
             config.CreateMap<PostRappel, Rappel>();
-
-            additionnelConfig?.Invoke(config);
         });
 }

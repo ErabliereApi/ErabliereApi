@@ -21,7 +21,7 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
 {
     private readonly ErabliereApiApplicationFactory<Startup> _factory;
     private readonly IFixture _fixture;
-    private readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions
+    private readonly JsonSerializerOptions _serializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
