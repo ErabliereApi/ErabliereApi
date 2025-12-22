@@ -16,12 +16,14 @@ describe('Alerte functionnality', { testIsolation: false }, () => {
 
         const email = FixtureUtil.getRandomEmail();
 
+        cy.wait(500);
+
         alertePage.clickOnAddAlerteButton()
                   .selectAlerteTrioDonnees()
                   .typeEmail(email)
                   .clickOnCreateButton();
 
-        cy.wait(5000);
+        cy.wait(3000);
 
         alertePage.getLastAlerteDonneesEmail().should('have.text', email);
     });

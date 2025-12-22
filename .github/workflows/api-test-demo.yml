@@ -54,7 +54,6 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           record: true
-          key: ${{ secrets.CYPRESS_RECORD_KEY }}
           working-directory: ErabliereIU
           config: video=false,baseUrl=https://erabliereapi-demo.azurewebsites.net
         env:

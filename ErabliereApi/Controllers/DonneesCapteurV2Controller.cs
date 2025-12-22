@@ -1,10 +1,9 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErabliereApi.Attributes;
+﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Generic;
+using ErabliereApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,17 +21,18 @@ namespace ErabliereApi.Controllers;
 public class DonneesCapteurV2Controller : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
+    private static readonly Dictionary<string, string> donneeCapteurSpecificMapping = new()
+    {
+        { nameof(PostDonneeCapteurV2.V), nameof(DonneeCapteur.Valeur) }
+    };
 
     /// <summary>
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="depot">Le dépôt des barils</param>
-    /// <param name="mapper">Interface de mapping entre les objets</param>
-    public DonneesCapteurV2Controller(ErabliereDbContext depot, IMapper mapper)
+    public DonneesCapteurV2Controller(ErabliereDbContext depot)
     {
         _depot = depot;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class DonneesCapteurV2Controller : ControllerBase
                                                               [FromQuery] DateTimeOffset? dd,
                                                               [FromQuery] DateTimeOffset? df,
                                                               [FromQuery][MaxLength(5)] string? order,
-                                                              [FromQuery]int? top,
+                                                              [FromQuery] int? top,
                                                               CancellationToken token)
     {
         var donneesQuery = _depot.DonneesCapteur.AsNoTracking()
@@ -77,7 +77,9 @@ public class DonneesCapteurV2Controller : ControllerBase
             donneesQuery = donneesQuery.Take(top.Value);
         }
 
-        var donnees = await donneesQuery.ProjectTo<GetDonneesCapteurV2>(_mapper.ConfigurationProvider).ToArrayAsync(token);
+        var donneesDb = await donneesQuery.ToArrayAsync(token);
+
+        var donnees = donneesDb.ArrayMapTo<DonneeCapteur, GetDonneesCapteurV2>();
 
         if (donnees.Length > 0)
         {
@@ -154,7 +156,7 @@ public class DonneesCapteurV2Controller : ControllerBase
             donneeCapteur.D = DateTimeOffset.Now;
         }
 
-        var newDonnee = _mapper.Map<DonneeCapteur>(donneeCapteur);
+        var newDonnee = donneeCapteur.MapTo<PostDonneeCapteurV2, DonneeCapteur>(donneeCapteurSpecificMapping);
 
         await _depot.DonneesCapteur.AddAsync(newDonnee, token);
 
@@ -184,13 +186,16 @@ public class DonneesCapteurV2Controller : ControllerBase
             var any = await _depot.Capteurs.AsNoTracking().AnyAsync(c => c.IdErabliere == id &&
                                                                          c.Id == donnee.IdCapteur, token);
 
-            if (any) {
-                var newDonnee = _mapper.Map<DonneeCapteur>(donnee);
+            if (any)
+            {
+                var newDonnee = donnee.MapTo<PostDonneeCapteurV2, DonneeCapteur>(donneeCapteurSpecificMapping);
 
                 await _depot.DonneesCapteur.AddAsync(newDonnee, token);
             }
-            else {
-                return new NotFoundObjectResult(new {
+            else
+            {
+                return new NotFoundObjectResult(new
+                {
                     message = $"Le capteur {donnee.IdCapteur} n'existe pas dans l'erablière {id}"
                 });
             }
@@ -198,7 +203,8 @@ public class DonneesCapteurV2Controller : ControllerBase
 
         var count = await _depot.SaveChangesAsync(token);
 
-        return Ok(new {
+        return Ok(new
+        {
             count
         });
     }

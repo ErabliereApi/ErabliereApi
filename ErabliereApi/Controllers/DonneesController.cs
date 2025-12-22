@@ -24,17 +24,14 @@ namespace ErabliereApi.Controllers;
 public class DonneesController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructeur par initlisation
     /// </summary>
     /// <param name="context">Classe de contexte pour accéder aux données</param>
-    /// <param name="mapper">Mapper entre les modèles</param>
-    public DonneesController(ErabliereDbContext context, IMapper mapper)
+    public DonneesController(ErabliereDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -95,7 +92,9 @@ public class DonneesController : ControllerBase
             query = query.Take(q.Value);
         }
 
-        var list = await query.ProjectTo<GetDonnee>(_mapper.ConfigurationProvider).ToArrayAsync();
+        var listDb = await query.ToArrayAsync();
+
+        var list = listDb.ArrayMapTo<Donnee, GetDonnee>();
 
         if (o == "c" && list.Length > 0)
         {
@@ -144,7 +143,7 @@ public class DonneesController : ControllerBase
         }
         else
         {
-            _context.Donnees.Add(_mapper.Map<Donnee>(donneeRecu));
+            _context.Donnees.Add(donneeRecu.MapTo<Donnee>());
 
             await _context.SaveChangesAsync();
         }
@@ -185,7 +184,7 @@ public class DonneesController : ControllerBase
         }
         else
         {
-            var donnee = _mapper.Map<Donnee>(donneeRecu);
+            var donnee = donneeRecu.MapTo<Donnee>();
 
             donnee.Iddp = donnePlusRecente.Id;
 

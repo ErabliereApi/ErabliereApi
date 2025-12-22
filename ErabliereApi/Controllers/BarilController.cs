@@ -49,20 +49,21 @@ public class BarilController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant de l'érablière</param>
     /// <param name="baril"></param>
+    /// <param name="token">Le token d'annulation</param>
     /// <response code="200">Le baril a été correctement ajouter.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à ajouter.</response>
     [HttpPost]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Ajouter(Guid id, Baril baril)
+    public async Task<IActionResult> Ajouter(Guid id, Baril baril, CancellationToken token)
     {
         if (id != baril.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id du baril à ajouter");
         }
 
-        var entity = await _depot.Barils.AddAsync(baril);
+        var entity = await _depot.Barils.AddAsync(baril, token);
 
-        await _depot.SaveChangesAsync();
+        await _depot.SaveChangesAsync(token);
 
         return Ok(new { id = entity.Entity.Id });
     }
@@ -72,11 +73,12 @@ public class BarilController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant de l'érablière</param>
     /// <param name="baril">Le baril a modifier</param>
+    /// <param name="token">Le token d'annulation</param>
     /// <response code="200">Le baril a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à modifier.</response>
     [HttpPut]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, Baril baril)
+    public async Task<IActionResult> Modifier(Guid id, Baril baril, CancellationToken token)
     {
         if (id != baril.IdErabliere)
         {
@@ -85,9 +87,9 @@ public class BarilController : ControllerBase
 
         _depot.Update(baril);
 
-        await _depot.SaveChangesAsync();
+        await _depot.SaveChangesAsync(token);
 
-        return Ok();
+        return NoContent();
     }
 
     /// <summary>
@@ -95,11 +97,12 @@ public class BarilController : ControllerBase
     /// </summary>
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="baril">Le baril a supprimer</param>
+    /// <param name="token">Le token d'annulation</param>
     /// <response code="202">Le baril a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à supprimer.</response>
     [HttpDelete]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Supprimer(Guid id, Baril baril)
+    public async Task<IActionResult> Supprimer(Guid id, Baril baril, CancellationToken token)
     {
         if (id != baril.IdErabliere)
         {
@@ -108,7 +111,7 @@ public class BarilController : ControllerBase
 
         _depot.Remove(baril);
 
-        await _depot.SaveChangesAsync();
+        await _depot.SaveChangesAsync(token);
 
         return NoContent();
     }
