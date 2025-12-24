@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ErabliereApi.Attributes;
+﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;

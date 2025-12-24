@@ -1,5 +1,3 @@
-using ErabliereApi.Donnees.AutoMapper;
-using ErabliereApi.Depot.Sql;
 using Microsoft.EntityFrameworkCore;
 using static System.Boolean;
 using static System.StringComparison;
@@ -65,9 +63,6 @@ public class Startup
             Console.WriteLine("CORS enabled. Services Added.");
             services.AddCors();
         }
-
-        // Automapper
-        services.AjouterAutoMapperErabliereApiDonnee();
 
         // HttpClient
         services.AddHttpClients(Configuration);

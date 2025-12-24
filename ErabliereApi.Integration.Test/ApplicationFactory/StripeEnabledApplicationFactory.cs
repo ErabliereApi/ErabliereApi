@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using AutoMapper;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;

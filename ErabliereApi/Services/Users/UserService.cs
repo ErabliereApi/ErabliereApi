@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ErabliereApi.Authorization;
+﻿using ErabliereApi.Authorization;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.NonHttp;
@@ -64,7 +62,7 @@ public class UserService : IUserService
         {
             customerDb = await _context.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
 
-            if (customerDb != null) 
+            if (customerDb != null)
             {
                 return customerDb;
             }
@@ -106,7 +104,7 @@ public class UserService : IUserService
         using var scope = _scopeFactory.CreateScope();
 
         var user = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext?.User;
-        
+
         string? uniqueName = UsersUtils.GetUniqueName(scope, user);
 
         if (uniqueName == null)
@@ -125,8 +123,24 @@ public class UserService : IUserService
 
         var idErabliere = erabliere.Id.Value;
         var query = _context.Customers.AsNoTracking()
-                                     .Where(c => c.UniqueName == uniqueName)
-                                     .ProjectTo<CustomerOwnershipAccess>(_fetchCustomerOwnershipAccessMap, new { idErabliere });
+                                      .Where(c => c.UniqueName == uniqueName)
+#nullable disable
+                                      .Include(c => c.CustomerErablieres.Where(ce => ce.IdErabliere == idErabliere))
+                                      .Select(c => new CustomerOwnershipAccess
+                                      {
+                                          Id = c.Id,
+                                          UniqueName = c.UniqueName,
+                                          CustomerErablieres = c.CustomerErablieres
+#nullable enable
+                                              .Select(ce => new CustomerErabliereOwnershipAccess
+                                              {
+                                                  IdCustomer = ce.IdCustomer,
+                                                  IdErabliere = ce.IdErabliere,
+                                                  Access = ce.Access,
+                                              })
+                                              .ToList()
+                                      });
+
 
         return await query.SingleOrDefaultAsync(token);
     }
@@ -168,16 +182,4 @@ public class UserService : IUserService
 
         return await service.GetAsync(customerId, cancellationToken: token);
     }
-
-    private static readonly AutoMapper.IConfigurationProvider _fetchCustomerOwnershipAccessMap = new MapperConfiguration(config =>
-    {
-        Guid idErabliere = Guid.Empty;
-
-#nullable disable
-        config.CreateMap<Donnees.Customer, CustomerOwnershipAccess>()
-              .ForMember(c => c.CustomerErablieres, o => o.MapFrom(cbd => cbd.CustomerErablieres.Where(cbde => cbde.IdErabliere == idErabliere)));
-#nullable enable
-
-        config.CreateMap<CustomerErabliere, CustomerErabliereOwnershipAccess>();
-    });
 }

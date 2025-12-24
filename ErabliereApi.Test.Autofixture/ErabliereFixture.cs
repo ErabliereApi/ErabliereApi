@@ -1,6 +1,5 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using AutoMapper;
 using ErabliereApi.Depot.Sql;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees;
 using Microsoft.EntityFrameworkCore;
-using ErabliereApi.Donnees.AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using ErabliereApi.Controllers;
@@ -87,7 +85,6 @@ public static class ErabliereFixture
 
             fixture.Register(() => builder.GetRequiredService<ErabliereDbContext>().PopulatesDbSets(fixture));
             fixture.Register(() => builder.GetRequiredService<IDistributedCache>());
-            fixture.Register(() => builder.GetRequiredService<IMapper>());
             fixture.Register(() => builder.GetRequiredService<IStringLocalizer<ErablieresController>>());
             fixture.Register(() => fixture.CreateRandomIPAddress());
 
@@ -136,8 +133,6 @@ public static class ErabliereFixture
         {
             options.UseInMemoryDatabase(Guid.NewGuid().ToString());
         });
-
-        services.AjouterAutoMapperErabliereApiDonnee();
 
         services.AddDistributedMemoryCache();
 

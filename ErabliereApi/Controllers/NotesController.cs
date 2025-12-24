@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ErabliereApi.Attributes;
+﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
@@ -22,22 +21,18 @@ namespace ErabliereApi.Controllers;
 public class NotesController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;
-    private readonly IMapper _mapper;
     private readonly ILogger<NotesController> _logger;
 
     /// <summary>
     /// Constructeur par défaut
     /// </summary>
     /// <param name="depot"></param>
-    /// <param name="mapper"></param>
     /// <param name="logger"></param>
     public NotesController(
         ErabliereDbContext depot,
-        IMapper mapper,
         ILogger<NotesController> logger)
     {
         _depot = depot;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -180,7 +175,10 @@ public class NotesController : ControllerBase
             postNote.NoteDate = DateTimeOffset.Now;
         }
 
-        var note = _mapper.Map<Note>(postNote);
+        var note = postNote.MapTo<PostNote, Note>(new Dictionary<string, Func<PostNote?, object?>>
+        {
+            { nameof(PostNote.FileBytes), pn => pn?.FileBytes != null ? pn.FileBytes : pn?.File != null ? Convert.FromBase64String(pn.File) : null }
+        });
 
         // Creer un rappel si le rappel est présent
         if (postNote.Rappel != null)
@@ -231,7 +229,7 @@ public class NotesController : ControllerBase
             return BadRequest("Le fichier est manquant");
         }
 
-        var note = _mapper.Map<Note>(postNoteMultipart);
+        var note = postNoteMultipart.MapTo<Note>();
 
         note.File = await postNoteMultipart.File.ToByteArray(token);
 
@@ -239,7 +237,7 @@ public class NotesController : ControllerBase
 
         await _depot.SaveChangesAsync(token);
 
-        return Ok(_mapper.Map<PostNoteMultipartResponse>(entite.Entity));
+        return Ok(entite.Entity.MapTo<PostNoteMultipartResponse>());
     }
 
     /// <summary>

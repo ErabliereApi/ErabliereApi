@@ -8,11 +8,6 @@ namespace ErabliereApi.Donnees.Action.NonHttp;
 public class CustomerErabliereOwnershipAccess
 {
     /// <summary>
-    /// Clé primaire de la jonction
-    /// </summary>
-    public Guid? Id { get; set; }
-
-    /// <summary>
     /// Clé étrangère de l'utilisateur
     /// </summary>
     public Guid? IdCustomer { get; set; }

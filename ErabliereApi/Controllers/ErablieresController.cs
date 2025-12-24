@@ -1,5 +1,3 @@
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using ErabliereApi.Attributes;
 using ErabliereApi.Authorization;
 using ErabliereApi.Depot.Sql;
@@ -16,6 +14,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
+using MQTTnet.Diagnostics.Logger;
 
 namespace ErabliereApi.Controllers;
 
@@ -28,7 +27,6 @@ namespace ErabliereApi.Controllers;
 public class ErablieresController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
-    private readonly IMapper _mapper;
     private readonly IConfiguration _config;
     private readonly IDistributedCache _cache;
     private readonly IServiceProvider _serviceProvider;
@@ -42,7 +40,6 @@ public class ErablieresController : ControllerBase
     /// Constructeur par initialisation
     /// </summary>
     /// <param name="context">Classe de contexte pour accéder à la BD</param>
-    /// <param name="mapper">mapper de donnée</param>
     /// <param name="config">Permet d'accéder au configuration de l'api</param>
     /// <param name="cache">Cache distribué</param>
     /// <param name="serviceProvider">Service scope</param>
@@ -50,7 +47,6 @@ public class ErablieresController : ControllerBase
     /// <param name="logger"></param>
     public ErablieresController(
         ErabliereDbContext context,
-        IMapper mapper,
         IConfiguration config,
         IDistributedCache cache,
         IServiceProvider serviceProvider,
@@ -58,7 +54,6 @@ public class ErablieresController : ControllerBase
         ILogger<ErablieresController> logger)
     {
         _context = context;
-        _mapper = mapper;
         _config = config;
         _cache = cache;
         _serviceProvider = serviceProvider;
@@ -215,7 +210,7 @@ public class ErablieresController : ControllerBase
             {
                 erablieresQuery = erablieresQuery.AsSingleQuery();
             }
-            else 
+            else
             {
                 erablieresQuery = erablieresQuery.AsSplitQuery();
             }
@@ -336,9 +331,19 @@ public class ErablieresController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Règle de mapping entre PostErabliere et Erabliere
+    /// </summary>
+    public static readonly Dictionary<string, string> MappingPostErabliere = new()
+    {
+        { nameof(PostErabliere.IpRules), nameof(Erabliere.IpRule) }
+    };
+
     private async Task<(Erabliere?, IActionResult?)> AddErabliereAsync(PostErabliere postErabliere, CancellationToken token)
     {
-        var erabliere = _mapper.Map<Erabliere>(postErabliere);
+        var erabliere = postErabliere.MapTo<PostErabliere, Erabliere>(MappingPostErabliere);
+
+        erabliere.CodePostal = postErabliere.CodePostal?.Trim();
 
         var (isAuthenticate, _, customer) = await IsAuthenticatedAsync(token);
 
@@ -625,7 +630,23 @@ public class ErablieresController : ControllerBase
 
         var customers = await _context.CustomerErablieres.AsNoTracking()
             .Where(c => c.IdErabliere == id)
-            .ProjectTo<GetCustomerAccess>(_mapper.ConfigurationProvider)
+            .Include(c => c.Customer)
+            .Select(c => new GetCustomerAccess
+            {
+                IdErabliere = c.IdErabliere,
+                IdCustomer = c.IdCustomer,
+                Access = c.Access,
+                Erabliere = new GetCustomerAccessErabliere
+                {
+                    Nom = erabliere.Nom,
+                },
+                Customer = c.Customer != null ? new GetCustomerAccessCustomer
+                {
+                    Email = c.Customer.Email,
+                    Name = c.Customer.Name,
+                    UniqueName = c.Customer.UniqueName
+                } : null
+            })
             .ToArrayAsync(token);
 
         return Ok(customers);
@@ -934,7 +955,23 @@ public class ErablieresController : ControllerBase
 
         var customers = await _context.CustomerErablieres.AsNoTracking()
             .Where(c => c.IdErabliere == id)
-            .ProjectTo<GetCustomerAccess>(_mapper.ConfigurationProvider)
+            .Include(c => c.Customer)
+            .Select(c => new GetCustomerAccess
+            {
+                IdErabliere = c.IdErabliere,
+                IdCustomer = c.IdCustomer,
+                Access = c.Access,
+                Erabliere = new GetCustomerAccessErabliere
+                {
+                    Nom = erabliere.Nom,
+                },
+                Customer = c.Customer != null ? new GetCustomerAccessCustomer
+                {
+                    Email = c.Customer.Email,
+                    Name = c.Customer.Name,
+                    UniqueName = c.Customer.UniqueName
+                } : null
+            })
             .ToArrayAsync(token);
 
         return Ok(customers);
