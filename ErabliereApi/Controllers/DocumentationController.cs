@@ -102,7 +102,7 @@ public class DocumentationController : ControllerBase
         var entite = await _depot.Documentation.AddAsync(
             postDocumentation.MapTo<PostDocumentation, Documentation>(new Dictionary<string, Func<PostDocumentation?, object?>>
             {
-                { "File", input => input?.File != null ? Convert.FromBase64String(input.File ?? "") : null }
+                { "File", input => !string.IsNullOrWhiteSpace(input?.File) ? Convert.FromBase64String(input.File ?? "") : null }
             }));
 
         await _depot.SaveChangesAsync(token);

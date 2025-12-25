@@ -81,6 +81,9 @@ public static class ErabliereFixture
         fixture.Customize<PostRappel>(c => c.With(r => r.Periodicite, NotesController.AllowedPeriodicite.GetRandom())
                                             .Without(r => r.IdErabliere));
 
+        fixture.Customize<PostDocumentation>(c => c.Without(d => d.File)
+                                                   .Without(d => d.FileExtension));
+
         fixture.Customize<Customer>(c =>
             c.With(c => c.Email, RandomEmail)
              .Without(c => c.ApiKeys)
