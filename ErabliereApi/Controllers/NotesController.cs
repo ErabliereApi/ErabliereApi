@@ -144,6 +144,11 @@ public class NotesController : ControllerBase
     }
 
     /// <summary>
+    /// Valeur permise pour les péridicité d'un rappel
+    /// </summary>
+    public static readonly string?[] AllowedPeriodicite = ["annuel", "mensuel", "hebdo", "bihebdo", "quotidien", null];
+
+    /// <summary>
     /// Action permettant d'ajouter une note
     /// </summary>
     /// <param name="id">Id de l'érablière</param>
@@ -177,13 +182,14 @@ public class NotesController : ControllerBase
 
         var note = postNote.MapTo<PostNote, Note>(new Dictionary<string, Func<PostNote?, object?>>
         {
-            { nameof(PostNote.FileBytes), pn => pn?.FileBytes != null ? pn.FileBytes : pn?.File != null ? Convert.FromBase64String(pn.File) : null }
+            { nameof(PostNote.File), pn => pn?.FileBytes != null ? pn.FileBytes : Convert.FromBase64String(pn?.File ?? "") },
+            { nameof(PostNote.Rappel), pn => pn?.Rappel?.MapTo<Rappel>() }
         });
 
         // Creer un rappel si le rappel est présent
         if (postNote.Rappel != null)
         {
-            var allowedPeriodiciteValues = new[] { "annuel", "mensuel", "hebdo", "bihebdo", "quotidien", null };
+            var allowedPeriodiciteValues = AllowedPeriodicite;
             if (!allowedPeriodiciteValues.Contains(postNote.Rappel.Periodicite, StringComparer.OrdinalIgnoreCase))
             {
                 ModelState.AddModelError("rappel.periodicite", $"Periodicité invalide. Doit être : Annuel, Mensuel, Hebdo, Bihebdo, Quotidien. Était: {postNote.Rappel.Periodicite}");
@@ -230,7 +236,7 @@ public class NotesController : ControllerBase
         }
 
         var note = postNoteMultipart.MapTo<Note>();
-
+        note.IdErabliere = id;
         note.File = await postNoteMultipart.File.ToByteArray(token);
 
         var entite = await _depot.Notes.AddAsync(note, token);

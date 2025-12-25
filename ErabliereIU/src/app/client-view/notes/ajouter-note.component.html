@@ -7,20 +7,11 @@
     <div class="row">
       <div class="col-md-6">
         <div class="mb-2">
-          <einput 
-            arialabel="Titre" 
-            [formGroup]="noteForm" 
-            name="title"
-            placeholder="Titre de la note"
+          <einput arialabel="Titre" [formGroup]="noteForm" name="title" placeholder="Titre de la note"
             [errorObj]="errorObj"></einput>
         </div>
         <div class="mb-2">
-          <einput 
-            arialabel="Text" 
-            type="textarea"
-            [formGroup]="noteForm" 
-            name="text"
-            placeholder="Description"
+          <einput arialabel="Text" type="textarea" [formGroup]="noteForm" name="text" placeholder="Description"
             [errorObj]="errorObj"></einput>
         </div>
         <div [class]="'form-group mb-3' + (noteForm.controls['file'].touched ? ' was-validated' : '')">
@@ -35,13 +26,8 @@
           }
         </div>
         <div class="mb-3">
-          <einput 
-            arialabel="Date de la note" 
-            [formGroup]="noteForm" 
-            name="noteDate"
-            type="date"
-            placeholder="Date de la note"
-            [errorObj]="errorObj"></einput>
+          <einput arialabel="Date de la note" [formGroup]="noteForm" name="noteDate" type="date"
+            placeholder="Date de la note" [errorObj]="errorObj"></einput>
         </div>
       </div>
       <div class="col-md-6">
@@ -52,23 +38,13 @@
         </div>
         @if(displayReminder) {
         <div class="mb-3">
-          <einput 
-            arialabel="Date Rappel" 
-            [formGroup]="noteForm" 
-            name="dateRappel"
-            type="date"
-            placeholder="Date de rappel"
-            [errorObj]="errorObj"></einput>
+          <einput arialabel="Date Rappel" [formGroup]="noteForm" name="dateRappel" type="date"
+            placeholder="Date de rappel" [errorObj]="errorObj"></einput>
         </div>
 
         <div class="mb-3">
-          <einput 
-            arialabel="Date Rappel Fin" 
-            [formGroup]="noteForm" 
-            name="dateRappelFin"
-            type="date"
-            placeholder="Date de fin de rappel"
-            [errorObj]="errorObj"></einput>
+          <einput arialabel="Date Rappel Fin" [formGroup]="noteForm" name="dateRappelFin" type="date"
+            placeholder="Date de fin de rappel" [errorObj]="errorObj"></einput>
         </div>
 
         <div [class]="'form-group mb-3' + (noteForm.controls['periodicite'].touched ? ' was-validated' : '')">
@@ -95,6 +71,9 @@
       <div class="col-md-12">
         <button id="creerNote" class="btn btn-primary me-2" (click)="onButtonCreerClick()">Créer</button>
         <button id="annulerCreerNote" class="btn btn-secondary" (click)="onButtonAnnuleClick()">Annuler</button>
+        <span class="text-danger">
+          {{generalError}}
+        </span>
       </div>
     </div>
     @if (uploadInProgress) {
@@ -109,6 +88,6 @@
 </div>
 } @else {
 <div>
-  <button id="addNoteButton" class="btn btn-primary" (click)="onButtonAjouterClick()">Ajouter</button>
+  <ebutton [id]="'addNoteButton'" type="primary" (clicked)="onButtonAjouterClick()">Ajouter</ebutton>
 </div>
 }

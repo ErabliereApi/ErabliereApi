@@ -74,6 +74,13 @@ public static class ErabliereFixture
                                                .Without(cc => cc.Owner)
                                                .Without(cc => cc.Id));
 
+        fixture.Customize<PostNote>(c => c.Without(n => n.File)
+                                          .Without(n => n.FileExtension)
+                                          .Without(n => n.FileBytes));
+
+        fixture.Customize<PostRappel>(c => c.With(r => r.Periodicite, NotesController.AllowedPeriodicite.GetRandom())
+                                            .Without(r => r.IdErabliere));
+
         fixture.Customize<Customer>(c =>
             c.With(c => c.Email, RandomEmail)
              .Without(c => c.ApiKeys)

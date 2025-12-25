@@ -11,13 +11,6 @@ using Xunit;
 namespace ErabliereApi.Test;
 public class AlerteCapteurControllerTest
 {
-    private readonly JsonComparer<object> _ignoreIdsEqualityComparer;
-
-    public AlerteCapteurControllerTest()
-    {
-        _ignoreIdsEqualityComparer = new JsonComparer<object>();
-    }
-
     [Theory, AutoApiData]
     public async Task TestGetAlerteCapteur(
         AlerteCapteursController controller, ErabliereDbContext context) 

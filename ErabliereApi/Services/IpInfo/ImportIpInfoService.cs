@@ -52,7 +52,7 @@ public class ImportIpInfoService
         // skip the first line (header)
         await reader.ReadLineAsync();
 
-        do
+        while (true)
         {
             var line = await reader.ReadLineAsync();
 
@@ -112,8 +112,7 @@ public class ImportIpInfoService
             }
 
             rowNumber++;
-
-        } while (!reader.EndOfStream);
+        }
 
         totalSaved += await _context.SaveChangesAsync(cancellationToken);
 

@@ -12,11 +12,17 @@ import { InputErrorComponent } from "src/generic/input-error.component";
 import { Rappel } from "src/model/Rappel";
 import { reminderValidator } from "./note.custom-validators";
 import { EinputComponent } from "src/generic/einput.component";
+import { EButtonComponent } from "src/generic/ebutton.component";
 
 @Component({
     selector: 'ajouter-note',
     templateUrl: 'ajouter-note.component.html',
-    imports: [ReactiveFormsModule, InputErrorComponent, EinputComponent]
+    imports: [
+      ReactiveFormsModule, 
+      InputErrorComponent, 
+      EinputComponent,
+      EButtonComponent
+    ]
 })
 export class AjouterNoteComponent implements OnInit {
   @Input() notes?: Note[];
@@ -109,6 +115,10 @@ export class AjouterNoteComponent implements OnInit {
   }
 
   onButtonAnnuleClick() {
+    this.generalError = null;
+    this.errorObj = null;
+    this.fileToLargeErrorMessage = null;
+    this.noteForm.reset();
     this.display = false;
   }
 
@@ -165,14 +175,15 @@ export class AjouterNoteComponent implements OnInit {
         this.needToUpdate.emit();
       })
       .catch(e => {
-        this.PostNoteCatchErrorMethod(e);
+        this.postNoteCatchErrorMethod(e);
       }).finally(() => {
         this.uploadInProgress = false;
         this.totalSize = undefined;
       });
   }
 
-  private PostNoteCatchErrorMethod(e: any) {
+  private postNoteCatchErrorMethod(e: any) {
+    console.log("postNoteCatchErrorMethod");
     if (e.status == 400) {
       this.errorObj = e;
       this.fileToLargeErrorMessage = null;
@@ -184,9 +195,11 @@ export class AjouterNoteComponent implements OnInit {
       this.generalError = null;
     }
     else {
+      console.error(e);
       this.errorObj = null;
       this.fileToLargeErrorMessage = null;
-      this.generalError = "Une erreur est survenue. " + this.errorObj.error.errors['postNote'];
+      this.generalError = "Une erreur imprévue est survenue.";
+      console.log(this.generalError);
     }
   }
 
