@@ -304,7 +304,26 @@ public class CustomersController : ControllerBase
         }
 
         var erablieres = await _context.CustomerErablieres.AsNoTracking()
+            .Include(c => c.Erabliere)
+            .Include(c => c.Customer)
             .Where(c => c.IdCustomer == id)
+            .Select(c => new GetCustomerAccess
+            {
+                IdCustomer = c.IdCustomer,
+                IdErabliere = c.IdErabliere,
+#nullable disable
+                Erabliere = new GetCustomerAccessErabliere
+                {
+                    Nom = c.Erabliere.Nom
+                },
+                Customer = new GetCustomerAccessCustomer
+                {
+                    Name = c.Customer.Name,
+                    Email = c.Customer.Email
+                },
+#nullable enable
+                Access = c.Access
+            })
             .ToArrayAsync(token);
 
         return Ok(erablieres);

@@ -956,6 +956,7 @@ public class ErablieresController : ControllerBase
         var customers = await _context.CustomerErablieres.AsNoTracking()
             .Where(c => c.IdErabliere == id)
             .Include(c => c.Customer)
+            .Include(c => c.Erabliere)
             .Select(c => new GetCustomerAccess
             {
                 IdErabliere = c.IdErabliere,
