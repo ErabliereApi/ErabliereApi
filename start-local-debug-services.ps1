@@ -40,10 +40,10 @@ if ($null -ne $emailImagesObserver) {
 
 $erabliereWS = Get-ChildItem -Path ..\ -Directory -Filter "ErabliereWS" | Select-Object -expand FullName
 if ($null -ne $erabliereWS) {
-    Set-Location $erabliereWS
-    Start-Process dotnet -ArgumentList "watch", "run", "$PWD\ErabliereWS.csproj", " --no-hot-reload"
+    Set-Location $erabliereWS\ErabliereWS
+    Start-Process dotnet -ArgumentList "watch", "run", "$PWD\ErabliereWS\ErabliereWS.csproj", " --no-hot-reload"
 
-    Set-Location ..\ErabliereApi
+    Set-Location ..\..\ErabliereApi
 }
 
 # if the parent folder contains a folder name JeuxDonneesErabliereAPI, then start the dotnet app in a new process, also in watch mode
