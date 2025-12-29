@@ -124,8 +124,6 @@ public class StripeUsageReccordTaskHost : IHost
 
     private async Task EnvoyerUtilisationAsync()
     {
-        Console.WriteLine("Envoie de l'utilisation à Stripe...");
-
         var skip = _config.GetValue<string>("StripeUsageReccord.SkipRecord");
 
         if (skip == "true")
@@ -137,6 +135,8 @@ public class StripeUsageReccordTaskHost : IHost
         using var scope = Services.CreateScope();
 
         var context = scope.ServiceProvider.GetRequiredService<UsageContext>();
+        
+        Console.WriteLine($"Envoie de {context.Usages.Count} utilisations à Stripe... ");
 
         var usageSummary = new Dictionary<string, MeterEventCreateOptions>(context.Usages.Count);
 

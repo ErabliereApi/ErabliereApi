@@ -74,11 +74,29 @@ public class CheckoutController : ControllerBase
     }
 
     /// <summary>
-    /// Get current balance for a customer
+    /// Get the customer's subscription status
     /// </summary>
     [HttpGet]
     [Route("[action]")]
     [Authorize]
+    public async Task<IActionResult> Subscriptions(CancellationToken token)
+    {
+        if (!_configuration.StripeIsEnabled())
+        {
+            return NotFound();
+        }
+
+        var status = await _checkoutService.GetCustomerSubscriptionStatusAsync(token);
+
+        return Ok(status);
+    }
+
+    /// <summary>
+    /// Get current balance of the project stripe account
+    /// </summary>
+    [HttpGet]
+    [Route("[action]")]
+    [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     public async Task<IActionResult> GetBalance(CancellationToken token)
     {
         if (!_configuration.StripeIsEnabled())
@@ -86,20 +104,20 @@ public class CheckoutController : ControllerBase
             return NotFound();
         }
 
-        var balance = await _checkoutService.GetBalanceAsync(token);
+        var balance = await _checkoutService.GetProjectBalanceAsync(token);
 
         return Ok(balance);
     }
 
     /// <summary>
-    /// 
+    /// Permet d'obtenir la liste des enregistrements d'utilisation en attente d'envoi à Stripe
     /// </summary>
-    /// <param name="token"></param>
     /// <returns></returns>
     [HttpGet]
     [Route("[action]")]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
-    public async Task<IActionResult> GetUsagesQueue(CancellationToken token)
+    [ProducesResponseType(typeof(IEnumerable<StripeIntegration.Usage>), 200)]
+    public IActionResult GetUsagesQueue()
     {
         if (!_configuration.StripeIsEnabled())
         {

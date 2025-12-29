@@ -15,6 +15,11 @@ public interface ICheckoutService
     Task<PostCheckoutObjResponse> CreateSessionAsync(CancellationToken token);
 
     /// <summary>
+    /// Get the customer's subscription status
+    /// </summary>
+    Task<object?> GetCustomerSubscriptionStatusAsync(CancellationToken token);
+
+    /// <summary>
     /// Handle the webhook events from Stripe
     /// </summary>
     Task Webhook(string json);
@@ -29,7 +34,7 @@ public interface ICheckoutService
     /// <summary>
     /// Get the balance of the Stripe account
     /// </summary>
-    Task<object> GetBalanceAsync(CancellationToken token);
+    Task<object> GetProjectBalanceAsync(CancellationToken token);
 
     /// <summary>
     /// Get the current state of usage records.

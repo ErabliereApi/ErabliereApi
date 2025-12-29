@@ -77,6 +77,42 @@ public class StripeCheckoutService : ICheckoutService
         };
     }
 
+    /// <inheritdoc />
+    public async Task<object?> GetCustomerSubscriptionStatusAsync(CancellationToken token)
+    {
+        var httpContext = _accessor.HttpContext
+            ?? throw new InvalidOperationException("HttpContext is null");
+
+        using var scope = httpContext.RequestServices.CreateScope();
+
+        var uniqueName = UsersUtils.GetUniqueName(
+            scope,
+            httpContext.User);
+
+        if (uniqueName == null)
+        {
+            return null;
+        }
+
+        var customer = await _userService.GetCustomerByUniqueNameAsync(uniqueName, token);
+
+        if (customer == null || string.IsNullOrEmpty(customer.StripeId))
+        {
+            return null;
+        }
+
+        StripeConfiguration.ApiKey = _options.Value.ApiKey;
+
+        var service = new SubscriptionService();
+        var subscriptions = await service.ListAsync(new SubscriptionListOptions
+        {
+            Customer = customer.StripeId,
+            Status = "all"
+        }, cancellationToken: token);
+
+        return subscriptions.Data;
+    }
+
     /// <summary>
     /// Implementation of a webhook needed for stripe
     /// </summary>
@@ -140,7 +176,10 @@ public class StripeCheckoutService : ICheckoutService
                 break;
 
             default:
-                logger.LogTrace("Unknow stripe event: {Event}", stripeEvent);
+                if (logger.IsEnabled(LogLevel.Trace))
+                {
+                    logger.LogTrace("Unknown stripe event: {Event}", stripeEvent);
+                }
                 break;
         }
     }
@@ -163,7 +202,7 @@ public class StripeCheckoutService : ICheckoutService
     }
 
     /// <inheritdoc />
-    public Task<object> GetBalanceAsync(CancellationToken token)
+    public Task<object> GetProjectBalanceAsync(CancellationToken token)
     {
         StripeConfiguration.ApiKey = _options.Value.ApiKey;
 

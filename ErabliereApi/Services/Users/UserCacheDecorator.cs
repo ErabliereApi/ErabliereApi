@@ -109,4 +109,10 @@ public class UserCacheDecorator : IUserService
     {
         return _userService.StripeGetAsync(customerId, token);
     }
+
+    /// <inheritdoc />
+    public Task<Customer?> GetCustomerByUniqueNameAsync(string uniqueName, CancellationToken token)
+    {
+        return _userService.GetCustomerByUniqueNameAsync(uniqueName, token);
+    }
 }

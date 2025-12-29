@@ -34,6 +34,11 @@ public interface IUserService
     Task<CustomerOwnershipAccess?> GetCurrentUserWithAccessAsync(Erabliere erabliere, CancellationToken token);
 
     /// <summary>
+    /// Permet d'obtenir un customer par son nom unique
+    /// </summary>
+    Task<Customer?> GetCustomerByUniqueNameAsync(string uniqueName, CancellationToken token);
+
+    /// <summary>
     /// Permet de modifier un customer pour appliquer les informations stripe.
     /// L'action se veut idempotent, si les données sont déjà appliqué, rien ne sera changé.
     /// </summary>

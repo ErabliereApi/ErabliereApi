@@ -182,4 +182,11 @@ public class UserService : IUserService
 
         return await service.GetAsync(customerId, cancellationToken: token);
     }
+
+    /// <inheritdoc />
+    public Task<Donnees.Customer?> GetCustomerByUniqueNameAsync(string uniqueName, CancellationToken token)
+    {
+        return _context.Customers.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.UniqueName == uniqueName, token);
+    }
 }

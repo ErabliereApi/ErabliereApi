@@ -160,11 +160,6 @@ public static class Swagger
             c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
             c.EnableTryItOutByDefault();
 
-            if (string.Equals(config["USE_SWAGGER_DARK_THEME"], TrueString, OrdinalIgnoreCase))
-            {
-                c.InjectStylesheet("/swagger/swagger-custom.css");
-            }
-
             if (config.IsAuthEnabled())
             {
                 c.OAuthAppName("ÉrablièreAPI - Swagger");
