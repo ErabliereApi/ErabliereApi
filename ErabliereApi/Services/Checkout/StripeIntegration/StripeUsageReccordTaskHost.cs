@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Billing;
 
-namespace ErabliereApi.StripeIntegration;
+namespace ErabliereApi.Services.StripeIntegration;
 
 /// <summary>
 /// Une class contenant une méthode d'extension pour décorer l'IHost
@@ -163,8 +163,10 @@ public class StripeUsageReccordTaskHost : IHost
                     Payload = new Dictionary<string, string>
                     {
                         { PayloadValueKey, usageReccorded.Quantite.ToString() },
-                        { "stripe_customer_id", usageReccorded.SubscriptionId }
+                        { "stripe_customer_id", usageReccorded.CustomerId }
                     },
+                    Identifier = Guid.NewGuid().ToString(),
+                    Timestamp = DateTime.UtcNow
                 };
 
                 usageSummary.Add(usageReccorded.SubscriptionId, createOptions);
@@ -178,8 +180,19 @@ public class StripeUsageReccordTaskHost : IHost
         foreach (var usageReccord in usageSummary)
         {
             Console.WriteLine($"Envoie de l'utilisation pour la souscription {usageReccord.Key} : {usageReccord.Value.Payload[PayloadValueKey]}");
-            var service = new MeterEventService();
-            await service.CreateAsync(usageReccord.Value);
+            try
+            {
+                var service = new MeterEventService();
+                var meterEvent = await service.CreateAsync(usageReccord.Value);
+
+                // Log the result
+                Console.WriteLine($"Utilisation envoyée : {meterEvent}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de l'envoie de l'utilisation pour la souscription {usageReccord.Key} : {ex.Message}");
+            }
+            
         }
     }
 

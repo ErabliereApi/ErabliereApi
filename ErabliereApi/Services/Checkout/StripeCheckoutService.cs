@@ -2,7 +2,7 @@
 using Stripe;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Donnees;
-using ErabliereApi.StripeIntegration;
+using ErabliereApi.Services.StripeIntegration;
 using ErabliereApi.Services.Users;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Extensions;
@@ -113,6 +113,44 @@ public class StripeCheckoutService : ICheckoutService
         return subscriptions.Data;
     }
 
+    /// <inheritdoc />
+    public Task<object> GetCustomerUpcomingInvoiceAsync(CancellationToken token)
+    {
+        var httpContext = _accessor.HttpContext
+            ?? throw new InvalidOperationException("HttpContext is null");
+
+        using var scope = httpContext.RequestServices.CreateScope();
+
+        var uniqueName = UsersUtils.GetUniqueName(
+            scope,
+            httpContext.User);
+
+        if (uniqueName == null)
+        {
+            return Task.FromResult<object>(null!);
+        }
+
+        var customerTask = _userService.GetCustomerByUniqueNameAsync(uniqueName, token);
+
+        return customerTask.ContinueWith<object>(t =>
+        {
+            var customer = t.Result;
+
+            if (customer == null || string.IsNullOrEmpty(customer.StripeId))
+            {
+                return null!;
+            }
+
+            StripeConfiguration.ApiKey = _options.Value.ApiKey;
+
+            var options = new InvoiceCreatePreviewOptions { Customer = customer.StripeId };
+            var service = new InvoiceService();
+            Invoice invoice = service.CreatePreview(options);
+
+            return invoice;
+        }, token);
+    }
+
     /// <summary>
     /// Implementation of a webhook needed for stripe
     /// </summary>
@@ -125,10 +163,10 @@ public class StripeCheckoutService : ICheckoutService
         var stripeEvent = EventUtility.ConstructEvent(json, signature, _options.Value.WebhookSiginSecret);
 
         await WebHookSwitchCaseLogic(
-            stripeEvent, 
+            stripeEvent,
             _logger,
             _userService,
-            _apiKeyService, 
+            _apiKeyService,
             _accessor.HttpContext?.RequestAborted ?? CancellationToken.None);
     }
 
@@ -143,8 +181,8 @@ public class StripeCheckoutService : ICheckoutService
     /// <returns></returns>
     public static async Task WebHookSwitchCaseLogic(Event stripeEvent,
         ILogger logger,
-        IUserService userService, 
-        IApiKeyService apiKeyService, 
+        IUserService userService,
+        IApiKeyService apiKeyService,
         CancellationToken token)
     {
         switch (stripeEvent.Type)
@@ -192,8 +230,14 @@ public class StripeCheckoutService : ICheckoutService
             throw new ArgumentNullException(nameof(apiKey), "apiKeyEntity.SubscriptionId is null");
         }
 
+        if (apiKey.Customer?.StripeId is null)
+        {
+            throw new ArgumentNullException(nameof(apiKey), "apiKeyEntity.Customer.StripeId is null");
+        }
+
         _usageContext.Usages.Enqueue(new Usage
         {
+            CustomerId = apiKey.Customer.StripeId,
             SubscriptionId = apiKey.SubscriptionId,
             Quantite = 1
         });

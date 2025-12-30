@@ -1,4 +1,4 @@
-namespace ErabliereApi.StripeIntegration;
+namespace ErabliereApi.Services.StripeIntegration;
 
 /// <summary>
 /// Classe représentant une utilisation avec une clé d'API
@@ -6,7 +6,12 @@ namespace ErabliereApi.StripeIntegration;
 public class Usage
 {
     /// <summary>
-    /// SubscriptionId de la clé d'API
+    /// CustomerId de la clé d'API coté stripe
+    /// </summary>
+    public string CustomerId { get; set; } = "";
+
+    /// <summary>
+    /// SubscriptionId de la clé d'API coté stripe
     /// </summary>
     public string SubscriptionId { get; set; } = "";
 

@@ -92,6 +92,24 @@ public class CheckoutController : ControllerBase
     }
 
     /// <summary>
+    /// Get the customer's upcoming invoice
+    /// </summary>
+    [HttpGet]
+    [Route("[action]")]
+    [Authorize]
+    public async Task<IActionResult> UpcomingInvoice(CancellationToken token)
+    {
+        if (!_configuration.StripeIsEnabled())
+        {
+            return NotFound();
+        }
+
+        var upcomingInvoice = await _checkoutService.GetCustomerUpcomingInvoiceAsync(token);
+
+        return Ok(upcomingInvoice);
+    }
+
+    /// <summary>
     /// Get current balance of the project stripe account
     /// </summary>
     [HttpGet]
@@ -116,7 +134,7 @@ public class CheckoutController : ControllerBase
     [HttpGet]
     [Route("[action]")]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
-    [ProducesResponseType(typeof(IEnumerable<StripeIntegration.Usage>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<Services.StripeIntegration.Usage>), 200)]
     public IActionResult GetUsagesQueue()
     {
         if (!_configuration.StripeIsEnabled())

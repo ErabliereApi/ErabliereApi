@@ -1,6 +1,6 @@
 ﻿using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
-using ErabliereApi.StripeIntegration;
+using ErabliereApi.Services.StripeIntegration;
 
 namespace ErabliereApi.Services;
 
@@ -41,4 +41,9 @@ public interface ICheckoutService
     /// Those are not sent to Stripe yet.
     /// </summary>
     IEnumerable<Usage> GetUsageRecords();
+
+    /// <summary>
+    /// Get the customer's upcoming invoice
+    /// </summary>
+    Task<object> GetCustomerUpcomingInvoiceAsync(CancellationToken token);
 }

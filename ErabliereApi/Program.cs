@@ -1,5 +1,5 @@
 using ErabliereApi;
-using ErabliereApi.StripeIntegration;
+using ErabliereApi.Services.StripeIntegration;
 
 var builder =  WebApplication.CreateBuilder(args);
 

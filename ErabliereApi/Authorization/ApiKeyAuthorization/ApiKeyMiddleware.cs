@@ -34,7 +34,9 @@ public class ApiKeyMiddleware : IMiddleware
 
             var dbContext = context.RequestServices.GetRequiredService<ErabliereDbContext>();
 
-            var apiKeyEntity = await dbContext.ApiKeys.FirstOrDefaultAsync(k => k.Key == hashkey, context.RequestAborted);
+            var apiKeyEntity = await dbContext.ApiKeys
+                .Include(k => k.Customer)
+                .FirstOrDefaultAsync(k => k.Key == hashkey, context.RequestAborted);
 
             if (apiKeyEntity != null && apiKeyEntity.IsActive())
             {

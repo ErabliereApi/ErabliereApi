@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using static System.Boolean;
 using static System.StringComparison;
 using ErabliereApi.Authorization;
@@ -11,18 +10,14 @@ using Prometheus;
 using ErabliereApi.HealthCheck;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using ErabliereApi.StripeIntegration;
+using ErabliereApi.Services.StripeIntegration;
 using ErabliereApi.Services;
 using ErabliereApi.Services.Nmap;
 using ErabliereApi.Authorization.Customers;
 using ErabliereApi.Middlewares;
-using ErabliereApi.Models;
-using ErabliereApi.Donnees;
 using Microsoft.Extensions.Options;
-using System.Text;
 using ErabliereApi.Services.Notifications;
 using MQTTnet.AspNetCore;
-using System.Net.Http.Headers;
 
 namespace ErabliereApi;
 
@@ -110,6 +105,7 @@ public class Startup
                 o.BasePlanPriceId = Configuration["Stripe.BasePlanPriceId"];
                 o.WebhookSecret = Configuration["Stripe.WebhookSecret"];
                 o.WebhookSiginSecret = Configuration["Stripe.WebhookSiginSecret"];
+                o.TimeSpanSendUsage = TimeSpan.FromSeconds(Convert.ToDouble(Configuration["StripeUsageReccord.TimeSpanSendUsageInSeconds"] ?? "300"));
             });
 
             services.AddTransient<ICheckoutService, StripeCheckoutService>()
