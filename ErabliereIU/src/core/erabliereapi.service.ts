@@ -36,7 +36,6 @@ import { IpInfo } from 'src/model/ipinfo';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
-    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -815,6 +814,16 @@ export class ErabliereApi {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/access/ApiKey/' + id + '/name', { name: name }, { headers: headers }));
     }
+
+    async getCustomerSubscriptions() {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<any[]>(this._environmentService.apiUrl + '/Checkout/subscriptions', { headers: headers }));
+    }
+
+    async getUpcomingInvoice(subscriptionId: string) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + '/Checkout/UpcomingInvoice?subscriptionId=' + subscriptionId, { headers: headers }));
+    }  
 }
 
 function isNotNullOrWhitespace(search: string | undefined) {

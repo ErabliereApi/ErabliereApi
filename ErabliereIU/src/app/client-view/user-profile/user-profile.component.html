@@ -32,7 +32,7 @@
             <ebutton type="success" (clicked)="buyApiKey()" [inProgress]="buyApiKeyClicked">Obtenir une clé d'api
             </ebutton>
             <ebutton class="ms-2" type="info" (clicked)="loadUserProfile()" [inProgress]="loadUserProfileClicked"
-                title="Rafraîchir">⟳</ebutton>
+                title="Rafraîchir clé d'api">⟳</ebutton>
         </div>
         <span class="text-danger">{{errorApiKey}}</span>
         <div>
@@ -70,8 +70,46 @@
         </div>
     </div>
     <div class="col-md-4 card">
-        <h3>Abonnement</h3>
+        <h3>Abonnements</h3>
+        <div class="btn-group mb-3">
+            <ebutton class="ms-2" type="info" (clicked)="getSubscriptions()" [inProgress]="loadUserProfileClicked"
+                title="Rafraîchir abonnement">⟳</ebutton>
+        </div>
+        @if (subscriptions != null) {
+        @for (subscription of subscriptions; track subscription.id) {
+        <p><strong>ID:</strong> {{ subscription.id }} <copy-id-button [text]="subscription.id"
+                title="Copier l'id de mon abonnement"></copy-id-button></p>
+        <p><strong>Type:</strong> {{ subscription.billing_mode.type }}</p>
+        <p><strong>Statut:</strong> {{ subscription.status }}</p>
+        <p><strong>Date de début:</strong> {{ subscription.start_date * 1000 | date:'yyyy-MM-dd' }}</p>
+        <p><strong>Date de fin:</strong> {{ subscription.end_date * 1000 | date:'yyyy-MM-dd' }}</p>
+        <hr />
+        }
+        }@else {
         <p>L'utilisateur ne possède pas d'abonnement</p>
+        }
+    </div>
+    <div class="col-md-4 card">
+        <h3>Coûts</h3>
+        @if (subscriptions == null || subscriptions.length == 0) {
+        <p>L'utilisateur ne possède pas d'abonnement. Aucun coût disponible.</p>
+        }
+        @if (errorGettingUpcomingInvoices != null) {
+            <p class="text-danger">{{ errorGettingUpcomingInvoices }}</p>
+        } @else if (upcomingInvoices != null) {
+            @for (upcomingInvoice of upcomingInvoices; track upcomingInvoice.id) {
+            <p><strong>Montant total à venir:</strong> {{ upcomingInvoice.amount_due / 100 | currency:'CAD' }}</p>
+            <p><strong>Date de facturation:</strong> {{ upcomingInvoice.next_payment_attempt * 1000 | date:'yyyy-MM-dd' }}
+            </p>
+            <p><strong>Détails:</strong></p>
+            <ul>
+                @for (item of upcomingInvoice.lines.data; track item.id) {
+                <li>{{ item.description }} - {{ item.amount / 100 | currency:'CAD' }}</li>
+                }
+            </ul>
+            <hr />
+            }
+        }
     </div>
     <div class="col-md-4 card">
         <h3>ErabliereAI</h3>
@@ -80,10 +118,6 @@
         } @else {
         <p>ErabliereAI n'est pas activé pour cet utilisateur.</p>
         }
-    </div>
-    <div class="col-md-4 card">
-        <h3>Coût</h3>
-        <p>Les coûts ne sont pas disponibles actuellement.</p>
     </div>
     }
 </div>

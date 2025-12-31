@@ -5,7 +5,7 @@ import { AppUser } from "src/model/appuser";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Customer } from "src/model/customer";
-import { DatePipe } from "@angular/common";
+import { CurrencyPipe, DatePipe } from "@angular/common";
 import { EButtonComponent } from "src/generic/ebutton.component";
 import { ApiKey } from "src/model/apikey";
 import { EModalComponent } from "src/generic/modal/emodal.component";
@@ -21,7 +21,16 @@ import {
 @Component({
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
-    imports: [CopyTextButtonComponent, DatePipe, EButtonComponent, EModalComponent, EinputComponent, ReactiveFormsModule, FormsModule],
+    imports: [
+        CopyTextButtonComponent, 
+        CurrencyPipe,
+        DatePipe, 
+        EButtonComponent, 
+        EModalComponent, 
+        EinputComponent, 
+        ReactiveFormsModule, 
+        FormsModule
+    ],
 })
 export class UserProfileComponent implements OnInit {
     user: AppUser | null = null;
@@ -75,6 +84,7 @@ export class UserProfileComponent implements OnInit {
         }).finally(() => {
             this.loadUserProfileClicked = false;
         });
+        this.getSubscriptions();
     }
 
     deleteApiKey(arg0: string | undefined) {
@@ -144,5 +154,53 @@ export class UserProfileComponent implements OnInit {
     closeEditApiKeyNameModal() {
         this.editApiKeyNameActive = false;
         this.editedApiKey = null;
+    }
+
+    gettingSubscriptions: boolean = false;
+    errorGettingSubscriptions: string | null = null;
+    subscriptions: any[] | null = null;
+
+    getSubscriptions() {
+        this.errorGettingSubscriptions = null;
+        this.gettingSubscriptions = true;
+        this.api.getCustomerSubscriptions().then(subscriptions => {
+            if (subscriptions.length > 0) {
+                this.subscriptions = subscriptions;
+                this.upcomingInvoices = new Array(subscriptions.length);
+                for (let i = 0; i < subscriptions.length; i++) {
+                    this.getUpcommingInvoice(i, subscriptions[i].id);
+                }
+            } else {
+                this.subscriptions = null;
+                this.upcomingInvoices = null;
+                this.errorGettingUpcomingInvoices = null;
+            }
+            this.errorGettingSubscriptions = null;
+        }).catch(error => {
+            console.error("Error getting subscriptions:", error);
+            this.errorGettingSubscriptions = "Erreur lors de la récupération des abonnements.";
+            this.subscriptions = null;
+        }).finally(() => {
+            this.gettingSubscriptions = false;
+        });
+    }
+
+    upcomingInvoices: any[] | null = null;
+    errorGettingUpcomingInvoices: string | null = null;
+    gettingUpcomingInvoices: boolean = false;
+
+    getUpcommingInvoice(index: number, subscriptionId: string) {
+        this.gettingUpcomingInvoices = true;
+        this.errorGettingUpcomingInvoices = null;
+        this.api.getUpcomingInvoice(subscriptionId).then(invoice => {
+            this.upcomingInvoices ??= [];
+            this.upcomingInvoices[index] = invoice;
+        }).catch(error => {
+            console.error("Error getting upcoming invoice:", error);
+            this.errorGettingUpcomingInvoices = "Erreur lors de la récupération de la prochaine facture.";
+            this.upcomingInvoices = null;
+        }).finally(() => {
+            this.gettingUpcomingInvoices = false;
+        });
     }
 }
