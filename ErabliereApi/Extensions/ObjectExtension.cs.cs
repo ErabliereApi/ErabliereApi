@@ -119,4 +119,38 @@ public static class ObjectExtension
         }
         return result;
     }
+
+    /// <summary>
+    /// Update the destination object from the source object.
+    /// It only updates the properties that exist in both objects.
+    /// It also only updates the values when the propoerty of the source is not the default value.
+    /// </summary>
+    public static void UpdateFrom<TSource, TDestination>(this TDestination destination, TSource source)
+    {
+        var ps = typeof(TSource).GetProperties();
+        var pd = typeof(TDestination).GetProperties().ToDictionary(p => p.Name);
+
+        foreach (var p in pd)
+        {
+            var propName = p.Key;
+            if (ps.Any(s => s.Name == propName))
+            {
+                var pSource = ps.First(s => s.Name == propName);
+                var value = pSource.GetValue(source);
+
+                if (value == null)
+                {
+                    continue;
+                }
+
+                var defaultValue = pSource.PropertyType.IsValueType ? Activator.CreateInstance(pSource.PropertyType) : null;
+                if (value.Equals(defaultValue))
+                {
+                    continue;
+                }
+                
+                p.Value.SetValue(destination, value);
+            }
+        }
+    }
 }

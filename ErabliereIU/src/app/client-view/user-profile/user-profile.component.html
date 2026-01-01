@@ -96,7 +96,7 @@
         }
         @if (errorGettingUpcomingInvoices != null) {
             <p class="text-danger">{{ errorGettingUpcomingInvoices }}</p>
-        } @else if (upcomingInvoices != null) {
+        } @else if (upcomingInvoices != null && allInvoicesLoaded(upcomingInvoices)) {
             @for (upcomingInvoice of upcomingInvoices; track upcomingInvoice.id) {
             <p><strong>Montant total à venir:</strong> {{ upcomingInvoice.amount_due / 100 | currency:'CAD' }}</p>
             <p><strong>Date de facturation:</strong> {{ upcomingInvoice.next_payment_attempt * 1000 | date:'yyyy-MM-dd' }}

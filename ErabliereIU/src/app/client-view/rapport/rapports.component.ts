@@ -7,19 +7,22 @@ import { format } from 'date-fns';
 import { TableauRapportComponent } from "./tableau/tableau-rapport.component";
 
 import { ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
+import { EModalComponent } from 'src/generic/modal/emodal.component';
+import { ModifierRapportsComponent } from './modifierRapport/app-modifier-rapport.component';
 
 @Component({
     selector: 'app-reports',
     templateUrl: './rapports.component.html',
     styleUrls: ['./rapports.component.css'],
     imports: [
-    RapportDegreJourComponent,
-    TableauRapportComponent
-]
+        RapportDegreJourComponent,
+        TableauRapportComponent,
+        EModalComponent,
+        ModifierRapportsComponent
+    ]
 })
 export class ReportsComponent implements OnInit {
     typeRapport: string = 'degreJour';
-
     rapportSavedError: string = '';
     rapportsSaved: Rapport[] = [];
     idErabliereSelectionee?: string | null;
@@ -106,5 +109,19 @@ export class ReportsComponent implements OnInit {
     changeSelectedReport($event: ResponseRapportDegreeJours) {
         console.log("Change selected report", $event);
         this.fetchRapports($event.id);
+    }
+
+    isOpenModifierRapportModal: boolean = false;
+
+    openModifierRapportModal(_t16: Rapport) {
+        this.isOpenModifierRapportModal = true;
+    }
+
+    closeModifierRapportModal() {
+        this.isOpenModifierRapportModal = false;
+    }
+
+    onRapportModifie($event: Event) {
+        alert('Méthode non implémentée');
     }
 }

@@ -636,7 +636,7 @@ export class ErabliereApi {
 
     async refreshRapport(idErabliereSelectionee: string | null | undefined, id: string | undefined) {
         const headers = await this.getHeaders();
-        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/Refresh' + id + '/Refresh';
+        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/Refresh/' + id + '/Refresh';
         return await firstValueFrom(this._httpClient.patch<any>(url, {}, { headers: headers }));
     }
 

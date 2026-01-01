@@ -114,7 +114,7 @@ public class StripeCheckoutService : ICheckoutService
     }
 
     /// <inheritdoc />
-    public Task<object> GetCustomerUpcomingInvoiceAsync(CancellationToken token)
+    public Task<object> GetCustomerUpcomingInvoiceAsync(string subscriptionId, CancellationToken token)
     {
         var httpContext = _accessor.HttpContext
             ?? throw new InvalidOperationException("HttpContext is null");
@@ -143,7 +143,11 @@ public class StripeCheckoutService : ICheckoutService
 
             StripeConfiguration.ApiKey = _options.Value.ApiKey;
 
-            var options = new InvoiceCreatePreviewOptions { Customer = customer.StripeId };
+            var options = new InvoiceCreatePreviewOptions 
+            { 
+                Customer = customer.StripeId,
+                Subscription = subscriptionId
+            };
             var service = new InvoiceService();
             Invoice invoice = service.CreatePreview(options);
 

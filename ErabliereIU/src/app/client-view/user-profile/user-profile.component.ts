@@ -158,7 +158,7 @@ export class UserProfileComponent implements OnInit {
 
     gettingSubscriptions: boolean = false;
     errorGettingSubscriptions: string | null = null;
-    subscriptions: any[] | null = null;
+    subscriptions: any[] = [];
 
     getSubscriptions() {
         this.errorGettingSubscriptions = null;
@@ -171,7 +171,7 @@ export class UserProfileComponent implements OnInit {
                     this.getUpcommingInvoice(i, subscriptions[i].id);
                 }
             } else {
-                this.subscriptions = null;
+                this.subscriptions = [];
                 this.upcomingInvoices = null;
                 this.errorGettingUpcomingInvoices = null;
             }
@@ -179,7 +179,7 @@ export class UserProfileComponent implements OnInit {
         }).catch(error => {
             console.error("Error getting subscriptions:", error);
             this.errorGettingSubscriptions = "Erreur lors de la récupération des abonnements.";
-            this.subscriptions = null;
+            this.subscriptions = [];
         }).finally(() => {
             this.gettingSubscriptions = false;
         });
@@ -202,5 +202,16 @@ export class UserProfileComponent implements OnInit {
         }).finally(() => {
             this.gettingUpcomingInvoices = false;
         });
+    }
+
+    allInvoicesLoaded(arg0: any[]) {
+        let allLoaded = true;
+        for (let invoice of arg0) {
+            if (!invoice) {
+                allLoaded = false;
+                break;
+            }
+        }        
+        return allLoaded;
     }
 }

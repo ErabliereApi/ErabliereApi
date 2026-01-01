@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Extensions;
+﻿using System.ComponentModel.DataAnnotations;
+using ErabliereApi.Extensions;
 using ErabliereApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -97,14 +98,14 @@ public class CheckoutController : ControllerBase
     [HttpGet]
     [Route("[action]")]
     [Authorize]
-    public async Task<IActionResult> UpcomingInvoice(CancellationToken token)
+    public async Task<IActionResult> UpcomingInvoice([FromQuery][MaxLength(100)] string subscriptionId, CancellationToken token)
     {
         if (!_configuration.StripeIsEnabled())
         {
             return NotFound();
         }
 
-        var upcomingInvoice = await _checkoutService.GetCustomerUpcomingInvoiceAsync(token);
+        var upcomingInvoice = await _checkoutService.GetCustomerUpcomingInvoiceAsync(subscriptionId,token);
 
         return Ok(upcomingInvoice);
     }

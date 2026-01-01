@@ -3,6 +3,8 @@ using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Donnees.Action.Put;
+using ErabliereApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -126,6 +128,35 @@ public class RapportsController : ControllerBase
     }
 
     /// <summary>
+    /// Mettre à jour un rapport les paramètres d'un rapport
+    /// </summary>
+    /// <param name="id">Id de l'érablière qui possède le rapport</param>
+    /// <param name="idRapport">Id du rapport à mettre à jour</param>
+    /// <param name="putRapport">Paramètres à mettre à jour</param>
+    /// <param name="token"></param>
+    [HttpPut("{idRapport}")]
+    [ValiderOwnership("id")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> UpdateRapport(
+        [FromRoute] Guid id, [FromRoute] Guid idRapport, [FromBody] PutRapport putRapport, CancellationToken token)
+    {
+        var rapport = await _context.Rapports.FirstOrDefaultAsync(r => r.Id == idRapport && r.IdErabliere == id, token);
+
+        if (rapport == null)
+        {
+            return NotFound();
+        }
+
+        rapport.UpdateFrom(putRapport);
+        rapport.DateModification = DateTimeOffset.Now;
+
+        await _context.SaveChangesAsync(token);
+
+        return NoContent();
+    }
+
+
+    /// <summary>
     /// Rafraichir un rapport
     /// </summary>
     /// <param name="id"></param>
@@ -133,10 +164,19 @@ public class RapportsController : ControllerBase
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPatch("[action]{idRapport}/Refresh")]
+    [HttpPatch("[action]/{idRapport}/Refresh")]
     [ValiderOwnership("id")]
     [ProducesResponseType(204)]
     public async Task<IActionResult> Refresh([FromRoute] Guid id, [FromRoute] Guid idRapport, CancellationToken token)
     {
+        // Si l'url utilisé est /Erablieres/{id}/Rapports/Refresh{idRapport}
+        // indiquer un warning dans les logs
+        var url = HttpContext.Request.Path.ToString();
+        if (url.Contains("Rapports/Refresh") && !url.Contains("Rapports/Refresh/"))
+        {
+            _logger.LogWarning("L'URL utilisée pour rafraichir le rapport est obsolete. L'URL utilisée est '{Url}'. L'URL correcte est '/Erablieres/{{id}}/Rapports/{{idRapport}}/Refresh'.", url);
+        }
+
         var rapport = await _context.Rapports.Include(r => r.Donnees).FirstOrDefaultAsync(r => r.Id == idRapport, token);
 
         if (rapport == null)

@@ -45,5 +45,5 @@ public interface ICheckoutService
     /// <summary>
     /// Get the customer's upcoming invoice
     /// </summary>
-    Task<object> GetCustomerUpcomingInvoiceAsync(CancellationToken token);
+    Task<object> GetCustomerUpcomingInvoiceAsync(string subscriptionId, CancellationToken token);
 }
