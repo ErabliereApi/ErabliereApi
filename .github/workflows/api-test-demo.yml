@@ -28,7 +28,7 @@ jobs:
       - name: Reboot the webapp
         run: |
           az webapp restart --name erabliereapi-demo --resource-group erabliereapi-demo
-          for i in {1..6}; do
+          for i in {1..9}; do
             echo "Waiting for webapp to restart... $((i*10))s elapsed"
             sleep 10
           done
