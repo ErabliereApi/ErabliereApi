@@ -25,6 +25,11 @@ public class IpInfoMiddleware : IMiddleware
     public const string CacheKeyPrefix = "IpInfo_";
 
     /// <summary>
+    /// Clé de configuration pour la durée de cache de l'API IpInfo
+    /// </summary>
+    public const string IpInfoApiCacheDuration = "IpInfoApi:CacheDuration";
+
+    /// <summary>
     /// Constructeur
     /// </summary>
     public IpInfoMiddleware(
@@ -99,7 +104,7 @@ public class IpInfoMiddleware : IMiddleware
 
             if (ipInfo != null && ipInfo.TTL >= DateTimeOffset.UtcNow)
             {
-                _memoryCache.Set(ipAddress, ipInfo, _config.GetRequiredValue<TimeSpan>("IpInfoApi:CacheDuration"));
+                _memoryCache.Set(ipAddress, ipInfo, _config.GetRequiredValue<TimeSpan>(IpInfoApiCacheDuration));
             }
             else if (ipInfo != null && (ipInfo.TTL == null || ipInfo.TTL < DateTimeOffset.UtcNow))
             {
@@ -148,7 +153,7 @@ public class IpInfoMiddleware : IMiddleware
                 await _context.SaveChangesAsync(context.RequestAborted);
 
                 // Cache the new IP information
-                _memoryCache.Set($"{CacheKeyPrefix}{ipAddress}", ipInfo, _config.GetRequiredValue<TimeSpan>("IpInfoApi:CacheDuration"));
+                _memoryCache.Set($"{CacheKeyPrefix}{ipAddress}", ipInfo, _config.GetRequiredValue<TimeSpan>(IpInfoApiCacheDuration));
             }
         }
 
@@ -189,7 +194,7 @@ public class IpInfoMiddleware : IMiddleware
                 await _context.SaveChangesAsync(context.RequestAborted);
 
                 // Cache the new IP information
-                _memoryCache.Set($"{CacheKeyPrefix}{ipAddress}", ipInfo, _config.GetRequiredValue<TimeSpan>("IpInfoApi:CacheDuration"));
+                _memoryCache.Set($"{CacheKeyPrefix}{ipAddress}", ipInfo, _config.GetRequiredValue<TimeSpan>(IpInfoApiCacheDuration));
             }
         }
 

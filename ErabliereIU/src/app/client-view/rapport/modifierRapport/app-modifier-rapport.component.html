@@ -3,63 +3,37 @@
         {{generalError}}
     </span>
     <div class="form-group">
-        <einput 
-            [arialabel]="'Nom'" 
-            [type]="'text'" 
-            [name]="'nom'"
-            [formGroup]="editRapportForm">
+        <einput [arialabel]="'Nom'" [type]="'text'" [name]="'nom'" [formGroup]="editRapportForm">
         </einput>
     </div>
     <div class="form-group">
-        <einput 
-            [arialabel]="'Type'" 
-            [type]="'text'" 
-            [name]="'type'"
-            [formGroup]="editRapportForm">
+        <einput [arialabel]="'Type'" [type]="'text'" [name]="'type'" [formGroup]="editRapportForm">
         </einput>
     </div>
     <div class="form-group">
-        <einput 
-            [arialabel]="'Utiliser temperature depuis trio de données'" 
-            [type]="'checkbox'" 
-            [name]="'utiliserTemperatureTrioDonnee'"
-            [formGroup]="editRapportForm">
+        <input name="utiliserTrioDonnees" type="checkbox" class="form-check-input" id="utiliserTrioDonnees" formControlName="utiliserTemperatureTrioDonnee" />
+        <input-error [errorObj]="errorObj" [controlName]="'utiliserTemperatureTrioDonnee'"></input-error>
+        <label for="utiliserTrioDonnees">Utiliser temperature depuis trio de données</label>
+    </div>
+    <div class="form-group">
+        <einput [arialabel]="'Date de début'" [type]="'text'" [name]="'dateDebut'" [formGroup]="editRapportForm">
         </einput>
     </div>
     <div class="form-group">
-        <einput 
-            [arialabel]="'Date de début'" 
-            [type]="'date'" 
-            [name]="'dateDebut'"
-            [formGroup]="editRapportForm">
+        <einput [arialabel]="'Date de fin'" [type]="'text'" [name]="'dateFin'" [formGroup]="editRapportForm">
         </einput>
     </div>
     <div class="form-group">
-        <einput 
-            [arialabel]="'Date de fin'" 
-            [type]="'date'" 
-            [name]="'dateFin'"
-            [formGroup]="editRapportForm">
+        <einput [arialabel]="'Seuil'" [type]="'number'" [name]="'seuilTemperature'" [formGroup]="editRapportForm">
         </einput>
     </div>
     <div class="form-group">
-        <einput 
-            [arialabel]="'Seuil'" 
-            [type]="'number'" 
-            [name]="'seuilTemperature'"
-            [formGroup]="editRapportForm">
-        </einput>
+        <input name="afficherDansDashboard" type="checkbox" class="form-check-input" id="afficherDansDashboard" formControlName="afficherDansDashboard" />
+        <input-error [errorObj]="errorObj" [controlName]="'afficherDansDashboard'"></input-error>
+        <label for="afficherDansDashboard">Afficher dans le dashboard</label>
     </div>
     <div class="form-group">
-        <einput 
-            [arialabel]="'Afficher dans le dashboard'" 
-            [type]="'checkbox'" 
-            [name]="'afficherDansDashboard'"
-            [formGroup]="editRapportForm">
-        </einput>
-    </div>
-    <div class="form-group">
-        <button class="btn btn-success m-1" (click)="onClickEnregistrer()">Enregistrer</button>
+        <ebutton type="success" class="m-1" (clicked)="onClickEnregistrer()" [inProgress]="saveInProgress">Enregistrer</ebutton>
         <button class="btn btn-secondary m-1" (click)="closeModal.emit()">Annuler</button>
     </div>
 </form>

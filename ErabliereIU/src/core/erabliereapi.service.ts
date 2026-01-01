@@ -28,7 +28,7 @@ import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/m
 import { firstValueFrom } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
 import { ApiKey } from 'src/model/apikey';
-import { Rapport } from 'src/model/rapport';
+import { PutRapport, Rapport } from 'src/model/rapport';
 import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
 import { Horaire } from 'src/model/horaire';
 import { Appareil } from 'src/model/appareil';
@@ -638,6 +638,12 @@ export class ErabliereApi {
         const headers = await this.getHeaders();
         const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/Refresh/' + id + '/Refresh';
         return await firstValueFrom(this._httpClient.patch<any>(url, {}, { headers: headers }));
+    }
+
+    async putRapport(idErabliereSelectionee: any, id: any, rapport: PutRapport) {
+        const headers = await this.getHeaders();
+        const url = this._environmentService.apiUrl + '/Erablieres/' + idErabliereSelectionee + '/Rapports/' + id;
+        return firstValueFrom(this._httpClient.put(url, rapport, { headers: headers }));
     }
 
     async deleteRapport(idErabliereSelectionee?: any, id?: any) {

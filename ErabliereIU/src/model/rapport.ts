@@ -1,5 +1,3 @@
-import { Capteur } from "./capteur";
-
 export class Rapport {
     id?: string;
     idErabliere?: string;
@@ -9,6 +7,8 @@ export class Rapport {
     dateModification?: Date;
     type?: string;
     utiliserTemperatureTrioDonnee?: boolean;
+    seuilTemperature?: number;
+    afficherDansDashboard?: boolean;
     nom?: string;
     somme?: number;
     moyenne?: number;
@@ -24,4 +24,14 @@ export class RapportDonnee {
     somme?: number;
     min?: number;
     max?: number;
+}
+
+export class PutRapport {
+    nom?: string;
+    type?: string;
+    dateDebut?: Date;
+    dateFin?: Date;
+    utiliserTemperatureTrioDonnee?: boolean;
+    seuilTemperature?: number;
+    afficherDansDashboard?: boolean;
 }

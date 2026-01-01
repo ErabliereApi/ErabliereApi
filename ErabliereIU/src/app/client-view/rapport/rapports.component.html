@@ -52,7 +52,7 @@
     [displayFooter]="false">
     <app-modifier-rapport
       [rapport]="rapportSelected"
-      (rapportModifie)="onRapportModifie($event)"
+      [idErabliereSelectionee]="idErabliereSelectionee"
       (closeModal)="closeModifierRapportModal()">
     </app-modifier-rapport>
   </emodal>
