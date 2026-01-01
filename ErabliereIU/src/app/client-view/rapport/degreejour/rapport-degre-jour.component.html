@@ -6,42 +6,42 @@
     <label for="dateDebut">Date de début</label>
     <input name="dateDebut" type="date" class="form-control" id="dateDebut" value="{{form.dateDebut}}"
       [(ngModel)]="form.dateDebut" />
-      <input-error [errorObj]="errorObj" [controlName]="'dateDebut'"></input-error>
-    </div>
-    <div class="form-group">
-      <label for="dateFin">Date de fin</label>
-      <input name="dateFin" type="date" class="form-control" id="dateFin" value="{{form.dateFin}}"
-        [(ngModel)]="form.dateFin" />
-        <input-error [errorObj]="errorObj" [controlName]="'dateFin'"></input-error>
-      </div>
-      <div class="form-group">
-        <label for="idCapteur">Capteur</label>
-        <select name="idCapteur" class="form-control" id="idCapteur" (change)="idCapteurChanged($event)">
-          <option value="">Sélectionner un capteur</option>
-          @for (capteur of capteurs; track capteur) {
-            <option [value]="capteur.id">{{capteur.nom}}</option>
-          }
-        </select>
-        <input-error [errorObj]="errorObj" [controlName]="'idCapteur'"></input-error>
-      </div>
-      <div class="form-check">
-        <input name="utiliserTrioDonnees" type="checkbox" class="form-check-input" id="utiliserTrioDonnees"
-          [(ngModel)]="form.utiliserTemperatureTrioDonnee" />
-          <input-error [errorObj]="errorObj" [controlName]="'utiliserTrioDonnees'"></input-error>
-          <label for="utiliserTrioDonnees">Utiliser temperature depuis trio de données</label>
-        </div>
-        <div class="form-group">
-          <label for="seuil">Seuil</label>
-          <input name="seuil" type="number" class="form-control" id="seuil" [(ngModel)]="form.seuilTemperature" />
-          <input-error [errorObj]="errorObj" [controlName]="'seuil'"></input-error>
-        </div>
-        <div class="form-group">
-          <input name="afficherRapportDashboard" type="checkbox" class="form-check-input" id="afficherRapportDashboard"
-            [(ngModel)]="form.afficherDansDashboard" />
-            <input-error [errorObj]="errorObj" [controlName]="'afficherRapportDashboard'"></input-error>
-            <label for="afficherRapportDashboard">Afficher dans le dashboard</label>
-          </div>
-          <div class="form-group">
-            <button class="btn btn-success m-1" (click)="onGenererRapport(true)">Générer & Sauvegarder</button>
-          </div>
-        </form>
+    <input-error [errorObj]="errorObj" [controlName]="'dateDebut'"></input-error>
+  </div>
+  <div class="form-group">
+    <label for="dateFin">Date de fin</label>
+    <input name="dateFin" type="date" class="form-control" id="dateFin" value="{{form.dateFin}}"
+      [(ngModel)]="form.dateFin" />
+    <input-error [errorObj]="errorObj" [controlName]="'dateFin'"></input-error>
+  </div>
+  <div class="form-group">
+    <label for="idCapteur">Capteur</label>
+    <select name="idCapteur" class="form-control" id="idCapteur" (change)="idCapteurChanged($event)">
+      <option value="">Sélectionner un capteur</option>
+      @for (capteur of capteurs; track capteur) {
+      <option [value]="capteur.id">{{capteur.nom}}</option>
+      }
+    </select>
+    <input-error [errorObj]="errorObj" [controlName]="'idCapteur'"></input-error>
+  </div>
+  <div class="form-check">
+    <input name="utiliserTrioDonnees" type="checkbox" class="form-check-input" id="utiliserTrioDonnees"
+      [(ngModel)]="form.utiliserTemperatureTrioDonnee" />
+    <input-error [errorObj]="errorObj" [controlName]="'utiliserTrioDonnees'"></input-error>
+    <label for="utiliserTrioDonnees">Utiliser temperature depuis trio de données</label>
+  </div>
+  <div class="form-group">
+    <label for="seuil">Seuil</label>
+    <input name="seuil" type="number" class="form-control" id="seuil" [(ngModel)]="form.seuilTemperature" />
+    <input-error [errorObj]="errorObj" [controlName]="'seuil'"></input-error>
+  </div>
+  <div class="form-group">
+    <input name="afficherRapportDashboard" type="checkbox" class="form-check-input" id="afficherRapportDashboard"
+      [(ngModel)]="form.afficherDansDashboard" />
+    <input-error [errorObj]="errorObj" [controlName]="'afficherRapportDashboard'"></input-error>
+    <label for="afficherRapportDashboard">Afficher dans le dashboard</label>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-success m-1" (click)="onGenererRapport(true)">Générer & Sauvegarder</button>
+  </div>
+</form>
