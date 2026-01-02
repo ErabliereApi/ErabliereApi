@@ -13,19 +13,19 @@
       <div class="row">
         <div class="col-md-3">
           <strong>Moyenne:</strong>
-          {{ formatNumber(rapportData?.moyenne) }}
+          {{ formatNumber(rapportData?.moyenne) }} {{ rapportData?.capteur?.symbole}}
         </div>
         <div class="col-md-3">
           <strong>Somme:</strong>
-          {{ formatNumber(rapportData?.somme) }}
+          {{ formatNumber(rapportData?.somme) }} {{ rapportData?.capteur?.symbole}}
         </div>
         <div class="col-md-3">
           <strong>Min:</strong>
-          {{ formatNumber(rapportData?.min) }}
+          {{ formatNumber(rapportData?.min) }} {{ rapportData?.capteur?.symbole}}
         </div>
         <div class="col-md-3">
           <strong>Max:</strong>
-          {{ formatNumber(rapportData?.max) }}
+          {{ formatNumber(rapportData?.max) }} {{ rapportData?.capteur?.symbole}}
         </div>
         <div class="col-md-3">
           <strong>Nombre de jours:</strong>
@@ -56,10 +56,10 @@
       @for (ligne of rapportData?.donnees; track ligne) {
         <tr>
           <td>{{ formatDate(ligne.date) }}</td>
-          <td>{{ formatNumber(ligne.moyenne) }}</td>
-          <td>{{ formatNumber(ligne.somme) }}</td>
-          <td>{{ formatNumber(ligne.min) }}</td>
-          <td>{{ formatNumber(ligne.max) }}</td>
+          <td>{{ formatNumber(ligne.moyenne) }} {{ rapportData?.capteur?.symbole}}</td>
+          <td>{{ formatNumber(ligne.somme) }} {{ rapportData?.capteur?.symbole}}</td>
+          <td>{{ formatNumber(ligne.min) }} {{ rapportData?.capteur?.symbole}}</td>
+          <td>{{ formatNumber(ligne.max) }} {{ rapportData?.capteur?.symbole}}</td>
         </tr>
       }
     </tbody>

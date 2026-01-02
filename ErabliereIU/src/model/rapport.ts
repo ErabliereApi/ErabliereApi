@@ -1,3 +1,5 @@
+import { Capteur } from "./capteur";
+
 export class Rapport {
     id?: string;
     idErabliere?: string;
@@ -16,6 +18,7 @@ export class Rapport {
     max?: number;
 
     donnees: RapportDonnee[] = [];
+    capteur?: Capteur | null = null;
 }
 
 export class RapportDonnee {

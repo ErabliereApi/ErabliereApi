@@ -74,6 +74,19 @@ public class RapportsController : ControllerBase
             return BadRequest($"L'id de la route '{id}' ne concorde pas avec l'id de l'érablière du rapport demandé '{rapport?.IdErabliere}'.");
         }
 
+        if (!rapport.UtiliserTemperatureTrioDonnee)
+        {
+            var rapportDegreeJour = JsonSerializer.Deserialize<PostRapportDegreeJourRequest>(rapport.RequestParameters);
+
+            if (rapportDegreeJour != null)
+            {
+                var capteur = await _context.Capteurs
+                    .FirstOrDefaultAsync(c => c.Id == rapportDegreeJour.IdCapteur && c.IdErabliere == id, HttpContext.RequestAborted);
+
+                rapport.Capteur = capteur;
+            }
+        }
+
         return Ok(rapport);
     }
 

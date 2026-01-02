@@ -108,6 +108,11 @@ public class Rapport : IIdentifiable<Guid?, Rapport>, IErabliereOwnable, IDatesI
     public DateTimeOffset? DM { get; set; }
 
     /// <summary>
+    /// Capteur associé au rapport si applicable
+    /// </summary>
+    public Capteur? Capteur { get; set; }
+
+    /// <summary>
     /// Compare les rapports par date de création
     /// </summary>
     /// <param name="other"></param>
