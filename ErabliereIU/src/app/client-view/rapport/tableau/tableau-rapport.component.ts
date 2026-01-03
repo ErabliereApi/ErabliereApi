@@ -20,9 +20,9 @@ export class TableauRapportComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['rapport']?.currentValue) {
-            const rapId = changes['rapport'].currentValue.id;
+            const rapportId = changes['rapport'].currentValue.id;
             const erabliereId = changes['rapport'].currentValue.idErabliere;
-            this._api.getRapport(erabliereId, rapId).then(rapport => {
+            this._api.getRapport(erabliereId, rapportId).then(rapport => {
                 this.erreur = null;
                 this.rapportData = rapport;
             }).catch(err => {
