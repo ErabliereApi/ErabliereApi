@@ -3,13 +3,13 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { Documentation } from 'src/model/documentation';
 import { ErabliereApiDocument } from 'src/model/erabliereApiDocument';
-
 import { AjouterDocumentationComponent } from './ajouter-documentation.component';
 import { ModifierDocumentationComponent } from './modifier-documentation.component';
 import { Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { PaginationComponent } from "src/generic/pagination/pagination.component";
 import { DownloadButtonComponent } from "./download-button.component";
+import { MarkdownRendererComponent } from 'src/generic/eapi-markdown.component';
 
 @Component({
     selector: 'documentation',
@@ -18,7 +18,8 @@ import { DownloadButtonComponent } from "./download-button.component";
         AjouterDocumentationComponent,
         ModifierDocumentationComponent,
         PaginationComponent,
-        DownloadButtonComponent
+        DownloadButtonComponent,
+        MarkdownRendererComponent
     ]
 })
 export class DocumentationComponent implements OnInit {
@@ -70,13 +71,13 @@ export class DocumentationComponent implements OnInit {
 
     loadDocumentations() {
         this._api.getDocumentations(this.idErabliereSelectionee, (this._pageActuelle - 1) * this._nombreParPage, this._nombreParPage).then(documentations => {
-            this._nombreTotal = documentations.count ? parseInt(documentations.count) : 0;
+            this._nombreTotal = documentations.count ? Number.parseInt(documentations.count) : 0;
             this.documentations = documentations.items;
         });
     }
 
     isImageType(_t11: Documentation): boolean {
-        return this.imgTypes.find(t => t == _t11.fileExtension) != null;
+        return this.imgTypes.some(t => t == _t11.fileExtension);
     }
 
     getApiRoot() {

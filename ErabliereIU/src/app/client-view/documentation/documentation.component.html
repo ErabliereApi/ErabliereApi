@@ -16,7 +16,9 @@
         <div class="card mb-3 me-3">
           <h4 class="card-header">{{ documentation.title }}</h4>
           <div class="card-body">
-            <p class="card-text">{{ documentation.text }}</p>
+            <p class="card-text">
+              <eapi-markdown [content]="documentation.text" />
+            </p>
             @if (documentation.fileExtension) {
               <p class="card-text"><span>Extension: </span>{{ documentation.fileExtension }}</p>
             }
