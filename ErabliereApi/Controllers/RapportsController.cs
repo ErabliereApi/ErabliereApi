@@ -176,7 +176,6 @@ public class RapportsController : ControllerBase
     /// <param name="idRapport"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    [HttpPatch("[action]{idRapport}/Refresh")]
     [HttpPatch("[action]/{idRapport}/Refresh")]
     [ValiderOwnership("id")]
     [ProducesResponseType(204)]
