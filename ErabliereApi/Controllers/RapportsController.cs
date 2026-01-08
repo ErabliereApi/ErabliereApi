@@ -181,14 +181,6 @@ public class RapportsController : ControllerBase
     [ProducesResponseType(204)]
     public async Task<IActionResult> Refresh([FromRoute] Guid id, [FromRoute] Guid idRapport, CancellationToken token)
     {
-        // Si l'url utilisé est /Erablieres/{id}/Rapports/Refresh{idRapport}
-        // indiquer un warning dans les logs
-        var url = HttpContext.Request.Path.ToString();
-        if (url.Contains("Rapports/Refresh") && !url.Contains("Rapports/Refresh/"))
-        {
-            _logger.LogWarning("L'URL utilisée pour rafraichir le rapport est obsolete. L'URL utilisée est '{Url}'. L'URL correcte est '/Erablieres/{{id}}/Rapports/{{idRapport}}/Refresh'.", url);
-        }
-
         var rapport = await _context.Rapports.Include(r => r.Donnees).FirstOrDefaultAsync(r => r.Id == idRapport, token);
 
         if (rapport == null)
