@@ -10,7 +10,5 @@ export class AlerteCapteur {
   maxValue?: number;
   dc?: string
   isEnable?: boolean;
-  emails?: string[];
-  numeros?: string[];
   capteur?: Capteur;
 }

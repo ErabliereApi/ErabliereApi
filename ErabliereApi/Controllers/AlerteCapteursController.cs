@@ -1,7 +1,6 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
-using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,22 +31,13 @@ public class AlerteCapteursController : ControllerBase
     /// </summary>
     /// <param name="id">Identifiant du capteur</param>
     /// <param name="token">Jeton d'annulation de la tâche</param>
-    /// <param name="additionnalProperties">Propriétés additionnelles à ajouter à la réponse</param>
     /// <remarks>Les valeurs numérique sont en dixième de leurs unitées respective.</remarks>
     /// <response code="200">Une liste d'alerte potentiellement vide.</response>
     [HttpGet]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IEnumerable<AlerteCapteur>> Lister(Guid id, CancellationToken token, [FromQuery] bool additionnalProperties)
+    public async Task<IEnumerable<AlerteCapteur>> Lister(Guid id, CancellationToken token)
     {
         var alertes = await _depot.AlerteCapteurs.AsNoTracking().Where(b => b.IdCapteur == id).ToArrayAsync(token);
-
-        if (additionnalProperties)
-        {
-            for (int i = 0; i < alertes.Length; i++)
-            {
-                alertes[i] = new GetAlerteCapteur(alertes[i]);
-            }
-        }
 
         return alertes;
     }
@@ -56,7 +46,6 @@ public class AlerteCapteursController : ControllerBase
     /// Lister les alertes des capteurs d'une erablière
     /// </summary>
     /// <param name="id">L'id de l'érablière</param>
-    /// <param name="additionnalProperties">Propriétés additionnel</param>
     /// <param name="include">Inclure les propriétés de navigation</param>
     /// <param name="token">Jeton d'annulation de la tâche</param>
     /// <returns></returns>
@@ -64,8 +53,7 @@ public class AlerteCapteursController : ControllerBase
     [HttpGet]
     [ValiderOwnership("id")]
     public async Task<IEnumerable<AlerteCapteur>> ListerAlerteCapteurErabliere(
-        Guid id, 
-        [FromQuery] bool additionnalProperties,
+        Guid id,
         [FromQuery] string? include,
         CancellationToken token)
     {
@@ -84,14 +72,6 @@ public class AlerteCapteursController : ControllerBase
         }
 
         var alertesCapteurs = await alertesCapteursQuery.ToArrayAsync(token);
-
-        if (additionnalProperties)
-        {
-            for (int i = 0; i < alertesCapteurs.Length; i++)
-            {
-                alertesCapteurs[i] = new GetAlerteCapteur(alertesCapteurs[i]);
-            }
-        }
 
         return alertesCapteurs;
     }
@@ -138,13 +118,12 @@ public class AlerteCapteursController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant du capteur</param>
     /// <param name="alerte">L'alerte a modifier</param>
-    /// <param name="additionalProperties">Propriété additionnel, tel que les adresse couriels dans une liste</param>
     /// <param name="token">Jeton d'annulation de la tâche</param>
     /// <response code="200">L'alerte a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à modifier.</response>
     [HttpPut]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Modifier(Guid id, PutAlerteCapteur alerte, bool? additionalProperties, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, PutAlerteCapteur alerte, CancellationToken token)
     {
         if (id != alerte.IdCapteur)
         {
@@ -170,10 +149,6 @@ public class AlerteCapteursController : ControllerBase
         var entity = _depot.Update(alerteCapteur);
 
         await _depot.SaveChangesAsync(token);
-
-        if (additionalProperties == true) {
-            return Ok(new GetAlerteCapteur(entity.Entity));
-        }
 
         return Ok(entity.Entity);
     }

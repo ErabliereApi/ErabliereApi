@@ -83,14 +83,10 @@
                             }
                         </td>
                         <td>
-                            @for (email of alerte.emails; track email;) {
-                            <span class="feature_desc">{{email}}</span>
-                            }
+                            {{alerte.envoyerA}}
                         </td>
                         <td>
-                            @for (numero of alerte.numeros; track numero;) {
-                            <span class="feature_desc">{{numero}}</span>
-                            }
+                            {{alerte.texterA}}
                         </td>
                         <td>
                             {{formatNumber(alerte.minValue, alerte.capteur?.symbole, true)}}
@@ -195,14 +191,10 @@
                             }
                         </td>
                         <td>
-                            @for (email of alerte.emails; track email;) {
-                            <span class="feature_desc">{{email}}</span>
-                            }
+                            {{alerte.envoyerA}}
                         </td>
                         <td>
-                            @for (numero of alerte.numeros; track numero;) {
-                            <span class="feature_desc">{{numero}}</span>
-                            }
+                            {{alerte.texterA}}
                         </td>
                         <td>
                             {{formatStringNumber(alerte.temperatureThresholdHight, "°C")}}

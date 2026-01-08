@@ -127,14 +127,14 @@ export class ErabliereApi {
 
     async getAlertes(idErabliereSelectionnee: any): Promise<Alerte[]> {
         const headers = await this.getHeaders();
-        const rtn = await firstValueFrom(this._httpClient.get<Alerte[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/alertes?additionalProperties=true", { headers: headers }));
+        const rtn = await firstValueFrom(this._httpClient.get<Alerte[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/alertes", { headers: headers }));
         return rtn ?? [];
     }
 
     async getAlertesCapteur(idErabliereSelectionnee: any): Promise<AlerteCapteur[]> {
         const headers = await this.getHeaders();
         const rtn = await firstValueFrom(this._httpClient.get<AlerteCapteur[]>(
-            this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/alertesCapteur?additionnalProperties=true&include=Capteur",
+            this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/alertesCapteur?include=Capteur",
             { headers: headers }));
         return rtn ?? [];
     }
@@ -183,12 +183,16 @@ export class ErabliereApi {
 
     async putAlerte(idErabliereSelectionnee: any, alerte: Alerte): Promise<any> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.put<Alerte>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/alertes?additionalProperties=true", alerte, { headers: headers }));
+        return firstValueFrom(
+            this._httpClient.put<Alerte>(
+                this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/alertes", alerte, { headers: headers }));
     }
 
     async putAlerteCapteur(idCapteur: any, alerte: AlerteCapteur): Promise<any> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.put<AlerteCapteur>(this._environmentService.apiUrl + '/Capteurs/' + idCapteur + "/alerteCapteurs?additionalProperties=true", alerte, { headers: headers }));
+        return firstValueFrom(
+            this._httpClient.put<AlerteCapteur>(
+                this._environmentService.apiUrl + '/Capteurs/' + idCapteur + "/alerteCapteurs", alerte, { headers: headers }));
     }
 
     async deleteAlerte(idErabliereSelectionnee: any, alerteId: any): Promise<any> {

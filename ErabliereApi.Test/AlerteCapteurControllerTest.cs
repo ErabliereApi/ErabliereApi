@@ -1,9 +1,7 @@
 ﻿using ErabliereApi.Controllers;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
-using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Test.Autofixture;
-using ErabliereApi.Test.EqualityComparer;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Xunit;
@@ -20,12 +18,11 @@ public class AlerteCapteurControllerTest
         Assert.NotNull(erabliere.Id);
         var response = await controller.ListerAlerteCapteurErabliere(
             erabliere.Id.Value,
-            additionnalProperties: true,
             include: "Capteur",
             System.Threading.CancellationToken.None
         );  
 
-        Assert.All(response, e => Assert.IsType<GetAlerteCapteur>(e));
+        Assert.All(response, e => Assert.IsType<AlerteCapteur>(e));
         var alerteCapteurs = Assert.IsAssignableFrom<AlerteCapteur[]>(response);
 
         var capteur = alerteCapteurs[0].Capteur;
@@ -61,14 +58,10 @@ public class AlerteCapteurControllerTest
                 MinValue = (short)(alerteCapteur.MinValue * 10),
                 Nom = alerteCapteur.Nom
             },
-            true,
             System.Threading.CancellationToken.None);
 
         var result = Assert.IsType<OkObjectResult>(response);
 
-        var alerteCapteurResponse = Assert.IsType<GetAlerteCapteur>(result.Value);
-
-        Assert.Equal(2, alerteCapteurResponse.Emails.Length);
-        Assert.Equal(2, alerteCapteurResponse.Numeros.Length);
+        var alerteCapteurResponse = Assert.IsType<AlerteCapteur>(result.Value);
     }
 }

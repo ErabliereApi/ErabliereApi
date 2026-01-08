@@ -12,7 +12,6 @@ import { CopyTextButtonComponent } from "src/generic/copy-text-button.component"
 @Component({
   selector: 'alerte-page',
   templateUrl: './alerte.component.html',
-  styleUrls: ['./alerte.component.css'],
   imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent]
 })
 export class AlerteComponent implements OnInit {
@@ -207,11 +206,11 @@ export class AlerteComponent implements OnInit {
   }
 
   formatStringNumber(str?: string, symbol?: string) {
-    if (str == null || str == "" || str == NaN.toString()) {
+    if (str == null || str == "" || str == Number.NaN.toString()) {
       return null;
     }
 
-    return (parseInt(str) / 10).toFixed(1) + " " + symbol;
+    return (Number.parseInt(str) / 10).toFixed(1) + " " + symbol;
   }
 
   formatStringNumberBase10(str?: string, symbol?: string) {
@@ -219,7 +218,7 @@ export class AlerteComponent implements OnInit {
       return null;
     }
 
-    return (parseInt(str)) + " " + symbol;
+    return (Number.parseInt(str)) + " " + symbol;
   }
 
   formatNumber(i?: number, symbol?: string, doNoDivide: boolean = false) {

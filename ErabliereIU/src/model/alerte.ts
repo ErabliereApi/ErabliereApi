@@ -11,6 +11,4 @@ export class Alerte {
   niveauBassinThresholdLow?: string
   niveauBassinThresholdHight?: string
   isEnable?: boolean;
-  emails?: string[];
-  numeros?: string[];
 }

@@ -3,7 +3,6 @@ using ErabliereApi.Action.Post;
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
-using ErabliereApi.Donnees.Action.Get;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -35,23 +34,14 @@ public class AlertesController : ControllerBase
     /// </summary>
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="token">Jeton d'annulation de la tâche</param>
-    /// <param name="additionalProperties">Propriété additionnel, tel que les adresse couriels dans une liste</param>
     /// <remarks>Les valeurs numérique sont en dixième de leurs unitées respective.</remarks>
     /// <response code="200">Une liste d'alerte potentiellement vide.</response>
     [HttpGet]
     [EnableQuery]
     [ValiderOwnership("id")]
-    public async Task<IEnumerable<Alerte>> Lister(Guid id, CancellationToken token, bool additionalProperties)
+    public async Task<IEnumerable<Alerte>> Lister(Guid id, CancellationToken token)
     {
         var alertes = await _depot.Alertes.AsNoTracking().Where(b => b.IdErabliere == id).ToArrayAsync(token);
-
-        if (additionalProperties)
-        {
-            for (int i = 0; i < alertes.Length; i++)
-            {
-                alertes[i] = new GetAlerte(alertes[i]);
-            }
-        }
 
         return alertes;
     }
@@ -102,13 +92,12 @@ public class AlertesController : ControllerBase
     /// </summary>
     /// <param name="id">L'identifiant de l'érablière</param>
     /// <param name="alerte">L'alerte a modifier</param>
-    /// <param name="additionalProperties">Propriété additionnel, tel que les adresse couriels dans une liste</param>
     /// <param name="token">Jeton d'annulation de la tâche</param>
     /// <response code="200">L'alerte a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à modifier.</response>
     [HttpPut]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, Alerte alerte, bool? additionalProperties, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, Alerte alerte, CancellationToken token)
     {
         if (id != alerte.IdErabliere)
         {
@@ -122,11 +111,6 @@ public class AlertesController : ControllerBase
         var entity = _depot.Update(alerte);
 
         await _depot.SaveChangesAsync(token);
-
-        if (additionalProperties == true) 
-        {
-            return Ok(new GetAlerte(entity.Entity));
-        }
 
         return Ok(entity.Entity);
     }
