@@ -8,11 +8,12 @@ import { AjouterAlerteComponent } from "./ajouter-alerte.component";
 import { ActivatedRoute } from "@angular/router";
 import { Erabliere } from "src/model/erabliere";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
+import { AlerteDestinatairesComponent } from "./alerte-destinataires.component";
 
 @Component({
   selector: 'alerte-page',
   templateUrl: './alerte.component.html',
-  imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent]
+  imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent, AlerteDestinatairesComponent]
 })
 export class AlerteComponent implements OnInit {
   alertes?: Array<Alerte>;

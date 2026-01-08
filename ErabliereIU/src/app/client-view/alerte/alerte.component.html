@@ -83,10 +83,12 @@
                             }
                         </td>
                         <td>
-                            {{alerte.envoyerA}}
+                            <alerte-destinataires [destinataires]="alerte.envoyerA ?? ''">
+                            </alerte-destinataires>
                         </td>
                         <td>
-                            {{alerte.texterA}}
+                            <alerte-destinataires [destinataires]="alerte.texterA ?? ''">
+                            </alerte-destinataires>
                         </td>
                         <td>
                             {{formatNumber(alerte.minValue, alerte.capteur?.symbole, true)}}
@@ -191,10 +193,10 @@
                             }
                         </td>
                         <td>
-                            {{alerte.envoyerA}}
+                            <alerte-destinataires [destinataires]="alerte.envoyerA ?? ''"></alerte-destinataires>
                         </td>
                         <td>
-                            {{alerte.texterA}}
+                            <alerte-destinataires [destinataires]="alerte.texterA ?? ''"></alerte-destinataires>
                         </td>
                         <td>
                             {{formatStringNumber(alerte.temperatureThresholdHight, "°C")}}
