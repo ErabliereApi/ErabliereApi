@@ -1,6 +1,7 @@
 using System.Xml;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ErabliereApi.Services.Nmap;
@@ -172,7 +173,7 @@ public class NmapService
         var appareil = existingDevices.FirstOrDefault(a => a.Adresses.Any(ad => ad.Addr == addr));
         if (appareil == null)
         {
-            _logger.LogWarning("No device found for address {Address}, skipping host", addr);
+            _logger.LogWarning("No device found for address {Address}, skipping host", addr?.Sanatize());
             return;
         }
         appareil.DM = DateTime.UtcNow;
