@@ -87,11 +87,11 @@ export class AppComponent implements OnInit, OnDestroy {
     const account = this.msalService.instance.getActiveAccount();
     if (account?.idTokenClaims) {
       const roles = account?.idTokenClaims['roles'];
-      if (roles != null) {
-        this.erabliereAIUserRole = roles.includes("ErabliereAIUser");
+      if (roles == null) {
+        this.erabliereAIUserRole = false;
       }
       else {
-        this.erabliereAIUserRole = false;
+        this.erabliereAIUserRole = roles.includes("ErabliereAIUser");
       }
     }
     else {

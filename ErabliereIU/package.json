@@ -29,7 +29,7 @@
     "chart.js": "^4.5.1",
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^4.1.0",
-    "mapbox-gl": "^3.17.0",
+    "mapbox-gl": "^3.20.0",
     "marked": "^17.0.4",
     "ng2-charts": "^8.0.0",
     "ngx-mask": "^20.0.3",
@@ -52,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "babel-loader": "^10.0.0",
-    "cypress": "^15.11.0",
+    "cypress": "^15.12.0",
     "eslint": "^9.39.2",
     "ts-node": "~10.9.2",
     "typescript": "^5.9.3"
