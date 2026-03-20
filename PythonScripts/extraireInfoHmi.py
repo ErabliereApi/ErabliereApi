@@ -107,6 +107,11 @@ for url in urls.split(","):
       if len(temp_precedent) == 1 and temp_precedent[0]['t'] < 0:
         temperature = -77
 
+    if vaccium >= 10000:
+      print('Cas spéciaux de image_to_string, bug du module image2text')
+      print('Soustraire 10000 du vaccium')
+      vaccium -= 10000
+
     try:
       file_save = "~/images/" + str(temperature) + "_" + str(vaccium) + "_" + str(nb) + ".jpg"
       # Check if it is windows
