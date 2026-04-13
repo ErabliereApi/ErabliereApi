@@ -10,11 +10,11 @@ namespace ErabliereApi.Services;
 public class MeteoMaticWeaterService : IWeaterService
 {
     /// <inheritdoc />
-    public async Task<(int, string)> GetLocationCodeAsync(string postalCode, CancellationToken cancellationToken)
+    public async Task<(int, string)> GetLocationCodeAsync(GetLocationCodeArgs arg, CancellationToken cancellationToken)
     {
         using var http = new HttpClient();
 
-        var response = await http.GetFromJsonAsync<MeteoMaticLocationResponse>($"https://geocoder.meteomatics.com/api/v1/geocoder/direct/?location={postalCode}&language=en&limit=8", cancellationToken);
+        var response = await http.GetFromJsonAsync<MeteoMaticLocationResponse>($"https://geocoder.meteomatics.com/api/v1/geocoder/direct/?location={arg.PostalCode}&language=en&limit=8", cancellationToken);
 
         var geo = response?.result?.FirstOrDefault()?.geometry;
 

@@ -5,21 +5,21 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace ErabliereApi.Services;
 
 /// <summary>
-/// Service pour interagir avec les prévisions météo
+/// Service pour interagir avec les prévisions météo depuis l'api de AccuWeather
 /// </summary>
-public class WeatherService : IWeaterService
+public class AccuWeatherService : IWeaterService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IDistributedCache _cache;
-    private readonly ILogger<WeatherService> _logger;
+    private readonly ILogger<AccuWeatherService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// Constructeur
     /// </summary>
-    public WeatherService(
+    public AccuWeatherService(
         IDistributedCache memoryCache,
-        ILogger<WeatherService> logger,
+        ILogger<AccuWeatherService> logger,
         IHttpContextAccessor httpContextAccessor,
         IHttpClientFactory httpClientFactory)
     {
@@ -32,9 +32,9 @@ public class WeatherService : IWeaterService
     /// <summary>
     /// Obtenir le code de localisation à partir d'un code postal
     /// </summary>
-    public async Task<(int, string)> GetLocationCodeAsync(string postalCode, CancellationToken cancellationToken)
+    public async Task<(int, string)> GetLocationCodeAsync(GetLocationCodeArgs arg, CancellationToken cancellationToken)
     {
-        var cacheKey = $"WeatherService.PostalCode.{postalCode}";
+        var cacheKey = $"WeatherService.PostalCode.{arg.PostalCode}";
         var locationCode = await _cache.GetStringAsync(cacheKey);
         if (!string.IsNullOrWhiteSpace(locationCode))
         {
@@ -45,7 +45,7 @@ public class WeatherService : IWeaterService
 
         try
         {
-            string url = $"/locations/v1/postalcodes/search?q={postalCode}";
+            string url = $"/locations/v1/postalcodes/search?q={arg.PostalCode}";
 
             var _httpClient = _httpClientFactory.CreateClient("AccuWeatherClient");
 

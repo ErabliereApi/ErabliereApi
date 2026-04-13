@@ -16,12 +16,12 @@ namespace ErabliereApi.Controllers;
 public class WeatherForecastController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
-    private readonly WeatherService _weatherService;
+    private readonly AccuWeatherService _weatherService;
 
     /// <summary>
     /// Constructeur
     /// </summary>
-    public WeatherForecastController(ErabliereDbContext context, WeatherService weatherService)
+    public WeatherForecastController(ErabliereDbContext context, AccuWeatherService weatherService)
     {
         _context = context;
         _weatherService = weatherService;
@@ -60,7 +60,12 @@ public class WeatherForecastController : ControllerBase
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal, token);
+        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(new GetLocationCodeArgs
+        {
+            PostalCode = erabliere.CodePostal,
+            Latitude = erabliere.Latitude,
+            Longitude = erabliere.Longitude
+        }, token);
 
         if (code != 200)
         {
@@ -113,7 +118,12 @@ public class WeatherForecastController : ControllerBase
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
 
-        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(erabliere.CodePostal, token);
+        var (code, locationCode) = await _weatherService.GetLocationCodeAsync(new GetLocationCodeArgs
+        {
+            PostalCode = erabliere.CodePostal,
+            Latitude = erabliere.Latitude,
+            Longitude = erabliere.Longitude
+        }, token);
 
         if (code != 200)
         {
