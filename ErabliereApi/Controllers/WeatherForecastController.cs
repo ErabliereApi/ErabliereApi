@@ -31,7 +31,7 @@ public class WeatherForecastController : ControllerBase
     /// Obtenir le fournisseur météo utilisé
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
+    [HttpGet("/WeatherForecast/Provider")]
     public string Provider()
     {
         return _weatherService.GetType().Name;
