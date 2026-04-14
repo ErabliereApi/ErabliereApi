@@ -1,5 +1,7 @@
 using System.Text.Json;
+using ErabliereApi.Extensions;
 using ErabliereApi.Services.AccuWeatherModels;
+using ErabliereApi.Services.GouvCAModels;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace ErabliereApi.Services;
@@ -12,7 +14,6 @@ public class GouvCAWeatherService : IWeaterService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IDistributedCache _cache;
     private readonly ILogger<GouvCAWeatherService> _logger;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// Constructeur
@@ -20,13 +21,11 @@ public class GouvCAWeatherService : IWeaterService
     public GouvCAWeatherService(
         IDistributedCache memoryCache,
         ILogger<GouvCAWeatherService> logger,
-        IHttpContextAccessor httpContextAccessor,
         IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
         _cache = memoryCache;
         _logger = logger;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
@@ -45,26 +44,10 @@ public class GouvCAWeatherService : IWeaterService
 
         try
         {
-            throw new NotImplementedException();
+            var lat = arg.Latitude.ToString("F3");
+            var longi = arg.Longitude.ToString("F3");
 
-            string url = $"/locations/v1/postalcodes/search?q={arg.PostalCode}";
-
-            var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCAUrl");
-
-            HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
-
-            responseBodyString = await response.Content.ReadAsStringAsync();
-
-            response.EnsureSuccessStatusCode();
-
-            var responseBody = JsonSerializer.Deserialize<List<LocationResponse>>(responseBodyString);
-            
-            if (responseBody == null || responseBody.Count == 0)
-            {
-                return (404, "");
-            }
-
-            var locationKey = responseBody[0].Key ?? "";
+            var locationKey = $"{lat},{longi}";
 
             await _cache.SetStringAsync(cacheKey, locationKey);
 
@@ -92,23 +75,19 @@ public class GouvCAWeatherService : IWeaterService
 
         try
         {
-            throw new NotImplementedException();
+            lang = lang == "fr-ca" ? "fr" : lang;
 
-            string url = $"/forecasts/v1/daily/5day/{location}?language={lang}";
+            string url = $"/api/app/v3/{lang}/Location/{location}";
 
             var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCAUrl");
 
             HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            if (response.Headers.TryGetValues("RateLimit-Remaining", out var vals))
-            {
-                var httpContext = _httpContextAccessor.HttpContext;
+            var rawData = await response.Content.ReadFromJsonAsync<GouvCAWeatherStationResponse[]>()
+                ?? throw new InvalidOperationException("weather forecast is null ater deserialize to GouvCAWeatherStationResponse");
 
-                httpContext?.Response.Headers.Append("X-ErabliereApi-AccuWeather-RateLimit-Remaining", vals.FirstOrDefault());
-            }
-
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = rawData.Single().ToWeatherForecastResponse();
 
             await _cache.SetStringAsync(cacheKey , responseBody, new DistributedCacheEntryOptions
             {
@@ -141,26 +120,19 @@ public class GouvCAWeatherService : IWeaterService
 
         try
         {
-            throw new NotImplementedException();
+            lang = lang == "fr-ca" ? "fr" : lang;
 
-            string url = 
-$"/forecasts/v1/hourly/12hour/{location}?language={lang}";
+            string url = $"/api/app/v3/{lang}/Location/{location}";
 
             var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCAUrl");
 
             HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            if (response.Headers.TryGetValues("RateLimit-Remaining", out var vals))
-            {
-                var httpContext = _httpContextAccessor.HttpContext;
+            var rawData = await response.Content.ReadFromJsonAsync<GouvCAWeatherStationResponse[]>()
+                ?? throw new InvalidOperationException("weather forecast is null ater deserialize to GouvCAWeatherStationResponse");
 
-                _logger.LogInformation("RateLimit-Remaining: {0}", vals.FirstOrDefault());
-
-                httpContext?.Response.Headers.Append("X-ErabliereApi-AccuWeather-RateLimit-Remaining", vals.FirstOrDefault());
-            }
-
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = rawData.Single().ToHourlyWeatherForecastResponse();
 
             await _cache.SetStringAsync(cacheKey , responseBody, new DistributedCacheEntryOptions
             {

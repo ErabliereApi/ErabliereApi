@@ -28,6 +28,16 @@ public class WeatherForecastController : ControllerBase
     }
 
     /// <summary>
+    /// Obtenir le fournisseur météo utilisé
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public string Provider()
+    {
+        return _weatherService.GetType().Name;
+    }
+
+    /// <summary>
     /// Obtenir les prévisions météo pour une érablière
     /// </summary>
     /// <param name="id">Identifiant de l'érablière</param>
