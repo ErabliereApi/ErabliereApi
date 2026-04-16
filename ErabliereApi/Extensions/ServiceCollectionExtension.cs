@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MQTTnet.AspNetCore;
 using StackExchange.Profiling;
 using System.Data.Common;
 using System.Globalization;
@@ -103,27 +102,6 @@ public static class ServiceCollectionExtension
         });
 
         services.AddSingleton<ODataCountHeaderMiddleware>();
-
-        return services;
-    }
-
-    /// <summary>
-    /// Adds MQTT services to the service collection.
-    /// This method checks the configuration to determine if MQTT is enabled,
-    /// and if so, it configures the MQTT server with a default endpoint port.
-    /// </summary>
-    public static IServiceCollection AddMqtt(this IServiceCollection services, IConfiguration config)
-    {
-        if (config.UseMQTT())
-        {
-            services
-                .AddHostedMqttServerWithServices(builder =>
-                {
-                    builder.WithDefaultEndpointPort(1883);
-                })
-                .AddMqttConnectionHandler()
-                .AddConnections();
-        }
 
         return services;
     }

@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
-using MQTTnet.Diagnostics.Logger;
 
 namespace ErabliereApi.Controllers;
 

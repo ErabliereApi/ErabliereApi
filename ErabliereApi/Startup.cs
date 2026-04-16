@@ -17,7 +17,6 @@ using ErabliereApi.Authorization.Customers;
 using ErabliereApi.Middlewares;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Services.Notifications;
-using MQTTnet.AspNetCore;
 
 namespace ErabliereApi;
 
@@ -47,7 +46,6 @@ public class Startup
     {
         services.AddLocalisation().
             AddErabliereApiControllers(Configuration).
-            AddMqtt(Configuration).
             AddErabliereAPIForwardedHeaders(Configuration).
             AddErabliereAPIAuthentication(Configuration).
             AjouterSwagger(Configuration);
@@ -261,24 +259,6 @@ public class Startup
                 Predicate = r => r.Tags.Contains("live")
             });
         });
-
-        if (Configuration.UseMQTT())
-        {
-            app.UseMqttServer(server =>
-            {
-                server.ClientConnectedAsync += async (e) =>
-                {
-                    Console.WriteLine($"Client {e.ClientId} connected");
-                    await Task.CompletedTask;
-                };
-
-                server.ClientDisconnectedAsync += async (e) =>
-                {
-                    Console.WriteLine($"Client {e.ClientId} disconnected");
-                    await Task.CompletedTask;
-                };
-            });
-        }
 
         app.UtiliserSwagger(Configuration);
 

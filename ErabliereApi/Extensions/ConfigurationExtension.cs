@@ -48,17 +48,6 @@ public static class ConfigurationExtension
     }
 
     /// <summary>
-    /// Check if the variable USEMQTT is equal to true
-    /// </summary>
-    /// <param name="config"></param>
-    /// <returns></returns>
-    /// <remarks>USEMQTT is used to enable or disable the MQTT service</remarks>
-    public static bool UseMQTT(this IConfiguration config)
-    {
-        return string.Equals(config["USEMQTT"]?.Trim(), TrueString, OrdinalIgnoreCase);
-    }
-
-    /// <summary>
     /// Obtient un valeur requise de la configuration
     /// </summary>
     public static T GetRequiredValue<T>(this IConfiguration config, string key)

@@ -17,7 +17,6 @@ using System.ClientModel;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using UglyToad.PdfPig;
 
 namespace ErabliereApi.Controllers;
 
@@ -307,27 +306,6 @@ public class ErabliereAIController : ControllerBase
                         ChatMessageContentPart.CreateTextPart(
                             attachment.TextContent)
                     );
-                }
-                else if (attachment.ContentType.ToLower() == "text/pdf")
-                {
-                    using var pdfDoc = PdfDocument.Open(Convert.FromBase64String(attachment.ContentBase64));
-
-                    var sb = new StringBuilder();
-
-                    foreach (var page in pdfDoc.GetPages())
-                    {
-                        var text = page.Text;
-
-                        if (!string.IsNullOrWhiteSpace(text))
-                        {
-                            sb.AppendLine(text);
-                        }
-                    }
-
-                    attachments.Add(
-                            ChatMessageContentPart.CreateTextPart(
-                                sb.ToString())
-                        );
                 }
                 else
                 {
