@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Chart, TooltipItem } from 'chart.js';
+import { Chart, TooltipItem, CategoryScale } from 'chart.js';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { WeatherForecast } from 'src/model/weatherForecast';
 import { Erabliere } from "src/model/erabliere";
@@ -96,6 +96,8 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
             let gradientMin = ctx?.createLinearGradient(0, 0, 0, 400);
             gradientMin?.addColorStop(0, 'rgba(0,0,255,0.4)');
             gradientMin?.addColorStop(1, 'rgba(255,255,255,0)');
+
+            Chart.register(CategoryScale);
 
             this.chart = new Chart('weatherChart', {
                 type: 'line',
