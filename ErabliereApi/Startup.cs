@@ -144,7 +144,8 @@ public class Startup
         }
 
         // Weather Service
-        services.AddTransient<AccuWeatherService>();
+        services.AddTransient<IWeaterService, AccuWeatherService>();
+        services.AddTransient<IWeaterService, GouvCAWeatherService>();
 
         // Nmap Service
         services.AddTransient<NmapService>();

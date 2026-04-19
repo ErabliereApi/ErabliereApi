@@ -368,7 +368,16 @@ public static class ServiceCollectionExtension
                 }
             });
         }
-        
+
+        var gouvCaBaseUrl = config["WeatherStationGouvCAUrl"];
+        if (!string.IsNullOrWhiteSpace(gouvCaBaseUrl))
+        {
+            services.AddHttpClient("WeatherStationGouvCA", c =>
+            {
+                c.BaseAddress = new Uri(gouvCaBaseUrl);
+            });
+        }
+
         return services;
     }
 }

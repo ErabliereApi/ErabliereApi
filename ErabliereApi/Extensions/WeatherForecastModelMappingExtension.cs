@@ -1,6 +1,7 @@
-using System.Text.Json;
 using ErabliereApi.Services.AccuWeatherModels;
 using ErabliereApi.Services.GouvCAModels;
+using System.Globalization;
+using System.Text.Json;
 
 namespace ErabliereApi.Extensions;
 
@@ -13,21 +14,78 @@ public static class WeatherForecastModelMappingExtension
     /// Prendre la réponse des prédiction météo du service de météo du Canada et les convertir en modèle WeatherForecastResponse.
     /// </summary>
     /// <param name="gouvCAWeatherStationResponse"></param>
+    /// <param name="cultureStr">Culture pour le parsing des dates</param>
     /// <returns></returns>
-    public static string ToWeatherForecastResponse(this GouvCAWeatherStationResponse gouvCAWeatherStationResponse)
+    public static string ToWeatherForecastResponse(this GouvCAWeatherStationResponse gouvCAWeatherStationResponse, string cultureStr)
     {
+        var culture = new CultureInfo(cultureStr);
+        bool hasDecember = false;
+
         var forecast = new WeatherForecastResponse
         {
-             Headline = new Headline
-             {
-                 
-             },
-             DailyForecasts = gouvCAWeatherStationResponse.dailyFcst?.daily?.Select(d =>
-                 new Dailyforecast
-                 {
-                     
-                 }
-             ).ToArray() ?? []
+            Headline = new Headline
+            {
+                EffectiveDate = gouvCAWeatherStationResponse.observation?.timeStamp,
+                EffectiveEpochDate = gouvCAWeatherStationResponse.lastUpdated,
+                Category = gouvCAWeatherStationResponse.observation?.condition,
+                EndDate = gouvCAWeatherStationResponse.observation?.timeStamp,
+                EndEpochDate = gouvCAWeatherStationResponse.lastUpdated + 200,
+                //Severity = 
+                //Text =
+                //Link =
+                //MobileLink =
+            },
+            DailyForecasts = gouvCAWeatherStationResponse.dailyFcst?.daily?.Select(d =>
+            {
+                DateTime? datedf = null;
+                if (d.date != null)
+                {
+                    d.date = d.date.Replace(",", ".,");
+                    d.date += ".";
+                    //hasDecember |= d.date.EndsWith("dec", StringComparison.InvariantCultureIgnoreCase);
+                    //if (hasDecember && d.date.EndsWith("jan", StringComparison.InvariantCultureIgnoreCase))
+                    //{
+                    //    d.date += ". " + DateTime.Now.Year + 1;
+                    //}
+                    //else
+                    //{
+                    //    d.date += ". " + DateTime.Now.Year;
+                    //}
+                    datedf = DateTime.ParseExact(d.date, "ddd, dd MMM", culture, DateTimeStyles.AssumeLocal);
+                }
+
+                var df = new Dailyforecast
+                {
+                    Date = datedf,
+                    //EpochDate
+                    Day = new Day
+                    {
+                        //HasPrecipitation
+                        //Icon
+                        //IconPhrase
+                        //PrecipitationIntensity
+                        //PrecipitationType
+                    },
+                    Night = new Night
+                    {
+                        //HasPrecipitation
+                        //Icon
+                        //IconPhrase
+                        //PrecipitationIntensity
+                        //PrecipitationType
+                    },
+                    //Sources
+                    //Link
+                    //MobileLink
+                    Temperature = new Services.AccuWeatherModels.Temperature
+                    {
+                        Maximum = new Maximum { Value = d.temperature?.periodHigh.AsFloat() },
+                        Minimum = new Minimum { Value = d.temperature?.periodLow.AsFloat() }
+                    }
+                };
+
+                return df;
+            }).ToArray() ?? []
         };
 
         return JsonSerializer.Serialize(forecast);
@@ -37,16 +95,32 @@ public static class WeatherForecastModelMappingExtension
     /// Prendre la réponse des prédictions météo du service de météo du Canada et les conertir en modèle HourlyWeatherForecastResponse.
     /// </summary>
     /// <param name="gouvCAWeatherStationResponse"></param>
+    /// <param name="cultureStr">Culture pour le parsing des dates</param>
     /// <returns></returns>
-    public static string ToHourlyWeatherForecastResponse(this GouvCAWeatherStationResponse gouvCAWeatherStationResponse)
+    public static string ToHourlyWeatherForecastResponse(this GouvCAWeatherStationResponse gouvCAWeatherStationResponse, string cultureStr)
     {
-       var forecast = gouvCAWeatherStationResponse.hourlyFcst?.hourly?.Select(h => 
-            new HourlyWeatherForecastResponse
-            {
-                
-            }
-        ).ToArray() ?? [];
+        var culture = new CultureInfo(cultureStr);
 
-       return JsonSerializer.Serialize(forecast);
+        var forecast = gouvCAWeatherStationResponse.hourlyFcst?.hourly?.Select(h =>
+             new HourlyWeatherForecastResponse
+             {
+
+             }
+         ).ToArray() ?? [];
+
+        return JsonSerializer.Serialize(forecast);
+    }
+
+    /// <summary>
+    /// Convertie un entier nullable en float
+    /// Si null, return null
+    /// </summary>
+    /// <param name="x"></param>
+    /// <returns></returns>
+    public static float? AsFloat(this int? x)
+    {
+        if (x == null) return null;
+
+        return (float)x;
     }
 }

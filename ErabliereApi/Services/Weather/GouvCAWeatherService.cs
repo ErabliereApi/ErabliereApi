@@ -44,8 +44,8 @@ public class GouvCAWeatherService : IWeaterService
 
         try
         {
-            var lat = arg.Latitude.ToString("F3");
-            var longi = arg.Longitude.ToString("F3");
+            var lat = arg.Latitude.ToString("F3").Replace(',', '.');
+            var longi = arg.Longitude.ToString("F3").Replace(',', '.');
 
             var locationKey = $"{lat},{longi}";
 
@@ -75,19 +75,19 @@ public class GouvCAWeatherService : IWeaterService
 
         try
         {
+            var culture = lang;
             lang = lang == "fr-ca" ? "fr" : lang;
 
             string url = $"/api/app/v3/{lang}/Location/{location}";
 
-            var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCAUrl");
+            var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCA");
 
             HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            var rawData = await response.Content.ReadFromJsonAsync<GouvCAWeatherStationResponse[]>()
-                ?? throw new InvalidOperationException("weather forecast is null ater deserialize to GouvCAWeatherStationResponse");
+            var rawData = await DeserializeWeatherCAResponse(response, cancellationToken);
 
-            var responseBody = rawData.Single().ToWeatherForecastResponse();
+            var responseBody = rawData.Single().ToWeatherForecastResponse(culture);
 
             await _cache.SetStringAsync(cacheKey , responseBody, new DistributedCacheEntryOptions
             {
@@ -102,6 +102,23 @@ public class GouvCAWeatherService : IWeaterService
         {
             _logger.LogCritical(ex, "Error retrieving weather forecast: {Message}", ex.Message);
             return new WeatherForecastResponse();
+        }
+    }
+
+    private async Task<GouvCAWeatherStationResponse[]> DeserializeWeatherCAResponse(HttpResponseMessage response, CancellationToken token)
+    {
+        var str = await response.Content.ReadAsStringAsync(token);
+
+        try
+        {
+            var rawData = JsonSerializer.Deserialize<GouvCAWeatherStationResponse[]>(str)
+                    ?? throw new InvalidOperationException($"weather forecast is null ater deserialize to GouvCAWeatherStationResponse {str}");
+
+            return rawData;
+        }
+        catch (JsonException e)
+        {
+            throw new InvalidDataException($"Cannot deserialize json {str}", e);
         }
     }
 
@@ -120,19 +137,19 @@ public class GouvCAWeatherService : IWeaterService
 
         try
         {
+            var culture = lang;
             lang = lang == "fr-ca" ? "fr" : lang;
 
             string url = $"/api/app/v3/{lang}/Location/{location}";
 
-            var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCAUrl");
+            var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCA");
 
             HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            var rawData = await response.Content.ReadFromJsonAsync<GouvCAWeatherStationResponse[]>()
-                ?? throw new InvalidOperationException("weather forecast is null ater deserialize to GouvCAWeatherStationResponse");
+            var rawData = await DeserializeWeatherCAResponse(response, cancellationToken);
 
-            var responseBody = rawData.Single().ToHourlyWeatherForecastResponse();
+            var responseBody = rawData.Single().ToHourlyWeatherForecastResponse(culture);
 
             await _cache.SetStringAsync(cacheKey , responseBody, new DistributedCacheEntryOptions
             {

@@ -12,12 +12,12 @@ public class WeatherForecastResponse
 public class Headline
 {
     public DateTimeOffset? EffectiveDate { get; set; }
-    public int EffectiveEpochDate { get; set; }
+    public long EffectiveEpochDate { get; set; }
     public int Severity { get; set; }
     public string? Text { get; set; }
     public string? Category { get; set; }
     public DateTimeOffset? EndDate { get; set; }
-    public int? EndEpochDate { get; set; }
+    public long? EndEpochDate { get; set; }
     public string? MobileLink { get; set; }
     public string? Link { get; set; }
 }
@@ -42,16 +42,16 @@ public class Temperature
 
 public class Minimum
 {
-    public float Value { get; set; }
+    public float? Value { get; set; }
     public string? Unit { get; set; }
-    public int UnitType { get; set; }
+    public int? UnitType { get; set; }
 }
 
 public class Maximum
 {
-    public float Value { get; set; }
+    public float? Value { get; set; }
     public string? Unit { get; set; }
-    public int UnitType { get; set; }
+    public int? UnitType { get; set; }
 }
 
 public class Day

@@ -16,25 +16,65 @@ namespace ErabliereApi.Controllers;
 public class WeatherForecastController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
-    private readonly AccuWeatherService _weatherService;
+    private readonly IEnumerable<IWeaterService> _weatherServices;
+    private readonly IConfiguration _config;
+    private readonly string DEFAULT_WEATHER_SERVICE = string.Empty;
 
     /// <summary>
     /// Constructeur
     /// </summary>
-    public WeatherForecastController(ErabliereDbContext context, AccuWeatherService weatherService)
+    public WeatherForecastController(ErabliereDbContext context, 
+        IEnumerable<IWeaterService> weatherServices,
+        IConfiguration configuration)
     {
         _context = context;
-        _weatherService = weatherService;
+        _weatherServices = weatherServices;
+        _config = configuration;
+        DEFAULT_WEATHER_SERVICE = configuration["WeatherService"] ?? string.Empty;
+    }
+
+    private IWeaterService? GetWeatherSvc(string? name = null)
+    {
+        var searchName = name ?? DEFAULT_WEATHER_SERVICE;
+        
+        foreach (var s in _weatherServices)
+        {
+            if (s.GetType().Name == searchName)
+            {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
+    private IWeaterService GetRequiredWeatherSvc(string? name = null)
+    {
+        var ws = GetWeatherSvc(name);
+        if (ws == null)
+        {
+            var wss = new List<string>();
+            foreach (var s in _weatherServices)
+            {
+                var t = s.GetType();
+                wss.Add(t.Name);
+            }
+            var wstring = wss.Aggregate((a, b) => $"{a},{b}");
+            throw new InvalidOperationException($"No service matching {name ?? DEFAULT_WEATHER_SERVICE} in {wss}");
+        }
+        return ws;
     }
 
     /// <summary>
     /// Obtenir le fournisseur météo utilisé
     /// </summary>
     /// <returns></returns>
+    [AllowAnonymous]
     [HttpGet("/WeatherForecast/Provider")]
     public string Provider()
     {
-        return _weatherService.GetType().Name;
+        var ws = GetWeatherSvc();
+        return ws?.GetType().Name ?? "No provider configured";
     }
 
     /// <summary>
@@ -43,6 +83,7 @@ public class WeatherForecastController : ControllerBase
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="lang">Paramètre de langue, fr-ca par défaut.</param>
     /// <param name="token">Token d'annulation</param>
+    /// <param name="provider">Nom du fournisseur météo. Ex: AccuWeatherService ou GouvCAWeatherService</param>
     /// <returns>Prévisions météo</returns>
     /// <response code="200">Prévisions météo</response>
     /// <response code="401">Non autorisé</response>
@@ -52,7 +93,7 @@ public class WeatherForecastController : ControllerBase
     [ProducesResponseType(200, Type = typeof(WeatherForecastResponse))]
     [AllowAnonymous]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> GetWeatherForecast(Guid id, CancellationToken token, string lang = "fr-ca")
+    public async Task<IActionResult> GetWeatherForecast(Guid id, CancellationToken token, string lang = "fr-ca", string? provider = null)
     {
         // Résoudre l'érablière
         var erabliere = await _context.Erabliere.FindAsync([id], token);
@@ -69,6 +110,8 @@ public class WeatherForecastController : ControllerBase
 
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
+
+        var _weatherService = GetRequiredWeatherSvc();
 
         var (code, locationCode) = await _weatherService.GetLocationCodeAsync(new GetLocationCodeArgs
         {
@@ -101,6 +144,7 @@ public class WeatherForecastController : ControllerBase
     /// </summary>
     /// <param name="id">Identifiant de l'érablière</param>
     /// <param name="lang">Paramètre de langue, fr-ca par défaut.</param>
+    /// <param name="provider">Nom du fournisseur météo. Ex: AccuWeatherService ou GouvCAWeatherService</param>
     /// <param name="token">Token d'annulation</param>
     /// <returns>Prévisions météo</returns>
     /// <response code="200">Prévisions météo</response>
@@ -110,7 +154,7 @@ public class WeatherForecastController : ControllerBase
     [ProducesResponseType(200, Type = typeof(HourlyWeatherForecastResponse[]))]
     [AllowAnonymous]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> GetHourlyWeatherForecast(Guid id, CancellationToken token, string lang = "fr-ca")
+    public async Task<IActionResult> GetHourlyWeatherForecast(Guid id, CancellationToken token, string lang = "fr-ca", string? provider = null)
     {
         // Résoudre l'érablière
         var erabliere = await _context.Erabliere.FindAsync([id], token);
@@ -127,6 +171,8 @@ public class WeatherForecastController : ControllerBase
 
             return new BadRequestObjectResult(new ValidationProblemDetails(ModelState));
         }
+
+        var _weatherService = GetRequiredWeatherSvc();
 
         var (code, locationCode) = await _weatherService.GetLocationCodeAsync(new GetLocationCodeArgs
         {

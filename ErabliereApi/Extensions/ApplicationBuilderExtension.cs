@@ -16,30 +16,38 @@ public static class ApplicationBuilderExtensions
     /// </summary>
     public static IApplicationBuilder MigrateDatabase(this IApplicationBuilder app, IConfiguration config, IServiceProvider serviceProvider)
     {
-        if (config.UseSql() &&
-            string.Equals(config["SQL_USE_STARTUP_MIGRATION"], TrueString, OrdinalIgnoreCase))
+        try
         {
-            var database = serviceProvider.GetRequiredService<ErabliereDbContext>();
-
-            var defaultMigrationTimeout = database.Database.GetCommandTimeout();
-
-            Console.WriteLine("Default migration timeout: " + defaultMigrationTimeout);
-
-            var migrationTimeout = config["SQL_STARTUP_MIGRATION_TIMEOUT"];
-
-            if (migrationTimeout != null)
+            if (config.UseSql() &&
+            string.Equals(config["SQL_USE_STARTUP_MIGRATION"], TrueString, OrdinalIgnoreCase))
             {
-                database.Database.SetCommandTimeout(int.Parse(migrationTimeout));
+                var database = serviceProvider.GetRequiredService<ErabliereDbContext>();
 
-                Console.WriteLine("Migration timeout: " + migrationTimeout);
+                var defaultMigrationTimeout = database.Database.GetCommandTimeout();
+
+                Console.WriteLine("Default migration timeout: " + defaultMigrationTimeout);
+
+                var migrationTimeout = config["SQL_STARTUP_MIGRATION_TIMEOUT"];
+
+                if (migrationTimeout != null)
+                {
+                    database.Database.SetCommandTimeout(int.Parse(migrationTimeout));
+
+                    Console.WriteLine("Migration timeout: " + migrationTimeout);
+                }
+
+                database.Database.Migrate();
             }
 
-            database.Database.Migrate();
+            if (config.IsIpInfoEnabled())
+            {
+                ImportIPInfoDatabase(config, serviceProvider);
+            }
         }
-
-        if (config.IsIpInfoEnabled())
+        catch (Exception e)
         {
-            ImportIPInfoDatabase(config, serviceProvider);
+            throw new InvalidOperationException(
+                $"Erreur lors de la migration initial à {config["SQL_CONNEXION_STRING"]}", e);
         }
 
         return app;

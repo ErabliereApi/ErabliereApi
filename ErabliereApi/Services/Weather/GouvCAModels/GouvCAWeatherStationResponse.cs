@@ -314,7 +314,7 @@ public class GouvCAWeatherStationResponse
     public string? cgndb { get; set; }
     public string? displayName { get; set; }
     public string? zonePoly { get; set; }
-    public int lastUpdated { get; set; }
+    public long lastUpdated { get; set; }
     public Alert? alert { get; set; }
     public Observation? observation { get; set; }
     public HourlyFcst? hourlyFcst { get; set; }
