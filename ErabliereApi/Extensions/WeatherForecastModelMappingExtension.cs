@@ -42,16 +42,19 @@ public static class WeatherForecastModelMappingExtension
                 {
                     d.date = d.date.Replace(",", ".,");
                     d.date += ".";
-                    //hasDecember |= d.date.EndsWith("dec", StringComparison.InvariantCultureIgnoreCase);
-                    //if (hasDecember && d.date.EndsWith("jan", StringComparison.InvariantCultureIgnoreCase))
-                    //{
-                    //    d.date += ". " + DateTime.Now.Year + 1;
-                    //}
-                    //else
-                    //{
-                    //    d.date += ". " + DateTime.Now.Year;
-                    //}
                     datedf = DateTime.ParseExact(d.date, "ddd, dd MMM", culture, DateTimeStyles.AssumeLocal);
+
+                    hasDecember |= datedf.Value.Month == 12;
+                    if (hasDecember && datedf.Value.Month == 1)
+                    {
+                        datedf = new DateTime(
+                            datedf.Value.Year + 1,
+                            datedf.Value.Month,
+                            datedf.Value.Day,
+                            datedf.Value.Hour,
+                            datedf.Value.Minute,
+                            datedf.Value.Second);
+                    }
                 }
 
                 var df = new Dailyforecast
@@ -104,7 +107,11 @@ public static class WeatherForecastModelMappingExtension
         var forecast = gouvCAWeatherStationResponse.hourlyFcst?.hourly?.Select(h =>
              new HourlyWeatherForecastResponse
              {
-
+                 DateTime = h.date != null ? DateTime.Parse(h.date) : DateTime.MinValue,
+                 Temperature = new HourlyForecastTemperature
+                 {
+                     
+                 }
              }
          ).ToArray() ?? [];
 

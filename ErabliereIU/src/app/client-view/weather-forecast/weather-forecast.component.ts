@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { Chart, TooltipItem, CategoryScale } from 'chart.js';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
-import { WeatherForecast } from 'src/model/weatherForecast';
+import { DailyForecast, WeatherForecast } from 'src/model/weatherForecast';
 import { Erabliere } from "src/model/erabliere";
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -18,6 +18,7 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
     text?: string;
     error?: any;
     interval?: NodeJS.Timeout;
+    njours: number = 5;
 
     constructor(private readonly api: ErabliereApi) {
     }
@@ -47,6 +48,7 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
     getWeatherData() {
         this.api.getWeatherForecast(this.erabliere?.id).then((data: WeatherForecast) => {
             this.weatherData = data;
+            this.njours = calcDays(this.weatherData.dailyForecasts);
             this.error = null;
             this.createChart();
         }).catch((error: HttpErrorResponse) => {
@@ -172,3 +174,24 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
         }, 0);
     }
 }
+function calcDays(dailyForecasts: DailyForecast[] | undefined): number {
+    if (dailyForecasts == null) {
+        return 0;
+    }
+    const first = dailyForecasts[0].date;
+    const last = dailyForecasts.at(-1)?.date;
+
+    if (last == null) {
+        return 1;
+    }
+
+    const fd = new Date(first) as any;
+    const fl = new Date(last) as any;
+
+    const diffInMs = Math.abs(fl - fd);
+
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+    return Math.floor(diffInDays);
+}
+
