@@ -21,6 +21,8 @@ public static class WeatherForecastModelMappingExtension
         var culture = new CultureInfo(cultureStr);
         bool hasDecember = false;
 
+        var forcastGroup = gouvCAWeatherStationResponse.dailyFcst?.daily?.GroupBy(d => d.date);
+
         var forecast = new WeatherForecastResponse
         {
             Headline = new Headline
@@ -35,14 +37,17 @@ public static class WeatherForecastModelMappingExtension
                 //Link =
                 //MobileLink =
             },
-            DailyForecasts = gouvCAWeatherStationResponse.dailyFcst?.daily?.Select(d =>
+            DailyForecasts = forcastGroup?.Select(g =>
             {
+                var key = g.Key;
+                Daily? day = null;
+                Daily? night = null;
                 DateTime? datedf = null;
-                if (d.date != null)
+                if (key != null)
                 {
-                    d.date = d.date.Replace(",", ".,");
-                    d.date += ".";
-                    datedf = DateTime.ParseExact(d.date, "ddd, dd MMM", culture, DateTimeStyles.AssumeLocal);
+                    key = key.Replace(",", ".,");
+                    key += ".";
+                    datedf = DateTime.ParseExact(key, "ddd, dd MMM", culture, DateTimeStyles.AssumeLocal);
 
                     hasDecember |= datedf.Value.Month == 12;
                     if (hasDecember && datedf.Value.Month == 1)
@@ -65,7 +70,7 @@ public static class WeatherForecastModelMappingExtension
                     {
                         //HasPrecipitation
                         //Icon
-                        //IconPhrase
+                        IconPhrase = day?.summary
                         //PrecipitationIntensity
                         //PrecipitationType
                     },
@@ -73,7 +78,7 @@ public static class WeatherForecastModelMappingExtension
                     {
                         //HasPrecipitation
                         //Icon
-                        //IconPhrase
+                        IconPhrase = night?.summary
                         //PrecipitationIntensity
                         //PrecipitationType
                     },
@@ -82,8 +87,8 @@ public static class WeatherForecastModelMappingExtension
                     //MobileLink
                     Temperature = new Services.AccuWeatherModels.Temperature
                     {
-                        Maximum = new Maximum { Value = d.temperature?.periodHigh.AsFloat() },
-                        Minimum = new Minimum { Value = d.temperature?.periodLow.AsFloat() }
+                        //Maximum = new Maximum { Value = g.Max(ge => ge.temperature.imperial.AsFloat() )}
+                        //Minimum = new Minimum { Value = d.temperature?.periodLow.AsFloat() }
                     }
                 };
 
@@ -108,10 +113,10 @@ public static class WeatherForecastModelMappingExtension
              new HourlyWeatherForecastResponse
              {
                  DateTime = h.date != null ? DateTime.Parse(h.date) : DateTime.MinValue,
-                 Temperature = new HourlyForecastTemperature
+                 Temperature = h.temperature?.metric != null ? new HourlyForecastTemperature
                  {
-                     
-                 }
+                     Value = double.Parse(h.temperature.metric)
+                 } : null
              }
          ).ToArray() ?? [];
 
