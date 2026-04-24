@@ -2,7 +2,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
-import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
+import { HourlyTemperature, HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 
 @Component({
     selector: 'hourly-weather-forecast',
@@ -36,10 +36,10 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
                 <td colspan="5">Aucune donnée disponible</td>
               </tr>
             }
-            @for (forecast of weatherData; track forecast) {
+            @for (forecast of weatherData; track forecast.epochDateTime) {
               <tr>
                 <td title={{forecast.link}}>{{ getHour(forecast) }}</td>
-                <td>{{ convertToCelsius(forecast.temperature?.value) }}°C</td>
+                <td>{{ convertToCelsius(forecast.temperature) }}°C</td>
                 <td>
                   <img
                     [src]="'/assets/weathericons/accuweather/' + pad2(forecast.weatherIcon) + '-s.png'"
@@ -100,12 +100,20 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
         });
     }
 
-    convertToCelsius(fahrenheit?: number) {
-        if (fahrenheit == null) {
+    convertToCelsius(hourlyTemp?: HourlyTemperature) {
+        if (hourlyTemp?.value == null) {
             return '';
         }
 
-        return Math.round((fahrenheit - 32) * 5 / 9);
+        if (hourlyTemp.unit === "C") {
+            return hourlyTemp.value;
+        }
+
+        if (hourlyTemp.unit === "F") {
+            return Math.round((hourlyTemp.value - 32) * 5 / 9);
+        }
+
+        throw new Error("Cannot convert unit " + hourlyTemp.unit +" to celcius");
     }
 
     getHour(_t12: HourlyWeatherForecast): string {

@@ -30,7 +30,7 @@ public class WeatherForecastModelMappingExtensionTest
         var ds = JsonSerializer.Deserialize<GouvCAWeatherStationResponse[]>(INPUT);
         ds.ShouldNotBeNull();
 
-        var weatherResponseStr = ds.ShouldHaveSingleItem().ToWeatherForecastResponse("fr-CA");
+        var weatherResponseStr = ds.ShouldHaveSingleItem().ToWeatherForecastResponse("fr-CA", "46.159,-70.779");
         var weatherInfo = JsonSerializer.Deserialize<WeatherForecastResponse>(weatherResponseStr);
 
         weatherInfo.ShouldNotBeNull();

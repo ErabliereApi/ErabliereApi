@@ -8,7 +8,7 @@ public class HourlyWeatherForecastResponse
     /// <summary>
     /// Date and time of the forecast
     /// </summary>
-    public DateTime DateTime { get; set; }
+    public DateTimeOffset DateTime { get; set; }
     /// <summary>
     /// Epoch date time
     /// </summary>

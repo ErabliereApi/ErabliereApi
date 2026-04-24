@@ -87,7 +87,7 @@ public class GouvCAWeatherService : IWeaterService
 
             var rawData = await DeserializeWeatherCAResponse(response, cancellationToken);
 
-            var responseBody = rawData.Single().ToWeatherForecastResponse(culture);
+            var responseBody = rawData.Single().ToWeatherForecastResponse(culture, location);
 
             await _cache.SetStringAsync(cacheKey , responseBody, new DistributedCacheEntryOptions
             {

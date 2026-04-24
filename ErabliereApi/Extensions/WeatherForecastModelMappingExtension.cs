@@ -15,8 +15,9 @@ public static class WeatherForecastModelMappingExtension
     /// </summary>
     /// <param name="gouvCAWeatherStationResponse"></param>
     /// <param name="cultureStr">Culture pour le parsing des dates</param>
+    /// <param name="coord">Les coordonnées</param>
     /// <returns></returns>
-    public static string ToWeatherForecastResponse(this GouvCAWeatherStationResponse gouvCAWeatherStationResponse, string cultureStr)
+    public static string ToWeatherForecastResponse(this GouvCAWeatherStationResponse gouvCAWeatherStationResponse, string cultureStr, string coord)
     {
         var culture = new CultureInfo(cultureStr);
         bool hasDecember = false;
@@ -83,12 +84,12 @@ public static class WeatherForecastModelMappingExtension
                         //PrecipitationType
                     },
                     //Sources
-                    //Link
-                    //MobileLink
+                    Link = "https://meteo.gc.ca/fr/location/index.html?coords=" + coord,
+                    MobileLink = "https://meteo.gc.ca/fr/location/index.html?coords=" + coord,
                     Temperature = new Services.AccuWeatherModels.Temperature
                     {
-                        //Maximum = new Maximum { Value = g.Max(ge => ge.temperature.imperial.AsFloat() )}
-                        //Minimum = new Minimum { Value = d.temperature?.periodLow.AsFloat() }
+                        Maximum = new Maximum { Value = g.Max(ge => ge.temperature?.imperial.AsFloat()) },
+                        Minimum = new Minimum { Value = g.Min(ge => ge.temperature?.imperial.AsFloat()) }
                     }
                 };
 
@@ -112,11 +113,21 @@ public static class WeatherForecastModelMappingExtension
         var forecast = gouvCAWeatherStationResponse.hourlyFcst?.hourly?.Select(h =>
              new HourlyWeatherForecastResponse
              {
-                 DateTime = h.date != null ? DateTime.Parse(h.date) : DateTime.MinValue,
+                 DateTime = DateTimeOffset.FromUnixTimeSeconds(h.epochTime),
+                 EpochDateTime = h.epochTime,
                  Temperature = h.temperature?.metric != null ? new HourlyForecastTemperature
                  {
-                     Value = double.Parse(h.temperature.metric)
-                 } : null
+                     Value = double.Parse(h.temperature.metric),
+                     Unit = "C",
+                     UnitType = 17
+                 } : null,
+                 HasPrecipitation = h.precip != "",
+                 WeatherIcon = h.iconCode != null ? int.Parse(h.iconCode) : 0,
+                 IconPhrase = h.condition
+                 //Link
+                 //MobileLink
+                 //PrecipitationIntensity
+                 //PrecipitationType
              }
          ).ToArray() ?? [];
 
@@ -129,10 +140,12 @@ public static class WeatherForecastModelMappingExtension
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static float? AsFloat(this int? x)
+    public static float? AsFloat(this string? x)
     {
         if (x == null) return null;
 
-        return (float)x;
+        if (float.TryParse(x, out var f)) return f;
+
+        throw new InvalidDataException($"string {x} is not a valid float");
     }
 }
