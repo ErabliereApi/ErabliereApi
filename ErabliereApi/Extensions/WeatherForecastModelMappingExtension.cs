@@ -33,22 +33,26 @@ public static class WeatherForecastModelMappingExtension
                 Category = gouvCAWeatherStationResponse.observation?.condition,
                 EndDate = gouvCAWeatherStationResponse.observation?.timeStamp,
                 EndEpochDate = gouvCAWeatherStationResponse.lastUpdated + 200,
-                //Severity = 
-                //Text =
-                //Link =
-                //MobileLink =
+                Severity = 3,
+                Text = gouvCAWeatherStationResponse.dailyFcst?.daily?.FirstOrDefault()?.text,
+                Link = "https://meteo.gc.ca/fr/location/index.html?coords=" + coord,
+                MobileLink = "https://meteo.gc.ca/fr/location/index.html?coords=" + coord,
             },
             DailyForecasts = forcastGroup?.Select(g =>
             {
                 var key = g.Key;
-                Daily? day = null;
-                Daily? night = null;
+                Daily? day = g.SingleOrDefault(g => g.periodID == 1);
+                Daily? night = g.SingleOrDefault(g => g.periodID == 2);
                 DateTime? datedf = null;
+                DateTimeOffset? datedfoffset = null;
                 if (key != null)
                 {
                     key = key.Replace(",", ".,");
-                    key += ".";
-                    datedf = DateTime.ParseExact(key, "ddd, dd MMM", culture, DateTimeStyles.AssumeLocal);
+                    if (!key.EndsWith("mai"))
+                    {
+                        key += ".";
+                    }
+                    datedf = DateTime.ParseExact(key, "ddd, d MMM", culture, DateTimeStyles.AssumeLocal);
 
                     hasDecember |= datedf.Value.Month == 12;
                     if (hasDecember && datedf.Value.Month == 1)
@@ -63,27 +67,29 @@ public static class WeatherForecastModelMappingExtension
                     }
                 }
 
+                datedfoffset = datedf;
+
                 var df = new Dailyforecast
                 {
                     Date = datedf,
-                    //EpochDate
+                    EpochDate = datedfoffset?.ToUnixTimeSeconds() ?? 0,
                     Day = new Day
                     {
-                        //HasPrecipitation
-                        //Icon
-                        IconPhrase = day?.summary
-                        //PrecipitationIntensity
-                        //PrecipitationType
+                        HasPrecipitation = day != null && day.precip != "",
+                        Icon = day?.iconCode != null ? int.Parse(day.iconCode) : 0,
+                        IconPhrase = day?.summary,
+                        PrecipitationIntensity = day?.precip,
+                        PrecipitationType = day?.text
                     },
                     Night = new Night
                     {
-                        //HasPrecipitation
-                        //Icon
-                        IconPhrase = night?.summary
-                        //PrecipitationIntensity
-                        //PrecipitationType
+                        HasPrecipitation = night != null && night.precip != "",
+                        Icon = night?.iconCode != null ? int.Parse(night.iconCode) : 0,
+                        IconPhrase = night?.summary,
+                        PrecipitationIntensity = day?.precip,
+                        PrecipitationType = day?.text
                     },
-                    //Sources
+                    Sources = null,
                     Link = "https://meteo.gc.ca/fr/location/index.html?coords=" + coord,
                     MobileLink = "https://meteo.gc.ca/fr/location/index.html?coords=" + coord,
                     Temperature = new Services.AccuWeatherModels.Temperature
@@ -123,11 +129,11 @@ public static class WeatherForecastModelMappingExtension
                  } : null,
                  HasPrecipitation = h.precip != "",
                  WeatherIcon = h.iconCode != null ? int.Parse(h.iconCode) : 0,
-                 IconPhrase = h.condition
-                 //Link
-                 //MobileLink
-                 //PrecipitationIntensity
-                 //PrecipitationType
+                 IconPhrase = h.condition,
+                 PrecipitationType = h.condition,
+                 PrecipitationIntensity = h.precip != "" ? h.precip : null,
+                 Link = null,
+                 MobileLink = null
              }
          ).ToArray() ?? [];
 
