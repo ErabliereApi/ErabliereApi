@@ -1,7 +1,7 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { Chart, TooltipItem, CategoryScale } from 'chart.js';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
-import { DailyForecast, WeatherForecast } from 'src/model/weatherForecast';
+import { WeatherForecast } from 'src/model/weatherForecast';
 import { Erabliere } from "src/model/erabliere";
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -10,7 +10,7 @@ import { HttpErrorResponse } from '@angular/common/http';
     templateUrl: 'weather-forecast.component.html',
     standalone: true,
 })
-export class WeatherForecastComponent implements OnChanges, OnDestroy {
+export class WeatherForecastComponent implements OnChanges, OnDestroy, OnInit {
     @Input() erabliere?: Erabliere;
 
     chart: any;
@@ -19,8 +19,15 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy {
     error?: any;
     interval?: NodeJS.Timeout;
     njours: number = 5;
+    provider: string = "";
 
     constructor(private readonly api: ErabliereApi) {
+    }
+
+    ngOnInit(): void {
+        this.api.getWeatherForecastProvider().then(prov => {
+            this.provider = prov;
+        })
     }
 
     ngOnChanges(changes: SimpleChanges) {

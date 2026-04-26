@@ -7,12 +7,21 @@ import { HourlyTemperature, HourlyWeatherForecast } from 'src/model/hourlyweathe
 @Component({
     selector: 'hourly-weather-forecast',
     template: `
-    @if (displayAccueatherLogo) {
+    @if (displayAccueatherLogo && provider == "AccuWeatherService") {
     <div class="text-center">
                     <small class="text-muted">
                         Prévisions 12 heures fournies par <a href="https://www.accuweather.com" target="_blank"><img
                                 src="/assets/weathericons/accuweather/favicon.ico" alt="AccuWeather Logo" width="20"
                                 height="20"> AccuWeather</a>
+                    </small>
+                </div>
+    }
+    @if (displayAccueatherLogo && provider == "GouvCAWeatherService") {
+        <div class="text-center">
+                    <small class="text-muted">
+                        Prévisions 24 heures fournies par <a href="https://weather.gc.ca/" target="_blank"><img
+                    src="/assets/weathericons/weathergcca/favicon.ico" alt="Weather GC CA Logo" width="20" height="20">
+                weather.qc.ca</a>
                     </small>
                 </div>
     }
@@ -42,7 +51,7 @@ import { HourlyTemperature, HourlyWeatherForecast } from 'src/model/hourlyweathe
                 <td>{{ convertToCelsius(forecast.temperature) }}°C</td>
                 <td>
                   <img
-                    [src]="'/assets/weathericons/accuweather/' + pad2(forecast.weatherIcon) + '-s.png'"
+                    [src]="'/assets/weathericons/' + getfolder() + '/' + pad2(forecast.weatherIcon) + '-s.png'"
                     [alt]="forecast.iconPhrase"
                     [title]="forecast.iconPhrase">
                   </td>
@@ -62,6 +71,7 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
     interval?: NodeJS.Timeout;
     idErabliere: any;
     @Input() displayAccueatherLogo: boolean = true;
+    @Input() provider: string = "";
 
     constructor(private readonly api: ErabliereApi, private readonly route: ActivatedRoute) {
     }
@@ -113,7 +123,7 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
             return Math.round((hourlyTemp.value - 32) * 5 / 9);
         }
 
-        throw new Error("Cannot convert unit " + hourlyTemp.unit +" to celcius");
+        throw new Error("Cannot convert unit " + hourlyTemp.unit + " to celcius");
     }
 
     getHour(_t12: HourlyWeatherForecast): string {
@@ -169,5 +179,15 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
         }
 
         return n.toString().padStart(2, '0');
+    }
+
+    getfolder() {
+        if (this.provider == "GouvCAWeatherService") {
+            return 'weathergcca'
+        }
+        if (this.provider == "AccuWeatherService") {
+            return 'accuweateher'
+        }
+        throw new Error("Provider inconnue")
     }
 }

@@ -3,22 +3,40 @@
         @if (erabliere?.codePostal?.trim() || displayImages) {
         <div class="row border-top py-2">
             @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoJour) {
-            <weather-forecast 
-                class="col-md-6" 
-                [erabliere]="erabliere">
+            <weather-forecast class="col-md-6" [erabliere]="erabliere">
             </weather-forecast>
             }
             @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoHeure) {
-                <hourly-weather-forecast 
-                    class="col-md-6" 
-                    style="max-height: 250px; overflow-y: auto; overflow-x: auto;"
-                    [displayAccueatherLogo]="!erabliere?.afficherPredictionMeteoJour">
-                </hourly-weather-forecast>
+            <hourly-weather-forecast class="col-md-6" style="max-height: 250px; overflow-y: auto; overflow-x: auto;"
+                [displayAccueatherLogo]="!erabliere?.afficherPredictionMeteoJour"
+                [provider]="weatherProvider">
+            </hourly-weather-forecast>
             }
-            @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoJour && erabliere?.afficherPredictionMeteoHeure) {
+            @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoJour &&
+            erabliere?.afficherPredictionMeteoHeure && weatherProvider == "AccuWeatherService") {
             <div class="col-md-12 text-center">
                 <small class="text-muted">
-                    Prévisions météos fournies par <a href="https://www.accuweather.com" target="_blank"><img src="/assets/weathericons/accuweather/favicon.ico" alt="AccuWeather Logo" width="20" height="20"> AccuWeather</a>
+                    Prévisions météos fournies par <a href="https://www.accuweather.com" target="_blank"><img
+                            src="/assets/weathericons/accuweather/favicon.ico" alt="AccuWeather Logo" width="20"
+                            height="20"> AccuWeather</a>
+                </small>
+            </div>
+            }
+            @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoJour &&
+            erabliere?.afficherPredictionMeteoHeure && weatherProvider == "GouvCAWeatherService") {
+            <div class="col-md-12 text-center">
+                <small class="text-muted">
+                    Prévisions météos fournies par <a href="https://weather.gc.ca/" target="_blank"><img
+                            src="/assets/weathericons/weathergcca/favicon.ico" alt="Weather GC CA Logo" width="20"
+                            height="20">
+                        weather.qc.ca</a>
+                </small>
+            </div>
+            }
+            @else {
+            <div class="col-md-12 text-center">
+                <small class="text-muted">
+                    {{weatherProvider}}
                 </small>
             </div>
             }

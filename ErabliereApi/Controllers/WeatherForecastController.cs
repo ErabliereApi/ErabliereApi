@@ -1,5 +1,6 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
+using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Services;
 using ErabliereApi.Services.AccuWeatherModels;
 using Microsoft.AspNetCore.Authorization;
@@ -71,10 +72,10 @@ public class WeatherForecastController : ControllerBase
     /// <returns></returns>
     [AllowAnonymous]
     [HttpGet("/WeatherForecast/Provider")]
-    public string Provider()
+    public WeatherProviderResponse Provider()
     {
         var ws = GetWeatherSvc();
-        return ws?.GetType().Name ?? "No provider configured";
+        return new WeatherProviderResponse { Provider = ws?.GetType().Name ?? "No provider configured" };
     }
 
     /// <summary>

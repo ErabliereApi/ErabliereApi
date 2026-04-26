@@ -34,6 +34,8 @@ export class ErabliereComponent implements OnInit {
   displayCapteurs: boolean = false;
   displayImages: boolean = false;
 
+  weatherProvider: string = "";
+
   private readonly authSvc: IAuthorisationSerivce;
 
   constructor(
@@ -81,6 +83,10 @@ export class ErabliereComponent implements OnInit {
         this.displayImages = false;
       });
     });
+
+    this._api.getWeatherForecastProvider().then(prov => {
+      this.weatherProvider = prov;
+    })
   }
 
   getErabliere() {

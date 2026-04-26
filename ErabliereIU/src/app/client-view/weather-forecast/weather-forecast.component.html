@@ -12,13 +12,15 @@
         <span class="ms-2">Chargement des prévisions météo...</span>
     </div>
     } @else {
-    <span data-bs-toggle="tooltip" title="{{ weatherData.headline?.category ?? '' }}" data-bs-placement="top">{{ text }}</span>
+    <span data-bs-toggle="tooltip" title="{{ weatherData.headline?.category ?? '' }}" data-bs-placement="top">{{ text
+        }}</span>
     <div class="chart-wrapper">
         <canvas id="weatherChart" class="chart">
         </canvas>
     </div>
     }
     @if (!erabliere?.afficherPredictionMeteoHeure) {
+    @if (provider == "AccuWeatherService") {
     <div class="text-center">
         <small class="text-muted">
             Prévisions 5 jours fournies par <a href="https://www.accuweather.com" target="_blank"><img
@@ -26,5 +28,15 @@
                 AccuWeather</a>
         </small>
     </div>
+    }
+    @if (provider == "GouvCAWeatherService") {
+        <div class="text-center">
+        <small class="text-muted">
+            Prévisions {{njours}} jours fournies par <a href="https://weather.gc.ca/" target="_blank"><img
+                    src="/assets/weathericons/weathergcca/favicon.ico" alt="Weather GC CA Logo" width="20" height="20">
+                weather.qc.ca</a>
+        </small>
+    </div>
+    }
     }
 </div>

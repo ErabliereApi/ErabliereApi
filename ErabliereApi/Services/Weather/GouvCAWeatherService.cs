@@ -83,7 +83,7 @@ public class GouvCAWeatherService : IWeaterService
             var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCA");
 
             HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            await response.EnsureSuccessStatusCodeAsync(_logger);
 
             var rawData = await DeserializeWeatherCAResponse(response, cancellationToken);
 
@@ -145,7 +145,7 @@ public class GouvCAWeatherService : IWeaterService
             var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCA");
 
             HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            await response.EnsureSuccessStatusCodeAsync(_logger);
 
             var rawData = await DeserializeWeatherCAResponse(response, cancellationToken);
 

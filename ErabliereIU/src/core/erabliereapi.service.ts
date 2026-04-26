@@ -33,6 +33,7 @@ import { PostImageGenerationResponse } from 'src/model/postImageGenerationRespon
 import { Horaire } from 'src/model/horaire';
 import { Appareil } from 'src/model/appareil';
 import { IpInfo } from 'src/model/ipinfo';
+import { WeatherProviderResponse } from 'src/model/weatherProviderResponse';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
@@ -487,6 +488,13 @@ export class ErabliereApi {
     async deleteErabliereAdmin(idErabliere: string): Promise<any> {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/Admin/Erablieres/' + idErabliere, { headers: headers }));
+    }
+
+    async getWeatherForecastProvider(): Promise<string> {
+        const rtn = await firstValueFrom(this._httpClient.get<WeatherProviderResponse>(
+            this._environmentService.apiUrl + '/WeatherForecast/Provider'
+        ))
+        return rtn.provider ?? "";
     }
 
     async getWeatherForecast(idErabliere: any): Promise<WeatherForecast> {

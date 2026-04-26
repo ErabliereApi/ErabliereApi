@@ -1,11 +1,31 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
+import { ErabliereApi } from "src/core/erabliereapi.service";
 
 @Component({
     selector: 'app-admin-connected-platform',
     templateUrl: './admin-connected-platform.component.html'
 })
-export class AdminConnectedPlatformComponent {
-    constructor() { }
+export class AdminConnectedPlatformComponent implements OnInit {
+
+    weatherProvder: string = "";
+
+    constructor(private readonly api: ErabliereApi) { }
+
+    ngOnInit(): void {
+        this.api.getWeatherForecastProvider().then(n => {
+            this.weatherProvder = n;
+
+            if (this.weatherProvder == "GouvCAWeatherService") {
+                const weatherService = this.platforms.find(p => p.name == "AccuWeather")
+                if (weatherService == null) return;
+                weatherService.name = "Weather.gc.ca"
+                weatherService.logo = "/assets/weathericons/weathergcca/favicon.ico"
+                weatherService.description = "Service météo du gouvernement du Canada. Permet d'afficher les prévision météo par jours et par heures. Encore plus de données seront intégré avec le temps."
+                weatherService.url = "https://weather.gc.ca/"
+            }
+        })
+    }
+
     platforms =
         [
             {
