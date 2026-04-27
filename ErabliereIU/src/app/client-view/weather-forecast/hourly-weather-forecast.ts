@@ -186,7 +186,7 @@ export class HourlyWeatherForecastComponent implements OnInit, OnDestroy {
             return 'weathergcca'
         }
         if (this.provider == "AccuWeatherService") {
-            return 'accuweateher'
+            return 'accuweather'
         }
         throw new Error("Provider inconnue")
     }
