@@ -154,9 +154,9 @@ export class WeatherForecastComponent implements OnChanges, OnDestroy, OnInit {
                             callbacks: {
                                 title: (tti: TooltipItem<"line">[]) => {
                                     const i = tti[0].dataIndex;
-                                    let dt = this.weatherData?.dailyForecasts?.[i].day.iconPhrase;
-                                    let nt = this.weatherData?.dailyForecasts?.[i].night.iconPhrase;
-                                    let precip = hasPrecipitation?.[i] ?
+                                    const dt = this.weatherData?.dailyForecasts?.[i].day.iconPhrase;
+                                    const nt = this.weatherData?.dailyForecasts?.[i].night.iconPhrase;
+                                    const precip = hasPrecipitation?.[i] ?
                                         `Précipitation: ${precipitationType?.[i] || ''} (${precipitationIntensity?.[i] || ''})` :
                                         'Pas de précipitation';
                                     return `Jour: ${dt} - Nuit: ${nt}\n${precip}`;

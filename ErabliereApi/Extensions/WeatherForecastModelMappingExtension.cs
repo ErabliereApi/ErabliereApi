@@ -24,6 +24,15 @@ public static class WeatherForecastModelMappingExtension
 
         var forcastGroup = gouvCAWeatherStationResponse.dailyFcst?.daily?.GroupBy(d => d.date);
 
+        if (forcastGroup == null)
+        {
+            throw new InvalidOperationException("forecastGroup can't be null after grouping");
+        }
+
+        var firstGroup = true;
+        var i = 1;
+        var count = forcastGroup.Count();
+
         var forecast = new WeatherForecastResponse
         {
             Headline = new Headline
@@ -41,8 +50,9 @@ public static class WeatherForecastModelMappingExtension
             DailyForecasts = forcastGroup?.Select(g =>
             {
                 var key = g.Key;
-                Daily? day = g.SingleOrDefault(g => g.periodID == 1);
-                Daily? night = g.SingleOrDefault(g => g.periodID == 2);
+                Daily? day = firstGroup && g.Count() == 1 ? null : g.First();
+                Daily? night = i == count && g.Count() == 1 ? g.First() : g.Last();
+                i++;
                 DateTime? datedf = null;
                 DateTimeOffset? datedfoffset = null;
                 if (key != null)
