@@ -41,12 +41,14 @@
             <label class="form-label" for="longitude">Longitude</label>
             <input type="text" class="form-control" id="longitude" name="longitude" rows="3" placeholder="Longitude"
                 [(ngModel)]="erabliere.longitude">
+            <span class="form-text">La longitude est requise pour les prévisions météo.</span>
             <input-error [errorObj]="errorObj" [controlName]="'longitude'"></input-error>
         </div>
         <div class="col-md-6 form-group">
             <label class="form-label" for="latitude">Latitude</label>
             <input type="text" class="form-control" id="latitude" name="latitude" rows="3" placeholder="Latitude"
                 [(ngModel)]="erabliere.latitude">
+            <span class="form-text">La latitude est requise pour les prévisions météo.</span>
             <input-error [errorObj]="errorObj" [controlName]="'latitude'"></input-error>
         </div>
         <div class="col-md-6 form-group">
