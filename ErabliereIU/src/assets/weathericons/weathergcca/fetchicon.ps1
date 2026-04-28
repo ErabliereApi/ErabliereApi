@@ -1,5 +1,5 @@
 $baseUrl = "https://weather.gc.ca/weathericons/small"
-$index = 1
+$index = 0
 
 while ($true) {
     # Format du numéro : 01, 02, 03, etc.
