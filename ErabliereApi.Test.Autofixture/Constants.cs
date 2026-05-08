@@ -1,0 +1,6 @@
+﻿namespace ErabliereApi.Test.Autofixture;
+
+public static class Constants
+{
+    public const string ChirpStackEx1 = "{\"deduplicationId\":\"2605e3ae-0f87-4adf-b9e1-9447e3a48669\",\"time\":\"2026-05-08T20:28:18.066156834+00:00\",\"deviceInfo\":{\"tenantId\":\"0c286d75-8ae2-44b5-902b-7bea25645e52\",\"tenantName\":\"ChirpStack\",\"applicationId\":\"6bf4fe33-fae6-440e-840d-6d47ccc3f1c1\",\"applicationName\":\"ErabliereApi\",\"deviceProfileId\":\"892a78c6-62f6-4aa1-9458-6289ee80088b\",\"deviceProfileName\":\"Senscap M2 Saint-Alfred\",\"deviceName\":\"Sol Serre\",\"devEui\":\"2cf7f1c060800046\",\"deviceClassEnabled\":\"CLASS_A\",\"tags\":{}},\"devAddr\":\"01d9ff4b\",\"adr\":true,\"dr\":3,\"fCnt\":243,\"fPort\":2,\"confirmed\":true,\"data\":\"AQYQrCYAAAEHENRiAAAABwBkAAEATcw=\",\"object\":{\"payload\":\"\",\"valid\":false,\"messages\":[],\"err\":-2.0},\"rxInfo\":[{\"gatewayId\":\"0016c001f1170e34\",\"uplinkId\":1429317755,\"nsTime\":\"2026-05-08T20:28:17.850358227+00:00\",\"rssi\":-71,\"snr\":13.75,\"location\":{},\"context\":\"UCh2sg==\",\"crcStatus\":\"CRC_OK\"}],\"txInfo\":{\"frequency\":902300000,\"modulation\":{\"lora\":{\"bandwidth\":125000,\"spreadingFactor\":7,\"codeRate\":\"CR_4_5\"}}},\"regionConfigId\":\"us915_0\"}";
+}
