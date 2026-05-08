@@ -141,6 +141,11 @@ namespace ErabliereApi.Depot.Sql
         /// Table des IPs et ASN importées de la base de données tierce
         /// </summary>
         public DbSet<IpNetworkAsnInfo> IpNetworkAsnInfos { get; private set; }
+
+        /// <summary>
+        /// Table d'aministration des serveurs Chirpstack
+        /// </summary>
+        public DbSet<ChirpStackSrvConfig> ChirpstackSrvConfigs { get; private set; }
 #pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />

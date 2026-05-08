@@ -172,6 +172,8 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
 
+        //app.UseMiddleware<LogRequestBodyMiddleware>();
+
         if (string.Equals(Configuration["MiniProfiler.Enable"], TrueString, OrdinalIgnoreCase))
         {
             app.UseMiniProfiler();
