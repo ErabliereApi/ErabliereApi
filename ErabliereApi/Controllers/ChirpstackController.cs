@@ -71,15 +71,56 @@ public class ChirpstackController : ControllerBase
             return BadRequest("Aucun capteur assossié avec l'érablière ou l'id d'appareil (ExternalId - devEui).");
         }
 
-        // Vérifier l'autorité de la clé d'API
+        // TODO: Vérifier l'autorité de la clé d'API
 
         // Décoder les données
         var data = eventInfo.data;
+        var bytes = Convert.FromBase64String(data);
+
+        var decodedData = DecodeData(bytes);
 
         // Enregistrer en BD
         await _context.SaveChangesAsync(token);
 
         return Ok();
+    }
+
+    private double[] DecodeData(byte[] b)
+    {
+        int i = 0;
+        int length = b.Length;
+        var channel = b[i++];
+        var mesurment = GetMesurement(b[i++], b[i++]);
+        var values = new List<double>();
+
+        while (i < (length - 2))
+        {
+            var value = (double)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+
+            switch (mesurment)
+            {
+                case 4102:
+                    value = value / 1000.0;
+                    break;
+                case 4103:
+                    value = value / 1000.0;
+                    break;
+                default:
+                    throw new InvalidOperationException($"Mesurement {mesurment} it unknow");
+            }
+
+            values.Add(value);
+        }
+
+        return values.ToArray();
+    }
+
+    private int GetMesurement(byte v1, byte v2)
+    {
+        int m = v1;
+        m = m + (v2 << 8);
+
+        return m;
     }
 
     [HttpGet("configs")]
