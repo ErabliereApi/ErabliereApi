@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Controllers;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Test.Autofixture;
+using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +14,15 @@ public class ChirpstackControllerTest
     [Fact]
     public void CanDeserialize()
     {
-        var str = JsonSerializer.Deserialize<PostChirpstackEvent>(Constants.ChirpStackEx1);
+        var guidId = Guid.NewGuid();
 
-        Assert.NotNull(str);
+        var payload = Constants.ChirpStackExOk.Replace("<replace-guid-erabliere>", guidId.ToString());
+
+        var eventInfo = JsonSerializer.Deserialize<PostChirpstackEvent>(payload);
+
+        Assert.NotNull(eventInfo);
+        Assert.NotNull(eventInfo.deviceInfo?.tags?.idErabliere);
+        Assert.Equal(guidId, eventInfo.deviceInfo.tags.idErabliere.Value);
     }
 
     [Theory, AutoApiData]

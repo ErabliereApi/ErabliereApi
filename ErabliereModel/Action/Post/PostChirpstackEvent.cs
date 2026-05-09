@@ -39,6 +39,7 @@ public class Deviceinfo
 
 public class Tags
 {
+    public Guid? idErabliere { get; set; }
 }
 
 public class Object

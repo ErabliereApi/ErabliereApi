@@ -39,19 +39,45 @@ public class ChirpstackController : ControllerBase
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
-        // TODO: Créer les endpoints d'administration de serveur chirpstack
         // Vérifier l'appareil distant depuis la configuration
         var srvInfo = await _context.ChirpstackSrvConfigs
-            .Where(c => c.DevEui == eventInfo.deviceInfo.devEui)
-            .SingleOrDefaultAsync(token);
+            .Where(c => c.TenantId == eventInfo.deviceInfo.tenantId &&
+                        c.ApplicationId == eventInfo.deviceInfo.applicationId &&
+                        c.DeviceProfileId == eventInfo.deviceInfo.deviceProfileId)
+            .FirstOrDefaultAsync(token);
+
+        if (srvInfo == null)
+        {
+            return BadRequest("No device info matching the server sending the request");
+        }
+
+        var idErabliere = eventInfo.deviceInfo.tags.idErabliere;
+
+        if (idErabliere == null)
+        {
+            ModelState.AddModelError("deviceInfo.tags.idErabliere", "L'id de l'érablière est requis");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
 
         // Mapper la données vers les bons capteurs
+        var capteurs = await _context.Capteurs
+            .Where(c => c.IdErabliere == idErabliere &&
+                        c.ExternalId == eventInfo.deviceInfo.devEui)
+            .ToArrayAsync(token);
+
+        if (capteurs.Length == 0)
+        {
+            return BadRequest("Aucun capteur assossié avec l'érablière ou l'id d'appareil (ExternalId - devEui).");
+        }
 
         // Vérifier l'autorité de la clé d'API
 
         // Décoder les données
+        var data = eventInfo.data;
 
         // Enregistrer en BD
+        await _context.SaveChangesAsync(token);
 
         return Ok();
     }
