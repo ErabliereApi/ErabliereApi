@@ -36,16 +36,19 @@ public class StripeUsageReccordTaskHost : IHost
 {
     private readonly IHost _host;
     private readonly IConfiguration _config;
+    private readonly ILogger<StripeUsageReccordTaskHost> _logger;
     private Task? _task;
     private bool _disposed = false;
 
     /// <summary>
     /// Initialise une nouvelle instance de la classe <see cref="StripeUsageReccordTaskHost"/>.
     /// </summary>
-    public StripeUsageReccordTaskHost(IHost host, IConfiguration config)
+    public StripeUsageReccordTaskHost(
+        IHost host, IConfiguration config, ILogger<StripeUsageReccordTaskHost> logger)
     {
         _host = host;
         _config = config;
+        _logger = logger;
     }
 
     /// <summary>
@@ -128,7 +131,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         if (skip == "true")
         {
-            Console.WriteLine("Envoie de l'utilisation à Stripe ignorée.");
+            _logger.LogWarning("Envoie de l'utilisation à Stripe ignorée.");
             return;
         }
 
@@ -136,7 +139,7 @@ public class StripeUsageReccordTaskHost : IHost
 
         var context = scope.ServiceProvider.GetRequiredService<UsageContext>();
         
-        Console.WriteLine($"Envoie de {context.Usages.Count} utilisations à Stripe... ");
+        _logger.LogInformation("Envoie de {StripeUsageCount} utilisations à Stripe... ", context.Usages.Count);
 
         var usageSummary = new Dictionary<string, MeterEventCreateOptions>(context.Usages.Count);
 
