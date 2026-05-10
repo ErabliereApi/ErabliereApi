@@ -122,16 +122,13 @@ public class CapteursController : ControllerBase
     {
         var query = _depot.Erabliere.AsQueryable();
 
-        if (dcNull.HasValue)
+        if (dcNull.HasValue && dcNull.Value)
         {
-            if (dcNull.Value)
-            {
-                query = query.Where(e => e.DC == null);
-            }
-            else
-            {
-                query = query.Where(e => e.DC != null);
-            }
+            query = query.Where(e => e.DC == null);
+        }
+        else
+        {
+            query = query.Where(e => e.DC != null);
         }
 
         if (!string.IsNullOrWhiteSpace(nameLike))
@@ -403,6 +400,11 @@ public class CapteursController : ControllerBase
         if (capteur.DisplayMax.HasValue)
         {
             capteurEntity.DisplayMax = capteur.DisplayMax.Value;
+        }
+
+        if (capteur.IdMesure.HasValue)
+        {
+            capteurEntity.IdMesure = capteur.IdMesure.Value;
         }
 
         _depot.Update(capteurEntity);

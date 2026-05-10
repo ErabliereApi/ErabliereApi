@@ -79,4 +79,9 @@ public class PostCapteur
     /// </summary>
     [Range(1, 12, ErrorMessage = "La taille du graphique doit être comprise entre 1 et 12")]
     public byte? Taille { get; set; }
+
+    /// <summary>
+    /// Id de la mesure pour la relation avec les mesures de capteurs LoRaWAN
+    /// </summary>
+    public int? IdMesure { get; set; }
 }

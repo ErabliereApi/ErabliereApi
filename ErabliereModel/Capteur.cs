@@ -152,6 +152,11 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     public double? DisplayMax { get; set; }
 
     /// <summary>
+    /// Id de la mesure pour la relation avec les mesures de capteurs LoRaWAN
+    /// </summary>
+    public int IdMesure { get; set; }
+
+    /// <summary>
     /// Style du capteur
     /// </summary>
     public CapteurStyle? CapteurStyle { get; set; }

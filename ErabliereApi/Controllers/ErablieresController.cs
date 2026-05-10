@@ -1,5 +1,6 @@
 using ErabliereApi.Attributes;
 using ErabliereApi.Authorization;
+using ErabliereApi.Controllers.Base;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Delete;
@@ -7,7 +8,6 @@ using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
 using ErabliereApi.Extensions;
-using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -23,7 +23,7 @@ namespace ErabliereApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Authorize]
-public class ErablieresController : ControllerBase
+public class ErablieresController : ErabliereApiBaseController
 {
     private readonly ErabliereDbContext _context;
     private readonly IConfiguration _config;
@@ -50,7 +50,7 @@ public class ErablieresController : ControllerBase
         IDistributedCache cache,
         IServiceProvider serviceProvider,
         IStringLocalizer<ErablieresController> localizer,
-        ILogger<ErablieresController> logger)
+        ILogger<ErablieresController> logger) : base(serviceProvider, context, config)
     {
         _context = context;
         _config = config;
@@ -394,29 +394,6 @@ public class ErablieresController : ControllerBase
         }
 
         return (entity.Entity, null);
-    }
-
-    private async Task<(bool, string, Customer?)> IsAuthenticatedAsync(CancellationToken token)
-    {
-        if (User?.Identity?.IsAuthenticated == true)
-        {
-            using var scope = _serviceProvider.CreateScope();
-
-            var unique_name = UsersUtils.GetUniqueName(scope, User);
-
-            var customer = await _context.Customers.SingleAsync(c => c.UniqueName == unique_name, token);
-
-            return (true, "Bearer", customer);
-        }
-
-        if (_config.StripeIsEnabled())
-        {
-            var apiKeyAuthContext = HttpContext?.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
-
-            return (apiKeyAuthContext?.Authorize == true, "ApiKey", apiKeyAuthContext?.Customer);
-        }
-
-        return (false, "", null);
     }
 
     /// <summary>

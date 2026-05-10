@@ -2,6 +2,8 @@
 using System.Text.Json.Serialization;
 namespace ErabliereApi.Donnees.Action.Post;
 
+#pragma warning disable CS1591 // Commentaire XML manquant pour le type ou le membre visible publiquement
+#nullable disable
 
 public class PostChirpstackEvent
 {
