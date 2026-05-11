@@ -22,7 +22,6 @@ public class ChirpstackController : ErabliereApiBaseController
 {
     private readonly ErabliereDbContext _context;
     private readonly IConfiguration _config;
-    private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
     /// Constructeur
@@ -36,7 +35,6 @@ public class ChirpstackController : ErabliereApiBaseController
     {
         _context = context;
         _config = config;
-        _serviceProvider = serviceProvider;
     }
 
     /// <summary>

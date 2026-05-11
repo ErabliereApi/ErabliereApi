@@ -22,7 +22,9 @@ public static class StripeUsageReccordTaskHostExtensions
 
         if (config.StripeIsEnabled())
         {
-            return new StripeUsageReccordTaskHost(host, config);
+            var logger = host.Services.GetRequiredService<ILogger<StripeUsageReccordTaskHost>>();
+
+            return new StripeUsageReccordTaskHost(host, config, logger);
         }
 
         return host;
@@ -79,7 +81,7 @@ public class StripeUsageReccordTaskHost : IHost
                 {
                     _task.Dispose();
                 }
-                
+
                 _host.Dispose();
             }
             _disposed = true;
@@ -99,11 +101,11 @@ public class StripeUsageReccordTaskHost : IHost
     /// </summary>
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
-        _task = Task.Run(async () => 
+        _task = Task.Run(async () =>
         {
             var options = Services.GetRequiredService<IOptions<StripeOptions>>();
 
-            while (!cancellationToken.IsCancellationRequested) 
+            while (!cancellationToken.IsCancellationRequested)
             {
                 await Task.Delay(options.Value.TimeSpanSendUsage, cancellationToken);
 
@@ -138,7 +140,7 @@ public class StripeUsageReccordTaskHost : IHost
         using var scope = Services.CreateScope();
 
         var context = scope.ServiceProvider.GetRequiredService<UsageContext>();
-        
+
         _logger.LogInformation("Envoie de {StripeUsageCount} utilisations à Stripe... ", context.Usages.Count);
 
         var usageSummary = new Dictionary<string, MeterEventCreateOptions>(context.Usages.Count);
@@ -195,7 +197,7 @@ public class StripeUsageReccordTaskHost : IHost
             {
                 Console.WriteLine($"Erreur lors de l'envoie de l'utilisation pour la souscription {usageReccord.Key} : {ex.Message}");
             }
-            
+
         }
     }
 

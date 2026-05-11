@@ -95,6 +95,13 @@ public class ChirpStackControllerTest : IClassFixture<ErabliereApiApplicationFac
         var configC = new StringContent(JsonSerializer.Serialize(payload.deviceInfo), Encoding.UTF8, "application/json");
         var responseC = await client.PostAsync("/chirpstack/configs", configC);
         responseC.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
+        var capteurs = await client.GetFromJsonAsync<Capteur[]>($"/erablieres/{erabliere.Id}/capteurs");
+        Assert.NotNull(capteurs);
+        foreach (var c in capteurs)
+        {
+            await client.DeleteAsync($"/erablieres/{erabliere.Id}/capteurs/{c.Id})");
+        }
+
 
         var content = new StringContent(payloadStr, Encoding.UTF8, "application/json");
 
