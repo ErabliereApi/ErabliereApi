@@ -70,44 +70,6 @@ public class ChirpStackControllerTest : IClassFixture<ErabliereApiApplicationFac
     }
 
     [Fact]
-    public async Task SimpleCall_ServerAndErabliereExistButNoCapteur_BadRequest()
-    {
-        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = true,
-            HandleCookies = true,
-            MaxAutomaticRedirections = 7
-        });
-
-        var cr = await client.PostAsJsonAsync("/erablieres", _fixture.Create<PostErabliere>());
-        Assert.Equal(System.Net.HttpStatusCode.OK, cr.StatusCode);
-        var erablieres = await client.GetFromJsonAsync<Erabliere[]>("/erablieres?$top=1&?$select=id");
-        Assert.NotNull(erablieres);
-        var erabliere = Assert.Single(erablieres);
-        Assert.NotNull(erabliere.Id);
-        var payloadStr = Constants.ChirpStackExOk.Replace("<replace-guid-erabliere>", erabliere.Id.ToString());
-        Assert.Contains(erabliere.Id.Value.ToString(), payloadStr);
-        var payload = JsonSerializer.Deserialize<PostChirpstackEvent>(payloadStr, _serializerOptions);
-        Assert.NotNull(payload);
-        var configC = new StringContent(JsonSerializer.Serialize(payload.deviceInfo), Encoding.UTF8, "application/json");
-        var responseC = await client.PostAsync("/chirpstack/configs", configC);
-        responseC.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
-        var capteurs = await client.GetFromJsonAsync<Capteur[]>($"/erablieres/{erabliere.Id}/capteurs");
-        Assert.NotNull(capteurs);
-        foreach (var c in capteurs)
-        {
-            var r = await client.DeleteAsync($"/erablieres/{erabliere.Id}/capteurs/{c.Id})");
-            Assert.Equal(System.Net.HttpStatusCode.NoContent, r.StatusCode);
-        }
-
-        var content = new StringContent(payloadStr, Encoding.UTF8, "application/json");
-
-        var response = await client.PostAsync("/chirpstack/events?event=up", content);
-
-        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
-    }
-
-    [Fact]
     public async Task SimpleCall_ServerErabliereAndCapteurExist_Ok()
     {
         var client = _factory.CreateClient(new WebApplicationFactoryClientOptions

@@ -164,7 +164,12 @@ public class StripeCheckoutService : ICheckoutService
     {
         var signature = _accessor.HttpContext?.Request.Headers["Stripe-Signature"];
 
-        var stripeEvent = EventUtility.ConstructEvent(json, signature, _options.Value.WebhookSiginSecret);
+        var stripeEvent = EventUtility.ConstructEvent(
+            json, 
+            signature, 
+            _options.Value.WebhookSiginSecret,
+            tolerance: 300,
+            _options.Value.ThrowOnApiMissMatch);
 
         await WebHookSwitchCaseLogic(
             stripeEvent,

@@ -44,4 +44,9 @@ public class StripeOptions
     /// L'interval à laquel l'utilisation est envoyer à Stripe
     /// </summary>
     public TimeSpan TimeSpanSendUsage { get; set; } = TimeSpan.FromMinutes(10);
+
+    /// <summary>
+    /// Indique si une exception est levé lors du parsing du message si les version ne concorde pas
+    /// </summary>
+    public bool ThrowOnApiMissMatch { get; set; }= true;
 }

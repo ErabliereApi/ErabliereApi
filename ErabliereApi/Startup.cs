@@ -104,6 +104,8 @@ public class Startup
                 o.WebhookSecret = Configuration["Stripe.WebhookSecret"];
                 o.WebhookSiginSecret = Configuration["Stripe.WebhookSiginSecret"];
                 o.TimeSpanSendUsage = TimeSpan.FromSeconds(Convert.ToDouble(Configuration["StripeUsageReccord.TimeSpanSendUsageInSeconds"] ?? "300"));
+                o.ThrowOnApiMissMatch = 
+                    Convert.ToBoolean(Configuration["Stripe.ThrowOnApiMissMatch"] ?? "true");
             });
 
             services.AddTransient<ICheckoutService, StripeCheckoutService>()
@@ -171,8 +173,6 @@ public class Startup
             IdentityModelEventSource.ShowPII = true;
             app.UseDeveloperExceptionPage();
         }
-
-        //app.UseMiddleware<LogRequestBodyMiddleware>();
 
         if (string.Equals(Configuration["MiniProfiler.Enable"], TrueString, OrdinalIgnoreCase))
         {

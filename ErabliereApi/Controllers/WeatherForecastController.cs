@@ -18,7 +18,6 @@ public class WeatherForecastController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
     private readonly IEnumerable<IWeaterService> _weatherServices;
-    private readonly IConfiguration _config;
     private readonly string DEFAULT_WEATHER_SERVICE = string.Empty;
 
     /// <summary>
@@ -30,7 +29,6 @@ public class WeatherForecastController : ControllerBase
     {
         _context = context;
         _weatherServices = weatherServices;
-        _config = configuration;
         DEFAULT_WEATHER_SERVICE = configuration["WeatherService"] ?? string.Empty;
     }
 
@@ -61,7 +59,7 @@ public class WeatherForecastController : ControllerBase
                 wss.Add(t.Name);
             }
             var wstring = wss.Aggregate((a, b) => $"{a},{b}");
-            throw new InvalidOperationException($"No service matching {name ?? DEFAULT_WEATHER_SERVICE} in {wss}");
+            throw new InvalidOperationException($"No service matching {name ?? DEFAULT_WEATHER_SERVICE} in {wstring}");
         }
         return ws;
     }
