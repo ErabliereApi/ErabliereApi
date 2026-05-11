@@ -5,11 +5,8 @@ using ErabliereApi.Integration.Test.ApplicationFactory;
 using ErabliereApi.Test.Autofixture;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Shouldly;
-using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -99,9 +96,9 @@ public class ChirpStackControllerTest : IClassFixture<ErabliereApiApplicationFac
         Assert.NotNull(capteurs);
         foreach (var c in capteurs)
         {
-            await client.DeleteAsync($"/erablieres/{erabliere.Id}/capteurs/{c.Id})");
+            var r = await client.DeleteAsync($"/erablieres/{erabliere.Id}/capteurs/{c.Id})");
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, r.StatusCode);
         }
-
 
         var content = new StringContent(payloadStr, Encoding.UTF8, "application/json");
 
