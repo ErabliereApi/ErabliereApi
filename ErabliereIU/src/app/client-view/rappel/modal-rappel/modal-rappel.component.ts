@@ -34,7 +34,6 @@ export class ModalRappelComponent implements OnInit {
             console.error('Note is not provided to ModalRappelComponent');
             return;
         }
-        console.log('ModalRappelComponent initialized with note:', this.note);
         this.getImages();
     }
 
@@ -73,7 +72,6 @@ export class ModalRappelComponent implements OnInit {
         this.reportRappelInProgress = true;
         this._api.reportRappelProchainePeriode(this.note.idErabliere, this.note.id).then(() => {
             this.error = null;
-            console.log('Periodicite due updated successfully');
             this.closeModal.emit(true);
             this.needToUpdate.emit(true);
         }).catch(error => {

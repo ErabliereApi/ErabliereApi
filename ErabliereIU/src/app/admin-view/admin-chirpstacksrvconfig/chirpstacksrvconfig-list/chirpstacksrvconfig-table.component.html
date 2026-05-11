@@ -1,0 +1,30 @@
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Server ID</th>
+        <th>Tenant Name</th>
+        <th>Tenant Id</th>
+        <th>Application Id</th>
+        <th>Application Name</th>
+        <th>Device Profile Id</th>
+        <th>Device Profile Name</th>
+        <th>Device Class Enabled</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (config of configs; track config.id) {
+        <tr>
+          <td>{{ config.id }}</td>
+          <td>{{ config.tenantId }}</td>
+          <td>{{ config.tenantName }}</td>
+          <td>{{ config.applicationId }}</td>
+          <td>{{ config.applicationName }}</td>
+          <td>{{ config.deviceProfileId }}</td>
+          <td>{{ config.deviceProfileName }}</td>
+          <td>{{ config.deviceClassEnabled }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

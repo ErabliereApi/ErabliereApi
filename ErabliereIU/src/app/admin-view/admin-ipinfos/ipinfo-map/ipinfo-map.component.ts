@@ -19,7 +19,6 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.api.getMapAccessToken("mapbox").then(t => {
             this.token = t.accessToken;
-            console.log("Mapbox token loaded");
             if (!this.token) {
                 console.error("Mapbox token is empty");
                 return;

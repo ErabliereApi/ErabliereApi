@@ -19,7 +19,6 @@ export class ErabliereAIGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Promise<boolean> {
     const userHasRole = await this.authServiceInstance.userIsInRole('ErabliereAIUser');
-    console.log(`Can active ${route.url}, User has role ErabliereAIUser: `, userHasRole);
     if (!userHasRole) {
       this.router.navigate(['/page401']);
     }

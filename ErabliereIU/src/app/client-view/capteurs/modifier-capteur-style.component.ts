@@ -199,8 +199,6 @@ export class ModifierCapteurStyleComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log('ModiierCapteurStyleComponent.ngOnInit()');
-
         if (this.inputCapteur?.capteurStyle) {
             this.stylesInst = { ...this.inputCapteur?.capteurStyle };
         }

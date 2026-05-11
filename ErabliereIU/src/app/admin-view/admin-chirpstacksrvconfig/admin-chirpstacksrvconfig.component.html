@@ -1,0 +1,18 @@
+<div class="m-3">
+    <h3>Serveurs Chirpstack</h3>
+    <hr />
+
+    <ebutton type="primary" (clicked)="displayAddChirpstackSrcModal(true)">Ajouter</ebutton>
+
+    @if (displayAddModal) {
+    <emodal
+        (closeModal)="displayAddChirpstackSrcModal(false)">
+    </emodal>
+    }
+
+    <div>
+        <chirpstacksrvconfig-table
+            [configs]="configs"
+            (deleteConfig)="deleteChirpstackSrvConfig($event)"></chirpstacksrvconfig-table>
+    </div>
+</div>

@@ -52,18 +52,6 @@ public class ChirpStackSrvConfig
     public string? DeviceProfileName { get; set; }
 
     /// <summary>
-    /// Nom d'appareil configuré dans le serveur Chirpstack
-    /// </summary>
-    [MaxLength(100)]
-    public string? DeviceName { get; set; }
-
-    /// <summary>
-    /// DevEui configuré dans le serveur Chirpstack
-    /// </summary>
-    [MaxLength(100)]
-    public string? DevEui {  get; set; }
-
-    /// <summary>
     /// Class LoRaWAN utilisé
     /// </summary>
     [MaxLength(100)]

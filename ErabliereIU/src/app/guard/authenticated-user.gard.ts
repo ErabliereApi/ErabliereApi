@@ -19,7 +19,6 @@ export class AuthenticatedUserGard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Promise<boolean> {
     const isLoggedIn = await this.authSvc.isLoggedIn();
-    console.log(`Can active ${route.url}, User is logged in: `, isLoggedIn);
     if (!isLoggedIn) {
       this.router.navigate(['/page401']);
     }

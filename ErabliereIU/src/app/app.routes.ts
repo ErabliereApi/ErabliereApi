@@ -29,6 +29,7 @@ import { AppareilsComponent } from './client-view/appareil/appareils.component';
 import { AdminIpinfosComponent } from './admin-view/admin-ipinfos/admin-ipinfos.component';
 import { AdminConnectedPlatformComponent } from './admin-view/admin-conected-platform/admin-connected-platform.component';
 import { AiImagesComponent } from './ai-view/ai-images/ai-images.component';
+import { AdminChirpstackSrvConfigComponent } from './admin-view/admin-chirpstacksrvconfig/admin-chirpstacksrvconfig';
 
 export const routes: Routes = [
     {
@@ -65,6 +66,11 @@ export const routes: Routes = [
                 path: 'apikeys',
                 title: 'Érablière Admin - API Keys',
                 component: AdminAPIKeysComponent,
+            },
+            {
+                path: 'chirpstack',
+                title: 'Érablière Admin - Chirpstack',
+                component: AdminChirpstackSrvConfigComponent
             },
             {
                 path: 'hologram',

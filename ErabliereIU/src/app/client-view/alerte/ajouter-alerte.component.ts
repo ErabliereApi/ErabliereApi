@@ -52,7 +52,6 @@ export class AjouterAlerteComponent implements OnInit {
             this.erabliere = r;
         }
         this.initializeForms();
-        console.log(this.erabliere);
         if (this.erabliere?.afficherTrioDonnees) {
             this.typeAlerte = 1;
         }
@@ -123,7 +122,6 @@ export class AjouterAlerteComponent implements OnInit {
 
     onButtonCreerClick() {
         if (this.alerte == null) {
-            console.log("this.alerte is undefined");
             this.generalError = "L'alerte n'est pas défini";
             return;
         }
@@ -157,7 +155,6 @@ export class AjouterAlerteComponent implements OnInit {
 
     onButtonCreerAlerteCapteurClick() {
         if (this.alerteCapteur == null) {
-            console.log("this.alerteCapteur is undefined");
             this.generalError = "L'alerte n'est pas défini";
             return;
         }

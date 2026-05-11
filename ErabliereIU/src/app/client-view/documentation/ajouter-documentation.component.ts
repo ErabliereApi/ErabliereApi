@@ -66,7 +66,6 @@ export class AjouterDocumentationComponent implements OnInit {
     }
 
     onButtonCreerClick() {
-        console.log(this.document);
         if (this.document != undefined) {
             this.document.idErabliere = this.idErabliereSelectionee;
             this.document.title = this.documentForm.controls['title'].value;

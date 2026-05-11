@@ -88,7 +88,6 @@ export class CapteurListComponent {
         }
         this.capteurTT = _t19;
         this.displayTooltip = true;
-        console.log("openTooltip");
     }
 
     keyUpTooltip(_t21: Capteur, $event: KeyboardEvent) {
@@ -104,7 +103,6 @@ export class CapteurListComponent {
     closeTooltip() {
         this.capteurTT = new Capteur();
         this.displayTooltip = false;
-        console.log("closeTooltip");
     }
 
     editDetailsNeedToUdate($event: any) {

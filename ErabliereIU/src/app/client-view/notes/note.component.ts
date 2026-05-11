@@ -149,7 +149,6 @@ export class NoteComponent implements OnInit {
     }
 
     displayImageModalFunc() {
-        console.log("displayImageModalFunc called for note", this.note);
         this.displayImageModal = true;
     }
 

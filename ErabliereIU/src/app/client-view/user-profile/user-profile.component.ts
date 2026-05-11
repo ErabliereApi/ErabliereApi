@@ -66,7 +66,6 @@ export class UserProfileComponent implements OnInit {
     loadUserProfile(): void {
         this.loadUserProfileClicked = true;
         this.authSvc.getUserInfo().then(userInfo => {
-            console.log("User profile loaded:", userInfo);
             this.user = userInfo;
             this.errorToken = null;
         }).catch(error => {
@@ -89,7 +88,6 @@ export class UserProfileComponent implements OnInit {
 
     deleteApiKey(arg0: string | undefined) {
         this.api.deleteApiKey(arg0).then(() => {
-            console.log("API key deleted successfully.");
             this.errorApiKey = null;
             this.loadUserProfile(); // Reload user profile to reflect changes
         }).catch(error => {
@@ -137,7 +135,6 @@ export class UserProfileComponent implements OnInit {
             this.editApiKeyErrorObj = null;
             let name = this.editApiKeyNameForm.controls['name'].value;
             this.api.updateApiKeyName(this.editedApiKey.id, name).then(() => {
-                console.log("API key name updated successfully.");
                 this.errorApiKey = null;
                 this.loadUserProfile(); // Reload user profile to reflect changes
                 this.editApiKeyNameActive = false;

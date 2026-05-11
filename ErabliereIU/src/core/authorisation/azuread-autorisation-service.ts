@@ -139,7 +139,6 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
       const user = this.getUser();
       if (user != null) {
         const roles = user.idTokenClaims?.roles;
-        console.log(roles);
         if (roles?.includes(role)) {
           return true;
         }

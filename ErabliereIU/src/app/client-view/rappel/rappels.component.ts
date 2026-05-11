@@ -35,7 +35,6 @@ export class RappelsComponent implements OnChanges, OnInit {
     }
     this._router.queryParams.subscribe(params => {
       if (params['idErabliereSelectionnee']) {
-        console.log('Query parameter idErabliereSelectionnee:', params['idErabliereSelectionnee']);
         this.idErabliereSelectionnee = params['idErabliereSelectionnee'];
         this.updateAndGetRappels();
       }
@@ -46,7 +45,6 @@ export class RappelsComponent implements OnChanges, OnInit {
     this._authService.getAuthorisationService().isLoggedIn().then(isLoggedIn => {
       this.isLogged = isLoggedIn;
       this.idErabliereSelectionnee = this.idErabliereSelectionnee || this._router.snapshot.queryParams['idErabliereSelectionnee'];
-      console.log('RappelsComponent ngOnInit with idErabliereSelectionnee:', this.idErabliereSelectionnee, 'isLogged:', this.isLogged);
       if (this.idErabliereSelectionnee && this.isLogged) {
         this.updateAndGetRappels();
       }

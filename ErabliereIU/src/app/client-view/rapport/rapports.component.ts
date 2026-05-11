@@ -69,13 +69,10 @@ export class ReportsComponent implements OnInit {
     }
 
     typeRapportChanged($event: Event) {
-        console.log("Type rapport changed", $event);
         this.typeRapport = ($event.target as HTMLSelectElement).value;
-        console.log("Type rapport", this.typeRapport);
     }
 
     selectReport(rapport: Rapport) {
-        console.log("Select rapport", rapport);
         this.rapportSelected = rapport;
     }
 

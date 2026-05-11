@@ -30,7 +30,6 @@ export class RapportDegreJourComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log('RapportDegreJourComponent onInit');
         this.route.params.subscribe(params => {
             this.idErabliere = params['idErabliereSelectionee'];
             this.api.getCapteurs(this.idErabliere).then((capteurs: Capteur[]) => {
@@ -44,7 +43,6 @@ export class RapportDegreJourComponent implements OnInit {
         try {
             this.form.idErabliere = this.idErabliere;
             const rapport = await this.api.postDegresJours(this.idErabliere, this.form, save);
-            console.log('RapportDegreJourComponent notifierAffichageRapport.emit', rapport);
             this.notifierAffichageRapport.emit(rapport);
             this.errorObj = null;
             this.generalError = undefined;
@@ -68,12 +66,10 @@ export class RapportDegreJourComponent implements OnInit {
     }
 
     onKeyPress(event: KeyboardEvent) {
-        console.log('RapportDegreJourComponent onKeyPress', event);
+        // Nothing to do
     }
 
     idCapteurChanged($event: Event) {
-        console.log('RapportDegreJourComponent idCapteurChanged', $event);
-
         this.form.idCapteur = ($event.target as HTMLSelectElement).value;
     }
 }

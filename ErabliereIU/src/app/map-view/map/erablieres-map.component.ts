@@ -77,7 +77,6 @@ export class ErablieresMapComponent implements OnInit {
         let erabliereGeoJson: any = null;
 
         try {
-            console.log(this.publicFilter);
             erabliereGeoJson = await this._api.getErablieresGeoJson(
                 this.publicFilter == "yes", 
                 this.myErablieresFilter == "yes", 
@@ -200,8 +199,6 @@ export class ErablieresMapComponent implements OnInit {
         let element = event.target as HTMLSelectElement;
 
         this.publicFilter = element.value;
-
-        console.log(this.publicFilter);
     }
 
     updateMyFilter(event: any) {

@@ -241,7 +241,6 @@ export class ErabliereAiWindowComponent implements OnInit {
     }
 
     toggleVisibilityCurrentConversation() {
-        console.log('toggleVisibilityCurrentConversation', this.currentConversation);
         if (this.currentConversation == null) {
             return;
         }

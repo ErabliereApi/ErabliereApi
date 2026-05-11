@@ -28,25 +28,19 @@ export class CustomerListComponent implements OnChanges, OnInit {
     showAccess: { [id: string]: boolean } = {}
 
     ngOnInit(): void {
-        console.log("Initializing CustomerListComponent with customers:", this.customers);
         this.customersFiltred = [...this.customers];
-        console.log("Initial customers:", this.customersFiltred);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['customers']) {
-            console.log("Customers changed:", changes['customers'].currentValue);
             this.customersFiltred = [...changes['customers'].currentValue];
-            console.log("Updated customersFiltred:", this.customersFiltred);
         }
     }
 
     filterCustomers(arg0: any) {
         arg0 = arg0.target.value;
-        console.log("Filtering customers with:", arg0);
         if (!arg0) {
             this.customersFiltred = [...this.customers];
-            console.log("No filter applied, showing all customers.");
             return;
         }
         this.customersFiltred = this.customers.filter(customer => {
