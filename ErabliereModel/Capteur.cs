@@ -80,6 +80,11 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     public string? ExternalId { get; set; }
 
     /// <summary>
+    /// Id de la mesure pour la relation avec les mesures de capteurs LoRaWAN. Selon les spec de Senscap.
+    /// </summary>
+    public int IdMesure { get; set; }
+
+    /// <summary>
     /// Date du dernier message
     /// </summary>
     public DateTimeOffset? LastMessageTime { get; set; }
@@ -150,11 +155,6 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     /// Affichage maximal lors de l'affichage des données dans les graphiques
     /// </summary>
     public double? DisplayMax { get; set; }
-
-    /// <summary>
-    /// Id de la mesure pour la relation avec les mesures de capteurs LoRaWAN
-    /// </summary>
-    public int IdMesure { get; set; }
 
     /// <summary>
     /// Style du capteur

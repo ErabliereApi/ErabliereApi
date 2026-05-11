@@ -128,7 +128,18 @@ import { Capteur } from 'src/model/capteur';
             ></einput>
         </div>
 
-        <div class="col-md-12 mb-3">
+        <div class="col-md-6 mb-3">
+            <einput
+                id="idMesure"
+                name="idMesure"
+                [type]="'number'"
+                placeholder="Id mesure"
+                [formGroup]="editCapteurForm"
+                [errorObj]="errorObj"
+            ></einput>
+        </div>
+
+        <div class="col-md-6 mb-3">
             <einput
                 id="displayTop"
                 name="displayTop"
@@ -198,6 +209,7 @@ export class ModifierCapteurDetailsComponent implements OnInit {
             ajouterDonneeDepuisInterface: [false],
             type: [''],
             externalId: [''],
+            idMesure: [null],
             displayType: [''],
             displayTop: [null],
             displayMin: [null],

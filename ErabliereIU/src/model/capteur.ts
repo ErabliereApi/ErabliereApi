@@ -14,6 +14,7 @@ export class Capteur {
     batteryLevel?: number;
     type?: string;
     externalId?: string;
+    idMesure?: number;
     lastMessageTime?: string;
     online?: boolean;
     reportFrequency?: number;

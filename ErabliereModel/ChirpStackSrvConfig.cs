@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace ErabliereApi.Donnees;
 
@@ -56,4 +54,9 @@ public class ChirpStackSrvConfig
     /// </summary>
     [MaxLength(100)]
     public string? DeviceClassEnabled { get; set; }
+
+    /// <summary>
+    /// Date du dernier message de ce serveur
+    /// </summary>
+    public DateTimeOffset? LastTimeSeen { get; set; }
 }

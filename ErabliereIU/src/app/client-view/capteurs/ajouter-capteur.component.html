@@ -45,6 +45,14 @@
             [title]="'Indiquer un identifiant externe uniquement pour information, par exemple un ID de capteur dans un système tiers.'" />
     </div>
 
+    <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['idMesure'].touched ? ' was-validated' : '')">
+        <einput [id]="'idMesure'" [name]="'idMesure'" [arialabel]="'Id mesure'"
+            [type]="'number'"
+            [placeholder]="'Id de la mesure'" [formGroup]="ajoutCapteurForm"
+            [errorObj]="errorObj"
+            [title]="'Indiquez le type de mesure selon les specification Sensecap.'" />
+    </div>
+
     <div [class]="'col-md-6 mb-3' + (ajoutCapteurForm.controls['displayType'].touched ? ' was-validated' : '')">
         <einput [id]="'displayType'" [name]="'displayType'" arialabel="Type d'affichage"
             placeholder="Type d'affichage du capteur" [formGroup]="ajoutCapteurForm" [maxlength]="50" 

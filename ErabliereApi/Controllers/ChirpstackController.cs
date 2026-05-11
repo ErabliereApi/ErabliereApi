@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Graph.Models;
-using System.Text.Json;
 
 namespace ErabliereApi.Controllers;
 
@@ -22,6 +20,7 @@ public class ChirpstackController : ErabliereApiBaseController
 {
     private readonly ErabliereDbContext _context;
     private readonly IConfiguration _config;
+    private readonly ILogger<ChirpstackController> _logger;
 
     /// <summary>
     /// Constructeur
@@ -30,11 +29,12 @@ public class ChirpstackController : ErabliereApiBaseController
     /// <param name="config"></param>
     /// <param name="serviceProvider"></param>
     public ChirpstackController(
-        ErabliereDbContext context, IConfiguration config, IServiceProvider serviceProvider)
+        ErabliereDbContext context, IConfiguration config, IServiceProvider serviceProvider, ILogger<ChirpstackController> logger)
          : base(serviceProvider, context, config)
     {
         _context = context;
         _config = config;
+        _logger = logger;
     }
 
     /// <summary>
@@ -67,19 +67,27 @@ public class ChirpstackController : ErabliereApiBaseController
             .Where(c => c.TenantId == eventInfo.deviceInfo.tenantId &&
                         c.ApplicationId == eventInfo.deviceInfo.applicationId &&
                         c.DeviceProfileId == eventInfo.deviceInfo.deviceProfileId)
-            .AsNoTracking()
             .FirstOrDefaultAsync(token);
 
         if (srvInfo == null)
         {
             return BadRequest("No device info matching the server sending the request");
         }
+        else
+        {
+            srvInfo.LastTimeSeen = DateTimeOffset.Now;
+            await _context.TrySaveChangesAsync(token);
+        }
 
         var idErabliere = eventInfo.deviceInfo.tags.idErabliere;
 
         if (idErabliere == null)
         {
-            ModelState.AddModelError("deviceInfo.tags.idErabliere", "L'id de l'érablière est requis");
+            var message = "L'id de l'érablière est requis";
+
+            ModelState.AddModelError("deviceInfo.tags.idErabliere", message);
+
+            _logger.LogWarning("Chirpstack event listner return bad request with message: {Message}", message);
 
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
@@ -88,12 +96,15 @@ public class ChirpstackController : ErabliereApiBaseController
         var capteurs = await _context.Capteurs
             .Where(c => c.IdErabliere == idErabliere &&
                         c.ExternalId == eventInfo.deviceInfo.devEui)
-            .AsNoTracking()
             .ToArrayAsync(token);
 
         if (capteurs.Length == 0)
         {
-            return BadRequest("Aucun capteur assossié avec l'érablière ou l'id d'appareil (ExternalId - devEui).");
+            var message = "Aucun capteur assossié avec l'érablière ou l'id d'appareil (ExternalId - devEui).";
+
+            _logger.LogWarning("Chirpstack event listner return bad request with message: {Message}", message);
+
+            return BadRequest(message);
         }
 
         // Vérifier l'autorité de l'appelant
@@ -103,7 +114,11 @@ public class ChirpstackController : ErabliereApiBaseController
 
             if (customer == null)
             {
-                return Unauthorized();
+                var message = "Customer not found";
+
+                _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
+
+                return Unauthorized(message);
             }
 
             var access = await _context.CustomerErablieres
@@ -113,12 +128,20 @@ public class ChirpstackController : ErabliereApiBaseController
 
             if (access == null)
             {
-                return Unauthorized();
+                var message = "No access";
+
+                _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
+
+                return Unauthorized(message);
             }
 
             if ((access.Access & 2) == 0)
             {
-                return Unauthorized();
+                var message = "No create access";
+
+                _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
+
+                return Unauthorized(message);
             }
         }
 
@@ -131,14 +154,18 @@ public class ChirpstackController : ErabliereApiBaseController
         // Enregistrer en BD
         foreach (var d in decodedData)
         {
-            var ca = capteurs.FirstOrDefault(c => c.IdMesure == d.Mesure);
+            var ca = capteurs.SingleOrDefault(c => c.IdMesure == d.Mesure);
 
             if (ca != null)
             {
+                ca.Online = true;
+                ca.LastMessageTime = DateTimeOffset.Now;
+
                 await _context.DonneesCapteur.AddAsync(new DonneeCapteur
                 {
                     IdCapteur = ca.Id,
-                    Valeur = d.Value
+                    Valeur = d.Value,
+                    D = DateTimeOffset.Now
                 });
             }
         }
@@ -188,7 +215,7 @@ public class ChirpstackController : ErabliereApiBaseController
         return values.ToArray();
     }
 
-    private int GetMesurement(byte v1, byte v2)
+    private static int GetMesurement(byte v1, byte v2)
     {
         int m = v1;
         m = m + (v2 << 8);

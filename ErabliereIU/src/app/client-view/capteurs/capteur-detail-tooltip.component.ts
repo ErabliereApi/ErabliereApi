@@ -46,6 +46,9 @@ import { Capteur } from 'src/model/capteur';
                 <dt>External Id</dt>
                 <dd>{{capteur.externalId}}</dd>
 
+                <dt>Id mesure</dt>
+                <dd>{{capteur.idMesure}}</dd>
+
                 <dt>Online</dt>
                 <dd>{{capteur.online}}</dd>
 

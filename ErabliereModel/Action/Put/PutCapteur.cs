@@ -72,6 +72,11 @@ public class PutCapteur
     public string? ExternalId { get; set; }
 
     /// <summary>
+    /// Id de la mesure pour la relation avec les mesures de capteurs LoRaWAN
+    /// </summary>
+    public int? IdMesure { get; set; }
+
+    /// <summary>
     /// Date du dernier message
     /// </summary>
     public DateTimeOffset? LastMessageTime { get; set; }
@@ -105,9 +110,4 @@ public class PutCapteur
     /// Affichage maximal lors de l'affichage des données dans les graphiques
     /// </summary>
     public double? DisplayMax { get; set; }
-
-    /// <summary>
-    /// Id de la mesure pour la relation avec les mesures de capteurs LoRaWAN
-    /// </summary>
-    public int? IdMesure { get; set; }
 }

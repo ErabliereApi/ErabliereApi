@@ -59,6 +59,11 @@ public class PostCapteur
     public string? ExternalId { get; set; }
 
     /// <summary>
+    /// Id de la mesure selon les spec. de Sensecap
+    /// </summary>
+    public int? MesurmentId { get; set; }
+
+    /// <summary>
     /// Affichage minimal lors de l'affichage des données dans les graphiques
     /// </summary>
     public double? DisplayMin { get; set; }

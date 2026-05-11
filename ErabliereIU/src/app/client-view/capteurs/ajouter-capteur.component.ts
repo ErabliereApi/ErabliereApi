@@ -68,6 +68,12 @@ export class AjouterCapteurComponent {
                     updateOn: 'blur'
                 }
             ),
+            idMesure: new FormControl(
+                '',
+                {
+                    updateOn: 'blur'
+                }
+            ),
             displayType: new FormControl(
                 '',
                 {
@@ -91,6 +97,7 @@ export class AjouterCapteurComponent {
         this.capteur.ajouterDonneeDepuisInterface = this.ajoutCapteurForm.controls['saisieManuelle'].value;
         this.capteur.type = this.ajoutCapteurForm.controls['type'].value;
         this.capteur.externalId = this.ajoutCapteurForm.controls['externalId'].value;
+        this.capteur.idMesure = this.tryParseInt(this.ajoutCapteurForm.controls['idMesure'].valid);
         this.capteur.displayType = this.ajoutCapteurForm.controls['displayType'].value;
         this.ajoutInProgress = true;
         this.erabliereApi.postCapteur(this.idErabliere, this.capteur).then(() => {
@@ -113,6 +120,16 @@ export class AjouterCapteurComponent {
 
     buttonAnnuler() {
         this.hideAjouterCapteur.emit();
+    }
+
+    tryParseInt(value: any) {
+        try {
+            return Number.parseInt(value);
+        }
+        catch (error) {
+            console.error(error);
+        }
+        return undefined;
     }
 }
 
