@@ -40,10 +40,12 @@ public class ApiKeyMiddleware : IMiddleware
 
             if (apiKeyEntity != null && apiKeyEntity.IsActive())
             {
+                var logger = context.RequestServices.GetRequiredService<ILogger<ApiKeyMiddleware>>();
+
                 // SubscriptionId is null when the key is not linked to a subscription, o need to record usage in checkoutservice
                 if (apiKeyEntity.SubscriptionId != null)
                 {
-                    Console.WriteLine("Recording usage for api key with subscription id " + apiKeyEntity.SubscriptionId);
+                    logger.LogInformation("Recording usage for api key with subscription id {SubscriptionId}", apiKeyEntity.SubscriptionId);
 
                     var checkoutService = context.RequestServices.GetRequiredService<ICheckoutService>();
 
@@ -59,7 +61,7 @@ public class ApiKeyMiddleware : IMiddleware
                 }
                 else
                 {
-                    Console.WriteLine("Skipping last usage update to reduce db load. apiKeyEntity.LastUsage was {0}", apiKeyEntity.LastUsage);
+                    logger.LogInformation("Skipping last usage update to reduce db load. apiKeyEntity.LastUsage was {LastUsage}", apiKeyEntity.LastUsage);
                 }
 
                 await AuthorizeRequestAsync(context, dbContext, apiKeyEntity);

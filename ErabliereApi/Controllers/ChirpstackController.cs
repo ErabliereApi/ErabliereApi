@@ -76,6 +76,7 @@ public class ChirpstackController : ErabliereApiBaseController
         else
         {
             srvInfo.LastTimeSeen = DateTimeOffset.Now;
+            srvInfo.LastDeviceSeen = eventInfo.deviceInfo.devEui;
             await _context.TrySaveChangesAsync(token);
         }
 

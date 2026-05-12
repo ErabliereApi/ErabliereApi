@@ -59,4 +59,9 @@ public class ChirpStackSrvConfig
     /// Date du dernier message de ce serveur
     /// </summary>
     public DateTimeOffset? LastTimeSeen { get; set; }
+
+    /// <summary>
+    /// DevEui du dernier appareil vue
+    /// </summary>
+    public string? LastDeviceSeen { get; set; }
 }

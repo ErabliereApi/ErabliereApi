@@ -8,4 +8,5 @@ export class ChirpstackSrvConfig {
     deviceProfileName?: string;
     deviceClassEnabled?: string;
     lastTimeSeen?: string;
+    lastDeviceSeen?: string;
 }
