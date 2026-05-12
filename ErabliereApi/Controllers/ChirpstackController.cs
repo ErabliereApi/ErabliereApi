@@ -196,10 +196,25 @@ public class ChirpstackController : ErabliereApiBaseController
 
             switch (mesurment)
             {
-                case 4102:
+                case 4097: // Air Temperature
                     value = value / 1000.0m;
                     break;
-                case 4103:
+                case 4098: // Air Humidity
+                    value = value / 1000.0m;
+                    break;
+                case 4099: // Light Intensity
+                    value = value / 1000.0m;
+                    break;
+                case 4100: // CO2
+                    value = value / 1000.0m;
+                    break;
+                case 4101: // Barometric Pressure
+                    value = value / 1000.0m;
+                    break;
+                case 4102: // Soil Temperature
+                    value = value / 1000.0m;
+                    break;
+                case 4103: // Soil Moisture
                     value = value / 1000.0m;
                     break;
                 default:
