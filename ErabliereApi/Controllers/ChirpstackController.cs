@@ -3,6 +3,7 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Extensions;
+using ErabliereApi.Services.LoRaWAN;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -146,11 +147,7 @@ public class ChirpstackController : ErabliereApiBaseController
             }
         }
 
-        // Décoder les données
-        var data = eventInfo.data;
-        var bytes = Convert.FromBase64String(data);
-
-        var decodedData = DecodeData(bytes);
+        var decodedData = LoRaWANPacketDecoder.DecodeData(eventInfo.data);
 
         // Enregistrer en BD
         foreach (var d in decodedData)
@@ -174,69 +171,6 @@ public class ChirpstackController : ErabliereApiBaseController
         await _context.SaveChangesAsync(token);
 
         return Ok();
-    }
-
-    class Mesurement
-    {
-        public int Mesure { get; set; }
-        public decimal Value { get; set; }
-    }
-
-    private Mesurement[] DecodeData(byte[] b)
-    {
-        int i = 0;
-        int length = b.Length;
-        var channel = b[i++];
-        var mesurment = GetMesurement(b[i++], b[i++]);
-        var values = new List<Mesurement>();
-
-        while (i < (length - 2))
-        {
-            var value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
-
-            switch (mesurment)
-            {
-                case 4097: // Air Temperature
-                    value = value / 1000.0m;
-                    break;
-                case 4098: // Air Humidity
-                    value = value / 1000.0m;
-                    break;
-                case 4099: // Light Intensity
-                    value = value / 1000.0m;
-                    break;
-                case 4100: // CO2
-                    value = value / 1000.0m;
-                    break;
-                case 4101: // Barometric Pressure
-                    value = value / 1000.0m;
-                    break;
-                case 4102: // Soil Temperature
-                    value = value / 1000.0m;
-                    break;
-                case 4103: // Soil Moisture
-                    value = value / 1000.0m;
-                    break;
-                default:
-                    throw new InvalidOperationException($"Mesurement {mesurment} it unknow");
-            }
-
-            values.Add(new Mesurement
-            {
-                Mesure = mesurment,
-                Value = value
-            });
-        }
-
-        return values.ToArray();
-    }
-
-    private static int GetMesurement(byte v1, byte v2)
-    {
-        int m = v1;
-        m = m + (v2 << 8);
-
-        return m;
     }
 
     /// <summary>
