@@ -9,24 +9,24 @@ public static class LoRaWANPacketDecoder
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static Mesurement[] DecodeData(string data)
+    public static (Mesurement[], int) TryDecodeData(string data, ILogger logger = null)
     {
         // Décoder les données
         var bytes = Convert.FromBase64String(data);
 
-        var decodedData = DecodeData(bytes);
+        var (decodedData, crc) = DecodeData(bytes, logger);
 
-        return decodedData;
+        return (decodedData, crc);
     }
 
     public class Mesurement
     {
         public int Channel { get; set; }
         public int Mesure { get; set; }
-        public decimal Value { get; set; }
+        public decimal? Value { get; set; }
     }
 
-    private static Mesurement[] DecodeData(byte[] b)
+    private static (Mesurement[], int) DecodeData(byte[] b, ILogger logger)
     {
         int i = 0;
         int length = b.Length;
@@ -36,7 +36,7 @@ public static class LoRaWANPacketDecoder
         {
             var channel = b[i++];
             var mesurment = GetMesurement(b[i++], b[i++]);
-            var value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+            decimal? value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
 
             switch (mesurment)
             {
@@ -50,7 +50,9 @@ public static class LoRaWANPacketDecoder
                     value = value / 1000.0m;
                     break;
                 default:
-                    throw new InvalidOperationException($"Mesurement {mesurment} it unknow");
+                    logger?.LogWarning("Mesurement {Mesurement} it unknow", mesurment);
+                    value = null;
+                    break;
             }
 
             values.Add(new Mesurement
@@ -63,7 +65,7 @@ public static class LoRaWANPacketDecoder
 
         var crc = b[i++] + (b[i++] << 8);
 
-        return values.ToArray();
+        return (values.ToArray(), crc);
     }
 
     private static int GetMesurement(byte v1, byte v2)

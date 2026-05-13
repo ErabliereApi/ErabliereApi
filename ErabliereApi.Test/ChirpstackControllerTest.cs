@@ -2,6 +2,7 @@
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Services.LoRaWAN;
 using ErabliereApi.Test.Autofixture;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
 using System.Threading;
@@ -31,9 +32,9 @@ public class ChirpstackControllerTest
     {
         var data = "AQYQrCYAAAEHENRiAAAABwBkAAEATcw=";
 
-        var decodedData = LoRaWANPacketDecoder.DecodeData(data);
+        var (decodedData, crc) = LoRaWANPacketDecoder.TryDecodeData(data);
 
-        Assert.Equal(2, decodedData.Length);
+        Assert.Equal(3, decodedData.Length);
         var soilTemperature = decodedData[0];
         var soilHumidity = decodedData[1];
 

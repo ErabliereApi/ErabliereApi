@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace ErabliereApi.Controllers;
 
@@ -81,6 +82,8 @@ public class ChirpstackController : ErabliereApiBaseController
             await _context.TrySaveChangesAsync(token);
         }
 
+        await ManageHistory(srvInfo, eventInfo, token);
+
         var idErabliere = eventInfo.deviceInfo.tags.idErabliere;
 
         if (idErabliere == null)
@@ -147,7 +150,7 @@ public class ChirpstackController : ErabliereApiBaseController
             }
         }
 
-        var decodedData = LoRaWANPacketDecoder.DecodeData(eventInfo.data);
+        var (decodedData, crc) = LoRaWANPacketDecoder.TryDecodeData(eventInfo.data, _logger);
 
         // Enregistrer en BD
         foreach (var d in decodedData)
@@ -171,6 +174,46 @@ public class ChirpstackController : ErabliereApiBaseController
         await _context.SaveChangesAsync(token);
 
         return Ok();
+    }
+
+    private async Task ManageHistory(ChirpStackSrvConfig server, PostChirpstackEvent eventInfo, CancellationToken token)
+    {
+        var history = await _context.ChirpstackMessageHistory
+            .Where(h => h.ChirpStackSrvConfigId == server.Id)
+            .OrderByDescending(h => h.Date)
+            .ToListAsync(token);
+
+        var limit = DateTimeOffset.Now - server.TimeToKeepLastMessage;
+
+        for (int i = 0; i < history.Count; i++)
+        {
+            ChirpStackMessage? h = history[i];
+            if (h.Date < limit)
+            {
+                _context.ChirpstackMessageHistory.Remove(h);
+                history.RemoveAt(i--);
+            }
+        }
+
+        if (history.Count > server.KeepNLastMessage)
+        {
+            var delta = history.Count - server.KeepNLastMessage;
+
+            var toDelete = history.Take(delta);
+
+            _context.ChirpstackMessageHistory.RemoveRange(toDelete);
+        }
+
+        await _context.ChirpstackMessageHistory.AddAsync(new ChirpStackMessage
+        {
+            ChirpStackSrvConfigId = server.Id,
+            Data = eventInfo.data,
+            Date = DateTimeOffset.Now,
+            DecodedData = JsonSerializer.Serialize(LoRaWANPacketDecoder.TryDecodeData(eventInfo.data, _logger)),
+            MessageJson = JsonSerializer.Serialize(eventInfo)
+        }, token);
+
+        await _context.TrySaveChangesAsync(token);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Donnees;
+﻿using Depot.Sql.Migrations;
+using ErabliereApi.Donnees;
 using ErabliereApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
@@ -146,6 +147,12 @@ namespace ErabliereApi.Depot.Sql
         /// Table d'aministration des serveurs Chirpstack
         /// </summary>
         public DbSet<ChirpStackSrvConfig> ChirpstackSrvConfigs { get; private set; }
+
+        /// <summary>
+        /// Table d'historique des messages chirpstack
+        /// </summary>
+        public DbSet<ChirpStackMessage> ChirpstackMessageHistory { get; private set; }
+
 #pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />
