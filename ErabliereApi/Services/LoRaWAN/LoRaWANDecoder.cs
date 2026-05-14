@@ -42,7 +42,7 @@ public static class LoRaWANPacketDecoder
         {
             if (isWeatherStation(b))
             {
-                decimal airTemp = ((ushort)(b[1] + (b[2] << 8))) / 10m;
+                decimal airTemp = ((b[1] << 8) + b[2]) / 10m;
                 int airHumidity = b[3];
                 uint lightIntensity = (uint)(b[4] + (b[5] << 8) + (b[6] << 16) + (b[7] << 24));
                 decimal uvIndex = b[8] / 10m;
