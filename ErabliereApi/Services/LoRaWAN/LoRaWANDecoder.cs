@@ -2,14 +2,18 @@
 
 namespace ErabliereApi.Services.LoRaWAN;
 
+/// <summary>
+/// Decodeur de paquet LoRaWAN
+/// </summary>
 public static class LoRaWANPacketDecoder
 {
     /// <summary>
     /// Decode LoRaWAN packet
     /// </summary>
     /// <param name="data"></param>
+    /// <param name="logger"></param>
     /// <returns></returns>
-    public static (Mesurement[], int) TryDecodeData(string data, ILogger logger = null)
+    public static (Mesurement[], int) TryDecodeData(string data, ILogger? logger = null)
     {
         // Décoder les données
         var bytes = Convert.FromBase64String(data);
@@ -24,46 +28,58 @@ public static class LoRaWANPacketDecoder
         public int Channel { get; set; }
         public int Mesure { get; set; }
         public decimal? Value { get; set; }
+        public string? errorMessage { get; set; }
     }
 
-    private static (Mesurement[], int) DecodeData(byte[] b, ILogger logger)
+    private static (Mesurement[], int) DecodeData(byte[] b, ILogger? logger)
     {
         int i = 0;
         int length = b.Length;
         var values = new List<Mesurement>();
+        var crc = 0;
 
-        while (i < (length - 2))
+        try
         {
-            var channel = b[i++];
-            var mesurment = GetMesurement(b[i++], b[i++]);
-            decimal? value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
-
-            switch (mesurment)
+            while (i < (length - 2))
             {
-                case 4097: // Air Temperature
-                case 4098: // Air Humidity
-                case 4099: // Light Intensity
-                case 4100: // CO2
-                case 4101: // Barometric Pressure
-                case 4102: // Soil Temperature
-                case 4103: // Soil Moisture
-                    value = value / 1000.0m;
-                    break;
-                default:
-                    logger?.LogWarning("Mesurement {Mesurement} it unknow", mesurment);
-                    value = null;
-                    break;
+                var channel = b[i++];
+                var mesurment = GetMesurement(b[i++], b[i++]);
+                decimal? value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+                string? message = null; 
+
+                switch (mesurment)
+                {
+                    case 4097: // Air Temperature
+                    case 4098: // Air Humidity
+                    case 4099: // Light Intensity
+                    case 4100: // CO2
+                    case 4101: // Barometric Pressure
+                    case 4102: // Soil Temperature
+                    case 4103: // Soil Moisture
+                        value = value / 1000.0m;
+                        break;
+                    default:
+                        message = $"Mesurement {mesurment} it unknow";
+                        value = null;
+                        logger?.LogWarning(message);
+                        break;
+                }
+
+                values.Add(new Mesurement
+                {
+                    Channel = channel,
+                    Mesure = mesurment,
+                    Value = value,
+                    errorMessage = message
+                });
             }
 
-            values.Add(new Mesurement
-            {
-                Channel = channel,
-                Mesure = mesurment,
-                Value = value
-            });
+            crc = b[i++] + (b[i] << 8);
         }
-
-        var crc = b[i++] + (b[i++] << 8);
+        catch (Exception e)
+        {
+            logger?.LogError(e, "Erreur lors du parsing des mesures du paquet LoRaWAN");
+        }
 
         return (values.ToArray(), crc);
     }
