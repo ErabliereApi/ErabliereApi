@@ -40,41 +40,100 @@ public static class LoRaWANPacketDecoder
 
         try
         {
-            while (i < (length - 2))
+            if (isWeatherStation(b))
             {
-                var channel = b[i++];
-                var mesurment = GetMesurement(b[i++], b[i++]);
-                decimal? value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
-                string? message = null; 
-
-                switch (mesurment)
+                decimal airTemp = ((ushort)(b[1] + (b[2] << 8))) / 10m;
+                int airHumidity = b[3];
+                uint lightIntensity = (uint)(b[4] + (b[5] << 8) + (b[6] << 16) + (b[7] << 24));
+                decimal uvIndex = b[8] / 10m;
+                decimal windSpeed = ((ushort)(b[9] + (b[10] << 8))) / 10m;
+                if (b[11] != 2)
                 {
-                    case 4097: // Air Temperature
-                    case 4098: // Air Humidity
-                    case 4099: // Light Intensity
-                    case 4100: // CO2
-                    case 4101: // Barometric Pressure
-                    case 4102: // Soil Temperature
-                    case 4103: // Soil Moisture
-                        value = value / 1000.0m;
-                        break;
-                    default:
-                        message = $"Mesurement {mesurment} it unknow";
-                        value = null;
-                        logger?.LogWarning(message);
-                        break;
+                    logger?.LogError("Byte at 11 should be 2");
                 }
+                int windDirection = b[12] + (b[13] << 8);
+                decimal rainfallIntensity = (b[14] + (b[15] << 8) + (b[16] << 16) + (b[17] << 24)) / 1000m;
+                decimal barometricPressur = (b[18] + (b[19] << 8)) * 10m;
 
                 values.Add(new Mesurement
                 {
-                    Channel = channel,
-                    Mesure = mesurment,
-                    Value = value,
-                    errorMessage = message
+                    Mesure = 4097,
+                    Value = airTemp
+                });
+                values.Add(new Mesurement
+                {
+                    Mesure = 4098,
+                    Value = airHumidity
+                });
+                values.Add(new Mesurement
+                {
+                    Mesure = 4099,
+                    Value = lightIntensity
+                });
+                values.Add(new Mesurement
+                {
+                    Mesure = 4190,
+                    Value = uvIndex
+                });
+                values.Add(new Mesurement
+                {
+                    Mesure = 4105,
+                    Value = windSpeed
+                });
+                values.Add(new Mesurement
+                {
+                    Mesure = 4104,
+                    Value = windDirection
+                });
+                values.Add(new Mesurement
+                {
+                    Mesure = 4113,
+                    Value = rainfallIntensity
+                });
+                values.Add(new Mesurement
+                {
+                    Mesure = 4101,
+                    Value = barometricPressur
                 });
             }
+            else
+            {
+                while (i < (length - 2))
+                {
+                    var channel = b[i++];
+                    var mesurment = GetMesurement(b[i++], b[i++]);
+                    decimal? value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+                    string? message = null;
 
-            crc = b[i++] + (b[i] << 8);
+                    switch (mesurment)
+                    {
+                        case 4097: // Air Temperature
+                        case 4098: // Air Humidity
+                        case 4099: // Light Intensity
+                        case 4100: // CO2
+                        case 4101: // Barometric Pressure
+                        case 4102: // Soil Temperature
+                        case 4103: // Soil Moisture
+                            value = value / 1000.0m;
+                            break;
+                        default:
+                            message = $"Mesurement {mesurment} it unknow";
+                            value = null;
+                            logger?.LogWarning(message);
+                            break;
+                    }
+
+                    values.Add(new Mesurement
+                    {
+                        Channel = channel,
+                        Mesure = mesurment,
+                        Value = value,
+                        errorMessage = message
+                    });
+                }
+
+                crc = b[i++] + (b[i] << 8);
+            }
         }
         catch (Exception e)
         {
@@ -82,6 +141,15 @@ public static class LoRaWANPacketDecoder
         }
 
         return (values.ToArray(), crc);
+    }
+
+    private static bool isWeatherStation(byte[] b)
+    {
+        var validLength = b.Length == 20;
+        var b1 = b[0] == 1;
+        var b2 = b[11] == 2;
+
+        return validLength && b1 && b2;
     }
 
     private static int GetMesurement(byte v1, byte v2)
