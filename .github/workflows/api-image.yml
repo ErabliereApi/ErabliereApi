@@ -43,7 +43,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # Login into dockerhub
       # skip this test if the run is trigger form a pull request from a fork

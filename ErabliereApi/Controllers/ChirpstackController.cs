@@ -40,6 +40,23 @@ public class ChirpstackController : ErabliereApiBaseController
     }
 
     /// <summary>
+    /// Permet de tester le decoder sur un paquet LoRaWAN en base64
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    [HttpGet("decode")]
+    public IActionResult Decode([FromQuery] string data)
+    {
+        var (array, crc) = LoRaWANPacketDecoder.TryDecodeData(data, _logger);
+
+        return Ok(new
+        {
+            values = array,
+            crc
+        });
+    }
+
+    /// <summary>
     /// Récepteur de l'intégration Http disponible dans Chirpstack
     /// </summary>
     /// <param name="eventStr"></param>
