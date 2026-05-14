@@ -173,7 +173,13 @@ public class ChirpstackController : ErabliereApiBaseController
         // Enregistrer en BD
         foreach (var d in decodedData)
         {
-            var ca = capteurs.SingleOrDefault(c => c.IdMesure == d.Mesure);
+            var cas = capteurs.Where(c => c.IdMesure == d.Mesure);
+            Capteur? ca = cas.FirstOrDefault();
+
+            if (cas.Count() > 1)
+            {
+                _logger.LogWarning("More than one sensor is mathing the mesurement idMesure {IdMesure}", d.Mesure);
+            }
 
             if (ca != null)
             {
@@ -186,6 +192,10 @@ public class ChirpstackController : ErabliereApiBaseController
                     Valeur = d.Value,
                     D = DateTimeOffset.Now
                 });
+            }
+            else
+            {
+                _logger.LogWarning("No sensor is matching the mesurment idMesure {IdMesure}", d.Mesure);
             }
         }
 

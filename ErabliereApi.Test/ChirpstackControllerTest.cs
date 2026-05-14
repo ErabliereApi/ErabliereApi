@@ -42,6 +42,16 @@ public class ChirpstackControllerTest
         Assert.Equal(4103, soilHumidity.Mesure);
     }
 
+    [Fact]
+    public void DecodeWeaterStationPacket()
+    {
+        string packet = "AQAwYQAAAAAAABACAEgAAAAAJfo=";
+
+        var (decodedData, crc) = LoRaWANPacketDecoder.TryDecodeData(packet);
+
+        Assert.NotEmpty(decodedData);
+    }
+
     [Theory, AutoApiData]
     public async Task CreerErabliereAnonyme(
         ChirpstackController controller, PostChirpstackEvent rootobject)
