@@ -44,16 +44,16 @@ public static class LoRaWANPacketDecoder
             {
                 decimal airTemp = ((b[1] << 8) + b[2]) / 10m;
                 int airHumidity = b[3];
-                uint lightIntensity = (uint)(b[4] + (b[5] << 8) + (b[6] << 16) + (b[7] << 24));
+                uint lightIntensity = (uint)((b[4] << 24) + (b[5] << 16) + (b[6] << 8) + b[7]);
                 decimal uvIndex = b[8] / 10m;
-                decimal windSpeed = ((ushort)(b[9] + (b[10] << 8))) / 10m;
+                decimal windSpeed = ((ushort)(b[9] << 8) + b[10]) / 10m;
                 if (b[11] != 2)
                 {
                     logger?.LogError("Byte at 11 should be 2");
                 }
-                int windDirection = b[12] + (b[13] << 8);
-                decimal rainfallIntensity = (b[14] + (b[15] << 8) + (b[16] << 16) + (b[17] << 24)) / 1000m;
-                decimal barometricPressur = (b[18] + (b[19] << 8)) * 10m;
+                int windDirection = (b[12] << 8) + b[13];
+                decimal rainfallIntensity = ((b[14] << 24) + (b[15] << 16) + (b[16] << 8) + b[17]) / 1000m;
+                decimal barometricPressur = ((b[18] << 8) + b[19]) * 10m;
 
                 values.Add(new Mesurement
                 {
