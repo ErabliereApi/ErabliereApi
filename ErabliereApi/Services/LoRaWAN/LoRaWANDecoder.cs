@@ -13,21 +13,59 @@ public static class LoRaWANPacketDecoder
     /// <param name="data"></param>
     /// <param name="logger"></param>
     /// <returns></returns>
-    public static (Mesurement[], int) TryDecodeData(string data, ILogger? logger = null)
+    public static MesurementResponse TryDecodeData(string data, ILogger? logger = null)
     {
         // Décoder les données
         var bytes = Convert.FromBase64String(data);
 
         var (decodedData, crc) = DecodeData(bytes, logger);
 
-        return (decodedData, crc);
+        return new MesurementResponse
+        {
+            Mesurements = decodedData,
+            Crc = crc
+        };
     }
 
+    /// <summary>
+    /// Modèle de réponse de la fonction de décodage
+    /// </summary>
+    public class MesurementResponse
+    {
+        /// <summary>
+        /// Liste des mesures
+        /// </summary>
+        public Mesurement[]? Mesurements { get; set; }
+
+        /// <summary>
+        /// CRC
+        /// </summary>
+        public int Crc { get; set; }
+    }
+
+    /// <summary>
+    /// Format du décodage d'une mesure
+    /// </summary>
     public class Mesurement
     {
+        /// <summary>
+        /// Canal
+        /// </summary>
         public int Channel { get; set; }
+
+        /// <summary>
+        /// L'ID de la mesure, voir les code de Senscap pour référence
+        /// </summary>
         public int Mesure { get; set; }
+
+        /// <summary>
+        /// La valeur
+        /// </summary>
         public decimal? Value { get; set; }
+
+        /// <summary>
+        /// Message d'erreur s'il y a lieu
+        /// </summary>
         public string? errorMessage { get; set; }
     }
 

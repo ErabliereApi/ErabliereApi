@@ -32,11 +32,12 @@ public class ChirpstackControllerTest
     {
         var data = "AQYQrCYAAAEHENRiAAAABwBkAAEATcw=";
 
-        var (decodedData, crc) = LoRaWANPacketDecoder.TryDecodeData(data);
+        var mesurements = LoRaWANPacketDecoder.TryDecodeData(data);
 
-        Assert.Equal(3, decodedData.Length);
-        var soilTemperature = decodedData[0];
-        var soilHumidity = decodedData[1];
+        Assert.NotNull(mesurements.Mesurements);
+        Assert.Equal(3, mesurements.Mesurements.Length);
+        var soilTemperature = mesurements.Mesurements[0];
+        var soilHumidity = mesurements.Mesurements[1];
 
         Assert.Equal(4102, soilTemperature.Mesure);
         Assert.Equal(4103, soilHumidity.Mesure);
@@ -47,9 +48,10 @@ public class ChirpstackControllerTest
     {
         string packet = "AQAwYQAAAAAAABACAEgAAAAAJfo=";
 
-        var (decodedData, crc) = LoRaWANPacketDecoder.TryDecodeData(packet);
+        var mesurements = LoRaWANPacketDecoder.TryDecodeData(packet);
 
-        Assert.NotEmpty(decodedData);
+        Assert.NotNull(mesurements.Mesurements);
+        Assert.NotEmpty(mesurements.Mesurements);
     }
 
     [Theory, AutoApiData]

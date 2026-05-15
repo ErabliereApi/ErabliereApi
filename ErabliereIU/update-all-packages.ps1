@@ -1,11 +1,19 @@
-Write-Host "Previewing updates..."
-npm i -g npm-check-updates
-ncu
+param(
+    $coolDown = 14
+)
 
 Write-Host "Updating angular"
 . .\update-angular-version.ps1
 
-ncu -u
+Write-Host "Previewing updates..."
+npm i -g npm-check-updates
+ncu --cooldown $coolDown
+
+Write-Host "Do you want to proceed to the update? (y/n) "
+$yn = Read-Host
+if ($yn -eq 'y') {
+  ncu -u --cooldown $coolDown
+}
 
 npm install
 

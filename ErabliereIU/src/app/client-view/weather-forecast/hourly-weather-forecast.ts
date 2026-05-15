@@ -32,7 +32,16 @@ import { HourlyTemperature, HourlyWeatherForecast } from 'src/model/hourlyweathe
               <th>Température</th>
               <th>Icône</th>
               <th>Type</th>
-              <th>Intensité</th>
+              <th>
+                @if (provider == "AccuWeatherService")
+                {
+                    Intensité
+                }
+                @else 
+                {
+                    Probabilité d'averse
+                }
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -56,7 +65,12 @@ import { HourlyTemperature, HourlyWeatherForecast } from 'src/model/hourlyweathe
                     [title]="forecast.iconPhrase">
                   </td>
                   <td>{{ precipitationTypeText(forecast.precipitationType) }}</td>
-                  <td>{{ precipitationIntensityText(forecast.precipitationIntensity) }}</td>
+                  <td>
+                    {{ precipitationIntensityText(forecast.precipitationIntensity) }}
+                    @if (provider == "GouvCAWeatherService") {
+                        %
+                    }
+                  </td>
                 </tr>
               }
             </tbody>

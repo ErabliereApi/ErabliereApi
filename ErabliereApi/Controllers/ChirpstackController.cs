@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using static ErabliereApi.Services.LoRaWAN.LoRaWANPacketDecoder;
 
 namespace ErabliereApi.Controllers;
 
@@ -31,6 +32,7 @@ public class ChirpstackController : ErabliereApiBaseController
     /// <param name="context"></param>
     /// <param name="config"></param>
     /// <param name="serviceProvider"></param>
+    /// <param name="logger"></param>
     public ChirpstackController(
         ErabliereDbContext context, IConfiguration config, IServiceProvider serviceProvider, ILogger<ChirpstackController> logger)
          : base(serviceProvider, context, config)
@@ -46,15 +48,12 @@ public class ChirpstackController : ErabliereApiBaseController
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpGet("decode")]
+    [ProducesResponseType(200, Type = typeof(MesurementResponse))]
     public IActionResult Decode([FromQuery] string data)
     {
-        var (array, crc) = LoRaWANPacketDecoder.TryDecodeData(data, _logger);
+        var mesurementResponse = TryDecodeData(data, _logger);
 
-        return Ok(new
-        {
-            values = array,
-            crc
-        });
+        return Ok(mesurementResponse);
     }
 
     /// <summary>
@@ -72,12 +71,16 @@ public class ChirpstackController : ErabliereApiBaseController
         {
             ModelState.AddModelError("request body", "The event is null");
 
+            _logger.LogWarning("The request body is null, return BadRequest");
+
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
         if (eventInfo.deviceInfo == null)
         {
             ModelState.AddModelError("deviceInfo", "The result.deviceInfo property is null");
+
+            _logger.LogWarning("deviceInfo property is null, return BadRequest");
 
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
@@ -91,6 +94,8 @@ public class ChirpstackController : ErabliereApiBaseController
 
         if (srvInfo == null)
         {
+            _logger.LogWarning("No device info matching the server sending the request, return BadRequest");
+
             return BadRequest("No device info matching the server sending the request");
         }
         else
@@ -168,36 +173,52 @@ public class ChirpstackController : ErabliereApiBaseController
             }
         }
 
-        var (decodedData, crc) = LoRaWANPacketDecoder.TryDecodeData(eventInfo.data, _logger);
+        var mesurementsResponse = TryDecodeData(eventInfo.data, _logger);
 
-        // Enregistrer en BD
-        foreach (var d in decodedData)
+        if (mesurementsResponse.Mesurements != null)
         {
-            var cas = capteurs.Where(c => c.IdMesure == d.Mesure);
-            Capteur? ca = cas.FirstOrDefault();
-
-            if (cas.Count() > 1)
+            // Enregistrer en BD
+            foreach (var d in mesurementsResponse.Mesurements)
             {
-                _logger.LogWarning("More than one sensor is mathing the mesurement idMesure {IdMesure}", d.Mesure);
-            }
+                var cas = capteurs.Where(c => c.IdMesure == d.Mesure);
+                Capteur? ca = cas.FirstOrDefault();
 
-            if (ca != null)
-            {
-                ca.Online = true;
-                ca.LastMessageTime = DateTimeOffset.Now;
-
-                await _context.DonneesCapteur.AddAsync(new DonneeCapteur
+                if (cas.Count() > 1)
                 {
-                    IdCapteur = ca.Id,
-                    Valeur = d.Value,
-                    D = DateTimeOffset.Now
-                });
-            }
-            else
-            {
-                _logger.LogWarning("No sensor is matching the mesurment idMesure {IdMesure}", d.Mesure);
+                    _logger.LogWarning(
+                        "More than one sensor is mathing the mesurement idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
+                        d.Mesure,
+                        eventStr,
+                        eventInfo.deviceInfo.devEui);
+                }
+
+                if (ca != null)
+                {
+                    ca.Online = true;
+                    ca.LastMessageTime = DateTimeOffset.Now;
+
+                    await _context.DonneesCapteur.AddAsync(new DonneeCapteur
+                    {
+                        IdCapteur = ca.Id,
+                        Valeur = d.Value,
+                        D = DateTimeOffset.Now
+                    });
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "No sensor is matching the mesurment idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
+                        d.Mesure,
+                        eventStr,
+                        eventInfo.deviceInfo.devEui);
+                }
             }
         }
+        else
+        {
+            _logger.LogWarning("mesurementsResponse.Mesurements == null");
+        }
+
 
         await _context.SaveChangesAsync(token);
 
@@ -237,7 +258,7 @@ public class ChirpstackController : ErabliereApiBaseController
             ChirpStackSrvConfigId = server.Id,
             Data = eventInfo.data,
             Date = DateTimeOffset.Now,
-            DecodedData = JsonSerializer.Serialize(LoRaWANPacketDecoder.TryDecodeData(eventInfo.data, _logger)),
+            DecodedData = JsonSerializer.Serialize(TryDecodeData(eventInfo.data, _logger)),
             MessageJson = JsonSerializer.Serialize(eventInfo)
         }, token);
 
@@ -285,8 +306,8 @@ public class ChirpstackController : ErabliereApiBaseController
     [HttpPut("configs/{id}")]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
     [ProducesDefaultResponseType(typeof(ChirpStackSrvConfig))]
-    public async Task<IActionResult> EditConfigs([FromRoute] Guid id,
-        [FromBody] ChirpStackSrvConfig chirpStackSrvConfig, CancellationToken token)
+    public async Task<IActionResult> EditConfigs(
+        [FromRoute] Guid id, [FromBody] ChirpStackSrvConfig chirpStackSrvConfig, CancellationToken token)
     {
         _context.Update(chirpStackSrvConfig);
 
