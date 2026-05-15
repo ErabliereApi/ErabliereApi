@@ -99,6 +99,12 @@ public class ChirpStackMessage
     public Guid? ChirpStackSrvConfigId { get; set; }
 
     /// <summary>
+    /// Event type sent by the chirpstack server (up or down)
+    /// </summary>
+    [MaxLength(25)]
+    public string? EventType { get; set; }
+
+    /// <summary>
     /// Message Json reçu
     /// </summary>
     public string? MessageJson { get; set; }

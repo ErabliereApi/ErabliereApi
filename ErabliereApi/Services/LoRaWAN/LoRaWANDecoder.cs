@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace ErabliereApi.Services.LoRaWAN;
+﻿namespace ErabliereApi.Services.LoRaWAN;
 
 /// <summary>
 /// Decodeur de paquet LoRaWAN
@@ -140,7 +138,7 @@ public static class LoRaWANPacketDecoder
                 {
                     var channel = b[i++];
                     var mesurment = GetMesurement(b[i++], b[i++]);
-                    decimal? value = (decimal)(b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+                    decimal? value = (b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
                     string? message = null;
 
                     switch (mesurment)
@@ -155,7 +153,7 @@ public static class LoRaWANPacketDecoder
                             value = value / 1000.0m;
                             break;
                         default:
-                            message = $"Mesurement {mesurment} it unknow";
+                            message = $"Mesurement {mesurment} it unknow in {Convert.ToBase64String(b)}";
                             value = null;
                             logger?.LogWarning(message);
                             break;
@@ -175,7 +173,7 @@ public static class LoRaWANPacketDecoder
         }
         catch (Exception e)
         {
-            logger?.LogError(e, "Erreur lors du parsing des mesures du paquet LoRaWAN");
+            logger?.LogError(e, "Erreur lors du parsing des mesures du paquet LoRaWAN {Data}", Convert.ToBase64String(b));
         }
 
         return (values.ToArray(), crc);

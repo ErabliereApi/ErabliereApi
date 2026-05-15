@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.8" />
-    <PackageReference Include="Microsoft.Graph" Version="5.105.0" />
+    <PackageReference Include="Microsoft.Graph" Version="6.0.3" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.84.0" />
     <PackageReference Include="Microsoft.Identity.Web" Version="4.9.0" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />

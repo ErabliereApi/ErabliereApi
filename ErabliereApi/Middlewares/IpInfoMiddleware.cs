@@ -227,7 +227,7 @@ public class IpInfoMiddleware : IMiddleware
                 }
                 else
                 {
-                    _logger.LogWarning("No matching network found for IP: {Ip} with ASN: {Asn} and country: {Country}", ipInfo.Ip, ipInfo.ASN, ipInfo.CountryCode);
+                    _logger.LogInformation("No matching network found for IP: {Ip} with ASN: {Asn} and country: {Country}", ipInfo.Ip, ipInfo.ASN, ipInfo.CountryCode);
                 }
             }
             else

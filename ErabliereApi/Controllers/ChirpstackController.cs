@@ -3,7 +3,6 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Extensions;
-using ErabliereApi.Services.LoRaWAN;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -56,6 +55,8 @@ public class ChirpstackController : ErabliereApiBaseController
         return Ok(mesurementResponse);
     }
 
+    private static ConcurrentDictionary<string, SemaphoreSlim> _semaphoreSlim = new ConcurrentDictionary<string, SemaphoreSlim>();
+
     /// <summary>
     /// Récepteur de l'intégration Http disponible dans Chirpstack
     /// </summary>
@@ -85,151 +86,164 @@ public class ChirpstackController : ErabliereApiBaseController
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
-        // Vérifier l'appareil distant depuis la configuration
-        var srvInfo = await _context.ChirpstackSrvConfigs
-            .Where(c => c.TenantId == eventInfo.deviceInfo.tenantId &&
-                        c.ApplicationId == eventInfo.deviceInfo.applicationId &&
-                        c.DeviceProfileId == eventInfo.deviceInfo.deviceProfileId)
-            .FirstOrDefaultAsync(token);
+        var sem = _semaphoreSlim.GetOrAdd(
+            $"{eventInfo.deviceInfo.tenantId}-{eventInfo.deviceInfo.applicationId}-{eventInfo.deviceInfo.deviceProfileId}",
+            (key) => new SemaphoreSlim(1));
 
-        if (srvInfo == null)
+        await sem.WaitAsync(token);
+
+        try
         {
-            _logger.LogWarning("No device info matching the server sending the request, return BadRequest");
-
-            return BadRequest("No device info matching the server sending the request");
-        }
-        else
-        {
-            srvInfo.LastTimeSeen = DateTimeOffset.Now;
-            srvInfo.LastDeviceSeen = eventInfo.deviceInfo.devEui;
-            await _context.TrySaveChangesAsync(token);
-        }
-
-        await ManageHistory(srvInfo, eventInfo, token);
-
-        var idErabliere = eventInfo.deviceInfo.tags.idErabliere;
-
-        if (idErabliere == null)
-        {
-            var message = "L'id de l'érablière est requis";
-
-            ModelState.AddModelError("deviceInfo.tags.idErabliere", message);
-
-            _logger.LogWarning("Chirpstack event listner return bad request with message: {Message}", message);
-
-            return BadRequest(new ValidationProblemDetails(ModelState));
-        }
-
-        // Mapper la données vers les bons capteurs
-        var capteurs = await _context.Capteurs
-            .Where(c => c.IdErabliere == idErabliere &&
-                        c.ExternalId == eventInfo.deviceInfo.devEui)
-            .ToArrayAsync(token);
-
-        if (capteurs.Length == 0)
-        {
-            var message = "Aucun capteur assossié avec l'érablière ou l'id d'appareil (ExternalId - devEui).";
-
-            _logger.LogWarning("Chirpstack event listner return bad request with message: {Message}", message);
-
-            return BadRequest(message);
-        }
-
-        // Vérifier l'autorité de l'appelant
-        if (_config.IsAuthEnabled())
-        {
-            var (a, b, customer) = await IsAuthenticatedAsync(token);
-
-            if (customer == null)
-            {
-                var message = "Customer not found";
-
-                _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
-
-                return Unauthorized(message);
-            }
-
-            var access = await _context.CustomerErablieres
-                .Where(ce => ce.IdErabliere == idErabliere &&
-                             ce.IdCustomer == customer.Id)
+            // Vérifier l'appareil distant depuis la configuration
+            var srvInfo = await _context.ChirpstackSrvConfigs
+                .Where(c => c.TenantId == eventInfo.deviceInfo.tenantId &&
+                            c.ApplicationId == eventInfo.deviceInfo.applicationId &&
+                            c.DeviceProfileId == eventInfo.deviceInfo.deviceProfileId)
                 .FirstOrDefaultAsync(token);
 
-            if (access == null)
+            if (srvInfo == null)
             {
-                var message = "No access";
+                _logger.LogWarning("No device info matching the server sending the request, return BadRequest");
 
-                _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
-
-                return Unauthorized(message);
+                return BadRequest("No device info matching the server sending the request");
+            }
+            else
+            {
+                srvInfo.LastTimeSeen = DateTimeOffset.Now;
+                srvInfo.LastDeviceSeen = eventInfo.deviceInfo.devEui;
+                await _context.TrySaveChangesAsync(token);
             }
 
-            if ((access.Access & 2) == 0)
+            await ManageHistory(srvInfo, eventStr, eventInfo, token);
+
+            var idErabliere = eventInfo.deviceInfo.tags.idErabliere;
+
+            if (idErabliere == null)
             {
-                var message = "No create access";
+                var message = "L'id de l'érablière est requis";
 
-                _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
+                ModelState.AddModelError("deviceInfo.tags.idErabliere", message);
 
-                return Unauthorized(message);
+                _logger.LogWarning("Chirpstack event listner return bad request with message: {Message}", message);
+
+                return BadRequest(new ValidationProblemDetails(ModelState));
             }
-        }
 
-        var mesurementsResponse = TryDecodeData(eventInfo.data, _logger);
+            // Mapper la données vers les bons capteurs
+            var capteurs = await _context.Capteurs
+                .Where(c => c.IdErabliere == idErabliere &&
+                            c.ExternalId == eventInfo.deviceInfo.devEui)
+                .ToArrayAsync(token);
 
-        if (mesurementsResponse.Mesurements != null)
-        {
-            // Enregistrer en BD
-            foreach (var d in mesurementsResponse.Mesurements)
+            if (capteurs.Length == 0)
             {
-                var cas = capteurs.Where(c => c.IdMesure == d.Mesure);
-                Capteur? ca = cas.FirstOrDefault();
+                var message = "Aucun capteur assossié avec l'érablière ou l'id d'appareil (ExternalId - devEui).";
 
-                if (cas.Count() > 1)
+                _logger.LogWarning("Chirpstack event listner return bad request with message: {Message}", message);
+
+                return BadRequest(message);
+            }
+
+            // Vérifier l'autorité de l'appelant
+            if (_config.IsAuthEnabled())
+            {
+                var (a, b, customer) = await IsAuthenticatedAsync(token);
+
+                if (customer == null)
                 {
-                    _logger.LogWarning(
-                        "More than one sensor is mathing the mesurement idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
-                        d.Mesure,
-                        eventStr,
-                        eventInfo.deviceInfo.devEui);
+                    var message = "Customer not found";
+
+                    _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
+
+                    return Unauthorized(message);
                 }
 
-                if (ca != null)
-                {
-                    ca.Online = true;
-                    ca.LastMessageTime = DateTimeOffset.Now;
+                var access = await _context.CustomerErablieres
+                    .Where(ce => ce.IdErabliere == idErabliere &&
+                                 ce.IdCustomer == customer.Id)
+                    .FirstOrDefaultAsync(token);
 
-                    await _context.DonneesCapteur.AddAsync(new DonneeCapteur
+                if (access == null)
+                {
+                    var message = "No access";
+
+                    _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
+
+                    return Unauthorized(message);
+                }
+
+                if ((access.Access & 2) == 0)
+                {
+                    var message = "No create access";
+
+                    _logger.LogWarning("Chirpstack event listner return Unauthorize with message: {Message}", message);
+
+                    return Unauthorized(message);
+                }
+            }
+
+            var mesurementsResponse = TryDecodeData(eventInfo.data, _logger);
+
+            if (mesurementsResponse.Mesurements != null)
+            {
+                // Enregistrer en BD
+                foreach (var d in mesurementsResponse.Mesurements)
+                {
+                    var cas = capteurs.Where(c => c.IdMesure == d.Mesure);
+                    Capteur? ca = cas.FirstOrDefault();
+
+                    if (cas.Count() > 1)
                     {
-                        IdCapteur = ca.Id,
-                        Valeur = d.Value,
-                        D = DateTimeOffset.Now
-                    });
-                }
-                else
-                {
-                    _logger.LogWarning(
-                        "No sensor is matching the mesurment idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
-                        d.Mesure,
-                        eventStr,
-                        eventInfo.deviceInfo.devEui);
+                        _logger.LogWarning(
+                            "More than one sensor is mathing the mesurement idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
+                            d.Mesure,
+                            eventStr,
+                            eventInfo.deviceInfo.devEui);
+                    }
+
+                    if (ca != null)
+                    {
+                        ca.Online = true;
+                        ca.LastMessageTime = DateTimeOffset.Now;
+
+                        await _context.DonneesCapteur.AddAsync(new DonneeCapteur
+                        {
+                            IdCapteur = ca.Id,
+                            Valeur = d.Value,
+                            D = DateTimeOffset.Now
+                        });
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "No sensor is matching the mesurment idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
+                            d.Mesure,
+                            eventStr,
+                            eventInfo.deviceInfo.devEui);
+                    }
                 }
             }
+            else
+            {
+                _logger.LogWarning("mesurementsResponse.Mesurements == null");
+            }
+
+
+            await _context.SaveChangesAsync(token);
         }
-        else
+        finally
         {
-            _logger.LogWarning("mesurementsResponse.Mesurements == null");
+            sem.Release();
         }
-
-
-        await _context.SaveChangesAsync(token);
 
         return Ok();
     }
 
-    private async Task ManageHistory(ChirpStackSrvConfig server, PostChirpstackEvent eventInfo, CancellationToken token)
+    private async Task ManageHistory(ChirpStackSrvConfig server, string? eventStr, PostChirpstackEvent eventInfo, CancellationToken token)
     {
         var history = await _context.ChirpstackMessageHistory
             .Where(h => h.ChirpStackSrvConfigId == server.Id)
-            .OrderByDescending(h => h.Date)
+            .OrderBy(h => h.Date)
             .ToListAsync(token);
 
         var limit = DateTimeOffset.Now - server.TimeToKeepLastMessage;
@@ -256,14 +270,20 @@ public class ChirpstackController : ErabliereApiBaseController
         await _context.ChirpstackMessageHistory.AddAsync(new ChirpStackMessage
         {
             ChirpStackSrvConfigId = server.Id,
+            EventType = eventStr,
             Data = eventInfo.data,
             Date = DateTimeOffset.Now,
-            DecodedData = JsonSerializer.Serialize(TryDecodeData(eventInfo.data, _logger)),
+            DecodedData = JsonSerializer.Serialize(TryDecodeData(eventInfo.data, _logger), _ignoreDefaultVlue),
             MessageJson = JsonSerializer.Serialize(eventInfo)
         }, token);
 
         await _context.TrySaveChangesAsync(token);
     }
+
+    private JsonSerializerOptions _ignoreDefaultVlue = new JsonSerializerOptions
+    {
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWriting
+    };
 
     /// <summary>
     /// Lister les serveur Chirpstack configuré
