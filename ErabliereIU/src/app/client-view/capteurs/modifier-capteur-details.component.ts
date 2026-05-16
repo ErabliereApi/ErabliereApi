@@ -228,6 +228,7 @@ export class ModifierCapteurDetailsComponent implements OnInit {
             ajouterDonneeDepuisInterface: this.capteur.ajouterDonneeDepuisInterface,
             type: this.capteur.type,
             externalId: this.capteur.externalId,
+            idMesure: this.capteur.idMesure,
             displayType: this.capteur.displayType,
             displayTop: this.capteur.displayTop,
             displayMin: this.capteur.displayMin,
