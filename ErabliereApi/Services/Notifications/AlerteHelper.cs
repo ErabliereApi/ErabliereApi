@@ -32,6 +32,11 @@ public static class AlerteHelper
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(emailConfig.Sender))
+        {
+            throw new InvalidOperationException("L'adresse email 'Sender' a été validé et ne devrait jamais être null ici.");
+        }
+
         try
         {
             if (alerte.EnvoyerA != null)
@@ -72,6 +77,11 @@ public static class AlerteHelper
             logger.LogWarning("Les configurations ne courriel ne sont pas initialisé, la fonctionnalité d'alerte ne peut pas fonctionner.");
 
             return;
+        }
+
+        if (string.IsNullOrWhiteSpace(emailConfig.Sender))
+        {
+            throw new InvalidOperationException("L'adresse email 'Sender' a été validé et ne devrait jamais être null ici.");
         }
 
         try
@@ -122,6 +132,11 @@ public static class AlerteHelper
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(emailConfig.Sender))
+        {
+            throw new InvalidOperationException("L'adresse email 'Sender' a été validé et ne devrait jamais être null ici.");
+        }
+
         try
         {
             if (alerte.EnvoyerA != null)
@@ -168,7 +183,10 @@ public static class AlerteHelper
 
                 foreach (var destinataire in alerte.TexterA.Split(';'))
                 {
-                    await smsService.SendSMSAsync(message, destinataire, CancellationToken.None);
+                    if (!string.IsNullOrWhiteSpace(destinataire))
+                    {
+                        await smsService.SendSMSAsync(message, destinataire, CancellationToken.None);
+                    }
                 }
             }
         }
@@ -203,7 +221,10 @@ public static class AlerteHelper
 
                 foreach (var destinataire in alerte.TexterA.Split(';'))
                 {
-                    await smsService.SendSMSAsync(message, destinataire, CancellationToken.None);
+                    if (!string.IsNullOrWhiteSpace (destinataire))
+                    {
+                        await smsService.SendSMSAsync(message, destinataire, CancellationToken.None);
+                    }
                 }
             }
         }
@@ -244,7 +265,10 @@ public static class AlerteHelper
 
                 foreach (var destinataire in alerte.TexterA.Split(';'))
                 {
-                    await smsService.SendSMSAsync(message, destinataire, CancellationToken.None);
+                    if (!string.IsNullOrWhiteSpace(destinataire))
+                    {
+                        await smsService.SendSMSAsync(message, destinataire, CancellationToken.None);
+                    }
                 }
             }
         }

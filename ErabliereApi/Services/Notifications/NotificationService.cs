@@ -45,7 +45,7 @@ public class NotificationService
     /// </summary>
     public async Task SendNotificationAsync(string message, string recipient, NotificationType type, CancellationToken token = default)
     {
-        if (type == NotificationType.Sms)
+        if (type == NotificationType.Sms && !string.IsNullOrWhiteSpace(recipient))
         {
             try
             {

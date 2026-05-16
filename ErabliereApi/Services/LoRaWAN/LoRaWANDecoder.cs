@@ -1,4 +1,6 @@
-﻿namespace ErabliereApi.Services.LoRaWAN;
+﻿using ErabliereApi.Services.Weather.Helper;
+
+namespace ErabliereApi.Services.LoRaWAN;
 
 /// <summary>
 /// Decodeur de paquet LoRaWAN
@@ -130,6 +132,27 @@ public static class LoRaWANPacketDecoder
                 {
                     Mesure = 4101,
                     Value = barometricPressur
+                });
+
+                decimal? dewPoint = null;
+                string? dewPointError = null;
+                try
+                {
+                    dewPoint = (decimal)DewPointCalculator.CalculateDewPoint
+                    (
+                        (double)airTemp,
+                        airHumidity
+                    );
+                } catch (Exception e)
+                {
+                    dewPointError = e.Message;
+                }
+
+                values.Add(new Mesurement
+                {
+                    Mesure = 4202,
+                    Value = dewPoint,
+                    errorMessage = dewPointError
                 });
             }
             else

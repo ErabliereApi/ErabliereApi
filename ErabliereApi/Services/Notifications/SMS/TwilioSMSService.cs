@@ -31,7 +31,7 @@ public class TwilioSmsService : ISmsService
     {
         try
         {
-            _logger.LogInformation("Begin sending SMS...");
+            _logger.LogInformation("Begin sending SMS message '{Message}' to {Destinataire}", message, destinataire);
 
             string? numero = _smsConfig.Numero;
             string? accountSid = _smsConfig.AccountSid;
