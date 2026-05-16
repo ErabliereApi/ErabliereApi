@@ -37,8 +37,8 @@ public class EmailConfig
     /// Indicate if email is configure.
     /// Return true if email and sender are not null
     /// </summary>
-    public bool IsConfigured => !string.IsNullOrWhiteSpace(Email) && 
-                                !string.IsNullOrWhiteSpace(Sender);
+    public bool IsConfigured => Email != null && 
+                                Sender != null;
 
     /// <summary>
     /// Indique le tenent, nécessaire pour l'authentication oauth

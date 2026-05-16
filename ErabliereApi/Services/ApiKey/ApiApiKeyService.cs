@@ -80,7 +80,7 @@ public class ApiApiKeyService : IApiKeyService
 
     private async Task SendEmailAsync(string email, string originalKey, CancellationToken token)
     {
-        if (_emailConfig.IsConfigured)
+        if (_emailConfig.IsConfigured && _emailConfig.Sender != null)
         {
             var mailMessage = new MimeMessage();
             mailMessage.From.Add(new MailboxAddress("ErabliereAPI - Your API Key", _emailConfig.Sender));

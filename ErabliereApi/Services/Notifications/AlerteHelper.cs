@@ -32,14 +32,9 @@ public static class AlerteHelper
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(emailConfig.Sender))
-        {
-            throw new InvalidOperationException("L'adresse email 'Sender' a été validé et ne devrait jamais être null ici.");
-        }
-
         try
         {
-            if (alerte.EnvoyerA != null)
+            if (alerte.EnvoyerA != null && emailConfig.Sender != null)
             {
                 var mailMessage = new MimeMessage();
                 mailMessage.From.Add(new MailboxAddress("ErabliereAPI - Alerte Service", emailConfig.Sender));
@@ -79,14 +74,9 @@ public static class AlerteHelper
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(emailConfig.Sender))
-        {
-            throw new InvalidOperationException("L'adresse email 'Sender' a été validé et ne devrait jamais être null ici.");
-        }
-
         try
         {
-            if (alerte.EnvoyerA != null)
+            if (alerte.EnvoyerA != null && emailConfig.Sender != null)
             {
                 var mailMessage = new MimeMessage();
                 mailMessage.From.Add(new MailboxAddress("ErabliereAPI - Alerte Service", emailConfig.Sender));
@@ -132,14 +122,9 @@ public static class AlerteHelper
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(emailConfig.Sender))
-        {
-            throw new InvalidOperationException("L'adresse email 'Sender' a été validé et ne devrait jamais être null ici.");
-        }
-
         try
         {
-            if (alerte.EnvoyerA != null)
+            if (alerte.EnvoyerA != null && emailConfig.Sender != null)
             {
                 var mailMessage = new MimeMessage();
                 mailMessage.From.Add(new MailboxAddress("ErabliereAPI - Alerte Service", emailConfig.Sender));
