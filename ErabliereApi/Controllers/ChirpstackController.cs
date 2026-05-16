@@ -189,6 +189,19 @@ public class ChirpstackController : ErabliereApiBaseController
                 // Enregistrer en BD
                 foreach (var d in mesurementsResponse.Mesurements)
                 {
+                    if (d.Mesure == 7)
+                    {
+                        foreach (var c in capteurs)
+                        {
+                            c.BatteryLevel = (byte?)d.Value;
+                        }
+                        continue;
+                    }
+                    if (d.Mesure == 8)
+                    {
+                        continue;
+                    }
+
                     var cas = capteurs.Where(c => c.IdMesure == d.Mesure);
                     Capteur? ca = cas.FirstOrDefault();
 
@@ -282,7 +295,7 @@ public class ChirpstackController : ErabliereApiBaseController
 
     private JsonSerializerOptions _ignoreDefaultVlue = new JsonSerializerOptions
     {
-        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWriting
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
     };
 
     /// <summary>

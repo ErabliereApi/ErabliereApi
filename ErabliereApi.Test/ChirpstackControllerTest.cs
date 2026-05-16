@@ -35,12 +35,16 @@ public class ChirpstackControllerTest
         var mesurements = LoRaWANPacketDecoder.TryDecodeData(data);
 
         Assert.NotNull(mesurements.Mesurements);
-        Assert.Equal(3, mesurements.Mesurements.Length);
+        Assert.Equal(4, mesurements.Mesurements.Length);
         var soilTemperature = mesurements.Mesurements[0];
         var soilHumidity = mesurements.Mesurements[1];
+        var battery = mesurements.Mesurements[2];
+        var frequency = mesurements.Mesurements[3];
 
         Assert.Equal(4102, soilTemperature.Mesure);
         Assert.Equal(4103, soilHumidity.Mesure);
+        Assert.Equal(7, battery.Mesure);
+        Assert.Equal(8, frequency.Mesure);
     }
 
     [Fact]

@@ -138,11 +138,27 @@ public static class LoRaWANPacketDecoder
                 {
                     var channel = b[i++];
                     var mesurment = GetMesurement(b[i++], b[i++]);
-                    decimal? value = (b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+                    decimal? value = null;
                     string? message = null;
 
                     switch (mesurment)
                     {
+                        case 07: // Batterie
+                            var batteryLevel = b[i++] + (b[i++] << 8);
+                            var frequency = b[i++] + (b[i++] << 8);
+                            values.Add(new Mesurement
+                            {
+                                Channel = channel,
+                                Mesure = 07,
+                                Value = batteryLevel
+                            });
+                            values.Add(new Mesurement
+                            {
+                                Channel = channel,
+                                Mesure = 08,
+                                Value = frequency
+                            });
+                            break;
                         case 4097: // Air Temperature
                         case 4098: // Air Humidity
                         case 4099: // Light Intensity
@@ -150,22 +166,29 @@ public static class LoRaWANPacketDecoder
                         case 4101: // Barometric Pressure
                         case 4102: // Soil Temperature
                         case 4103: // Soil Moisture
+                            value = (b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
                             value = value / 1000.0m;
+                            values.Add(new Mesurement
+                            {
+                                Channel = channel,
+                                Mesure = mesurment,
+                                Value = value,
+                                errorMessage = message
+                            });
                             break;
                         default:
                             message = $"Mesurement {mesurment} it unknow in {Convert.ToBase64String(b)}";
-                            value = null;
+                            value = (b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
                             logger?.LogWarning(message);
+                            values.Add(new Mesurement
+                            {
+                                Channel = channel,
+                                Mesure = mesurment,
+                                Value = value,
+                                errorMessage = message
+                            });
                             break;
                     }
-
-                    values.Add(new Mesurement
-                    {
-                        Channel = channel,
-                        Mesure = mesurment,
-                        Value = value,
-                        errorMessage = message
-                    });
                 }
 
                 crc = b[i++] + (b[i] << 8);
