@@ -45,9 +45,9 @@ public class ChirpstackController : ErabliereApiBaseController
     /// <param name="emailService"></param>
     /// <param name="smsService"></param>
     public ChirpstackController(
-        ErabliereDbContext context, 
-        IConfiguration config, 
-        IServiceProvider serviceProvider, 
+        ErabliereDbContext context,
+        IConfiguration config,
+        IServiceProvider serviceProvider,
         ILogger<ChirpstackController> logger,
         IOptions<EmailConfig> emailConfig,
         IOptions<SMSConfig> smsConfig,
@@ -290,19 +290,26 @@ public class ChirpstackController : ErabliereApiBaseController
 
     private async Task ExecuteAlerteFeatureAsync(Capteur ca, DonneeCapteur newDonneesCapteur)
     {
-        var alertes = await _context.AlerteCapteurs.AsNoTracking()
+        try
+        {
+            var alertes = await _context.AlerteCapteurs.AsNoTracking()
                         .Where(a => a.OwnerId == ca.IdErabliere &&
                                     a.IdCapteur == ca.Id &&
                                     a.IsEnable)
                         .ToArrayAsync();
 
-        for (int i = 0; i < alertes.Length; i++)
-        {
-            var alerte = alertes[i];
+            for (int i = 0; i < alertes.Length; i++)
+            {
+                var alerte = alertes[i];
 
-            await MaybeTriggerAlerte(
-                alerte,
-                newDonneesCapteur);
+                await MaybeTriggerAlerte(
+                    alerte,
+                    newDonneesCapteur);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error in ExecuteAlerteFeatureAsync of ChirpstackController");   
         }
     }
 
