@@ -1,5 +1,6 @@
 ﻿using ErabliereApi.Donnees.Interfaces;
 using ErabliereApi.Donnees.Ownable;
+using ErabliereModel.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,7 +9,7 @@ namespace ErabliereApi.Donnees;
 /// <summary>
 /// Une données d'un capteur
 /// </summary>
-public class DonneeCapteur : IIdentifiable<Guid?, DonneeCapteur>, ILevelTwoOwnable<Capteur>
+public class DonneeCapteur : IIdentifiable<Guid?, DonneeCapteur>, ILevelTwoOwnable<Capteur>, IDonneeTexte
 {
     /// <summary>
     /// L'id de la donnée du capteur
@@ -62,5 +63,11 @@ public class DonneeCapteur : IIdentifiable<Guid?, DonneeCapteur>, ILevelTwoOwnab
         }
 
         return other.Id.Value.CompareTo(other.Id.Value);
+    }
+
+    /// <inheritdoc />
+    public string? GetDonneeTexte()
+    {
+        return $"Valeur: {Valeur}, Texte: {Text ?? "N/A"}, Date: {D}";
     }
 }

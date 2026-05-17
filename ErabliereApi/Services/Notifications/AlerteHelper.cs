@@ -65,7 +65,7 @@ public static class AlerteHelper
         ILogger logger,
         EmailConfig emailConfig,
         IEmailService emailService,
-        PostDonneeCapteur? _donnee)
+        IDonneeTexte? _donnee)
     {
         if (!emailConfig.IsConfigured)
         {
@@ -189,7 +189,7 @@ public static class AlerteHelper
         ILogger logger,
         SMSConfig smsConfig,
         ISmsService smsService,
-        PostDonneeCapteur? _donnee)
+        IDonneeTexte? _donnee)
     {
         if (!smsConfig.IsConfigured)
         {

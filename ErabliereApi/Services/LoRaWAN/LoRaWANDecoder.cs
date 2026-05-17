@@ -66,7 +66,7 @@ public static class LoRaWANPacketDecoder
         /// <summary>
         /// Message d'erreur s'il y a lieu
         /// </summary>
-        public string? errorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 
     private static (Mesurement[], int) DecodeData(byte[] b, ILogger? logger)
@@ -80,6 +80,40 @@ public static class LoRaWANPacketDecoder
         {
             if (isWeatherStation(b))
             {
+                if (b[0] == 4) // Battery info packet
+                {
+                    var bib = b[0..10];
+                    b = b[10..];
+
+                    values.Add(new Mesurement
+                    {
+                        Channel = bib[0],
+                        Mesure = 7,
+                        Value = bib[1]
+                    });
+
+                    values.Add(new Mesurement
+                    {
+                        Channel = bib[0],
+                        Mesure = 9, // Hardware version
+                        Value = (bib[2] << 24) + (bib[3] << 16) + (bib[4] << 8) + bib[5],
+                    });
+
+                    values.Add(new Mesurement
+                    {
+                        Channel = bib[0],
+                        Mesure = 8, // interval uplink
+                        Value = (bib[6] << 8) + bib[7]
+                    });
+
+                    values.Add(new Mesurement
+                    {
+                        Channel = bib[0],
+                        Mesure = 10, // GPS Ulink interval
+                        Value = (bib[8] << 8) + bib[9]
+                    });
+                }
+
                 decimal airTemp = ((b[1] << 8) + b[2]) / 10m;
                 int airHumidity = b[3];
                 uint lightIntensity = (uint)((b[4] << 24) + (b[5] << 16) + (b[6] << 8) + b[7]);
@@ -152,8 +186,18 @@ public static class LoRaWANPacketDecoder
                 {
                     Mesure = 4202,
                     Value = dewPoint,
-                    errorMessage = dewPointError
+                    ErrorMessage = dewPointError
                 });
+
+                if (b.Length == 22)
+                {
+                    values.Add(new Mesurement
+                    {
+                        Channel = b[20],
+                        Mesure = 7,
+                        Value = b[21]
+                    });
+                }
             }
             else
             {
@@ -196,7 +240,7 @@ public static class LoRaWANPacketDecoder
                                 Channel = channel,
                                 Mesure = mesurment,
                                 Value = value,
-                                errorMessage = message
+                                ErrorMessage = message
                             });
                             break;
                         default:
@@ -208,7 +252,7 @@ public static class LoRaWANPacketDecoder
                                 Channel = channel,
                                 Mesure = mesurment,
                                 Value = value,
-                                errorMessage = message
+                                ErrorMessage = message
                             });
                             break;
                     }
@@ -227,11 +271,33 @@ public static class LoRaWANPacketDecoder
 
     private static bool isWeatherStation(byte[] b)
     {
-        var validLength = b.Length == 20;
-        var b1 = b[0] == 1;
-        var b2 = b[11] == 2;
+        var validLength = b.Length == 20 || b.Length == 22 || b.Length == 30;
 
-        return validLength && b1 && b2;
+        if (b.Length == 20)
+        {
+            var b1 = b[0] == 1;
+            var b2 = b[11] == 2;
+
+            return b1 && b2;
+        }
+        else if (b.Length == 22)
+        {
+            var b1 = b[0] == 1;
+            var b2 = b[11] == 2;
+            var b3 = b[20] == 3;
+
+            return b1 && b2 && b3;
+        }
+        else if (b.Length == 30)
+        {
+            var b1 = b[0] == 4;
+            var b2 = b[10] == 1;
+            var b3 = b[21] == 2;
+
+            return b1 && b2 && b3;
+        }
+
+        return false;
     }
 
     private static int GetMesurement(byte v1, byte v2)

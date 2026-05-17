@@ -1,8 +1,10 @@
-﻿using ErabliereApi.Controllers.Base;
+﻿using ErabliereApi.Attributes;
+using ErabliereApi.Controllers.Base;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Extensions;
+using ErabliereApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -10,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Text.Json;
 using static ErabliereApi.Services.LoRaWAN.LoRaWANPacketDecoder;
+using static ErabliereApi.Services.AlerteHelper;
+using Microsoft.Extensions.Options;
 
 namespace ErabliereApi.Controllers;
 
@@ -24,6 +28,10 @@ public class ChirpstackController : ErabliereApiBaseController
     private readonly ErabliereDbContext _context;
     private readonly IConfiguration _config;
     private readonly ILogger<ChirpstackController> _logger;
+    private readonly IOptions<EmailConfig> _emailConfig;
+    private readonly IOptions<SMSConfig> _smsConfig;
+    private readonly IEmailService _emailService;
+    private readonly ISmsService _smsService;
 
     /// <summary>
     /// Constructeur
@@ -32,13 +40,28 @@ public class ChirpstackController : ErabliereApiBaseController
     /// <param name="config"></param>
     /// <param name="serviceProvider"></param>
     /// <param name="logger"></param>
+    /// <param name="emailConfig"></param>
+    /// <param name="smsConfig"></param>
+    /// <param name="emailService"></param>
+    /// <param name="smsService"></param>
     public ChirpstackController(
-        ErabliereDbContext context, IConfiguration config, IServiceProvider serviceProvider, ILogger<ChirpstackController> logger)
+        ErabliereDbContext context, 
+        IConfiguration config, 
+        IServiceProvider serviceProvider, 
+        ILogger<ChirpstackController> logger,
+        IOptions<EmailConfig> emailConfig,
+        IOptions<SMSConfig> smsConfig,
+        IEmailService emailService,
+        ISmsService smsService)
          : base(serviceProvider, context, config)
     {
         _context = context;
         _config = config;
         _logger = logger;
+        _emailConfig = emailConfig;
+        _smsConfig = smsConfig;
+        _emailService = emailService;
+        _smsService = smsService;
     }
 
     /// <summary>
@@ -199,6 +222,15 @@ public class ChirpstackController : ErabliereApiBaseController
                     }
                     if (d.Mesure == 8)
                     {
+                        foreach (var c in capteurs)
+                        {
+                            c.ReportFrequency = (int?)d.Value;
+                        }
+                        continue;
+                    }
+                    if (d.Mesure == 9 || d.Mesure == 10)
+                    {
+                        _logger.LogWarning("Mesurement unmanaged {Mesurement}", JsonSerializer.Serialize(d));
                         continue;
                     }
 
@@ -219,12 +251,16 @@ public class ChirpstackController : ErabliereApiBaseController
                         ca.Online = true;
                         ca.LastMessageTime = DateTimeOffset.Now;
 
-                        await _context.DonneesCapteur.AddAsync(new DonneeCapteur
+                        var newDonneesCapteur = new DonneeCapteur
                         {
                             IdCapteur = ca.Id,
                             Valeur = d.Value,
                             D = DateTimeOffset.Now
-                        });
+                        };
+
+                        await _context.DonneesCapteur.AddAsync(newDonneesCapteur);
+
+                        await ExecuteAlerteFeatureAsync(ca, newDonneesCapteur);
                     }
                     else
                     {
@@ -250,6 +286,63 @@ public class ChirpstackController : ErabliereApiBaseController
         }
 
         return Ok();
+    }
+
+    private async Task ExecuteAlerteFeatureAsync(Capteur ca, DonneeCapteur newDonneesCapteur)
+    {
+        var alertes = await _context.AlerteCapteurs.AsNoTracking()
+                        .Where(a => a.OwnerId == ca.IdErabliere &&
+                                    a.IdCapteur == ca.Id &&
+                                    a.IsEnable)
+                        .ToArrayAsync();
+
+        for (int i = 0; i < alertes.Length; i++)
+        {
+            var alerte = alertes[i];
+
+            await MaybeTriggerAlerte(
+                alerte,
+                newDonneesCapteur);
+        }
+    }
+
+    private async Task MaybeTriggerAlerte(
+        AlerteCapteur alerte,
+        DonneeCapteur donnee)
+    {
+        var validationCount = 0;
+        var conditionMet = 0;
+
+        if (alerte.MinValue.HasValue)
+        {
+            validationCount++;
+
+            if (donnee.Valeur <= alerte.MinValue.Value)
+            {
+                conditionMet++;
+            }
+        }
+
+        if (alerte.MaxValue.HasValue)
+        {
+            validationCount++;
+
+            if (donnee.Valeur >= alerte.MaxValue.Value)
+            {
+                conditionMet++;
+            }
+        }
+
+        if (conditionMet > 0)
+        {
+            await TriggerAlerteCourriel(alerte, _logger, _emailConfig.Value, _emailService, donnee);
+            await TriggerAlerteSMS(alerte, _logger, _smsConfig.Value, _smsService, donnee);
+        }
+        else
+        {
+            _logger.LogInformation("Alerte {AlerteId} {AlerteNom} not trigger", alerte.Id, alerte.Nom);
+            _logger.LogInformation("Validation count greater that 0 {ValidationCountGt0} && validation count eqal conditionMet {ValidationCount} == {ConditionMet} = false", validationCount > 0, validationCount, conditionMet);
+        }
     }
 
     private async Task ManageHistory(ChirpStackSrvConfig server, string? eventStr, PostChirpstackEvent eventInfo, CancellationToken token)

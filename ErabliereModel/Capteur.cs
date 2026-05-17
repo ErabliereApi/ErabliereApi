@@ -95,8 +95,9 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     public bool? Online { get; set; }
 
     /// <summary>
-    /// Fréquence de rapport
+    /// Fréuence de réception des données en minutes.
     /// </summary>
+    /// <remarks>Champs informatif seulement, aucune automatisation relié.</remarks>
     public int? ReportFrequency { get; set; }
 
     /// <summary>
