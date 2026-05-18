@@ -1,5 +1,4 @@
-﻿using ErabliereApi.Attributes;
-using ErabliereApi.Controllers.Base;
+﻿using ErabliereApi.Controllers.Base;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
@@ -258,9 +257,9 @@ public class ChirpstackController : ErabliereApiBaseController
                             D = DateTimeOffset.Now
                         };
 
-                        await _context.DonneesCapteur.AddAsync(newDonneesCapteur);
+                        await _context.DonneesCapteur.AddAsync(newDonneesCapteur, token);
 
-                        await ExecuteAlerteFeatureAsync(ca, newDonneesCapteur);
+                        await ExecuteAlerteFeatureAsync(ca, newDonneesCapteur, token);
                     }
                     else
                     {
@@ -288,15 +287,14 @@ public class ChirpstackController : ErabliereApiBaseController
         return Ok();
     }
 
-    private async Task ExecuteAlerteFeatureAsync(Capteur ca, DonneeCapteur newDonneesCapteur)
+    private async Task ExecuteAlerteFeatureAsync(Capteur ca, DonneeCapteur newDonneesCapteur, CancellationToken token)
     {
         try
         {
-            var alertes = await _context.AlerteCapteurs.AsNoTracking()
-                        .Where(a => a.OwnerId == ca.IdErabliere &&
-                                    a.IdCapteur == ca.Id &&
-                                    a.IsEnable)
-                        .ToArrayAsync();
+            var alertes = await _context.AlerteCapteurs
+                        .AsNoTracking()
+                        .Where(a => a.IdCapteur == ca.Id && a.IsEnable)
+                        .ToArrayAsync(token);
 
             for (int i = 0; i < alertes.Length; i++)
             {
