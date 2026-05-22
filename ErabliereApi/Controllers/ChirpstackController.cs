@@ -241,8 +241,8 @@ public class ChirpstackController : ErabliereApiBaseController
                         _logger.LogWarning(
                             "More than one sensor is mathing the mesurement idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
                             d.Mesure,
-                            eventStr,
-                            eventInfo.deviceInfo.devEui);
+                            eventStr?.Sanatize(),
+                            eventInfo.deviceInfo.devEui?.Sanatize());
                     }
 
                     if (ca != null)
