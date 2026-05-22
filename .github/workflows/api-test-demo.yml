@@ -45,10 +45,11 @@ jobs:
         with:
             node-version: '24'
 
-      - name: Install dependencies
+      - name: Install dependencies & run post install script
         run: |
           cd ErabliereIU
           npm install
+          npm run postinstall
 
       - name: Cypress run
         uses: cypress-io/github-action@v6

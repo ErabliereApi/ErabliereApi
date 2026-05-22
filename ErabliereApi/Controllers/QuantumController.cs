@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
 
 namespace ErabliereApi.Controllers;
 
@@ -12,6 +11,7 @@ namespace ErabliereApi.Controllers;
 [Authorize]
 public class QuantumController : ControllerBase
 {
+    private static readonly string[] _validProviders = ["IBM", "Quandela"];
     private readonly IHttpClientFactory _factory;
 
     /// <summary>
@@ -25,11 +25,19 @@ public class QuantumController : ControllerBase
     /// <summary>
     /// Retourne les jobs.
     /// </summary>
+    /// <param name="provider">Name of the provider (IBM or Quandela)</param>
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpGet("[action]")]
-    public async Task<IActionResult> GetJobs(CancellationToken token)
+    public async Task<IActionResult> GetJobs([FromQuery] string provider, CancellationToken token)
     {
+        if (!_validProviders.Contains(provider))
+        {
+            ModelState.AddModelError("provider", $"Query string parameter provider must be one of [{_validProviders.Aggregate((a, b) => string.Concat(a, ',', b))}]");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
+
         string path = "/runtime/jobs?limit=10&offset=0&exclude_params=true";
 
         return await IbmQuantumQuery(path, token);
@@ -39,8 +47,15 @@ public class QuantumController : ControllerBase
     /// Retourne les backends.
     /// </summary>
     [HttpGet("[action]")]
-    public async Task<IActionResult> GetBackends(CancellationToken token)
+    public async Task<IActionResult> GetBackends([FromQuery] string provider, CancellationToken token)
     {
+        if (!_validProviders.Contains(provider))
+        {
+            ModelState.AddModelError("provider", $"Query string parameter provider must be one of [{_validProviders.Aggregate((a, b) => string.Concat(a, ',', b))}]");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
+
         string path = "/runtime/backends";
 
         return await IbmQuantumQuery(path, token);
