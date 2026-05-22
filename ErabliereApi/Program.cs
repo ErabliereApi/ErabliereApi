@@ -9,6 +9,11 @@ var startup = new Startup(builder.Configuration);
 
 startup.ConfigureServices(builder.Services);
 
+builder.WebHost.UseKestrel(c =>
+{
+    c.AddServerHeader = false;
+});
+
 var webApp = builder.Build();
 
 var logger = webApp.Services.GetRequiredService<ILogger<Program>>();

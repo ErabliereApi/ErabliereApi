@@ -50,6 +50,7 @@ jobs:
           cd ErabliereIU
           echo "min-release-age=1" > .npmrc
           echo "registry=https://registry.npmjs.org" >> .npmrc
+          echo "loglevel=info" >> .npmrc
           npm install
           
 
