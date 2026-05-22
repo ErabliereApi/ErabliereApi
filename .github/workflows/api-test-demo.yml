@@ -48,8 +48,10 @@ jobs:
       - name: Install dependencies & run post install script
         run: |
           cd ErabliereIU
+          echo "min-release-age=1" > .npmrc
+          echo "registry=https://registry.npmjs.org" >> .npmrc
           npm install
-          npm run postinstall
+          
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
