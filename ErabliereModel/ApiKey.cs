@@ -60,6 +60,18 @@ public class ApiKey
     public DateTimeOffset? LastUsage { get; set; }
 
     /// <summary>
+    /// If set, the API is limited to the user right + the API authorize Uri and the authorize verbs (if set).
+    /// </summary>
+    [MaxLength(500)]
+    public string? AuthorizeUris { get; set; }
+
+    /// <summary>
+    /// If set, the API action is limited to the user right + the API authorize verbs and the authorize uris (if set).
+    /// </summary>
+    [MaxLength(25)]
+    public string? AuthorizeVerbs { get; set; }
+
+    /// <summary>
     /// Tel if the api key is active
     /// </summary>
     /// <returns></returns>
