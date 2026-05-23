@@ -113,6 +113,15 @@ export class AdminConnectedPlatformComponent implements OnInit {
                             de modèles de langage dans les applications.`,
                 url: 'https://azure.microsoft.com/en-us/services/cognitive-services/openai-service/',
                 logo: 'assets/images/azure-openai.png'
+            },
+            {
+                name: 'Google GenAI',
+                connected: true,
+                description: `Google GenAI est une plateforme qui permet aux développeurs d'accéder à des modèles d'IA avancés
+                            via le cloud. Elle offre des outils pour le développement d'applications basées sur l'IA et l'intégration
+                            de modèles de langage dans les applications.`,
+                url: 'https://aistudio.google.com/welcome',
+                logo: 'assets/images/google-genai.png'
             }
         ];
 }
