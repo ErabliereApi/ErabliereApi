@@ -17,6 +17,7 @@ using ErabliereApi.Authorization.Customers;
 using ErabliereApi.Middlewares;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Services.Notifications;
+using ErabliereApi.Services.AI;
 
 namespace ErabliereApi;
 
@@ -154,6 +155,16 @@ public class Startup
 
         // IpInfo Middleware and Service
         services.AddIpInfoServices(Configuration);
+
+        // AIService
+        if (string.Equals(Configuration["PrimaryAIService"]?.Trim(), "Google", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddTransient<IAIService, GeminiAIService>();
+        }
+        else
+        {
+            services.AddTransient<IAIService, AzureOpenAIService>();
+        }
     }
 
     /// <summary>

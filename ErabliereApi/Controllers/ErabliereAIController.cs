@@ -5,6 +5,7 @@ using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Patch;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Extensions;
+using ErabliereApi.Services.AI;
 using ErabliereApi.Services.Users;
 using ErabliereModel.Action.Post;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +32,7 @@ public class ErabliereAIController : ControllerBase
     private readonly ErabliereDbContext _depot;
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IAIService _aiService;
 
     /// <summary>
     /// Constructeur par initialisation
@@ -38,11 +40,14 @@ public class ErabliereAIController : ControllerBase
     /// <param name="depot"></param>
     /// <param name="configuration"></param>
     /// <param name="httpClientFactory"></param>
-    public ErabliereAIController(ErabliereDbContext depot, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+    /// <param name="aIService"></param>
+    public ErabliereAIController(
+        ErabliereDbContext depot, IConfiguration configuration, IHttpClientFactory httpClientFactory, IAIService aIService)
     {
         _depot = depot;
         _configuration = configuration;
         _httpClientFactory = httpClientFactory;
+        _aiService = aIService;
     }
 
     /// <summary>
@@ -130,14 +135,7 @@ public class ErabliereAIController : ControllerBase
         // if the convesation id is null, create a new conversation
         Conversation? conversation = await GetOrCreateConversation(prompt, defaultSystemPhrase, cancellationToken);
 
-        ChatMessageContentPart? aiResponse;
-
-        var _client = new AzureOpenAIClient(
-            new Uri(_configuration["AzureOpenAIUri"] ?? ""),
-            new AzureKeyCredential(_configuration["AzureOpenAIKey"] ?? "")
-        );
-
-        var client = _client.GetChatClient(_configuration["AzureOpenAIDeploymentChatModelName"]);
+        AIResponse? aiResponse;
 
         switch (prompt.PromptType)
         {
@@ -175,14 +173,11 @@ public class ErabliereAIController : ControllerBase
 
                 try
                 {
-                    var responseWithoutStream = await client.CompleteChatAsync(
+                    aiResponse = await _aiService.CompleteChatAsync(
                         messagesPrompt,
                         chatCompletionsOptions,
                         cancellationToken
                     );
-
-                    var responseChat = responseWithoutStream.Value;
-                    aiResponse = responseChat?.Content?.FirstOrDefault();
                 }
                 catch (ClientResultException e)
                 {
@@ -200,7 +195,7 @@ public class ErabliereAIController : ControllerBase
                 
                 break;
             default:
-                var completionResponse = await client.CompleteChatAsync(
+                aiResponse = await _aiService.CompleteChatAsync(
                     [prompt.Prompt],
                     new ChatCompletionOptions
                     {
@@ -211,9 +206,7 @@ public class ErabliereAIController : ControllerBase
                     },
                     cancellationToken
                 );
-                var completion = completionResponse.Value;
 
-                aiResponse = completion?.Content?.FirstOrDefault();
                 break;
         }
 
@@ -234,7 +227,7 @@ public class ErabliereAIController : ControllerBase
             IsUser = false,
             CreatedAt = DateTime.Now,
             Refusal = aiResponse?.Refusal,
-            ImageUri = aiResponse?.Kind == ChatMessageContentPartKind.Image ? aiResponse?.ImageUri.ToString() : null
+            ImageUri = aiResponse?.Kind == ChatMessageContentPartKind.Image.ToString() ? aiResponse?.ImageUri?.ToString() : null
         };
 
         await _depot.Messages.AddAsync(query, cancellationToken);

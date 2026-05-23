@@ -32,7 +32,8 @@ public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
 
         if (typeInfo.Name == nameof(ErabliereAIController))
         {
-            var aiEnable = !string.IsNullOrWhiteSpace(_config["AzureOpenAIUri"]);
+            var aiEnable = !string.IsNullOrWhiteSpace(_config["AzureOpenAIUri"]) ||
+                           !string.IsNullOrWhiteSpace(_config["GoogleGenAIKey"]);
 
             return aiEnable;
         }
