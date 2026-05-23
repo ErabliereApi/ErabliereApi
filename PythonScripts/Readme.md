@@ -9,7 +9,7 @@ Sous Linux:
 cd ErabliereApi/PythonScripts
 sudo sh instal.sh
 python3 -m venv my-venv
-./my-venv/bin/pip3 install -r requirements.txt
+./my-venv/bin/pip3 install --only-binary :all: --require-hashes -r requirements.txt
 ```
 
 Sous windows:

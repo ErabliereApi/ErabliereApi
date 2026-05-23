@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Services.Weather.Helper;
+﻿using ErabliereApi.Extensions;
+using ErabliereApi.Services.Weather.Helper;
 
 namespace ErabliereApi.Services.LoRaWAN;
 
@@ -244,7 +245,7 @@ public static class LoRaWANPacketDecoder
                             });
                             break;
                         default:
-                            message = $"Mesurement {mesurment} it unknow in {Convert.ToBase64String(b)}";
+                            message = $"Mesurement {mesurment} it unknow in {Convert.ToBase64String(b).Sanatize()}";
                             value = (b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
                             logger?.LogWarning(message);
                             values.Add(new Mesurement
@@ -263,7 +264,7 @@ public static class LoRaWANPacketDecoder
         }
         catch (Exception e)
         {
-            logger?.LogError(e, "Erreur lors du parsing des mesures du paquet LoRaWAN {Data}", Convert.ToBase64String(b));
+            logger?.LogError(e, "Erreur lors du parsing des mesures du paquet LoRaWAN {Data}", Convert.ToBase64String(b).Sanatize());
         }
 
         return (values.ToArray(), crc);

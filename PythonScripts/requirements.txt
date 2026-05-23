@@ -1,6 +1,7 @@
 requests==2.33.0
 azure-identity==1.16.1
-pillow==12.2.0
+pillow==12.2.0 \
+    --hash=sha256:4e6c62e9d237e9b65fac06857d511e90d8461a32adcc1b9065ea0c0fa3a28150
 pytesseract==0.3.10
 flask-restful==0.3.10
 werkzeug==3.1.6

@@ -266,8 +266,8 @@ public class ChirpstackController : ErabliereApiBaseController
                         _logger.LogWarning(
                             "No sensor is matching the mesurment idMesure {IdMesure} from query event {EventStr}, {DevEUI}",
                             d.Mesure,
-                            eventStr,
-                            eventInfo.deviceInfo.devEui);
+                            eventStr?.Sanatize(),
+                            eventInfo.deviceInfo.devEui?.Sanatize());
                     }
                 }
             }
