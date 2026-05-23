@@ -87,8 +87,26 @@ public class ApiKeyMiddleware : IMiddleware
     {
         var apiKeyAuthContext = context.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
 
-        apiKeyAuthContext.Authorize = true;
+        var authorizeVerb = apiKeyEntity.AuthorizeVerbs == null || apiKeyEntity.AuthorizeVerbs.Contains(context.Request.Method, StringComparison.InvariantCultureIgnoreCase);
+        var authorizeUri = apiKeyEntity.AuthorizeUris == null || VerifyUris(apiKeyEntity.AuthorizeUris, context.Request.Path);
+
+        apiKeyAuthContext.Authorize = authorizeVerb && authorizeUri;
         apiKeyAuthContext.Customer = await dbContext.Customers.FindAsync([apiKeyEntity.CustomerId], cancellationToken: context.RequestAborted);
         apiKeyAuthContext.ApiKey = apiKeyEntity;
+    }
+
+    private static bool VerifyUris(string authorizeUris, PathString path)
+    {
+        var uris = authorizeUris.Split("|||");
+
+        foreach (var uri in uris)
+        {
+            if (path.StartsWithSegments(uri))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

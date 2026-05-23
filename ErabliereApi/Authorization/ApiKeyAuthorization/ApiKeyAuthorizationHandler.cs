@@ -21,13 +21,18 @@ public class ApiKeyAuthrizationHandler : IAuthorizationHandler
     /// <inheritdoc />
     public Task HandleAsync(AuthorizationHandlerContext context)
     {
-        var authContext = _accessor.HttpContext?.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
+        var httpContext = _accessor.HttpContext;
 
-        if (authContext != null && authContext.Authorize) 
+        if (httpContext != null)
         {
-            foreach (var requirement in context.PendingRequirements)
+            var authContext = httpContext.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
+
+            if (authContext.Authorize)
             {
-                context.Succeed(requirement);
+                foreach (var requirement in context.PendingRequirements)
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
         

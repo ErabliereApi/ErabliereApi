@@ -19,4 +19,16 @@ public class PostApiKey
     /// </summary>
     [MaxLength(50)]
     public string? Name { get; set; }
+
+    /// <summary>
+    /// Uri path autorisé
+    /// </summary>
+    [MaxLength(500)]
+    public string? AuthorizeUris { get; set; }
+
+    /// <summary>
+    /// Autorisé les verbes
+    /// </summary>
+    [MaxLength(25)]
+    public string? AuthorizeVerbs { get; set; }
 }

@@ -17,7 +17,7 @@ public class TenantIdHandler : AuthorizationHandler<TenantIdRequirement>
         }
         else
         {
-            var tenantIdClaim = context.User.FindFirst(c => c.Type == "http://schemas.microsoft.com/identity/claims/tenantid");
+            var tenantIdClaim = context.User.FindFirst(c => c.Type == TenantIdRequirement.TenantIDClaimIdentifier);
 
             if (tenantIdClaim == null || tenantIdClaim.Value == requirement.TenantId)
             {

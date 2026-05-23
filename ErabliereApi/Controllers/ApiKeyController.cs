@@ -1,4 +1,5 @@
 using ErabliereApi.Authorization;
+using ErabliereApi.Authorization.Policies.Requirements;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Put;
@@ -20,16 +21,19 @@ public class ApiKeyController : ControllerBase
 {
     private readonly ErabliereDbContext _context;
     private readonly IApiKeyService _apiApiKeyService;
+    private readonly TenantIdRequirement _tenantIdRequirement;
 
     /// <summary>
     /// Constructeur
     /// </summary>
     /// <param name="context"></param>
     /// <param name="apiKeyService"></param>
-    public ApiKeyController(ErabliereDbContext context, IApiKeyService apiKeyService)
+    /// <param name="tenantIdRequirement"></param>
+    public ApiKeyController(ErabliereDbContext context, IApiKeyService apiKeyService, TenantIdRequirement tenantIdRequirement)
     {
         _context = context;
         _apiApiKeyService = apiKeyService;
+        _tenantIdRequirement = tenantIdRequirement;
     }
 
     /// <summary>
@@ -50,7 +54,10 @@ public class ApiKeyController : ControllerBase
             RevocationTime = k.RevocationTime,
             SubscriptionId = k.SubscriptionId,
             Key = "***",
-            Customer = k.Customer
+            Customer = k.Customer,
+            AuthorizeUris = k.AuthorizeUris,
+            AuthorizeVerbs = k.AuthorizeVerbs,
+            LastUsage = k.LastUsage
         });
     }
 
@@ -86,7 +93,9 @@ public class ApiKeyController : ControllerBase
             HeaderName = ApiKeyMiddleware.XApiKeyHeader,
             Key = originalKey,
             apikey.CreationTime,
-            apikey.CustomerId
+            apikey.CustomerId,
+            apikey.AuthorizeVerbs,
+            apikey.AuthorizeUris
         });
     }
 
@@ -94,6 +103,7 @@ public class ApiKeyController : ControllerBase
     /// Permet de modifier le nom d'une clé d'API.
     /// </summary>
     [HttpPut("{id}/name")]
+    [Authorize]
     public async Task<IActionResult> UpdateApiKeyName(Guid id, [FromBody] PutApiKeyName param, CancellationToken token)
     {
         var user = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), User);
@@ -130,6 +140,49 @@ public class ApiKeyController : ControllerBase
     }
 
     /// <summary>
+    /// Permet de modifier les restriction d'uri et méthode
+    /// </summary>
+    [HttpPut("{id}/restriction")]
+    [Authorize]
+    public async Task<IActionResult> UpdateApiKeyRestriction(Guid id, [FromBody] PutApiKeyRestriction param, CancellationToken token)
+    {
+        var user = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), User);
+
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UniqueName == user, token);
+
+        if (customer == null)
+        {
+            return Forbid();
+        }
+
+        var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
+
+        if (apiKey == null)
+        {
+            return NotFound();
+        }
+
+        if (apiKey.CustomerId != customer.Id)
+        {
+            return Forbid();
+        }
+
+        if (param.AuthorizeUris != null)
+        {
+            apiKey.AuthorizeUris = param.AuthorizeUris;
+        }
+
+        if (param.AuthorizeVerbs != null)
+        {
+            apiKey.AuthorizeVerbs = param.AuthorizeVerbs;
+        }
+        
+        await _context.SaveChangesAsync(token);
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Permet de révoquer une clé d'API.
     /// </summary>
     [HttpPut("{id}/revoke")]
@@ -158,17 +211,17 @@ public class ApiKeyController : ControllerBase
     [ProducesResponseType(204)]
     public async Task<IActionResult> DeleteApiKey(Guid id, CancellationToken token)
     {
-        if (!User.IsInRole("administrateur"))
-        {
-            using var scope = HttpContext.RequestServices.CreateScope();
+        var isAdmin = User.IsInRole("administrateur");
+        var isMainTenant = HttpContext.User.FindFirst(c => c.Type == TenantIdRequirement.TenantIDClaimIdentifier)?.Value ==
+                           _tenantIdRequirement.TenantId;
 
-            var unique_name = UsersUtils.GetUniqueName(scope, User);
-#nullable disable
-            var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id && k.Customer.UniqueName == unique_name, token);
-#nullable enable
+        if (isAdmin && isMainTenant)
+        {
+            var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
+
             if (apiKey == null)
             {
-                return NoContent();
+                return NotFound();
             }
 
             _context.ApiKeys.Remove(apiKey);
@@ -179,11 +232,15 @@ public class ApiKeyController : ControllerBase
         }
         else
         {
-            var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);
+            using var scope = HttpContext.RequestServices.CreateScope();
 
+            var unique_name = UsersUtils.GetUniqueName(scope, User);
+#nullable disable
+            var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id && k.Customer.UniqueName == unique_name, token);
+#nullable enable
             if (apiKey == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ApiKeys.Remove(apiKey);
