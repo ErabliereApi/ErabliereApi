@@ -64,7 +64,7 @@ public class DonneesCapteurController : ControllerBase
     {
         if (id != capteur.IdCapteur)
         {
-            return BadRequest("L'id de la route ne concorde pas avec l'id du baril à supprimer.");
+            return BadRequest("L'id de la route ne concorde pas avec l'id du capteur dans la donnée à supprimer.");
         }
 
         _depot.Remove(capteur);
