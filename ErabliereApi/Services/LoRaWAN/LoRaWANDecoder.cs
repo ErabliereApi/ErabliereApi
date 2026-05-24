@@ -115,7 +115,7 @@ public static class LoRaWANPacketDecoder
                     });
                 }
 
-                decimal airTemp = ((b[1] << 8) + b[2]) / 10m;
+                decimal airTemp = ((short)((b[1] << 8) | b[2])) / 10m;
                 int airHumidity = b[3];
                 uint lightIntensity = (uint)((b[4] << 24) + (b[5] << 16) + (b[6] << 8) + b[7]);
                 decimal uvIndex = b[8] / 10m;
@@ -234,7 +234,8 @@ public static class LoRaWANPacketDecoder
                         case 4101: // Barometric Pressure
                         case 4102: // Soil Temperature
                         case 4103: // Soil Moisture
-                            value = (b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+                            value = BitConverter.ToInt32(b, i);
+                            i += 4;
                             value = value / 1000.0m;
                             values.Add(new Mesurement
                             {
@@ -246,7 +247,8 @@ public static class LoRaWANPacketDecoder
                             break;
                         default:
                             message = $"Mesurement {mesurment} it unknow in {Convert.ToBase64String(b).Sanatize()}";
-                            value = (b[i++] + (b[i++] << 8) + (b[i++] << 16) + (b[i++] << 24));
+                            value = BitConverter.ToInt32(b, i);
+                            i += 4;
                             logger?.LogWarning(message);
                             values.Add(new Mesurement
                             {

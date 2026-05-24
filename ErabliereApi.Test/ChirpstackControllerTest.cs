@@ -2,7 +2,6 @@
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Services.LoRaWAN;
 using ErabliereApi.Test.Autofixture;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Text.Json;
 using System.Threading;
@@ -42,8 +41,11 @@ public class ChirpstackControllerTest
         var frequency = mesurements.Mesurements[3];
 
         Assert.Equal(4102, soilTemperature.Mesure);
+        Assert.Equal(9.9m, soilTemperature.Value);
         Assert.Equal(4103, soilHumidity.Mesure);
+        Assert.Equal(25.3m, soilHumidity.Value);
         Assert.Equal(7, battery.Mesure);
+        Assert.Equal(100m, battery.Value);
         Assert.Equal(8, frequency.Mesure);
     }
 
@@ -56,10 +58,12 @@ public class ChirpstackControllerTest
 
         Assert.NotNull(mesurements.Mesurements);
         Assert.NotEmpty(mesurements.Mesurements);
+        Assert.Equal(4097, mesurements.Mesurements[0].Mesure);
+        Assert.Equal(4.8m, mesurements.Mesurements[0].Value);
     }
 
     [Theory, AutoApiData]
-    public async Task CreerErabliereAnonyme(
+    public async Task RandomCall(
         ChirpstackController controller, PostChirpstackEvent rootobject)
     {
         var resp = await controller.EventListener("up", rootobject, CancellationToken.None);
