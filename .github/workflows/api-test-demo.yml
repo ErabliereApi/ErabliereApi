@@ -19,12 +19,12 @@ jobs:
 
     steps:
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-        uses: azure/login@v2
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5
         with: # Set Azure credentials secret as an input
           creds: ${{ secrets.AZURE_DEMO_CREDENTIALS }}
           enable-AzPSSession: true
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Reboot the webapp
         run: |
           az webapp restart --name erabliereapi-demo --resource-group erabliereapi-demo
@@ -33,15 +33,15 @@ jobs:
             sleep 10
           done
 
-      - uses: actions/checkout@master
-      - uses: matt-ball/newman-action@master
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: matt-ball/newman-action@170d252f10d199d75d6be4c739b48a3bd5f15ece
         with:
           collection: Postman/ErablièreAPI.postman_collection.json
           environment: Postman/ErabliereAPI-Demo.postman_environment.json
           reporters: '["cli","junit"]'
 
       - name: Install node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
             node-version: '24'
 
@@ -55,7 +55,7 @@ jobs:
           
 
       - name: Cypress run
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@dace029018fcdf86e0df89a31bc3cfa5b32570d8
         with:
           record: true
           working-directory: ErabliereIU
@@ -69,7 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v4.2.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: failure()
         with:
           name: screenshots
@@ -79,13 +79,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: run_tests
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       # Login into dockerhub
       # skip this test if the run is trigger form a pull request from a fork
       - name: Login to Docker Hub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           username: ${{ secrets.registryUsername }}
           password: ${{ secrets.registryPassword }}

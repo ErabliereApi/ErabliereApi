@@ -30,12 +30,14 @@ public static class AuthenticationExtension
 
             if (!string.IsNullOrWhiteSpace(configuration["AzureAD:ClientId"]))
             {
+                var tenantIdRequirement = new TenantIdRequirement(configuration["AzureAD:TenantIdPrincipal"] ?? "");
+                services.AddSingleton(tenantIdRequirement);
                 services.AddSingleton<IAuthorizationHandler, TenantIdHandler>();
                 services.AddAuthorization(options =>
                 {
                     options.AddPolicy("TenantIdPrincipal", policy =>
                     {
-                        policy.Requirements.Add(new TenantIdRequirement(configuration["AzureAD:TenantIdPrincipal"] ?? ""));
+                        policy.Requirements.Add(tenantIdRequirement);
                     });
                 });
 
@@ -50,12 +52,14 @@ public static class AuthenticationExtension
         }
         else
         {
+            var tenantIdRequirement = new TenantIdRequirement("");
+            services.AddSingleton(tenantIdRequirement);
             services.AddSingleton<IAuthorizationHandler, AllowAnonymous>();
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("TenantIdPrincipal", policy =>
                 {
-                    policy.Requirements.Add(new TenantIdRequirement(""));
+                    policy.Requirements.Add(tenantIdRequirement);
                 });
             });
         }

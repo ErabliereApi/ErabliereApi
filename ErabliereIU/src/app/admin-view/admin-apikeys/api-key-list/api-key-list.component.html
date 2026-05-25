@@ -9,20 +9,22 @@
                 <th>Dernière utilisation</th>
                 <th>Révoqué</th>
                 <th>Date révocation</th>
-                <th class="min"></th>
+                <th>Méthodes autorisées</th>
+                <th>Urls autorisées</th>
             </tr>
         </thead>
         <tbody>
             @for (apikey of apiKeys; track apikey.id) {
             <tr>
                 <td><copy-id-button [text]="apikey.id" [title]="'Copier l\'id de la clé d\'api:' + apikey.id"></copy-id-button></td>
-                <td>{{apikey.name}}</td>
+                <td>{{apikey.name}} <ebutton type="primary">&#9998;</ebutton></td>
                 <td>{{apikey?.customer?.name}}</td>
                 <td>{{apikey.creationTime | date: 'yyyy-MM-dd' }}</td>
                 <td>{{apikey.lastUsage | date: 'yyyy-MM-dd' }}</td>
                 <td>{{apikey.revocationTime != null}}</td>
                 <td>{{apikey.revocationTime | date: 'yyyy-MM-dd' }}</td>
-                <td class="min"></td>
+                <td>{{apikey.authorizeVerbs}}</td>
+                <td>{{apikey.authorizeUris}}</td>
             </tr>
             }
         </tbody>

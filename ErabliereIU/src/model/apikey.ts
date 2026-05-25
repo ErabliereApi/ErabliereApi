@@ -9,6 +9,8 @@ export class ApiKey
     revocationTime?: Date;
     deletionTime?: Date;
     customerId?: string;
-    customer?: Customer
+    customer?: Customer;
     lastUsage?: Date;
+    authorizeUris?: string;
+    authorizeVerbs?: string;
 }

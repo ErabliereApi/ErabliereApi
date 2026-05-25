@@ -21,17 +21,17 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@84498526a009a99c875e83ef4821a8ba52de7c22
       with:
         languages: ${{ matrix.language }}
         build-mode: none
 
     # When the dotnet version changes, the dotnet version used by CodeQL must be changed in the repos root folder inside global.json
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v4
+      uses: github/codeql-action/autobuild@84498526a009a99c875e83ef4821a8ba52de7c22
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@84498526a009a99c875e83ef4821a8ba52de7c22
