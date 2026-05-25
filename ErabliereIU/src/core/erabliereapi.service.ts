@@ -709,6 +709,14 @@ export class ErabliereApi {
                 this._environmentService.apiUrl + '/access/ApiKey?$expand=customer', { headers: header }));
     }
 
+    async postApiKey(formValue: any) {
+        const header = await this.getHeaders();
+
+        return await firstValueFrom(
+            this._httpClient.post<ApiKey>(
+                this._environmentService.apiUrl + '/access/ApiKey', formValue, { headers: header }));
+    }
+
     async getTunnelKeys() {
         const header = await this.getHeaders();
 

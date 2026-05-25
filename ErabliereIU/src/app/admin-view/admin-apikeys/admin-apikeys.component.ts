@@ -5,6 +5,8 @@ import { ApiKey } from 'src/model/apikey';
 import { EButtonComponent } from 'src/generic/ebutton.component';
 import { EModalComponent } from 'src/generic/modal/emodal.component';
 import { ApiKeyEditNameComponent } from "./api-key-edit-name/api-key-edit-name.component";
+import { GenericFormComponent } from 'src/generic/forms/generic-form.component';
+import { FormFieldConfig } from 'src/model/form-field-config';
 
 @Component({
     selector: 'app-admin-apikeys',
@@ -17,32 +19,70 @@ import { ApiKeyEditNameComponent } from "./api-key-edit-name/api-key-edit-name.c
             {
                 <emodal
                     (closeModal)="displayAddModal(false)">
+                    <app-generic-form 
+                        [formConfig]="newApiKeyField"
+                        (submitClicked)="(postNewApiKey)" />    
                 </emodal>
             }
             @if (isDisplayEditNameModal)
             {
                 <emodal
                     (closeModal)="displayEditNameModal(false)">
-                    <api-key-edit-name-compoent />
+                    <api-key-edit-name-compoent (needToUpdate)="(ngOnInit)" />
                 </emodal>
             }
             @if (isDisplayAccessModal)
             {
                 <emodal
                     (closeModal)="displayEditAccessModal(false)">
+                    <app-generic-form 
+                        [formConfig]="accesFormConfig" />
                 </emodal>
             }
             <div>
-                <api-key-list [apiKeys]="apikeys"></api-key-list>
+                <api-key-list 
+                    [apiKeys]="apikeys" 
+                    (editNameFormOpen)="displayEditNameModal(true)"
+                    (editAccessFormOpen)="displayEditAccessModal(true)"></api-key-list>
             </div>
         </div>
     `,
-    imports: [ApiKeyListComponent, EButtonComponent, EModalComponent, ApiKeyEditNameComponent]
+    imports: [
+        ApiKeyListComponent, 
+        EButtonComponent, 
+        EModalComponent, 
+        ApiKeyEditNameComponent,
+        GenericFormComponent
+    ]
 })
 export class AdminAPIKeysComponent implements OnInit {
     isDisplayAddModal: boolean = false;
     isDisplayEditNameModal: boolean = false;
     isDisplayAccessModal: boolean = false;
+    newApiKeyField: FormFieldConfig[] = [
+        {
+            key: "Nom",
+            label: "Nom",
+            type: "text"
+        },
+        {
+            key: "customerId",
+            label: "Utilisateur",
+            type: "text"
+        }
+    ];
+    accesFormConfig: FormFieldConfig[] = [
+        {
+            key: "autoriseUris",
+            label: "Uris autorisés",
+            type: "text"
+        },
+        {
+            key: "autoriseVerbs",
+            label: "Méthode autorisé",
+            type: "text"
+        }
+    ]
 
     constructor(private readonly _api: ErabliereApi) { }
 
@@ -64,5 +104,12 @@ export class AdminAPIKeysComponent implements OnInit {
 
     displayEditAccessModal(arg0: boolean) {
         this.isDisplayAccessModal = arg0;
+    }
+
+    postNewApiKey(formValue: any) {
+        console.log(formValue);
+        this._api.postApiKey(formValue).then(() => {
+            this.ngOnInit();
+        });
     }
 }

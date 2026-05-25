@@ -1,0 +1,102 @@
+<form [formGroup]="form" (ngSubmit)="submitForm()" class="generic-form">
+  <div *ngFor="let field of formConfig" [class]="'form-group ' + (field.class || '')">
+    <label [for]="field.key">{{ field.label }}</label>
+
+    <div [ngSwitch]="field.type">
+      <!-- Types d'input standards -->
+      <input
+        *ngSwitchCase="'text'"
+        [type]="field.type"
+        [id]="field.key"
+        [formControlName]="field.key"
+        [placeholder]="field.placeholder"
+        [disabled]="field.disabled ?? false"
+        class="form-control"
+      />
+      <input
+        *ngSwitchCase="'number'"
+        [type]="field.type"
+        [id]="field.key"
+        [formControlName]="field.key"
+        [placeholder]="field.placeholder"
+        [disabled]="field.disabled ?? false"
+        class="form-control"
+      />
+      <input
+        *ngSwitchCase="'email'"
+        [type]="field.type"
+        [id]="field.key"
+        [formControlName]="field.key"
+        [placeholder]="field.placeholder"
+        [disabled]="field.disabled ?? false"
+        class="form-control"
+      />
+      <input
+        *ngSwitchCase="'password'"
+        [type]="field.type"
+        [id]="field.key"
+        [formControlName]="field.key"
+        [placeholder]="field.placeholder"
+        [disabled]="field.disabled ?? false"
+        class="form-control"
+      />
+      <input
+        *ngSwitchCase="'date'"
+        [type]="field.type"
+        [id]="field.key"
+        [formControlName]="field.key"
+        [placeholder]="field.placeholder"
+        [disabled]="field.disabled ?? false"
+        class="form-control"
+      />
+
+      <!-- Textarea -->
+      <textarea
+        *ngSwitchCase="'textarea'"
+        [id]="field.key"
+        [formControlName]="field.key"
+        [placeholder]="field.placeholder"
+        [disabled]="field.disabled ?? false"
+        class="form-control"
+      ></textarea>
+
+      <!-- Select / Dropdown -->
+      <select
+        *ngSwitchCase="'select'"
+        [id]="field.key"
+        [formControlName]="field.key"
+        [disabled]="field.disabled ?? false"
+        class="form-control"
+      >
+        <option value="" disabled>{{ field.placeholder || 'Sélectionner une option' }}</option>
+        <option *ngFor="let option of field.options" [value]="option.key">{{ option.value }}</option>
+      </select>
+
+      <!-- Checkbox -->
+      <div *ngSwitchCase="'checkbox'" class="form-check">
+        <input
+          type="checkbox"
+          [id]="field.key"
+          [formControlName]="field.key"
+          [disabled]="field.disabled ?? false"
+          class="form-check-input"
+        />
+        <label [for]="field.key" class="form-check-label">{{ field.placeholder || '' }}</label>
+      </div>
+    </div>
+
+    <!-- Affichage des erreurs de validation -->
+    <div *ngIf="getControl(field.key)?.invalid && (getControl(field.key)?.touched || getControl(field.key)?.dirty)" class="error-message">
+      <div *ngIf="hasError(field.key, 'required')">{{ field.label }} est requis.</div>
+      <div *ngIf="hasError(field.key, 'minlength')">{{ field.label }} doit avoir au moins {{ field.validators?.minLength }} caractères.</div>
+      <div *ngIf="hasError(field.key, 'maxlength')">{{ field.label }} ne doit pas dépasser {{ field.validators?.maxLength }} caractères.</div>
+      <div *ngIf="hasError(field.key, 'email')">{{ field.label }} doit être une adresse email valide.</div>
+      <div *ngIf="hasError(field.key, 'min')">{{ field.label }} doit être au moins {{ field.validators?.min }}.</div>
+      <div *ngIf="hasError(field.key, 'max')">{{ field.label }} ne doit pas dépasser {{ field.validators?.max }}.</div>
+      <div *ngIf="hasError(field.key, 'pattern')">{{ field.label }} est invalide.</div>
+      <!-- Ajoutez d'autres messages d'erreur si vous avez d'autres validateurs -->
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="form.invalid" class="btn btn-primary mt-3">{{ submitButtonText }}</button>
+</form>
