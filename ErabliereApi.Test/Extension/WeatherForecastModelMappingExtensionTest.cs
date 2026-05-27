@@ -15,7 +15,8 @@ namespace ErabliereApi.Test.Extension;
 public class WeatherForecastModelMappingExtensionTest
 {
     [Theory]
-    [InlineData("sam., 18 avr.", "ddd, dd MMM")]
+    [InlineData("sam., 18 avr.", "ddd, d MMM")]
+    [InlineData("lun., 1 juin", "ddd, d MMM")]
     public void DateFormatExploration(string date, string format)
     {
         var culture = new CultureInfo("fr-CA");

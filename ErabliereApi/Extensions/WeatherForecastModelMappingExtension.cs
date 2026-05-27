@@ -58,7 +58,7 @@ public static class WeatherForecastModelMappingExtension
                 if (key != null)
                 {
                     key = key.Replace(",", ".,");
-                    if (!key.EndsWith("mai"))
+                    if (!key.EndsWith("mai") && !key.EndsWith("juin"))
                     {
                         key += ".";
                     }
