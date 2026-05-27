@@ -1,4 +1,5 @@
-﻿using ErabliereApi.Donnees.Interfaces;
+﻿using ErabliereApi.Donnees.Contantes;
+using ErabliereApi.Donnees.Interfaces;
 using ErabliereApi.Donnees.Ownable;
 using ErabliereModel.Interfaces;
 using System;
@@ -24,7 +25,7 @@ public class DonneeCapteur : IIdentifiable<Guid?, DonneeCapteur>, ILevelTwoOwnab
     /// <summary>
     /// Text associé à la donnée
     /// </summary>
-    [MaxLength(50)]
+    [MaxLength(Specifications.DonnesCapteurTextMaxLength)]
     public string? Text { get; set; }
 
     /// <summary>

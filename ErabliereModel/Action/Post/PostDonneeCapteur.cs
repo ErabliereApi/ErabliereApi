@@ -1,4 +1,5 @@
-﻿using ErabliereModel.Interfaces;
+﻿using ErabliereApi.Donnees.Contantes;
+using ErabliereModel.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -17,7 +18,7 @@ public class PostDonneeCapteur : IDonneeTexte
     /// <summary>
     /// Text associé à la donnée
     /// </summary>
-    [MaxLength(50)]
+    [MaxLength(Specifications.DonnesCapteurTextMaxLength)]
     public string? Text { get; set; }
 
     /// <summary>

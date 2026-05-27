@@ -1,3 +1,4 @@
+using ErabliereApi.Donnees.Contantes;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,7 +22,7 @@ namespace ErabliereApi.Donnees
         /// <summary>
         /// Text associé à la donnée
         /// </summary>
-        [MaxLength(50)]
+        [MaxLength(Specifications.DonnesCapteurTextMaxLength)]
         public string? Text { get; set; }
 
         /// <summary>
