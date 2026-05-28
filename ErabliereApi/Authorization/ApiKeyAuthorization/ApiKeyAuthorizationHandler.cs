@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 namespace ErabliereApi.Authorization;
 
 /// <summary>
-/// Classe utiliser quand la fonction Stripe est activé dans l'api.
 /// Authorise les clients qui ont une clé d'api valide en regardant l'état de ApiKeyAuthrozationContext.
 /// </summary>
 public class ApiKeyAuthrizationHandler : IAuthorizationHandler
@@ -12,7 +11,7 @@ public class ApiKeyAuthrizationHandler : IAuthorizationHandler
     private readonly IHttpContextAccessor _accessor;
 
     /// <summary>
-    /// Classe par défaut de cette classe singleton
+    /// Constructeur par défaut de cette classe singleton
     /// </summary>
     public ApiKeyAuthrizationHandler(IHttpContextAccessor accessor)
     {

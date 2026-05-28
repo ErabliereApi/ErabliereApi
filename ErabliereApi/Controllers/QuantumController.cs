@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Web;
 
 namespace ErabliereApi.Controllers;
 
@@ -65,11 +66,11 @@ public class QuantumController : ControllerBase
         switch (provider)
         {
             case "IBM":
-                path = $"/runtime/jobs/{id}";
+                path = $"/runtime/jobs/{HttpUtility.UrlEncode(id)}";
 
                 return await IbmQuantumQuery(path, token);
             case "Quandela":
-                path = $"/api/jobs/{id}/data";
+                path = $"/api/jobs/{HttpUtility.UrlEncode(id)}/data";
 
                 return await QuandelaQuery(path, token);
             default:
@@ -100,7 +101,7 @@ public class QuantumController : ControllerBase
         }
     }
 
-    private async Task<IActionResult> IbmQuantumQuery(string path, CancellationToken token)
+    private async Task<IActionResult> IbmQuantumQuery(PathString path, CancellationToken token)
     {
         var client = _factory.CreateClient("IbmQuantumClient");
 
@@ -116,7 +117,7 @@ public class QuantumController : ControllerBase
         }
     }
 
-    private async Task<IActionResult> QuandelaQuery(string path, CancellationToken token)
+    private async Task<IActionResult> QuandelaQuery(PathString path, CancellationToken token)
     {
         var client = _factory.CreateClient("QuandelaClient");
 
