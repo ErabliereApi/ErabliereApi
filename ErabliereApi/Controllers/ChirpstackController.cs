@@ -254,7 +254,8 @@ public class ChirpstackController : ErabliereApiBaseController
                         {
                             IdCapteur = ca.Id,
                             Valeur = d.Value,
-                            D = DateTimeOffset.Now
+                            D = DateTimeOffset.Now,
+                            Text = d.Text
                         };
 
                         await _context.DonneesCapteur.AddAsync(newDonneesCapteur, token);

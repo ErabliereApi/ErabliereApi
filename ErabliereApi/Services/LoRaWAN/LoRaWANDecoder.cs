@@ -65,6 +65,11 @@ public static class LoRaWANPacketDecoder
         public decimal? Value { get; set; }
 
         /// <summary>
+        /// Text informatif sur la mesure
+        /// </summary>
+        public string? Text { get; set; }
+
+        /// <summary>
         /// Message d'erreur s'il y a lieu
         /// </summary>
         public string? ErrorMessage { get; set; }
@@ -156,7 +161,8 @@ public static class LoRaWANPacketDecoder
                 values.Add(new Mesurement
                 {
                     Mesure = 4104,
-                    Value = windDirection
+                    Value = windDirection,
+                    Text = GetWindDirectionText(windDirection)
                 });
                 values.Add(new Mesurement
                 {
@@ -309,5 +315,12 @@ public static class LoRaWANPacketDecoder
         m = m + (v2 << 8);
 
         return m;
+    }
+
+    private static readonly string[] caridnals = { "N", "NE", "E", "SE", "S", "SW", "W", "NW", "N" };
+
+    private static string GetWindDirectionText(double wd)
+    {
+        return caridnals[(int)Math.Round(wd % 360 / 45)];
     }
 }
