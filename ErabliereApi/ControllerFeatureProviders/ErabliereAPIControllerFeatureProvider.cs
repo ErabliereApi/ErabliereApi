@@ -47,7 +47,8 @@ public class ErabliereApiControllerFeatureProvider : ControllerFeatureProvider
 
         if (typeInfo.Name == nameof(QuantumController))
         {
-            var enableQuantum = !string.IsNullOrWhiteSpace(_config["IQP_API_TOKEN"]);
+            var enableQuantum = !string.IsNullOrWhiteSpace(_config["IQP_API_TOKEN"]) ||
+                                !string.IsNullOrWhiteSpace(_config["QUANDELA_API_TOKEN"]);
             return enableQuantum;
         }
 

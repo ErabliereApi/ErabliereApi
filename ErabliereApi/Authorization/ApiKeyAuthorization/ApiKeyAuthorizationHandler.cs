@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace ErabliereApi.Authorization;
 
@@ -31,7 +32,14 @@ public class ApiKeyAuthrizationHandler : IAuthorizationHandler
             {
                 foreach (var requirement in context.PendingRequirements)
                 {
-                    context.Succeed(requirement);
+                    if (requirement.GetType() == typeof(RolesAuthorizationRequirement))
+                    {
+                        context.Fail();
+                    }
+                    else
+                    {
+                        context.Succeed(requirement);
+                    }
                 }
             }
         }

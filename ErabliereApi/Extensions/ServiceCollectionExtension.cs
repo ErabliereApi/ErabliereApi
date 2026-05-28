@@ -355,6 +355,16 @@ public static class ServiceCollectionExtension
             });
         }
 
+        var quandela = config["QUANDELA_API_TOKEN"];
+        if (!string.IsNullOrWhiteSpace(quandela))
+        {
+            services.AddHttpClient("QuandelaClient", c =>
+            {
+                c.BaseAddress = new Uri(config.GetValue<string>("QuandelaApiBaseUrl") ?? throw new InvalidOperationException("La variable d'environnement 'IbmQuantumBaseUrl' à une valeur null."));
+                c.DefaultRequestHeaders.Add("Authorization", $"Bearer {quandela}");
+            });
+        }
+
         var weatherBaseUrl = config["AccuWeatherBaseUrl"];
         if (!string.IsNullOrWhiteSpace(weatherBaseUrl))
         {
