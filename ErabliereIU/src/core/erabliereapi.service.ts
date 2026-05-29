@@ -717,6 +717,14 @@ export class ErabliereApi {
                 this._environmentService.apiUrl + '/access/ApiKey', formValue, { headers: header }));
     }
 
+    async revokeApiKey(apiKeyId: string | undefined) {
+        const header = await this.getHeaders();
+
+        return await firstValueFrom(
+            this._httpClient.put<ApiKey>(
+                this._environmentService.apiUrl + '/access/ApiKey/' + apiKeyId + "/revoke", undefined, { headers: header }));
+    }
+
     async getTunnelKeys() {
         const header = await this.getHeaders();
 

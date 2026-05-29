@@ -1,6 +1,8 @@
-Write-Host "A script to update the angular version in the project"
+param(
+    $version = "latest"
+)
 
-$version = "latest"
+Write-Host "A script to update the angular version in the project"
 
 Write-Host "ng update preview"
 ng update

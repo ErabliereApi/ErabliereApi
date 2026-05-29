@@ -11,10 +11,16 @@ import { EButtonComponent } from 'src/generic/ebutton.component';
     imports: [CopyTextButtonComponent, DatePipe, EButtonComponent]
 })
 export class ApiKeyListComponent {
-
     @Input() apiKeys: ApiKey[] = [];
-    @Output() editNameFormOpen = new EventEmitter();
-    @Output() editAccessFormOpen = new EventEmitter();
+    @Output() editNameFormOpen = new EventEmitter<ApiKey>();
+    @Output() editAccessFormOpen = new EventEmitter<ApiKey>();
+    @Output() revokeApiKey = new EventEmitter<string|undefined>();
 
     constructor() { }
+
+    revoquer(apikeyId: string|undefined) {
+        if (confirm("Êtes-vus sur de vouloir supprimer la clé d'api avec l'id: " + apikeyId + " ?")) {
+            this.revokeApiKey.emit(apikeyId);
+        }
+    }
 }

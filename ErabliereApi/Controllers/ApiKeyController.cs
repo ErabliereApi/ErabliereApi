@@ -104,6 +104,7 @@ public class ApiKeyController : ControllerBase
     /// </summary>
     [HttpPut("{id}/name")]
     [Authorize]
+    [ProducesResponseType(204)]
     public async Task<IActionResult> UpdateApiKeyName(Guid id, [FromBody] PutApiKeyName param, CancellationToken token)
     {
         var user = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), User);
@@ -144,6 +145,7 @@ public class ApiKeyController : ControllerBase
     /// </summary>
     [HttpPut("{id}/restriction")]
     [Authorize]
+    [ProducesResponseType(204)]
     public async Task<IActionResult> UpdateApiKeyRestriction(Guid id, [FromBody] PutApiKeyRestriction param, CancellationToken token)
     {
         var user = UsersUtils.GetUniqueName(HttpContext.RequestServices.CreateScope(), User);
@@ -187,6 +189,7 @@ public class ApiKeyController : ControllerBase
     /// </summary>
     [HttpPut("{id}/revoke")]
     [Authorize(Roles = "administrateur", Policy = "TenantIdPrincipal")]
+    [ProducesResponseType(204)]
     public async Task<IActionResult> RevokeApiKey(Guid id, CancellationToken token)
     {
         var apiKey = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == id, token);

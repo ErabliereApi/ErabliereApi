@@ -43,14 +43,15 @@ import { FormFieldConfig } from 'src/model/form-field-config';
                 <api-key-list 
                     [apiKeys]="apikeys" 
                     (editNameFormOpen)="displayEditNameModal(true)"
-                    (editAccessFormOpen)="displayEditAccessModal(true)"></api-key-list>
+                    (editAccessFormOpen)="displayEditAccessModal(true, $event)"
+                    (revokeApiKey)="revoquer($event)"></api-key-list>
             </div>
         </div>
     `,
     imports: [
-        ApiKeyListComponent, 
-        EButtonComponent, 
-        EModalComponent, 
+        ApiKeyListComponent,
+        EButtonComponent,
+        EModalComponent,
         ApiKeyEditNameComponent,
         GenericFormComponent
     ]
@@ -59,6 +60,7 @@ export class AdminAPIKeysComponent implements OnInit {
     isDisplayAddModal: boolean = false;
     isDisplayEditNameModal: boolean = false;
     isDisplayAccessModal: boolean = false;
+    editAccessApiKey?: ApiKey;
     newApiKeyField: FormFieldConfig[] = [
         {
             key: "Nom",
@@ -102,8 +104,19 @@ export class AdminAPIKeysComponent implements OnInit {
         this.isDisplayEditNameModal = arg0;
     }
 
-    displayEditAccessModal(arg0: boolean) {
-        this.isDisplayAccessModal = arg0;
+    displayEditAccessModal(display: boolean, apiKey?: ApiKey) {
+        this.editAccessApiKey = apiKey;
+        if (this.editAccessApiKey != null) {
+            const autUri = this.accesFormConfig.find(v => v.key == "autoriseUris");
+            const autMathod = this.accesFormConfig.find(v => v.key == "autoriseVerbs");
+            if (autUri != null) {
+                autUri.initialValue = this.editAccessApiKey.authorizeUris;
+            }
+            if (autMathod != null) {
+                autMathod.initialValue = this.editAccessApiKey.authorizeVerbs;
+            }
+        }
+        this.isDisplayAccessModal = display;
     }
 
     postNewApiKey(formValue: any) {
@@ -111,5 +124,11 @@ export class AdminAPIKeysComponent implements OnInit {
         this._api.postApiKey(formValue).then(() => {
             this.ngOnInit();
         });
+    }
+
+    revoquer($event: string | undefined) {
+        this._api.revokeApiKey($event).then(() => {
+            this.ngOnInit();
+        })
     }
 }
