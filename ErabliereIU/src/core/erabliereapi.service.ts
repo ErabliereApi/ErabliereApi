@@ -27,7 +27,7 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
 import { firstValueFrom } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
-import { ApiKey } from 'src/model/apikey';
+import { ApiKey, PutApiKeyRestriction } from 'src/model/apikey';
 import { PutRapport, Rapport } from 'src/model/rapport';
 import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
 import { Horaire } from 'src/model/horaire';
@@ -38,6 +38,7 @@ import { ChirpstackSrvConfig } from 'src/model/chripstacksrvconfig';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
+    
     private readonly _authService: IAuthorisationSerivce
 
     constructor(private readonly _httpClient: HttpClient,
@@ -723,6 +724,14 @@ export class ErabliereApi {
         return await firstValueFrom(
             this._httpClient.put<ApiKey>(
                 this._environmentService.apiUrl + '/access/ApiKey/' + apiKeyId + "/revoke", undefined, { headers: header }));
+    }
+
+    async putApiKeyRestriction(apiKeyId: any, payload: PutApiKeyRestriction) {
+        const header = await this.getHeaders();
+
+        return await firstValueFrom(
+            this._httpClient.put<ApiKey>(
+                this._environmentService.apiUrl + '/access/ApiKey/' + apiKeyId + "/restriction", payload, { headers: header }));
     }
 
     async getTunnelKeys() {

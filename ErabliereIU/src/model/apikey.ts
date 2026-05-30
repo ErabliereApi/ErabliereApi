@@ -14,3 +14,8 @@ export class ApiKey
     authorizeUris?: string;
     authorizeVerbs?: string;
 }
+
+export class PutApiKeyRestriction {
+    authorizeUris?: string;
+    authorizeVerbs?: string;
+}

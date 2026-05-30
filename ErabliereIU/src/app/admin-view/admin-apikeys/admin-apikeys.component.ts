@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ApiKeyListComponent } from './api-key-list/api-key-list.component';
-import { ApiKey } from 'src/model/apikey';
+import { ApiKey, PutApiKeyRestriction } from 'src/model/apikey';
 import { EButtonComponent } from 'src/generic/ebutton.component';
 import { EModalComponent } from 'src/generic/modal/emodal.component';
 import { ApiKeyEditNameComponent } from "./api-key-edit-name/api-key-edit-name.component";
@@ -27,8 +27,11 @@ import { FormFieldConfig } from 'src/model/form-field-config';
             @if (isDisplayEditNameModal)
             {
                 <emodal
+                    title="Modifier le nom"
                     (closeModal)="displayEditNameModal(false)">
-                    <api-key-edit-name-compoent (needToUpdate)="(ngOnInit)" />
+                    <api-key-edit-name-compoent 
+                        (needToUpdate)="ngOnInit()"
+                        [apiKey]="editNameApiKey" />
                 </emodal>
             }
             @if (isDisplayAccessModal)
@@ -36,13 +39,14 @@ import { FormFieldConfig } from 'src/model/form-field-config';
                 <emodal
                     (closeModal)="displayEditAccessModal(false)">
                     <app-generic-form 
+                        (submitClicked)="putNewAccessRule($event)"
                         [formConfig]="accesFormConfig" />
                 </emodal>
             }
             <div>
                 <api-key-list 
                     [apiKeys]="apikeys" 
-                    (editNameFormOpen)="displayEditNameModal(true)"
+                    (editNameFormOpen)="displayEditNameModal(true, $event)"
                     (editAccessFormOpen)="displayEditAccessModal(true, $event)"
                     (revokeApiKey)="revoquer($event)"></api-key-list>
             </div>
@@ -61,6 +65,7 @@ export class AdminAPIKeysComponent implements OnInit {
     isDisplayEditNameModal: boolean = false;
     isDisplayAccessModal: boolean = false;
     editAccessApiKey?: ApiKey;
+    editNameApiKey?: ApiKey;
     newApiKeyField: FormFieldConfig[] = [
         {
             key: "Nom",
@@ -100,7 +105,8 @@ export class AdminAPIKeysComponent implements OnInit {
         this.isDisplayAddModal = arg0;
     }
 
-    displayEditNameModal(arg0: boolean) {
+    displayEditNameModal(arg0: boolean, apiKey?: ApiKey) {
+        this.editNameApiKey = apiKey;
         this.isDisplayEditNameModal = arg0;
     }
 
@@ -130,5 +136,15 @@ export class AdminAPIKeysComponent implements OnInit {
         this._api.revokeApiKey($event).then(() => {
             this.ngOnInit();
         })
+    }
+
+    putNewAccessRule(formValue: any) {
+        console.log(formValue);
+        const r = new PutApiKeyRestriction();
+        r.authorizeUris = formValue.autoriseUris;
+        r.authorizeVerbs = formValue.autoriseVerbs;
+        this._api.putApiKeyRestriction(this.editAccessApiKey?.id, r).then(() => {
+            this.ngOnInit();
+        });
     }
 }

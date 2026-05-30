@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, Forms
 import { FormFieldConfig } from '../../model/form-field-config';
 import { CommonModule, NgIf, NgSwitch } from '@angular/common';
 import { NgFor } from '@angular/common';
+import { EButtonComponent } from '../ebutton.component';
 
 @Component({
   selector: 'app-generic-form',
@@ -15,7 +16,8 @@ import { NgFor } from '@angular/common';
     NgIf,
     NgFor,
     ReactiveFormsModule,
-    CommonModule
+    CommonModule,
+    EButtonComponent
   ]
 })
 export class GenericFormComponent implements OnInit {
@@ -92,6 +94,7 @@ export class GenericFormComponent implements OnInit {
   }
 
   submitForm(): void {
+    console.log("Submit generic form", this.form);
     if (this.form.valid) {
       this.submitClicked.emit(this.form.value);
     } else {

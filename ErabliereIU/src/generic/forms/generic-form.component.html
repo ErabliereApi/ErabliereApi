@@ -98,5 +98,5 @@
     </div>
   </div>
 
-  <button type="submit" [disabled]="form.invalid" class="btn btn-primary mt-3">{{ submitButtonText }}</button>
+  <ebutton type="primary" (clicked)="submitForm()" [disabled]="form.invalid">{{ submitButtonText }}</ebutton>
 </form>
