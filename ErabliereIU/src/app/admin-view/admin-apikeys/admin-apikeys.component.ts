@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ApiKeyListComponent } from './api-key-list/api-key-list.component';
-import { ApiKey, PutApiKeyRestriction } from 'src/model/apikey';
+import { ApiKey, PostApiKey, PutApiKeyRestriction } from 'src/model/apikey';
 import { EButtonComponent } from 'src/generic/ebutton.component';
 import { EModalComponent } from 'src/generic/modal/emodal.component';
 import { ApiKeyEditNameComponent } from "./api-key-edit-name/api-key-edit-name.component";
 import { GenericFormComponent } from 'src/generic/forms/generic-form.component';
 import { FormFieldConfig } from 'src/model/form-field-config';
+import { Customer } from 'src/model/customer';
+import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 
 @Component({
     selector: 'app-admin-apikeys',
@@ -21,7 +23,27 @@ import { FormFieldConfig } from 'src/model/form-field-config';
                     (closeModal)="displayAddModal(false)">
                     <app-generic-form 
                         [formConfig]="newApiKeyField"
-                        (submitClicked)="(postNewApiKey)" />    
+                        (submitClicked)="postNewApiKey($event)" /> 
+                        
+                    @if (newlyCreatedApiKey != null) {
+                        <div class="api-key-container">
+                            <h3 class="api-key-title">Votre nouvelle clé API ({{newlyCreatedApiKey.name}})</h3>
+
+                            <div class="api-key-box">
+                                <span class="api-key-value">{{ newlyCreatedApiKey.key }}</span>
+                                <copy-id-button [text]="newlyCreatedApiKey.key" />
+                            </div>
+
+                            <p>
+                                Utiliser la clé d'API avec l'entête 'X-ErabliereApi-ApiKey' vos requêtes HTTP.
+                            </p>
+
+                            <p class="api-key-warning">
+                                ⚠️ Cette clé ne sera plus affichée.  
+                                Copiez-la et conservez-la dans un endroit sécurisé.
+                            </p>
+                        </div>
+                    }
                 </emodal>
             }
             @if (isDisplayEditNameModal)
@@ -52,12 +74,16 @@ import { FormFieldConfig } from 'src/model/form-field-config';
             </div>
         </div>
     `,
+    styleUrls: [
+        './admin-apikeys.component.css'
+    ],
     imports: [
         ApiKeyListComponent,
         EButtonComponent,
         EModalComponent,
         ApiKeyEditNameComponent,
-        GenericFormComponent
+        GenericFormComponent,
+        CopyTextButtonComponent
     ]
 })
 export class AdminAPIKeysComponent implements OnInit {
@@ -68,14 +94,14 @@ export class AdminAPIKeysComponent implements OnInit {
     editNameApiKey?: ApiKey;
     newApiKeyField: FormFieldConfig[] = [
         {
-            key: "Nom",
+            key: "name",
             label: "Nom",
             type: "text"
         },
         {
             key: "customerId",
             label: "Utilisateur",
-            type: "text"
+            type: "select"
         }
     ];
     accesFormConfig: FormFieldConfig[] = [
@@ -89,13 +115,25 @@ export class AdminAPIKeysComponent implements OnInit {
             label: "Méthode autorisé",
             type: "text"
         }
-    ]
+    ];
+    cusotmersList: Customer[] = [];
+    newlyCreatedApiKey?: ApiKey;
 
     constructor(private readonly _api: ErabliereApi) { }
 
     ngOnInit(): void {
         this._api.getApiKeys().then(apikeys => {
             this.apikeys = apikeys;
+        });
+        this._api.getCustomers().then(clist => {
+            this.cusotmersList = clist;
+            const custIdField = this.newApiKeyField.find(f => f.key == "customerId");
+            if (custIdField != null) {
+                custIdField.options = clist.map(c => ({
+                    key: c.id as string,
+                    value: c.email ?? ""
+                }));
+            }
         });
     }
 
@@ -126,8 +164,11 @@ export class AdminAPIKeysComponent implements OnInit {
     }
 
     postNewApiKey(formValue: any) {
-        console.log(formValue);
-        this._api.postApiKey(formValue).then(() => {
+        const r = new PostApiKey();
+        r.name = formValue.name;
+        r.customerId = formValue.customerId;
+        this._api.postApiKey(formValue).then((r) => {
+            this.newlyCreatedApiKey = r;
             this.ngOnInit();
         });
     }
@@ -139,7 +180,6 @@ export class AdminAPIKeysComponent implements OnInit {
     }
 
     putNewAccessRule(formValue: any) {
-        console.log(formValue);
         const r = new PutApiKeyRestriction();
         r.authorizeUris = formValue.autoriseUris;
         r.authorizeVerbs = formValue.autoriseVerbs;

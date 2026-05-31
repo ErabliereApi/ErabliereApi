@@ -15,6 +15,13 @@ export class ApiKey
     authorizeVerbs?: string;
 }
 
+export class PostApiKey {
+    name?: string;
+    customerId?: string;
+    authorizeUris?: string;
+    authorizeVerbs?: string;
+}
+
 export class PutApiKeyRestriction {
     authorizeUris?: string;
     authorizeVerbs?: string;

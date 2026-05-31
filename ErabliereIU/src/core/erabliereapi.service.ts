@@ -27,7 +27,7 @@ import { HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 import { PostDegresJoursRepportRequest, ResponseRapportDegreeJours } from 'src/model/postDegresJoursRepportRequest';
 import { firstValueFrom } from 'rxjs';
 import { GetMapAccessToken } from 'src/model/getMapAccessToken';
-import { ApiKey, PutApiKeyRestriction } from 'src/model/apikey';
+import { ApiKey, PostApiKey, PutApiKeyRestriction } from 'src/model/apikey';
 import { PutRapport, Rapport } from 'src/model/rapport';
 import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
 import { Horaire } from 'src/model/horaire';
@@ -710,7 +710,7 @@ export class ErabliereApi {
                 this._environmentService.apiUrl + '/access/ApiKey?$expand=customer', { headers: header }));
     }
 
-    async postApiKey(formValue: any) {
+    async postApiKey(formValue: PostApiKey) {
         const header = await this.getHeaders();
 
         return await firstValueFrom(

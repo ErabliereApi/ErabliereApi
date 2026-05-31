@@ -33,7 +33,7 @@ public class ApiKeyAuthrizationHandler : IAuthorizationHandler
                 {
                     if (requirement.GetType() == typeof(RolesAuthorizationRequirement))
                     {
-                        context.Fail();
+                        context.Fail(new AuthorizationFailureReason(this, "Cannot satisfy role requirements"));
                     }
                     else
                     {
