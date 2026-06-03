@@ -75,6 +75,19 @@ public static class ServiceCollectionExtension
     /// </summary>
     public static IServiceCollection AddErabliereApiControllers(this IServiceCollection services, IConfiguration config)
     {
+        // Register and configure Problem Details
+        services.AddProblemDetails(options =>
+        {
+            options.CustomizeProblemDetails = context =>
+            {
+                // Remove traceId from the dictionary extensions
+                if (context.ProblemDetails.Extensions.ContainsKey("traceId"))
+                {
+                    context.ProblemDetails.Extensions.Remove("traceId");
+                }
+            };
+        });
+
         services.AddControllers(o =>
         {
             if (string.Equals(config["MiniProfiler.Enable"], TrueString, OrdinalIgnoreCase))

@@ -192,6 +192,9 @@ public class Startup
 
         app.UseErabliereAPIForwardedHeadersRules(logger, Configuration);
 
+        app.UseStatusCodePages(); // Formats status code errors as ProblemDetails
+        app.UseExceptionHandler(); // Formats unhandled exceptions as ProblemDetails
+
         if (Configuration.IsIpInfoEnabled())
         {
             app.UseMiddleware<IpInfoMiddleware>();
