@@ -6,10 +6,12 @@ using ErabliereApi.Services;
 using ErabliereApi.Services.Emails;
 using ErabliereApi.Services.IpInfo;
 using ErabliereApi.Services.SMS;
+using ErabliereApi.Validators;
 using MailKit;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -75,6 +77,12 @@ public static class ServiceCollectionExtension
     /// </summary>
     public static IServiceCollection AddErabliereApiControllers(this IServiceCollection services, IConfiguration config)
     {
+        // OData validator
+        services.AddSingleton<IODataQueryValidator, CustomODataQueryValidator>();
+
+        // Register the custom handler and core problem details services
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+
         // Register and configure Problem Details
         services.AddProblemDetails(options =>
         {

@@ -72,21 +72,10 @@ public class ImagesCapteurController : ControllerBase
             route += $"&search={search}";
         }
 
-        try
-        {
-            var response = await client.GetAsync(route, token);
+        var response = await client.GetAsync(route, token);
 
-            var obj = await response.Content.ReadFromJsonAsync<List<GetImageInfo>>(token);
+        var obj = await response.Content.ReadFromJsonAsync<List<GetImageInfo>>(token);
 
-            return Ok(obj);
-        }
-        catch (HttpRequestException e) 
-        {
-            return StatusCode((int)(e.StatusCode ?? HttpStatusCode.InternalServerError), e.Message);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        return Ok(obj);
     }
 }

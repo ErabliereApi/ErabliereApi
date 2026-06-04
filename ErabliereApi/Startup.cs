@@ -193,7 +193,10 @@ public class Startup
         app.UseErabliereAPIForwardedHeadersRules(logger, Configuration);
 
         app.UseStatusCodePages(); // Formats status code errors as ProblemDetails
-        app.UseExceptionHandler(); // Formats unhandled exceptions as ProblemDetails
+        app.UseExceptionHandler(new ExceptionHandlerOptions
+        {
+            SuppressDiagnosticsCallback = context => false
+        }); // Formats unhandled exceptions as ProblemDetails
 
         if (Configuration.IsIpInfoEnabled())
         {
@@ -281,7 +284,7 @@ public class Startup
 
         app.UseSpa(spa =>
         {
-
+            
         });
     }
 }
