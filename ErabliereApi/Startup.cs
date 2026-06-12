@@ -51,6 +51,17 @@ public class Startup
             AddErabliereAPIAuthentication(Configuration).
             AjouterSwagger(Configuration);
 
+        // Hsts
+        if (string.Equals(Configuration["USE_HSTS"], TrueString, InvariantCultureIgnoreCase))
+        {
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365); // Sets 1 year
+            });
+        }
+
         // Cors
         if (string.Equals(Configuration["USE_CORS"], TrueString, OrdinalIgnoreCase))
         {
