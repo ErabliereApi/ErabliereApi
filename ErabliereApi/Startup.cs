@@ -396,7 +396,7 @@ public class Startup
         // - 'self': Connexions à votre propre domaine (APIs).
         // - wss://your-websocket-domain.com: Exemple pour les connexions WebSocket.
         // - https://api.your-backend.com: Exemple pour une API backend distincte.
-        "connect-src 'self'",
+        "connect-src 'self' https://api.mapbox.com",
 
         // frame-src: Sources autorisées pour l'intégration de contenu dans des iframes.
         // - 'none': Désactive l'intégration de contenu dans des iframes.
@@ -416,6 +416,9 @@ public class Startup
         // frame-ancestors: Empêche le clickjacking en interdisant l'intégration de votre page dans des iframes/frames.
         // - 'none': Interdit toute intégration.
         "frame-ancestors 'none'",
+
+        // worker-src
+        "worker-src 'self' blob:"
 
         // report-uri / report-to: Pour le reporting des violations CSP.
         // - /csp-report: Envoyez les rapports de violation à ce point de terminaison sur votre serveur.
