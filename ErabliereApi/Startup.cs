@@ -212,6 +212,7 @@ public class Startup
         if (string.Equals(Configuration["USE_HSTS"], TrueString, InvariantCultureIgnoreCase))
         {
             app.UseHsts();
+            app.UseHttpsRedirection();
         }
 
         if (Configuration.IsIpInfoEnabled())
