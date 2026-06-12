@@ -355,7 +355,10 @@ public class Startup
 
                 context.Response.Headers.Append("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=()");
 
-                context.Response.Headers.Append("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+                if (!string.IsNullOrWhiteSpace(Configuration["Cross-Origin-Opener-Policy"]))
+                {
+                    context.Response.Headers.Append("Cross-Origin-Opener-Policy", Configuration["Cross-Origin-Opener-Policy"]);
+                }
 
                 context.Response.Headers.Append("Cross-Origin-Resource-Policy", "cross-origin");
             }
