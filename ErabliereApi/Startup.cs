@@ -327,37 +327,40 @@ public class Startup
     private Func<Task> GenerateOnStaticFileResponseStartFunc(HttpContext context)
     {
         return () =>
-                {
-                    // WARNINGS & BEST PRACTICES:
-                    // - 'unsafe-inline' et 'unsafe-eval' doivent être ÉVITÉS en production
-                    //   sauf si absolument nécessaire. Ils réduisent considérablement l'efficacité de CSP.
-                    // - Préférez 'nonce' pour les scripts/styles inline (nécessite le rendu côté serveur de l'attribut nonce).
-                    // - Utilisez une politique CSP stricte qui n'autorise que les sources nécessaires.
-                    // - Revoyez et mettez à jour régulièrement votre CSP à mesure que votre application évolue.
-                    // - Utilisez 'Content-Security-Policy-Report-Only' en développement/test
-                    //   pour observer les violations sans bloquer le contenu.
+        {
+            if (string.Equals(Configuration["USE_SECURITY_HEADERS"]?.Trim(), TrueString, InvariantCultureIgnoreCase))
+            {
+                // WARNINGS & BEST PRACTICES:
+                // - 'unsafe-inline' et 'unsafe-eval' doivent être ÉVITÉS en production
+                //   sauf si absolument nécessaire. Ils réduisent considérablement l'efficacité de CSP.
+                // - Préférez 'nonce' pour les scripts/styles inline (nécessite le rendu côté serveur de l'attribut nonce).
+                // - Utilisez une politique CSP stricte qui n'autorise que les sources nécessaires.
+                // - Revoyez et mettez à jour régulièrement votre CSP à mesure que votre application évolue.
+                // - Utilisez 'Content-Security-Policy-Report-Only' en développement/test
+                //   pour observer les violations sans bloquer le contenu.
 
-                    // 1. Générez un nonce unique pour les scripts/styles inline pour cette requête (FORTEMENT recommandé pour la sécurité)
-                    //    Ceci nécessite que votre code côté client ou votre moteur de template insère le même nonce dans les balises <script> et <style> inline.
-                    //    Si votre SPA ne génère pas de HTML côté serveur avec des nonces, vous devrez peut-être temporairement utiliser 'unsafe-inline' (à éviter).
-                    // string nonce = Guid.NewGuid().ToString("N");
-                    // context.Items["ScriptNonce"] = nonce; // Stockez-le pour une utilisation ultérieure dans les vues si vous rendez du HTML côté serveur.
+                // 1. Générez un nonce unique pour les scripts/styles inline pour cette requête (FORTEMENT recommandé pour la sécurité)
+                //    Ceci nécessite que votre code côté client ou votre moteur de template insère le même nonce dans les balises <script> et <style> inline.
+                //    Si votre SPA ne génère pas de HTML côté serveur avec des nonces, vous devrez peut-être temporairement utiliser 'unsafe-inline' (à éviter).
+                // string nonce = Guid.NewGuid().ToString("N");
+                // context.Items["ScriptNonce"] = nonce; // Stockez-le pour une utilisation ultérieure dans les vues si vous rendez du HTML côté serveur.
 
-                    // 2. Ajoutez l'en-tête CSP à la réponse
-                    context.Response.Headers.Append("Content-Security-Policy", cspHeaderValue);
-                    // Pour les tests, utilisez "Content-Security-Policy-Report-Only" pour que les violations soient rapportées
-                    // mais pas bloquées (utile en développement pour affiner la politique).
-                    // context.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeaderValue);
+                // 2. Ajoutez l'en-tête CSP à la réponse
+                context.Response.Headers.Append("Content-Security-Policy", cspHeaderValue);
+                // Pour les tests, utilisez "Content-Security-Policy-Report-Only" pour que les violations soient rapportées
+                // mais pas bloquées (utile en développement pour affiner la politique).
+                // context.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeaderValue);
 
 
-                    context.Response.Headers.Append("X-Frame-Options", "DENY");
+                context.Response.Headers.Append("X-Frame-Options", "DENY");
 
-                    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
 
-                    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+                context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+            }
 
-                    return Task.CompletedTask;
-                };
+            return Task.CompletedTask;
+        };
     }
 
     private static List<string> cspPolicy = new List<string>
@@ -378,12 +381,12 @@ public class Startup
         // - 'self': Styles de votre propre domaine.
         // - 'unsafe-inline': AUTORISE TOUS LES STYLES INLINE. À ÉVITER SI POSSIBLE.
         //   Mieux: Utilisez 'nonce-{random-value}' et appliquez l'attribut nonce à vos balises <style>.
-        $"style-src 'self' 'unsafe-inline https://api.mapbox.com", // Ajoutez votre nonce ici: 'nonce-{nonce}'
+        $"style-src 'self' 'unsafe-inline' https://api.mapbox.com", // Ajoutez votre nonce ici: 'nonce-{nonce}'
 
         // img-src: Sources autorisées pour les images.
         // - 'self': Images de votre propre domaine.
         // - data:: Autorise les URIs de données (ex: images encodées en base64).
-        "img-src 'self'",
+        "img-src 'self' data:",
 
         // font-src: Sources autorisées pour les polices.
         // - 'self': Polices de votre propre domaine.
