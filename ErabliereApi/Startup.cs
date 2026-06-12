@@ -105,7 +105,7 @@ public class Startup
                 o.WebhookSecret = Configuration["Stripe.WebhookSecret"];
                 o.WebhookSiginSecret = Configuration["Stripe.WebhookSiginSecret"];
                 o.TimeSpanSendUsage = TimeSpan.FromSeconds(Convert.ToDouble(Configuration["StripeUsageReccord.TimeSpanSendUsageInSeconds"] ?? "300"));
-                o.ThrowOnApiMissMatch = 
+                o.ThrowOnApiMissMatch =
                     Convert.ToBoolean(Configuration["Stripe.ThrowOnApiMissMatch"] ?? "true");
             });
 
@@ -282,9 +282,103 @@ public class Startup
 
         app.UtiliserSwagger(Configuration);
 
+        if (string.Equals(Configuration["USE_SECURITY_HEADERS"]?.Trim(), TrueString, InvariantCultureIgnoreCase))
+        {
+            app.Use(async (context, next) =>
+            {
+                // WARNINGS & BEST PRACTICES:
+                // - 'unsafe-inline' et 'unsafe-eval' doivent être ÉVITÉS en production
+                //   sauf si absolument nécessaire. Ils réduisent considérablement l'efficacité de CSP.
+                // - Préférez 'nonce' pour les scripts/styles inline (nécessite le rendu côté serveur de l'attribut nonce).
+                // - Utilisez une politique CSP stricte qui n'autorise que les sources nécessaires.
+                // - Revoyez et mettez à jour régulièrement votre CSP à mesure que votre application évolue.
+                // - Utilisez 'Content-Security-Policy-Report-Only' en développement/test
+                //   pour observer les violations sans bloquer le contenu.
+
+                // 1. Générez un nonce unique pour les scripts/styles inline pour cette requête (FORTEMENT recommandé pour la sécurité)
+                //    Ceci nécessite que votre code côté client ou votre moteur de template insère le même nonce dans les balises <script> et <style> inline.
+                //    Si votre SPA ne génère pas de HTML côté serveur avec des nonces, vous devrez peut-être temporairement utiliser 'unsafe-inline' (à éviter).
+                // string nonce = Guid.NewGuid().ToString("N");
+                // context.Items["ScriptNonce"] = nonce; // Stockez-le pour une utilisation ultérieure dans les vues si vous rendez du HTML côté serveur.
+
+                // 2. Ajoutez l'en-tête CSP à la réponse
+                context.Response.Headers.Append("Content-Security-Policy", cspHeaderValue);
+                // Pour les tests, utilisez "Content-Security-Policy-Report-Only" pour que les violations soient rapportées
+                // mais pas bloquées (utile en développement pour affiner la politique).
+                // context.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeaderValue);
+
+                // 3. Continuez le pipeline de requêtes
+                await next();
+            });
+        }
+
         app.UseSpa(spa =>
         {
-            
+
         });
     }
+
+    private static List<string> cspPolicy = new List<string>
+    {
+        // default-src: Politique par défaut pour la récupération de ressources (si non spécifié ailleurs).
+        // 'self' signifie que seules les ressources de la même origine sont autorisées.
+        "default-src 'self'",
+
+        // script-src: Sources autorisées pour les scripts JavaScript.
+        // - 'self': Scripts de votre propre domaine.
+        // - 'unsafe-inline': AUTORISE TOUS LES SCRIPTS INLINE. À ÉVITER SI POSSIBLE.
+        //   Mieux: Utilisez 'nonce-{random-value}' et appliquez l'attribut nonce à vos balises <script>.
+        // - 'unsafe-eval': AUTORISE JS EVAL() ET SIMILAIRES. À ÉVITER SI POSSIBLE.
+        //   Souvent nécessaire pour certains frameworks (ex: anciennes versions d'Angular, React DevTools).
+        $"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com", // Ajoutez votre nonce ici: 'nonce-{nonce}'
+
+        // style-src: Sources autorisées pour les feuilles de style.
+        // - 'self': Styles de votre propre domaine.
+        // - 'unsafe-inline': AUTORISE TOUS LES STYLES INLINE. À ÉVITER SI POSSIBLE.
+        //   Mieux: Utilisez 'nonce-{random-value}' et appliquez l'attribut nonce à vos balises <style>.
+        $"style-src 'self' 'unsafe-inline https://api.mapbox.com", // Ajoutez votre nonce ici: 'nonce-{nonce}'
+
+        // img-src: Sources autorisées pour les images.
+        // - 'self': Images de votre propre domaine.
+        // - data:: Autorise les URIs de données (ex: images encodées en base64).
+        "img-src 'self'",
+
+        // font-src: Sources autorisées pour les polices.
+        // - 'self': Polices de votre propre domaine.
+        "font-src 'self'",
+
+        // connect-src: Sources autorisées pour les requêtes (XHR, WebSockets, EventSource).
+        // - 'self': Connexions à votre propre domaine (APIs).
+        // - wss://your-websocket-domain.com: Exemple pour les connexions WebSocket.
+        // - https://api.your-backend.com: Exemple pour une API backend distincte.
+        "connect-src 'self'",
+
+        // frame-src: Sources autorisées pour l'intégration de contenu dans des iframes.
+        // - 'none': Désactive l'intégration de contenu dans des iframes.
+        //   Si vous avez besoin d'iframes (ex: YouTube), listez les sources spécifiques (ex: https://www.youtube.com).
+        "frame-src 'none'",
+
+        // object-src: Sources autorisées pour les éléments <object>, <embed>, <applet> (Flash, Java applets).
+        // - 'none': Généralement non nécessaire pour les applications web modernes.
+        "object-src 'none'",
+
+        // base-uri: Spécifie les URLs possibles pour l'élément <base>.
+        "base-uri 'self'",
+
+        // form-action: Restreint les URLs qui peuvent être utilisées comme cible d'une soumission de formulaire.
+        "form-action 'self'",
+
+        // frame-ancestors: Empêche le clickjacking en interdisant l'intégration de votre page dans des iframes/frames.
+        // - 'none': Interdit toute intégration.
+        "frame-ancestors 'none'",
+
+        // report-uri / report-to: Pour le reporting des violations CSP.
+        // - /csp-report: Envoyez les rapports de violation à ce point de terminaison sur votre serveur.
+        //                Nécessite un gestionnaire côté serveur pour traiter ces rapports (ex: Serilog.Sinks.HttpCollector).
+        // - 'report-to' est la norme plus récente et plus flexible, mais nécessite un en-tête Report-To séparé.
+        // "report-uri /csp-report",
+        // "report-to default" // Si vous définissez également un en-tête Report-To
+    };
+
+    private static string cspHeaderValue = string.Join("; ", cspPolicy);
 }
