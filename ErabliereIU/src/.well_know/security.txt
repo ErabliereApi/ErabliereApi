@@ -1,0 +1,10 @@
+# security.txt pour ErabliereApi
+# Spécification : https://securitytxt.org/
+
+Contact: mailto:erabliereapi@freddycoder.com
+Contact: https://erabliereapi.com/apropos
+Acknowledgments: https://erabliereapi.freddycoder.com/termesandcondition
+Policy: https://erabliereapi.freddycoder.com/termesandcondition
+Preferred-Languages: fr, en
+Canonical: https://erabliereapi.com/.well-known/security.txt
+Expires: 2027-12-31T23:59:59Z
