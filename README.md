@@ -5,7 +5,7 @@ L'application est accessible à l'url: https://erabliereapi.freddycoder.com/ une
 
 Un démo est accessible à l'url: https://erabliereapi-demo.azurewebsites.net/ qui ne nécessite pas d'authentification.
 
-Page de présentation: https://erabliereapi.webflow.io/
+Page de présentation: https://maple-whispers-ai.lovable.app
 
 ## But
 Le but de ce projet est d'analyser, lever des alertes et automatiser certain mecanisme. Basé sur les données receuillis et de façon centralisé.

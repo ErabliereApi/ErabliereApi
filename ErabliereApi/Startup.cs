@@ -198,6 +198,11 @@ public class Startup
             SuppressDiagnosticsCallback = context => false
         }); // Formats unhandled exceptions as ProblemDetails
 
+        if (string.Equals(Configuration["USE_HSTS"], TrueString, InvariantCultureIgnoreCase))
+        {
+            app.UseHsts();
+        }
+
         if (Configuration.IsIpInfoEnabled())
         {
             app.UseMiddleware<IpInfoMiddleware>();
@@ -280,8 +285,6 @@ public class Startup
             });
         });
 
-        app.UtiliserSwagger(Configuration);
-
         if (string.Equals(Configuration["USE_SECURITY_HEADERS"]?.Trim(), TrueString, InvariantCultureIgnoreCase))
         {
             app.Use(async (context, next) =>
@@ -307,7 +310,25 @@ public class Startup
                 // mais pas bloquées (utile en développement pour affiner la politique).
                 // context.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeaderValue);
 
-                // 3. Continuez le pipeline de requêtes
+
+                context.Response.Headers.Append("X-Frame-Options", "DENY");
+
+                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+
+                context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+
+                await next();
+            });
+        }
+
+        app.UtiliserSwagger(Configuration);
+
+        if (string.Equals(Configuration["USE_CONTENT_TYPE_FOR_SPA"], TrueString, InvariantCultureIgnoreCase))
+        {
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Append("Content-Type", "text/html; charset=UTF-8");
+
                 await next();
             });
         }
