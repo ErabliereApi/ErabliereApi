@@ -396,7 +396,7 @@ public class Startup
         // - 'self': Connexions à votre propre domaine (APIs).
         // - wss://your-websocket-domain.com: Exemple pour les connexions WebSocket.
         // - https://api.your-backend.com: Exemple pour une API backend distincte.
-        "connect-src 'self' https://api.mapbox.com",
+        "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
 
         // frame-src: Sources autorisées pour l'intégration de contenu dans des iframes.
         // - 'none': Désactive l'intégration de contenu dans des iframes.
