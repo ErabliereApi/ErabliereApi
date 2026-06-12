@@ -386,67 +386,18 @@ public class Startup
 
     private static List<string> cspPolicy = new List<string>
     {
-        // default-src: Politique par défaut pour la récupération de ressources (si non spécifié ailleurs).
-        // 'self' signifie que seules les ressources de la même origine sont autorisées.
         "default-src 'self'",
-
-        // script-src: Sources autorisées pour les scripts JavaScript.
-        // - 'self': Scripts de votre propre domaine.
-        // - 'unsafe-inline': AUTORISE TOUS LES SCRIPTS INLINE. À ÉVITER SI POSSIBLE.
-        //   Mieux: Utilisez 'nonce-{random-value}' et appliquez l'attribut nonce à vos balises <script>.
-        // - 'unsafe-eval': AUTORISE JS EVAL() ET SIMILAIRES. À ÉVITER SI POSSIBLE.
-        //   Souvent nécessaire pour certains frameworks (ex: anciennes versions d'Angular, React DevTools).
-        $"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com", // Ajoutez votre nonce ici: 'nonce-{nonce}'
-
-        // style-src: Sources autorisées pour les feuilles de style.
-        // - 'self': Styles de votre propre domaine.
-        // - 'unsafe-inline': AUTORISE TOUS LES STYLES INLINE. À ÉVITER SI POSSIBLE.
-        //   Mieux: Utilisez 'nonce-{random-value}' et appliquez l'attribut nonce à vos balises <style>.
-        $"style-src 'self' 'unsafe-inline' https://api.mapbox.com", // Ajoutez votre nonce ici: 'nonce-{nonce}'
-
-        // img-src: Sources autorisées pour les images.
-        // - 'self': Images de votre propre domaine.
-        // - data:: Autorise les URIs de données (ex: images encodées en base64).
+        $"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com",
+        $"style-src 'self' 'unsafe-inline' https://api.mapbox.com",
         "img-src 'self' data:",
-
-        // font-src: Sources autorisées pour les polices.
-        // - 'self': Polices de votre propre domaine.
         "font-src 'self'",
-
-        // connect-src: Sources autorisées pour les requêtes (XHR, WebSockets, EventSource).
-        // - 'self': Connexions à votre propre domaine (APIs).
-        // - wss://your-websocket-domain.com: Exemple pour les connexions WebSocket.
-        // - https://api.your-backend.com: Exemple pour une API backend distincte.
         "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://login.microsoftonline.com",
-
-        // frame-src: Sources autorisées pour l'intégration de contenu dans des iframes.
-        // - 'none': Désactive l'intégration de contenu dans des iframes.
-        //   Si vous avez besoin d'iframes (ex: YouTube), listez les sources spécifiques (ex: https://www.youtube.com).
         "frame-src 'none' https://login.microsoftonline.com",
-
-        // object-src: Sources autorisées pour les éléments <object>, <embed>, <applet> (Flash, Java applets).
-        // - 'none': Généralement non nécessaire pour les applications web modernes.
         "object-src 'none'",
-
-        // base-uri: Spécifie les URLs possibles pour l'élément <base>.
         "base-uri 'self'",
-
-        // form-action: Restreint les URLs qui peuvent être utilisées comme cible d'une soumission de formulaire.
         "form-action 'self' https://login.microsoftonline.com",
-
-        // frame-ancestors: Empêche le clickjacking en interdisant l'intégration de votre page dans des iframes/frames.
-        // - 'none': Interdit toute intégration.
-        "frame-ancestors 'none' https://login.microsoftonline.com",
-
-        // worker-src
+        "frame-ancestors 'self' https://login.microsoftonline.com",
         "worker-src 'self' blob:"
-
-        // report-uri / report-to: Pour le reporting des violations CSP.
-        // - /csp-report: Envoyez les rapports de violation à ce point de terminaison sur votre serveur.
-        //                Nécessite un gestionnaire côté serveur pour traiter ces rapports (ex: Serilog.Sinks.HttpCollector).
-        // - 'report-to' est la norme plus récente et plus flexible, mais nécessite un en-tête Report-To séparé.
-        // "report-uri /csp-report",
-        // "report-to default" // Si vous définissez également un en-tête Report-To
     };
 
     private static string cspHeaderValue = string.Join("; ", cspPolicy);
