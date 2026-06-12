@@ -417,12 +417,12 @@ public class Startup
         // - 'self': Connexions à votre propre domaine (APIs).
         // - wss://your-websocket-domain.com: Exemple pour les connexions WebSocket.
         // - https://api.your-backend.com: Exemple pour une API backend distincte.
-        "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
+        "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://login.microsoftonline.com",
 
         // frame-src: Sources autorisées pour l'intégration de contenu dans des iframes.
         // - 'none': Désactive l'intégration de contenu dans des iframes.
         //   Si vous avez besoin d'iframes (ex: YouTube), listez les sources spécifiques (ex: https://www.youtube.com).
-        "frame-src 'none'",
+        "frame-src 'none' https://login.microsoftonline.com",
 
         // object-src: Sources autorisées pour les éléments <object>, <embed>, <applet> (Flash, Java applets).
         // - 'none': Généralement non nécessaire pour les applications web modernes.
@@ -432,11 +432,11 @@ public class Startup
         "base-uri 'self'",
 
         // form-action: Restreint les URLs qui peuvent être utilisées comme cible d'une soumission de formulaire.
-        "form-action 'self'",
+        "form-action 'self' https://login.microsoftonline.com",
 
         // frame-ancestors: Empêche le clickjacking en interdisant l'intégration de votre page dans des iframes/frames.
         // - 'none': Interdit toute intégration.
-        "frame-ancestors 'none'",
+        "frame-ancestors 'none' https://login.microsoftonline.com",
 
         // worker-src
         "worker-src 'self' blob:"
