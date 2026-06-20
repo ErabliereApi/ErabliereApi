@@ -252,7 +252,7 @@ public static class LoRaWANPacketDecoder
                             });
                             break;
                         default:
-                            message = $"Mesurement {mesurment} it unknow in {Convert.ToBase64String(b).Sanatize()}";
+                            message = $"Mesurement {mesurment} it unknow in {Convert.ToBase64String(b)}".Sanatize();
                             value = BitConverter.ToInt32(b, i);
                             i += 4;
                             logger?.LogWarning(message);
