@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Capteur } from 'src/model/capteur';
 import { Erabliere } from 'src/model/erabliere';
@@ -15,7 +15,8 @@ import { Horaire } from 'src/model/horaire';
 @Component({
     selector: 'capteur-panels',
     templateUrl: './capteur-panels.component.html',
-    imports: [GraphPanelComponent, TablePanelComponent, RapportPanelComponent, NgClass, HoraireTableComponent]
+    imports: [GraphPanelComponent, TablePanelComponent, RapportPanelComponent, NgClass, HoraireTableComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class CapteurPanelsComponent implements OnInit, OnChanges {
     @Input() capteurs?: Capteur[] = []

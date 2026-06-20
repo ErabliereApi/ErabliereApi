@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { MessageListComponent } from '../messageList/message-list.component';
@@ -19,6 +19,7 @@ import { Conversation } from 'src/model/conversation';
             </div>
         </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MessageListComponent],
 })
 export class ErabliereAiPublicConversationComponent implements OnInit {

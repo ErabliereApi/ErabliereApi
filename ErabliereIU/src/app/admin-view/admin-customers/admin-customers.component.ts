@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CustomerListComponent } from "./customer-list/customer-list.component";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Customer } from "src/model/customer";
@@ -7,6 +7,7 @@ import { PaginationComponent } from 'src/generic/pagination/pagination.component
 
 @Component({
   selector: 'admin-customers',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CustomerListComponent,
     ModifierCustomerComponent,

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
@@ -10,7 +10,8 @@ import { ModifierErabliereComponent } from 'src/app/client-view/erablieres/modif
 @Component({
     selector: 'erablieres-side-bar',
     templateUrl: 'erablieres-side-bar.component.html',
-    imports: [AjouterErabliereComponent, ModifierErabliereComponent]
+    imports: [AjouterErabliereComponent, ModifierErabliereComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ErabliereSideBarComponent implements OnInit {
   private readonly _authService: IAuthorisationSerivce

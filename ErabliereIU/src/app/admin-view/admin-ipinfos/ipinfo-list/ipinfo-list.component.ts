@@ -1,11 +1,12 @@
 import { DatePipe } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { IpInfo } from "src/model/ipinfo";
 import { EButtonComponent } from "src/generic/ebutton.component";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 
 @Component({
     selector: 'app-ipinfo-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './ipinfo-list.component.html',
     imports: [
         DatePipe,

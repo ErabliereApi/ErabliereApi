@@ -20,7 +20,7 @@
     <div class="form-group mb-3">
       <span class="form-label">Termes et conditions d'utilisation:</span><br />
       @if (customer?.acceptTermsAt) {
-      <span class="text-success">Accepté le {{ customer?.acceptTermsAt }}</span>
+      <span class="text-success">Accepté le {{ customer.acceptTermsAt }}</span>
       } @else {
       <div class="btn-group">
         <button type="button" class="btn btn-info" (click)="acceptTerms(customer?.uniqueName)" [title]="'Accepter les termes et conditions d\'utilisation pour ' + customer?.id" >

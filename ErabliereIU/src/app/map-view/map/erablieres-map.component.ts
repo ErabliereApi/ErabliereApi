@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { FormsModule } from '@angular/forms';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
@@ -11,6 +11,7 @@ import { EnvironmentService } from 'src/environments/environment.service';
     imports: [
         FormsModule
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [
         `.match-parent {
             width: 100%;
@@ -30,7 +31,7 @@ export class ErablieresMapComponent implements OnInit {
 
     private readonly _authService: IAuthorisationSerivce
 
-    constructor(authFactoryService: AuthorisationFactoryService, private readonly _api: ErabliereApi, private readonly _env: EnvironmentService) { 
+    constructor(authFactoryService: AuthorisationFactoryService, private readonly _api: ErabliereApi, private readonly _env: EnvironmentService) {
         this._authService = authFactoryService.getAuthorisationService();
 
         this._authService.loginChanged.subscribe(isLoggedIn => {
@@ -78,9 +79,9 @@ export class ErablieresMapComponent implements OnInit {
 
         try {
             erabliereGeoJson = await this._api.getErablieresGeoJson(
-                this.publicFilter == "yes", 
-                this.myErablieresFilter == "yes", 
-                this.sensorFilter, 
+                this.publicFilter == "yes",
+                this.myErablieresFilter == "yes",
+                this.sensorFilter,
                 this.maxSensors);
 
             this.error = undefined;
@@ -91,9 +92,9 @@ export class ErablieresMapComponent implements OnInit {
             console.error("Error while fetching erablieres", e);
             this.nombreElements = 0;
         }
-        
+
         this.loadingInProgress = false;
-        
+
         this.duration = Date.now() - dur;
 
         this.duration = this.duration / 1000;

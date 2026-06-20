@@ -1,5 +1,5 @@
 
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Subject } from "rxjs";
 import { ErabliereApi } from "src/core/erabliereapi.service";
@@ -10,9 +10,10 @@ import { ErabliereApiDocument } from "src/model/erabliereApiDocument";
     selector: 'modifier-documentation',
     templateUrl: 'modifier-documentation.component.html',
     imports: [
-    ReactiveFormsModule,
-    InputErrorComponent
-]
+        ReactiveFormsModule,
+        InputErrorComponent
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ModifierDocumentationComponent implements OnInit {
     constructor(private readonly _api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
@@ -28,8 +29,11 @@ export class ModifierDocumentationComponent implements OnInit {
     errorObj: any;
 
     ngOnInit() {
-        this.documentationSubject?.subscribe(async (doc) => {
-            if (doc != undefined) {
+        this.documentationSubject?.subscribe(doc => {
+            if (doc == undefined) {
+                this.display = false;
+            }
+            else {
                 this.display = true;
                 this.documentForm = this.fb.group({
                     id: doc.id,
@@ -38,17 +42,14 @@ export class ModifierDocumentationComponent implements OnInit {
                     text: doc.text
                 });
             }
-            else {
-                this.display = false;
-            }
         });
-    
+
     }
 
     onButtonAnnulerClick() {
         this.documentationSubject?.next(undefined);
     }
-        
+
     onButtonModifierClick() {
         const putDocument = {
             id: this.documentForm.controls['id'].value,

@@ -1,8 +1,9 @@
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
     selector: 'tunnel-keys-table',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './tunnel-keys-table.component.html',
     imports: []
 })

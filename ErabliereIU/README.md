@@ -8,6 +8,8 @@ Projet contenant le projet d'interface graphique de ErabliereAPI.
 
 Il faut avoir node js d'installé sur votre poste. https://nodejs.org
 
+> En date du 20 juin 2026, il faut utiliser la version de nodejs 26 pour la compatibilité avec angular 22.
+
 Le cli angular doit aussi être installé.
 
 ```

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { GenericFormComponent } from 'src/generic/forms/generic-form.component';
 import { ApiKey } from 'src/model/apikey';
@@ -6,6 +6,7 @@ import { FormFieldConfig } from 'src/model/form-field-config';
 
 @Component({
     selector: 'api-key-edit-name-compoent',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true,
     templateUrl: './api-key-edit-name.component.html',
     imports: [GenericFormComponent]

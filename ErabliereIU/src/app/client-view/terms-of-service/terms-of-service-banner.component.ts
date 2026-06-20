@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
@@ -6,6 +6,7 @@ import { ErabliereApi } from 'src/core/erabliereapi.service';
 @Component({
   selector: 'terms-of-service-banner',
   templateUrl: './terms-of-service-banner.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class TermsOfServiceBannerComponent implements OnInit {
   hasAcceptTerms: boolean = true;

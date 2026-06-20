@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { AuthorisationFactoryService } from "src/core/authorisation/authorisation-factory-service";
 import { IAuthorisationSerivce } from "src/core/authorisation/iauthorisation-service";
 import { AppUser } from "src/model/appuser";
@@ -21,6 +21,7 @@ import {
 @Component({
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CopyTextButtonComponent, 
         CurrencyPipe,

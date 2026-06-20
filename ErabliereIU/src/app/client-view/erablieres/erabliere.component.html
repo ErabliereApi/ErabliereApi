@@ -8,12 +8,12 @@
             }
             @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoHeure) {
             <hourly-weather-forecast class="col-md-6" style="max-height: 250px; overflow-y: auto; overflow-x: auto;"
-                [displayAccueatherLogo]="!erabliere?.afficherPredictionMeteoJour"
+                [displayAccueatherLogo]="!erabliere.afficherPredictionMeteoJour"
                 [provider]="weatherProvider">
             </hourly-weather-forecast>
             }
             @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoJour &&
-            erabliere?.afficherPredictionMeteoHeure && weatherProvider == "AccuWeatherService") {
+            erabliere.afficherPredictionMeteoHeure && weatherProvider == "AccuWeatherService") {
             <div class="col-md-12 text-center">
                 <small class="text-muted">
                     Prévisions météos fournies par <a href="https://www.accuweather.com" target="_blank"><img
@@ -23,7 +23,7 @@
             </div>
             }
             @if (erabliere?.codePostal?.trim() && erabliere?.afficherPredictionMeteoJour &&
-            erabliere?.afficherPredictionMeteoHeure && weatherProvider == "GouvCAWeatherService") {
+            erabliere.afficherPredictionMeteoHeure && weatherProvider == "GouvCAWeatherService") {
             <div class="col-md-12 text-center">
                 <small class="text-muted">
                     Prévisions météos fournies par <a href="https://weather.gc.ca/" target="_blank"><img
@@ -54,7 +54,7 @@
         <capteur-panels [capteurs]="erabliere?.capteurs" [erabliere]="erabliere"></capteur-panels>
         }
         @if (erabliere?.afficherSectionBaril) {
-        <barils-panel [erabliereId]="erabliere?.id"></barils-panel>
+        <barils-panel [erabliereId]="erabliere.id"></barils-panel>
         }
     </div>
     <div class="col-md-2 order-1 order-md-2 py-2">

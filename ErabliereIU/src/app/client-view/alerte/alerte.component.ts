@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { Observable, Subject } from "rxjs";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Alerte } from "src/model/alerte";
@@ -12,6 +12,7 @@ import { AlerteDestinatairesComponent } from "./alerte-destinataires.component";
 
 @Component({
   selector: 'alerte-page',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './alerte.component.html',
   imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent, AlerteDestinatairesComponent]
 })

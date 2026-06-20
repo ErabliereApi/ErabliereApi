@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CustomerAccess } from "src/model/customerAccess";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { ViewCustomerAccessRowComponent } from "./view-customer-access-row/view-customer-access-row.component";
@@ -7,6 +7,7 @@ import { AddCustomerAccessRowComponent } from "./add-customer-access-row/add-cus
 
 @Component({
     selector: 'admin-customer-access-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ViewCustomerAccessRowComponent,
         EditCustomerAccessRowComponent,
@@ -15,7 +16,7 @@ import { AddCustomerAccessRowComponent } from "./add-customer-access-row/add-cus
     templateUrl: './customer-access-list.component.html',
     styleUrl: './customer-access-list.component.css'
 })
-export class AdminCustomerAccessListComponent {
+export class AdminCustomerAccessListComponent implements OnInit {
     @Input() idCustomer?: string;
 
     @Output() changementAcces: EventEmitter<CustomerAccess[]> = new EventEmitter();

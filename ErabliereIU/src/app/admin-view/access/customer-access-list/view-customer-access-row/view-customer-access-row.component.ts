@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CustomerAccess } from "src/model/customerAccess";
 
 @Component({
     selector: 'tr[view-customer-access-row]',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [],
     templateUrl: './view-customer-access-row.component.html'
 })

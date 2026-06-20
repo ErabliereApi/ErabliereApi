@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormFieldConfig } from '../../model/form-field-config';
 import { CommonModule, NgIf, NgSwitch } from '@angular/common';
@@ -10,6 +10,7 @@ import { EButtonComponent } from '../ebutton.component';
   templateUrl: './generic-form.component.html',
   styleUrls: ['./generic-form.component.css'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormsModule,
     NgSwitch,

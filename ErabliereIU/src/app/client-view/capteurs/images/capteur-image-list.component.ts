@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
 import {
     AbstractControl,
     FormArray,
@@ -15,6 +15,7 @@ import { CopyTextButtonComponent } from 'src/generic/copy-text-button.component'
 
 @Component({
     selector: 'app-capteur-image-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ReactiveFormsModule, CopyTextButtonComponent
     ],

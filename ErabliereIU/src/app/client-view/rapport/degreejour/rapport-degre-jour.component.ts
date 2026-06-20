@@ -1,5 +1,5 @@
 
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Capteur } from 'src/model/capteur';
@@ -15,7 +15,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
         FormsModule,
         ReactiveFormsModule,
         InputErrorComponent
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class RapportDegreJourComponent implements OnInit {
     form: PostDegresJoursRepportRequest = new PostDegresJoursRepportRequest();

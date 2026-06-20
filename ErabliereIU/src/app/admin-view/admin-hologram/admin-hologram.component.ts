@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { TunnelKeysTableComponent } from './tunnel-keys-table/tunnel-keys-table.component';
 
 @Component({
     selector: 'admin-hologram',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './admin-hologram.component.html',
     imports: [TunnelKeysTableComponent]
 })

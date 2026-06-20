@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { DonneesComponent } from 'src/app/client-view/donnees/donnees.component';
 import { BarilsComponent } from 'src/app/client-view/barils/barils.component';
@@ -16,6 +16,7 @@ import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-ser
 @Component({
   selector: 'erablieres',
   templateUrl: 'erabliere.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     DonneesComponent,
     CapteurPanelsComponent,
@@ -91,16 +92,16 @@ export class ErabliereComponent implements OnInit {
 
   getErabliere() {
     this._api.getErabliere(this.idErabliereSelectionee).then((erabliere) => {
-        this.erabliere = erabliere;
-        this.resetErabliere.next(erabliere);
-        this.displayCapteurs = !!this.erabliere.capteurs?.find(capteur => capteur.afficherCapteurDashboard) || !!this.erabliere.afficherSectionHoraire;
-      }).catch((error) => {
-        console.error('Error fetching erabliere:', error)
-        this.erabliere = undefined;
-        this.resetErabliere.next(new Erabliere());
-        this.displayCapteurs = false;
-        this.displayImages = false;
-      });
+      this.erabliere = erabliere;
+      this.resetErabliere.next(erabliere);
+      this.displayCapteurs = !!this.erabliere.capteurs?.find(capteur => capteur.afficherCapteurDashboard) || !!this.erabliere.afficherSectionHoraire;
+    }).catch((error) => {
+      console.error('Error fetching erabliere:', error)
+      this.erabliere = undefined;
+      this.resetErabliere.next(new Erabliere());
+      this.displayCapteurs = false;
+      this.displayImages = false;
+    });
   }
 
   getClassPanneauImage(arg0: Erabliere | undefined) {

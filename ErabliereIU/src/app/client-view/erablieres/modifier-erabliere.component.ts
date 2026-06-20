@@ -1,5 +1,5 @@
 // This a component that allows to add a new erabliere
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ErabliereFormComponent } from '../erablieres/erabliere-form.component'
 import { ErabliereAccessListComponent } from 'src/app/admin-view/access/erabliere-access-list/erabliere-access-list.component';
@@ -13,6 +13,7 @@ import { EButtonComponent } from 'src/generic/ebutton.component';
 @Component({
     selector: 'modifier-erabliere',
     templateUrl: './modifier-erabliere.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ErabliereFormComponent,
         ErabliereAccessListComponent,

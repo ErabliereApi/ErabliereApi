@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 
 @Component({
     selector: 'copy-id-button',
@@ -7,7 +7,8 @@ import { Component, Input } from "@angular/core";
                 (click)="copyText($event, text)" [title]="title">
         &#x2398;
         </button>
-    `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class CopyTextButtonComponent {
     @Input() text: string | undefined | null = '';

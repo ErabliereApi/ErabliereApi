@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Rapport } from 'src/model/rapport';
 
 @Component({
     selector: 'rapport-panel',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div class="card text-center">
             <div class="card-header">

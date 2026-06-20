@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 
 
 @Component({
     selector: 'app-ipinfo-map',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './ipinfo-map.component.html',
     styleUrls: ['./ipinfo-map.component.css']
 })

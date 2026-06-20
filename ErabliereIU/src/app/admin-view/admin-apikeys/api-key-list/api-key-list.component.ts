@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ApiKey } from 'src/model/apikey';
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 import { DatePipe } from '@angular/common';
@@ -6,6 +6,7 @@ import { EButtonComponent } from 'src/generic/ebutton.component';
 
 @Component({
     selector: 'api-key-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './api-key-list.component.html',
     standalone: true,
     imports: [CopyTextButtonComponent, DatePipe, EButtonComponent]

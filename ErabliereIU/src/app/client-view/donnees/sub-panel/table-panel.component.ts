@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { PanelHeaderComponent } from './header/panel-header.component';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { DonneeCapteur } from 'src/model/donneeCapteur';
@@ -7,6 +7,7 @@ import { AjouterDonneeCapteurComponent } from 'src/app/client-view/donneeCapteur
 
 @Component({
     selector: 'table-panel',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div id="graph-pannel-{{idCapteur}}" [className]="online == undefined || online ? '' : 'border-top border-danger'">
           <panel-header

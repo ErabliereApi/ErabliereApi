@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChange } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, SimpleChange } from '@angular/core';
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -7,7 +7,8 @@ import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
         <span>{{titre}}</span>
         <input class="form-control" type="date" [formControl]="dateControl"/>
     `,
-    imports: [ReactiveFormsModule]
+    imports: [ReactiveFormsModule],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DateTimeSelectorComponent implements OnInit {
     @Input() titre?: string;

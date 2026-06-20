@@ -1,5 +1,5 @@
 
-import { Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { MarkdownRendererComponent } from 'src/generic/eapi-markdown.component';
 import { Conversation, Message } from 'src/model/conversation';
 import { formatDistanceToNow } from 'date-fns';
@@ -10,6 +10,7 @@ import { marked } from 'marked';
 
 @Component({
     selector: 'erabliereai-message-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <ul class="list-unstyled text-white">
           @for (message of messages; track message; let i = $index) {

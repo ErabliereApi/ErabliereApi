@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, SimpleChanges, OnChanges, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Note } from 'src/model/note';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { RappelComponent } from './rappel.component';
@@ -13,7 +13,8 @@ import { Subject } from 'rxjs';
     RappelComponent,
     ModalRappelComponent
   ],
-  templateUrl: './rappels.component.html'
+  templateUrl: './rappels.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class RappelsComponent implements OnChanges, OnInit {
   @Input() idErabliereSelectionnee: any;

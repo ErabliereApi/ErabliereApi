@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 
 @Component({
     selector: 'app-pagination',
     imports: [],
-    templateUrl: './pagination.component.html'
+    templateUrl: './pagination.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class PaginationComponent implements OnChanges {
     @Input() nombreParPage: number = 1;

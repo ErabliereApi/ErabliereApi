@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { CustomerAccess } from 'src/model/customerAccess';
 import { ViewErabliereAccessRowComponent } from './view-erabliere-access-row/view-erabliere-access-row.component';
@@ -7,6 +7,7 @@ import { AddErabliereAccessRowComponent } from "./add-erabliere-access-row/add-e
 
 @Component({
     selector: 'erabliere-access-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './erabliere-access-list.component.html',
     styleUrl: 'erabliere-access-list.component.css',
     imports: [

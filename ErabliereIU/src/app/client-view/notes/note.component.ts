@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Note } from 'src/model/note';
 import { DatePipe } from '@angular/common';
@@ -12,7 +12,8 @@ import { MarkdownRendererComponent } from "src/generic/eapi-markdown.component";
 @Component({
     selector: 'note',
     templateUrl: 'note.component.html',
-    imports: [DatePipe, EButtonComponent, MarkdownRendererComponent]
+    imports: [DatePipe, EButtonComponent, MarkdownRendererComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 
 export class NoteComponent implements OnInit {

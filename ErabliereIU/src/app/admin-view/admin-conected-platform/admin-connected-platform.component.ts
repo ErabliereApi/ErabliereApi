@@ -1,8 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 
 @Component({
     selector: 'app-admin-connected-platform',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './admin-connected-platform.component.html'
 })
 export class AdminConnectedPlatformComponent implements OnInit {

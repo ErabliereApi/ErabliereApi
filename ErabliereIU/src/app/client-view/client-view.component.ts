@@ -1,8 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {ErabliereSideBarComponent} from "./erablieres-side-bar/erablieres-side-bar.component";
-import {NavigationEnd, Router, RouterOutlet} from "@angular/router";
-import {ClientNavBarComponent} from "./client-nav-bar/client-nav-bar.component";
-import {YouAreNotConnectedComponent} from "./you-are-not-connected/you-are-not-connected.component";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ErabliereSideBarComponent } from "./erablieres-side-bar/erablieres-side-bar.component";
+import { NavigationEnd, Router, RouterOutlet } from "@angular/router";
+import { ClientNavBarComponent } from "./client-nav-bar/client-nav-bar.component";
+import { YouAreNotConnectedComponent } from "./you-are-not-connected/you-are-not-connected.component";
 import { TermsOfServiceBannerComponent } from './terms-of-service/terms-of-service-banner.component';
 
 @Component({
@@ -14,7 +14,8 @@ import { TermsOfServiceBannerComponent } from './terms-of-service/terms-of-servi
         YouAreNotConnectedComponent,
         TermsOfServiceBannerComponent
     ],
-    templateUrl: './client-view.component.html'
+    templateUrl: './client-view.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ClientViewComponent implements OnInit {
     private readonly _pagesSansMenu = ["apropos", "profile", "termesandcondition"];

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { Documentation } from 'src/model/documentation';
@@ -20,7 +20,8 @@ import { MarkdownRendererComponent } from 'src/generic/eapi-markdown.component';
         PaginationComponent,
         DownloadButtonComponent,
         MarkdownRendererComponent
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DocumentationComponent implements OnInit {
     @Input() idErabliereSelectionee: any

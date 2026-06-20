@@ -1,5 +1,5 @@
 // This a component that allows to add a new erabliere
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { Erabliere } from 'src/model/erabliere';
 import { NgClass } from '@angular/common';
@@ -9,6 +9,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 @Component({
     selector: 'erabliere-form',
     templateUrl: './erabliere-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ReactiveFormsModule,
         FormsModule,

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CustomerAccess} from "src/model/customerAccess";
 import {ErabliereApi} from "src/core/erabliereapi.service";
 import { ViewErabliereAccessRowComponent } from './view-erabliere-access-row/view-erabliere-access-row.component';
@@ -7,6 +7,7 @@ import { AddErabliereAccessRowComponent } from "./add-erabliere-access-row/add-e
 
 @Component({
     selector: 'admin-erabliere-access-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ViewErabliereAccessRowComponent,
         EditErabliereAccessRowComponent,

@@ -1,8 +1,9 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { Horaire } from "src/model/horaire";
 
 @Component({
     selector: "horaire-table",
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <table class="table table-striped table-sm">
             <thead>

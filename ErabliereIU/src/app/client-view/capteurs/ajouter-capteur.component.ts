@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { PutCapteur } from "src/model/putCapteur";
 import {
@@ -15,6 +15,7 @@ import { EButtonComponent } from "src/generic/ebutton.component";
 
 @Component({
     selector: 'ajouter-capteur',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: 'ajouter-capteur.component.html',
     imports: [ReactiveFormsModule, FormsModule, EinputComponent, InputErrorComponent, EButtonComponent]
 })

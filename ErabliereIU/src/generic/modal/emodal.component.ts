@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
 import { EButtonComponent } from "../ebutton.component";
 
 @Component({
@@ -6,7 +6,8 @@ import { EButtonComponent } from "../ebutton.component";
     templateUrl: './emodal.component.html',
     imports: [
         EButtonComponent
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class EModalComponent {
     @Input() title: string = "";

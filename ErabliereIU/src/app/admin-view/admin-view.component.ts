@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import {Router, RouterOutlet} from "@angular/router";
 import {AdminNavBarComponent} from "./admin-nav-bar/admin-nav-bar.component";
 import {IAuthorisationSerivce} from "src/core/authorisation/iauthorisation-service";
@@ -10,7 +10,8 @@ import {AuthorisationFactoryService} from "src/core/authorisation/authorisation-
         RouterOutlet,
         AdminNavBarComponent
     ],
-    templateUrl: './admin-view.component.html'
+    templateUrl: './admin-view.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class AdminViewComponent implements OnInit {
 
@@ -22,14 +23,14 @@ export class AdminViewComponent implements OnInit {
 
     ngOnInit(): void {
         this.authSvc.loginChanged.subscribe(async isLoggedIn => {
-            if (!isLoggedIn) {
-                this.router.navigate(['/']);
-            }
-            else {
+            if (isLoggedIn) {
                 const user = await this.authSvc.getUserInfo();
                 if (!user.roles.includes('administrator')) {
                     this.router.navigate(['/']);
                 }
+            }
+            else {
+                this.router.navigate(['/']);
             }
         });
     }

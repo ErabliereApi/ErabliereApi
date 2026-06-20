@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import {FormBuilder, FormControl, ReactiveFormsModule, UntypedFormGroup, Validators} from '@angular/forms';
 import {Erabliere} from "src/model/erabliere";
@@ -6,7 +6,8 @@ import {Erabliere} from "src/model/erabliere";
 @Component({
     selector: 'admin-select-erabliere',
     templateUrl: 'select-erabliere.component.html',
-    imports: [ReactiveFormsModule]
+    imports: [ReactiveFormsModule],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 
 export class AdminSelectErabliereComponent implements OnInit {

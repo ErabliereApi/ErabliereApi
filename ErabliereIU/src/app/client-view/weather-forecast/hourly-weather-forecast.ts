@@ -1,11 +1,12 @@
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { HourlyTemperature, HourlyWeatherForecast } from 'src/model/hourlyweatherforecast';
 
 @Component({
     selector: 'hourly-weather-forecast',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
     @if (displayAccueatherLogo && provider == "AccuWeatherService") {
     <div class="text-center">

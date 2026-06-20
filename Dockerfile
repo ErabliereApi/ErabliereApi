@@ -1,5 +1,5 @@
 # Build the angular app
-FROM node:24-alpine AS angular-builder
+FROM node:26-alpine AS angular-builder
 WORKDIR /usr/src/app
 COPY ErabliereIU/package.json ErabliereIU/package-lock.json ./
 RUN npm ci
@@ -35,7 +35,8 @@ WORKDIR /app
 COPY --from=build-api-env /app/ErabliereApi/out ./
 RUN chmod u+x docker-entrypoint.sh
 COPY --from=angular-builder /usr/src/app/dist/ErabliereIU/browser ./wwwroot
-RUN rm ./wwwroot/assets/config/oauth-oidc.json && mv ./wwwroot/assets/config/oauth-oidc-docker.json ./wwwroot/assets/config/oauth-oidc.json
+RUN rm ./wwwroot/assets/config/oauth-oidc.json && \
+    mv ./wwwroot/assets/config/oauth-oidc-docker.json ./wwwroot/assets/config/oauth-oidc.json
 
 # Expose port
 EXPOSE 443

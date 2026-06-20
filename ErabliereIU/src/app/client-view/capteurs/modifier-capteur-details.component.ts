@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
     ReactiveFormsModule,
     FormsModule,
@@ -13,6 +13,7 @@ import { Capteur } from 'src/model/capteur';
 
 @Component({
     selector: 'modifier-capteur-details',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
     <form [formGroup]="editCapteurForm" class="row mb-3" novalidate>
         <!-- Section des erreurs générales -->

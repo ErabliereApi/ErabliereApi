@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Erabliere } from "src/model/erabliere";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { ErabliereListComponent } from "./erabliere-list/erabliere-list.component";
@@ -7,6 +7,7 @@ import { PaginationComponent } from 'src/generic/pagination/pagination.component
 
 @Component({
     selector: 'admin-erablieres',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ErabliereListComponent,
         ModifierErabliereComponent,

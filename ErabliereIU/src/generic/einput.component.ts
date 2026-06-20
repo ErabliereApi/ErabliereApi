@@ -1,10 +1,11 @@
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { InputErrorComponent } from "./input-error.component";
 
 
 @Component({
   selector: 'einput',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
         <label for="{{ name }}" class="form-label">{{ arialabel ?? smartName(name) }}:</label>
         <div [formGroup]="formGroup" [class]="'input-group' + (formGroup.controls[name].touched ? ' was-validated' : '')">
@@ -62,7 +63,7 @@ export class EinputComponent {
   @Input() decimalMarker: "." | "," | [".", ","] = ".";
   @Input() customPatterns: any
   @Input() spChar: string[] = []
-  @Input() type: "text" | "textarea"| "number" | "date" | "checkbox" = "text"
+  @Input() type: "text" | "textarea" | "number" | "date" | "checkbox" = "text"
   @Input() errorObj?: any;
   @Input() pattern?: string;
   @Input() maxlength?: number;

@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Capteur, CapteurStyle } from 'src/model/capteur';
 import { GraphPanelComponent } from "../donnees/sub-panel/graph-panel.component";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-modifier-capteur-style',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div class="row">
             <div class="col-6">

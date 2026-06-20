@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Horaire } from "src/model/horaire";
 import { EinputComponent } from "src/generic/einput.component";
@@ -8,7 +8,8 @@ import { ErabliereApi } from "src/core/erabliereapi.service";
 @Component({
     selector: "horaire-form",
     templateUrl: "./horaire-form.component.html",
-    imports: [FormsModule, EinputComponent, ReactiveFormsModule, EButtonComponent]
+    imports: [FormsModule, EinputComponent, ReactiveFormsModule, EButtonComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class HoraireComponent implements OnInit, OnChanges {
     @Input() erabliereId?: any;

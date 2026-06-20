@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ErabliereFormComponent } from 'src/app/client-view/erablieres/erabliere-form.component'
 import { EButtonComponent } from 'src/generic/ebutton.component';
@@ -6,7 +6,8 @@ import { EButtonComponent } from 'src/generic/ebutton.component';
 @Component({
     selector: 'ajouter-erabliere',
     templateUrl: './ajouter-erabliere.component.html',
-    imports: [ErabliereFormComponent, EButtonComponent]
+    imports: [ErabliereFormComponent, EButtonComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class AjouterErabliereComponent {
     @ViewChild(ErabliereFormComponent) erabliereForm?: ErabliereFormComponent;

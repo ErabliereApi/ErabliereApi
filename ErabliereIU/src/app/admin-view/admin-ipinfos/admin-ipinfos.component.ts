@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { IpInfo } from "src/model/ipinfo";
 import { IpinfoListComponent } from "./ipinfo-list/ipinfo-list.component";
@@ -7,6 +7,7 @@ import { PaginationComponent } from "src/generic/pagination/pagination.component
 
 @Component({
     selector: 'app-admin-ipinfos',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './admin-ipinfos.component.html',
     imports: [
         IpinfoListComponent,
@@ -46,7 +47,7 @@ export class AdminIpinfosComponent implements OnInit {
     private loadIpInfos() {
         this.api.getIpInfos({ top: this.top, skip: this.skip }).then(infos => {
             this.ipInfos = infos.items;
-            this.totalCount = parseInt(infos.count ?? "0");
+            this.totalCount = Number.parseInt(infos.count ?? "0");
         }).catch(err => {
             this.totalCount = 0;
             this.ipInfos = [];

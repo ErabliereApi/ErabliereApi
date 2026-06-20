@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ApiKeyListComponent } from './api-key-list/api-key-list.component';
 import { ApiKey, PostApiKey, PutApiKeyRestriction } from 'src/model/apikey';
@@ -12,6 +12,7 @@ import { CopyTextButtonComponent } from "src/generic/copy-text-button.component"
 
 @Component({
     selector: 'app-admin-apikeys',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div class="m-3">
             <h3>Clé d'API</h3>

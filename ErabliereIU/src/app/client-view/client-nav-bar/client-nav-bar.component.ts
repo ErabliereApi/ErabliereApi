@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { EnvironmentService } from 'src/environments/environment.service';
@@ -10,7 +10,8 @@ import {ConnectionButtonComponent} from "src/core/authorisation/connection-butto
 @Component({
     selector: 'client-nav-bar',
     templateUrl: 'client-nav-bar.component.html',
-    imports: [RouterLink, RouterLinkActive, ConnectionButtonComponent]
+    imports: [RouterLink, RouterLinkActive, ConnectionButtonComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ClientNavBarComponent implements OnInit {
   private readonly _authService: IAuthorisationSerivce

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Customer } from 'src/model/customer';
 import {FormBuilder, FormControl, ReactiveFormsModule, UntypedFormGroup, Validators} from '@angular/forms';
@@ -6,7 +6,8 @@ import {FormBuilder, FormControl, ReactiveFormsModule, UntypedFormGroup, Validat
 @Component({
     selector: 'select-customer',
     templateUrl: 'select-customer.component.html',
-    imports: [ReactiveFormsModule]
+    imports: [ReactiveFormsModule],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 
 export class SelectCustomerComponent implements OnInit {
@@ -15,7 +16,7 @@ export class SelectCustomerComponent implements OnInit {
 
     customers: Customer[] = [];
 
-    constructor(private _api: ErabliereApi, private formBuilder: FormBuilder) {
+    constructor(private readonly _api: ErabliereApi, private readonly formBuilder: FormBuilder) {
         this.form = this.formBuilder.group({
             customer: new FormControl(null,
                 {

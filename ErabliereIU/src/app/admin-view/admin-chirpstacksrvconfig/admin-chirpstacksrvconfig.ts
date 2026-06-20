@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ChirpstackSrvConfigTableComponent } from './chirpstacksrvconfig-list/chirpstacksrvconfig-table.comonent';
 import { EButtonComponent } from "src/generic/ebutton.component";
@@ -9,6 +9,7 @@ import { ChirpstackSrvConfig } from 'src/model/chripstacksrvconfig';
 
 @Component({
     selector: 'admin-chirpstacksrvconfig',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './admin-chirpstacksrvconfig.component.html',
     imports: [
         ChirpstackSrvConfigTableComponent, 

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { EntraRedirectComponent } from './entra-redirect.component';
 import { Router, RouterOutlet } from '@angular/router';
 import { ErabliereAIComponent } from 'src/generic/erabliereai/erabliereai-chat.component';
@@ -12,6 +12,7 @@ import { InteractionStatus } from '@azure/msal-browser';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     RouterOutlet,
     EntraRedirectComponent,

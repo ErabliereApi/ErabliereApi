@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Capteur } from "src/model/capteur";
 import {
@@ -12,6 +12,7 @@ import { EModalComponent } from "src/generic/modal/emodal.component";
 
 @Component({
     selector: 'capteur-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: 'capteur-list.component.html',
     styleUrl: 'capteur-list.component.css',
     imports: [

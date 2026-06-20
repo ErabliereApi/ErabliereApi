@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Customer } from "src/model/customer";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
@@ -10,7 +10,8 @@ import { InputErrorComponent } from 'src/generic/input-error.component';
         InputErrorComponent,
         ReactiveFormsModule
     ],
-    templateUrl: './modifier-customer.component.html'
+    templateUrl: './modifier-customer.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ModifierCustomerComponent implements OnInit {
 

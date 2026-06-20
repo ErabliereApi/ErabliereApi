@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {InputErrorComponent} from "src/generic/input-error.component";
 import {FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {OnlyDigitsDirective} from "src/generic/directives/only-digits.directive";
@@ -7,6 +7,7 @@ import {ErabliereApi} from "src/core/erabliereapi.service";
 
 @Component({
     selector: 'ajouter-capteur-image',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         InputErrorComponent,
         ReactiveFormsModule,

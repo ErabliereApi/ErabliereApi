@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Alerte } from "src/model/alerte";
 import { UntypedFormGroup, UntypedFormBuilder, ReactiveFormsModule } from "@angular/forms";
@@ -11,6 +11,7 @@ import { CopyTextButtonComponent } from "src/generic/copy-text-button.component"
 
 @Component({
     selector: 'modifier-alerte-modal',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: 'modifier-alerte.component.html',
     imports: [ReactiveFormsModule, EinputComponent, CopyTextButtonComponent]
 })

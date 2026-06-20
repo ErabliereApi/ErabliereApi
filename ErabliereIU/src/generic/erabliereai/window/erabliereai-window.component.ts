@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -12,6 +12,7 @@ import { MessageListComponent } from "../messageList/message-list.component";
     templateUrl: './erabliereai-window.component.html',
     styleUrls: ['./erabliereai-window.component.css'],
     imports: [FormsModule, MessageListComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ErabliereAiWindowComponent implements OnInit {
     @Output() closeChatWindowEvent = new EventEmitter<boolean>();

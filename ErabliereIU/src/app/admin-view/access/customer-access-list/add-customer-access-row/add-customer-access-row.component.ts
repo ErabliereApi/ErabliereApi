@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CustomerAccess } from "src/model/customerAccess";
 import { FormBuilder, FormControl, ReactiveFormsModule, UntypedFormGroup, Validators } from "@angular/forms";
 import { Erabliere } from "src/model/erabliere";
@@ -6,6 +6,7 @@ import { AdminSelectErabliereComponent } from "src/app/client-view/erablieres/ad
 
 @Component({
     selector: 'tr[add-customer-access-row]',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         AdminSelectErabliereComponent,
         ReactiveFormsModule

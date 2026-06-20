@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { Chart, TooltipItem, CategoryScale } from 'chart.js';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { WeatherForecast } from 'src/model/weatherForecast';
@@ -9,6 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
     selector: 'weather-forecast',
     templateUrl: 'weather-forecast.component.html',
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class WeatherForecastComponent implements OnChanges, OnDestroy, OnInit {
     @Input() erabliere?: Erabliere;

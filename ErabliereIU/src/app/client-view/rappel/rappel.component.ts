@@ -1,11 +1,12 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
 import { Note } from 'src/model/note';
 import { ModalRappelComponent } from "./modal-rappel/modal-rappel.component";
 
 @Component({
     selector: 'app-rappel',
     styleUrls: ['./rappel.component.css'],
-    templateUrl: './rappel.component.html'
+    templateUrl: './rappel.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class RappelComponent {
     @Input() note: Note;

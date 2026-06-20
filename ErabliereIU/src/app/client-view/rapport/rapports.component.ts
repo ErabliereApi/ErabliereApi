@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { RapportDegreJourComponent } from './degreejour/rapport-degre-jour.component';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +14,7 @@ import { ModifierRapportsComponent } from './modifierRapport/app-modifier-rappor
     selector: 'app-reports',
     templateUrl: './rapports.component.html',
     styleUrls: ['./rapports.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         RapportDegreJourComponent,
         TableauRapportComponent,

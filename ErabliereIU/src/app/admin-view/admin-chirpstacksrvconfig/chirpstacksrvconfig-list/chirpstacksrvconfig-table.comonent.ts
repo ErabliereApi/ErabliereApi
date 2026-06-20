@@ -1,9 +1,10 @@
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ChirpstackSrvConfig } from 'src/model/chripstacksrvconfig';
 
 @Component({
     selector: 'chirpstacksrvconfig-table',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './chirpstacksrvconfig-table.component.html',
     imports: []
 })

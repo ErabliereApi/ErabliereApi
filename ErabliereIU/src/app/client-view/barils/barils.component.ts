@@ -1,10 +1,11 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Baril } from 'src/model/baril';
 
 
 @Component({
   selector: 'barils-panel',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
         <div class="m-3 border-top py-2">
           <h3>Barils</h3>

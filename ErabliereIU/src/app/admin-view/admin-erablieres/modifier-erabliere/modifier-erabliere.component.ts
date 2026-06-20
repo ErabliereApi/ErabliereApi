@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {
     FormControl,
     FormsModule,
@@ -13,6 +13,7 @@ import {InputErrorComponent} from "src/generic/input-error.component";
 
 @Component({
     selector: 'modifier-erabliere-modal',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         FormsModule,
         InputErrorComponent,

@@ -1,5 +1,5 @@
 
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { GetImageInfo } from 'src/model/imageInfo';
@@ -7,6 +7,7 @@ import { GetImageInfo } from 'src/model/imageInfo';
 @Component({
     selector: 'image-panel',
     templateUrl: "./image-panel.component.html",
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
         
     `],

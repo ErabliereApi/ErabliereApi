@@ -1,5 +1,5 @@
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Documentation } from 'src/model/documentation';
 
@@ -13,7 +13,8 @@ import { Documentation } from 'src/model/documentation';
           }
         </button>
         `,
-    imports: []
+    imports: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DownloadButtonComponent {
     @Input() label: string = 'Télécharger';
@@ -51,7 +52,7 @@ export class DownloadButtonComponent {
         // Create a link to download the file
         let link = document.createElement('a');
 
-        link.href = window.URL.createObjectURL(blob);
+        link.href = globalThis.URL.createObjectURL(blob);
 
         link.download = this.documentation.title + '.' + this.documentation.fileExtension;
 
@@ -65,7 +66,7 @@ export class DownloadButtonComponent {
         document.body.removeChild(link);
 
         // Remove the blob from memory
-        window.URL.revokeObjectURL(link.href);
+        globalThis.URL.revokeObjectURL(link.href);
 
         this.isLoading = false;
         this.isDisabled = false;

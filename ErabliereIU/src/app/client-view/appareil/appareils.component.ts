@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router"
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Appareil } from "src/model/appareil";
@@ -8,6 +8,7 @@ import { DatePipe } from "@angular/common";
 
 @Component({
     selector: 'appareils',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './appareils.component.html',
     imports: [CopyTextButtonComponent, EButtonComponent, DatePipe]
 })

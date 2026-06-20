@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import {
   UntypedFormGroup,
@@ -22,7 +22,8 @@ import { EButtonComponent } from "src/generic/ebutton.component";
       InputErrorComponent, 
       EinputComponent,
       EButtonComponent
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class AjouterNoteComponent implements OnInit {
   @Input() notes?: Note[];

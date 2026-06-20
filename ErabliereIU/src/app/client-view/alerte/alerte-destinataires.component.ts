@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
     selector: 'alerte-destinataires',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         @if (destinataires.length > 0) {
         <div>

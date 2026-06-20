@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { Rapport } from 'src/model/rapport';
 
@@ -7,7 +7,8 @@ import { Rapport } from 'src/model/rapport';
     selector: 'app-tableau-rapport',
     templateUrl: './tableau-rapport.component.html',
     styleUrls: ['./tableau-rapport.component.css'],
-    imports: [CommonModule]
+    imports: [CommonModule],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class TableauRapportComponent implements OnChanges {
     @Input() rapport: Rapport | null = null;

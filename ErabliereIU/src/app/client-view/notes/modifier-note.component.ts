@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { UntypedFormGroup, UntypedFormBuilder, FormControl, Validators, ReactiveFormsModule, AbstractControlOptions } from "@angular/forms";
 import { Note } from "src/model/note";
@@ -12,7 +12,8 @@ import { EinputComponent } from "src/generic/einput.component";
 @Component({
     selector: 'modifier-note',
     templateUrl: 'modifier-note.component.html',
-    imports: [ReactiveFormsModule, EinputComponent, InputErrorComponent, EButtonComponent]
+    imports: [ReactiveFormsModule, EinputComponent, InputErrorComponent, EButtonComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ModifierNoteComponent implements OnInit {
     @Input() noteSubject?: Subject<Note | null>;

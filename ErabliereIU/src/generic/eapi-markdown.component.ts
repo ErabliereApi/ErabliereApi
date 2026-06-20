@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit } from '@angular/core';
 import { marked } from 'marked';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
@@ -6,6 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     selector: 'eapi-markdown',
     template: `<div [innerHTML]="safeHtmlContent"></div>`,
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class MarkdownRendererComponent implements OnInit, OnChanges {
     @Input() content?: string = ''

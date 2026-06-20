@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, ReactiveFormsModule } from "@angular/forms";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { PostDonneeCapteur } from "src/model/donneeCapteur";
@@ -7,6 +7,7 @@ import { EinputComponent } from "src/generic/einput.component";
 
 @Component({
     selector: 'ajouter-donnee-capteur',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         @if (!display) {
           <button class="btn btn-primary" (click)="afficherForm()">Ajouter</button>

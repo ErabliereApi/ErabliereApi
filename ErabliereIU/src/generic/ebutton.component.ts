@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output, Input } from "@angular/core";
+import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy } from "@angular/core";
 
 @Component({
     selector: 'ebutton',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <button 
             id="{{buttonId}}" 

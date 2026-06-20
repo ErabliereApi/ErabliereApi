@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ConnectionButtonComponent } from 'src/core/authorisation/connection-button/connection-button.component';
 import { EnvironmentService } from 'src/environments/environment.service';
@@ -34,13 +34,14 @@ import { EnvironmentService } from 'src/environments/environment.service';
     </div>
 </nav>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ConnectionButtonComponent,
         RouterLink,
         RouterLinkActive
     ]
 })
-export class MapNavBarComponent{
+export class MapNavBarComponent {
 
     useAuthentication: boolean = false;
 

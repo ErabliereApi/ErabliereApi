@@ -1,14 +1,15 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { EnvironmentService } from "src/environments/environment.service";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 
 
 @Component({
     selector: 'apropos',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: "./apropos.component.html",
     imports: []
 })
-export class AproposComponent {
+export class AproposComponent implements OnInit {
     urlApi?: string
     checkoutEnabled?: boolean
     supportEmail?: string
@@ -36,7 +37,7 @@ export class AproposComponent {
 
     buyApiKey(): void {
         this.api.startCheckoutSession().then(resonse => {
-            window.location.href = resonse.url;
+            globalThis.location.href = resonse.url;
         });
     }
 }

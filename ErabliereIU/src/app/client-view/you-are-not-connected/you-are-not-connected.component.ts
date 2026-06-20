@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { EnvironmentService } from '../../../environments/environment.service';
@@ -6,7 +6,8 @@ import { EnvironmentService } from '../../../environments/environment.service';
 @Component({
     selector: 'you-are-not-connected',
     templateUrl: 'you-are-not-connected.component.html',
-    standalone: true
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class YouAreNotConnectedComponent implements OnInit {
   useAuthentication: boolean;

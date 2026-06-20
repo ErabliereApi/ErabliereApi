@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnInit } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Alerte } from "src/model/alerte";
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, ReactiveFormsModule } from "@angular/forms";
@@ -13,6 +13,7 @@ import { EButtonComponent } from "src/generic/ebutton.component";
 
 @Component({
     selector: 'ajouter-alerte-modal',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: 'ajouter-alerte.component.html',
     imports: [ReactiveFormsModule, EinputComponent, EButtonComponent]
 })

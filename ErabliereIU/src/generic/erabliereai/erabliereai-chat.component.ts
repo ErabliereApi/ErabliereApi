@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ErabliereAiWindowComponent } from './window/erabliereai-window.component';
 
 @Component({
@@ -6,6 +6,7 @@ import { ErabliereAiWindowComponent } from './window/erabliereai-window.componen
     templateUrl: './erabliereai-chat.component.html',
     styleUrls: ['./erabliereai-chat.component.css'],
     imports: [ErabliereAiWindowComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ErabliereAIComponent {
     chatOpen = false;

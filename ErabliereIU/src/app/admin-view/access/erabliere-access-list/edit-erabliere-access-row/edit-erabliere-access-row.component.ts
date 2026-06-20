@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CustomerAccess } from "src/model/customerAccess";
 import { FormBuilder, FormControl, ReactiveFormsModule, UntypedFormGroup } from "@angular/forms";
 
 @Component({
     selector: 'tr[edit-erabliere-access-row]',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ReactiveFormsModule
     ],

@@ -1,9 +1,10 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
     selector: 'bar-panel',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div>
             <h3>{{ titre }} {{ valeurActuel }} {{ symbole }}</h3>

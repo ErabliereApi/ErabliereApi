@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ChartDataset, ChartType } from 'chart.js';
 import { Subject } from 'rxjs';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
@@ -15,7 +15,8 @@ import { GraphPanelComponent } from './sub-panel/graph-panel.component';
         GraphPanelComponent,
         VacuumGraphPanelComponent,
         BarPanelComponent,
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DonneesComponent implements OnInit {
   @ViewChild('temperatureGraphPannel') temperatureGraphPannel?: GraphPanelComponent

@@ -1,8 +1,9 @@
-import { Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 
 
 @Component({
     selector: 'input-error',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         @if (errorObj?.error?.errors != null && errorObj.error.errors.hasOwnProperty(this.controlName)) {
           <div class="text-danger">

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MapNavBarComponent } from './map-nav-bar/map-nav-bar.component';
 
@@ -12,6 +12,7 @@ import { MapNavBarComponent } from './map-nav-bar/map-nav-bar.component';
         <router-outlet></router-outlet>
     </main>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         RouterOutlet,
         MapNavBarComponent

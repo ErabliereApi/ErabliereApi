@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
@@ -14,7 +14,8 @@ import { CapteurStyle } from 'src/model/capteur';
         DateTimeSelectorComponent,
         AjouterDonneeCapteurComponent,
         BaseChartDirective,
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class GraphPanelComponent implements OnInit {
     @ViewChild(BaseChartDirective) chart?: BaseChartDirective;

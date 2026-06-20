@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { CustomerAccess } from 'src/model/customerAccess';
 
 @Component({
     selector: 'tr[view-erabliere-access-row]',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: 'view-erabliere-access-row.component.html',
     standalone: true
 })

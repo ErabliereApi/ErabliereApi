@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Capteur } from "src/model/capteur";
 import { CapteurListComponent } from "./capteur-list.component";
@@ -10,6 +10,7 @@ import { EModalComponent } from "src/generic/modal/emodal.component";
 
 @Component({
     selector: 'gestion-capteurs',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: 'gestion-capteurs.component.html',
     imports: [
         AjouterCapteurComponent, 

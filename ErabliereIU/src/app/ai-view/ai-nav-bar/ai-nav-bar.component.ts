@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { EnvironmentService } from '../../../environments/environment.service';
@@ -9,6 +9,7 @@ import {ConnectionButtonComponent} from "src/core/authorisation/connection-butto
 
 @Component({
     selector: 'ai-nav-bar',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: 'ai-nav-bar.component.html',
     imports: [RouterLink, RouterLinkActive, ConnectionButtonComponent]
 })

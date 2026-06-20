@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     EventEmitter,
     Input,
@@ -13,7 +14,8 @@ import { Note } from 'src/model/note';
 @Component({
     selector: 'app-modal-rappel',
     imports: [EButtonComponent, MarkdownRendererComponent],
-    templateUrl: './modal-rappel.component.html'
+    templateUrl: './modal-rappel.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ModalRappelComponent implements OnInit {
     @Input() note: Note = new Note();

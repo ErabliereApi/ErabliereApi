@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Capteur } from 'src/model/capteur';
 
 @Component({
     selector: 'capteur-detail-tooltip',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div class="tooltip-container">
             <div class="tooltip-column">

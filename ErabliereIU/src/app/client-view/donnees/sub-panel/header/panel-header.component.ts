@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
     selector: 'panel-header',
+    changeDetection: ChangeDetectionStrategy.Eager,
     template: `
         <div class="row">
             <div [className]="batteryLevel ? col10 : col12">

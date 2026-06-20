@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Note } from 'src/model/note';
 import { NoteComponent } from './note.component';
 import { AjouterNoteComponent } from './ajouter-note.component';
@@ -16,7 +16,8 @@ import { PaginationComponent } from "src/generic/pagination/pagination.component
         ModifierNoteComponent,
         NoteComponent,
         PaginationComponent
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class NotesComponent implements OnInit {
     @Input() idErabliereSelectionee: any

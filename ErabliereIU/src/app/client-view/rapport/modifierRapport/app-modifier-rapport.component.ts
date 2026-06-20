@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
 import { EinputComponent } from "src/generic/einput.component";
 import { Rapport } from "src/model/rapport";
 import { UntypedFormBuilder, UntypedFormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -15,7 +15,8 @@ import { EButtonComponent } from "src/generic/ebutton.component";
         ReactiveFormsModule,
         InputErrorComponent,
         EButtonComponent
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ModifierRapportsComponent implements OnChanges {
     isOpenModifierRapportModal: boolean = false;

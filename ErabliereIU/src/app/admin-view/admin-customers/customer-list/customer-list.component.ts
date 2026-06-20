@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Customer } from "src/model/customer";
 import { CustomerAccess } from "src/model/customerAccess";
 import { Erabliere } from "src/model/erabliere";
@@ -11,6 +11,7 @@ import { fr } from 'date-fns/locale';
 
 @Component({
     selector: 'customer-list',
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './customer-list.component.html',
     imports: [
         AdminCustomerAccessListComponent,

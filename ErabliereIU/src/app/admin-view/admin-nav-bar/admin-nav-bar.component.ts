@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {RouterLink, RouterLinkActive} from "@angular/router";
 import {ConnectionButtonComponent} from "src/core/authorisation/connection-button/connection-button.component";
 import {EnvironmentService} from "../../../environments/environment.service";
 
 @Component({
     selector: 'admin-nav-bar',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         RouterLink,
         RouterLinkActive,
