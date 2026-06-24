@@ -1,5 +1,5 @@
 import { MsalService } from '@azure/msal-angular';
-import { AccountInfo, PopupRequest, SilentRequest } from '@azure/msal-browser';
+import { AccountInfo, RedirectRequest, SilentRequest } from '@azure/msal-browser';
 import { firstValueFrom, Subject } from 'rxjs';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { AppUser } from 'src/model/appuser';
@@ -23,11 +23,11 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
     if (!this.initialize) {
       await this.init();
     }
-    const popupParam: PopupRequest = {
+    const popupParam: RedirectRequest = {
       scopes: this._environmentService.scopes?.split(' ') ?? [],
       prompt: "select_account"
     }
-    await firstValueFrom(this._msalInstance.loginPopup(popupParam)).then(response => {
+    await firstValueFrom(this._msalInstance.loginRedirect(popupParam)).then(response => {
       return this.completeLogin();
     });
   }
@@ -70,12 +70,12 @@ export class AzureADAuthorisationService implements IAuthorisationSerivce {
       name: null,
       email: null,
       roles: []
-    } as AppUser;
+    };
   }
 
   logout() {
-    this._msalInstance.logoutPopup().subscribe(async response => {
-      await this.completeLogout();
+    this._msalInstance.logoutRedirect().subscribe(response => {
+      this.completeLogout();
     });
   }
 

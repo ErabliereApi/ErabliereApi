@@ -1,6 +1,6 @@
 import { provideAppInitializer, ApplicationConfig, provideZoneChangeDetection, importProvidersFrom, inject } from '@angular/core';
 import { routes } from './app.routes';
-import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { MsalService, MSAL_INSTANCE, MsalGuard, MsalBroadcastService, MsalInterceptorConfiguration, MSAL_INTERCEPTOR_CONFIG } from '@azure/msal-angular';
 import { BrowserCacheLocation, Configuration, InteractionType, IPublicClientApplication, LogLevel, PublicClientApplication } from '@azure/msal-browser';
@@ -28,8 +28,7 @@ export function MSALInstanceFactory(envSvc: EnvironmentService): IPublicClientAp
             clientId: envSvc.clientId,
             authority: "https://login.microsoftonline.com/" + envSvc.tenantId,
             redirectUri: "/signin-callback",
-            postLogoutRedirectUri: "/signout-callback",
-            navigateToLoginRequestUrl: true
+            postLogoutRedirectUri: "/signout-callback"
         },
         cache: {
             cacheLocation: BrowserCacheLocation.LocalStorage,
@@ -56,11 +55,7 @@ export function MSALInstanceFactory(envSvc: EnvironmentService): IPublicClientAp
                     }
                 },
                 piiLoggingEnabled: false
-            },
-            windowHashTimeout: 60000,
-            iframeHashTimeout: 10000,
-            loadFrameTimeout: 0,
-            asyncPopups: false
+            }
         }
     };
 
@@ -95,7 +90,7 @@ export const appConfig: ApplicationConfig = {
         importProvidersFrom(
             BrowserModule
         ),
-        provideHttpClient(withInterceptorsFromDi(), withFetch()),
+        provideHttpClient(withInterceptorsFromDi()),
         {
             provide: MSAL_INSTANCE,
             useFactory: MSALInstanceFactory,
