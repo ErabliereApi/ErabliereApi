@@ -1,5 +1,5 @@
 import { DatePipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core"
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core"
 import { Router } from "@angular/router";
 import { AuthorisationFactoryService } from "src/core/authorisation/authorisation-factory-service";
 import { IAuthorisationSerivce } from "src/core/authorisation/iauthorisation-service";
@@ -9,6 +9,7 @@ import { EnvironmentService } from "src/environments/environment.service";
 @Component({
     selector: 'terme-and-condition',
     templateUrl: 'app.termes-and-conditions.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         DatePipe
     ]
