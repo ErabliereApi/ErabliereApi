@@ -62,5 +62,20 @@ public class ErabliereEntityConfiguration : IEntityTypeConfiguration<Erabliere>
         erabliere.HasMany(u => u.Horaires)
                  .WithOne(a => a.Erabliere)
                  .HasForeignKey(a => a.IdErabliere);
+
+        erabliere.HasMany(e => e.LignesTubelure)
+                 .WithOne(l => l.Erabliere)
+                 .HasForeignKey(l => l.IdErabliere)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+        erabliere.HasMany(e => e.Arbres)
+                 .WithOne(a => a.Erabliere)
+                 .HasForeignKey(a => a.IdErabliere)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+        erabliere.HasMany(e => e.Entailles)
+                 .WithOne(e => e.Erabliere)
+                 .HasForeignKey(e => e.IdErabliere)
+                 .OnDelete(DeleteBehavior.Cascade);
     }
 }

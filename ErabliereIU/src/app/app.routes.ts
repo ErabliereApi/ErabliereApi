@@ -12,6 +12,7 @@ import { AdminViewComponent } from "./admin-view/admin-view.component";
 import { AdminErablieresComponent } from "src/app/admin-view/admin-erablieres/admin-erablieres.component";
 import { ClientViewComponent } from "./client-view/client-view.component";
 import { GestionCapteursComponent } from "src/app/client-view/capteurs/gestion-capteurs.component";
+import { TubelureComponent } from "src/app/client-view/tubelure/tubelure.component";
 import { ReportsComponent } from 'src/app/client-view/rapport/rapports.component';
 import { AdminAPIKeysComponent } from 'src/app/admin-view/admin-apikeys/admin-apikeys.component';
 import { MapViewComponent } from './map-view/map-view.component';
@@ -175,6 +176,11 @@ export const routes: Routes = [
                 path: 'e/:idErabliereSelectionee/rapports',
                 title: 'ÉrablièreIU - Rapports',
                 component: ReportsComponent
+            },
+            {
+                path: 'e/:idErabliereSelectionee/tubelure',
+                title: 'ÉrablièreIU - Tubelure',
+                component: TubelureComponent
             },
             {
                 path: 'apropos',

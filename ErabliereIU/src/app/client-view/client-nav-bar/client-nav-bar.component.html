@@ -57,6 +57,14 @@
                         Rapports
                     </a>
                 </li>
+                @if (mapFeatureEnable) {
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/e/{{idErabliereSelectionee}}/tubelure" routerLinkActive="active"
+                        ariaCurrentWhenActive="page">
+                        Tubelure
+                    </a>
+                </li>
+                }
                 }
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/apropos" routerLinkActive="active" ariaCurrentWhenActive="page">
