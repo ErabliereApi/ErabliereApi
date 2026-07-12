@@ -1,0 +1,58 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Overview
+
+ErabliereApi is a maple-syrup-production (érablière) monitoring platform: an ASP.NET Core REST API plus an Angular web app, collecting sensor data (temperature, vacuum, tank level), alerts, reports, notes, and AI chat features. Much of the codebase — identifiers, routes, comments, docs — is in **French**; follow that convention when adding code.
+
+Project tracking lives in Azure DevOps: https://dev.azure.com/freddycoder/ErabliereAPI
+
+## Solution layout
+
+- `ErabliereApi/` — the ASP.NET Core web API (main project, targets .NET 9; `global.json` pins SDK 10 with `rollForward: latestMajor`).
+- `ErabliereModel/` — data-model project (`ErabliereApi.Donnees`), one entity per file (Erabliere, Capteur, DonneeCapteur, Alerte, ...). `Erabliere` is the root of the data hierarchy; most entities are owned by one.
+- `ErabliereIU/` — Angular 22 front-end. **It has its own `ErabliereIU/CLAUDE.md`** — read it before working there (dev server, Cypress tests, runtime config, MSAL auth).
+- `ErabliereAPI.Proxy/` — NSwag-generated C# client published to NuGet. Regenerated with NSwag Studio from the OpenAPI spec + `GenerateProxy.ps1` (see its Readme); don't hand-edit generated files.
+- `ErabliereApi.Test/` (unit), `ErabliereApi.Integration.Test/` (in-memory `WebApplicationFactory` + AngleSharp; includes Stripe webhook JSON fixtures), `ErabliereApi.Test.Autofixture/` — all xUnit.
+- `Infrastructure/`, `docker-compose*.yaml`, `Dockerfile` — Kubernetes/docker deployment; `PythonScripts/` — device/data-feeding scripts; `Postman/` — API collections.
+
+## Commands
+
+Backend (from repo root):
+- `dotnet build ErabliereApi.sln`
+- `dotnet test` — all test projects. Single project: `dotnet test ErabliereApi.Test`. Single test: `dotnet test --filter "FullyQualifiedName~MyTestName"`.
+- `.\start-code-coverage-report.ps1` — tests with coverage + HTML report in `coveragereport/` (needs `reportgenerator` tool).
+- Run the API alone: `dotnet watch run` in `ErabliereApi/` (Development uses HTTP 5000 / HTTPS 5001).
+
+Full stack:
+- `.\start-light.ps1` — starts the API (`dotnet watch`) and the Angular dev server (`npm start`, https://localhost:4200). Pass `-startStripe $true` to also forward Stripe webhooks.
+- `.\start-local-debug-services.ps1` — same plus Stripe CLI login/listen and optional sibling repos (EmailImagesObserver, ErabliereWS, JeuxDonneesErabliereAPI).
+
+Docker: `docker build -t erabliereapi:local .` at the repo root; `docker compose up -d` for a local deployment.
+
+EF Core migrations (from `ErabliereApi/`, requires `dotnet-ef` and the `SQL_CONNEXION_STRING` + `USE_SQL` **machine environment variables** — the ef tool ignores launchSettings.json):
+```
+dotnet ef --startup-project . migrations add <Name> --output-dir "Depot\Sql\Migrations" --namespace "Depot.Sql.Migrations"
+```
+
+## Configuration is environment-variable driven
+
+Nearly every feature is toggled by string-compared config values read in `Startup.cs` / `Extensions/ServiceCollectionExtension.cs` (e.g. `"true"`/`"false"` strings). Key ones:
+- `USE_AUTHENTICATION` — turn auth on/off (locally: `dotnet user-secrets set USE_AUTHENTICATION false`).
+- `USE_SQL`, `SQL_CONNEXION_STRING`, `SQL_USE_STARTUP_MIGRATION` — `false` runs fully in-memory (no persistence, handy for dev); `SQL_USE_STARTUP_MIGRATION=true` applies migrations at API startup.
+- `USE_CORS`, `USE_HSTS`, `LOG_SQL`, `MiniProfiler.Enable`, `Stripe.*` (Stripe integration, webhooks at `/Checkout/Webhook` via the Stripe CLI).
+
+Local secrets go through `dotnet user-secrets`, not appsettings.
+
+## Backend architecture
+
+- `Program.cs` → `Startup.cs`, which delegates most registration to extension methods in `Extensions/` (`AddErabliereApiControllers`, `AddErabliereAPIAuthentication`, `AddDatabase`, `AddHttpClients`, ...). New services are wired there, not inline in Startup.
+- Controllers in `Controllers/` (one per resource, French names: `ErablieresController`, `CapteurController`, `DonneesCapteurController`, ...) expose **OData-style querying** (`$filter`, `$expand`, `$orderby`) consumed by the Angular app's `erabliereapi.service.ts`.
+- Data access is a single EF Core `ErabliereDbContext` (`Depot/Sql/`), entity configurations in `Depot/Sql/EntityConfiguration/`, migrations in `Depot/Sql/Migrations/`.
+- Cross-cutting concerns: `Authorization/` (API keys, customer access to érablières), `Middlewares/`, `Services/` (AI, ApiKey, Checkout/Stripe, IpInfo, LoRaWAN/ChirpStack, Nmap, Notifications, Users, Weather), Prometheus metrics, health checks, MiniProfiler.
+- The API serves the built Angular app from `wwwroot/`; building the UI into it (`ng build --output-path="..\ErabliereApi\wwwroot\."`) gives a same-origin setup that preserves the custom `x-ddr`/`x-dde` delta-range headers used to minimize transferred sensor data.
+
+## CI
+
+GitHub Actions (`.github/workflows/`): `api-image.yml` (docker image), `api-test-demo.yml` (tests), `codeql-analysis.yml`, `proxy-publish.yaml` (NuGet proxy package).

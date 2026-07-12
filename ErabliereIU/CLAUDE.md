@@ -35,6 +35,8 @@ Auth is abstracted behind `IAuthorisationSerivce` and resolved at runtime by `Au
 
 MSAL is wired in `src/app/app.config.ts` (`MSALInstanceFactory`, `MSALInterceptorConfigFactory`) using the runtime `EnvironmentService`. Never call MSAL directly from features — go through `AuthorisationFactoryService.getAuthorisationService()`. Route guards (`src/app/guard/`) do the same: `AdminGuard` checks the `administrateur` role, `AuthenticatedUserGard` checks login.
 
+Since Angular 22, components whose data loads are triggered by MSAL events/subscriptions (outside Angular's notification zone) must set `ChangeDetectionStrategy.Eager`, otherwise the view silently never updates after data arrives.
+
 ### Central data access: `ErabliereApi` service
 
 `src/core/erabliereapi.service.ts` is the single large service wrapping all backend calls. It builds **OData** query strings by hand (`$filter`, `$expand`, `$orderby`) against `EnvironmentService.apiUrl` and attaches auth headers from the resolved auth service. The API uses custom `x-ddr` / `x-dde` HTTP headers to minimize transferred data (delta ranges) — search the repo for these when touching data-fetch optimization. New backend endpoints are added as methods here.

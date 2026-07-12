@@ -33,7 +33,7 @@
 
         @if (loadingInProgress) {
         <div class="chargement">
-            <div class="spinner-border text-primary" role="status">
+            <div class="spinner-border text-primary">
                 <span class="visually-hidden">Chargement...</span>
             </div>
         </div>
@@ -65,11 +65,11 @@
             }
             @else if (mode === 'ligne') {
             <div class="d-flex gap-2 flex-wrap align-items-center mb-2">
-                <span class="badge fs-6 text-white" [style.background]="couleursLigne[typeLigneEnCours]">
+                <label for="nomLigne" class="badge fs-6 text-white" [style.background]="couleursLigne[typeLigneEnCours]">
                     {{ libellesLigne[typeLigneEnCours] }} — {{ pointsEnCours.length }} point(s)
-                </span>
+                </label>
                 <input type="text" class="form-control form-control-lg nom-ligne" placeholder="Nom de la ligne (ex: M-01)"
-                    [(ngModel)]="nomLigneEnCours" name="nomLigne" />
+                    [(ngModel)]="nomLigneEnCours" name="nomLigne" id="nomLigne" />
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <button type="button" class="btn btn-primary btn-lg" (click)="ajouterPointGps()" [disabled]="!gpsFix"
