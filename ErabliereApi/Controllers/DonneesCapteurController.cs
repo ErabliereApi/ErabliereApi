@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -36,14 +37,28 @@ public class DonneesCapteurController : ControllerBase
     /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à modifier.</response>
     [HttpPut]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Modifier(Guid id, DonneeCapteur capteur, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, PutDonneeCapteur capteur, CancellationToken token)
     {
         if (id != capteur.IdCapteur)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id du capteur à modifier.");
         }
 
-        _depot.Update(capteur);
+        if (capteur.Id == null)
+        {
+            return BadRequest("L'id de la donnée à modifier est requis.");
+        }
+
+        var entity = await _depot.DonneesCapteur.FindAsync([capteur.Id], token);
+
+        if (entity == null || entity.IdCapteur != id)
+        {
+            return NotFound();
+        }
+
+        entity.Valeur = capteur.Valeur;
+        entity.Text = capteur.Text;
+        entity.D = capteur.D;
 
         await _depot.SaveChangesAsync(token);
 

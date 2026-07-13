@@ -205,16 +205,16 @@ public class DonneesController : ControllerBase
     [ValiderIPRules]
     [ValiderOwnership("id")]
     [Route("Importer")]
-    public async Task<IActionResult> Importer(Guid id, Donnee[] donnees, CancellationToken token)
+    public async Task<IActionResult> Importer(Guid id, PostDonnee[] donnees, CancellationToken token)
     {
         await _context.AddRangeAsync(donnees.Select(d =>
         {
-            if (d.IdErabliere == null)
-            {
-                d.IdErabliere = id;
-            }
+            var donnee = d.MapTo<Donnee>();
 
-            return d;
+            // L'érablière est toujours celle de la route, jamais celle fournie dans le corps.
+            donnee.IdErabliere = id;
+
+            return donnee;
         }), cancellationToken: token);
 
         var nbStateEntrySaved = await _context.SaveChangesAsync(token);

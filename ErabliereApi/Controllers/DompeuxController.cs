@@ -2,6 +2,8 @@
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Get;
+using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Donnees.Action.Put;
 using ErabliereApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -90,19 +92,28 @@ public class DompeuxController : ControllerBase
     [HttpPost]
     [ValiderIPRules]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Ajouter(Guid id, Dompeux dompeux)
+    public async Task<IActionResult> Ajouter(Guid id, PostDompeux dompeux)
     {
         if (id != dompeux.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id du dompeux");
         }
 
-        if (dompeux.T == default || dompeux.T.Equals(DateTimeOffset.MinValue))
+        var t = dompeux.T;
+
+        if (t == default || t.Equals(DateTimeOffset.MinValue))
         {
-            dompeux.T = DateTimeOffset.Now;
+            t = DateTimeOffset.Now;
         }
 
-        var entity = await _context.Dompeux.AddAsync(dompeux);
+        var entity = await _context.Dompeux.AddAsync(new Dompeux
+        {
+            Id = dompeux.Id,
+            IdErabliere = dompeux.IdErabliere,
+            T = t,
+            DD = dompeux.DD,
+            DF = dompeux.DF
+        });
 
         await _context.SaveChangesAsync();
 
@@ -118,7 +129,7 @@ public class DompeuxController : ControllerBase
     [HttpPut("{idDompeux}")]
     [ValiderIPRules]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, Guid idDompeux, Dompeux donnee)
+    public async Task<IActionResult> Modifier(Guid id, Guid idDompeux, PutDompeux donnee)
     {
         if (id != donnee.IdErabliere)
         {
@@ -129,7 +140,16 @@ public class DompeuxController : ControllerBase
             return BadRequest("L'id du dompeux de la route ne concorde pas avec l'id du dompeux");
         }
 
-        _context.Dompeux.Update(donnee);
+        var entity = await _context.Dompeux.FindAsync([idDompeux]);
+
+        if (entity == null || entity.IdErabliere != id)
+        {
+            return NotFound();
+        }
+
+        entity.T = donnee.T;
+        entity.DD = donnee.DD;
+        entity.DF = donnee.DF;
 
         await _context.SaveChangesAsync();
 

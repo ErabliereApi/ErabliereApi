@@ -31,19 +31,13 @@ public class WriteEndpointsBindDtoNotEntityTest
     /// Dette technique connue : contrôleurs qui lient encore une entité EF brute. Ne pas allonger
     /// cette liste — migrer vers un DTO quand on touche à ces contrôleurs.
     /// Format des clés : "NomController.NomMethode(NomType)".
+    /// Les entrées restantes sont réservées aux administrateurs (acteurs de confiance, risque
+    /// d'over-posting faible) et sont laissées en dette assumée.
     /// </summary>
     private static readonly HashSet<string> ExceptionsConnues = new()
     {
-        "AlerteCapteursController.Ajouter(AlerteCapteur)",
-        "AlertesController.Modifier(Alerte)",
-        "BarilController.Ajouter(Baril)",
-        "BarilController.Modifier(Baril)",
         "ChirpstackController.CreateConfigs(ChirpStackSrvConfig)",
         "ChirpstackController.EditConfigs(ChirpStackSrvConfig)",
-        "DompeuxController.Ajouter(Dompeux)",
-        "DompeuxController.Modifier(Dompeux)",
-        "DonneesCapteurController.Modifier(DonneeCapteur)",
-        "DonneesController.Importer(Donnee)",
         "IpInfoController.ImportIpInfo(IpInfo)",
     };
 

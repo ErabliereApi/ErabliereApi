@@ -1,6 +1,8 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,14 +56,21 @@ public class BarilController : ControllerBase
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à ajouter.</response>
     [HttpPost]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Ajouter(Guid id, Baril baril, CancellationToken token)
+    public async Task<IActionResult> Ajouter(Guid id, PostBaril baril, CancellationToken token)
     {
         if (id != baril.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id du baril à ajouter");
         }
 
-        var entity = await _depot.Barils.AddAsync(baril, token);
+        var entity = await _depot.Barils.AddAsync(new Baril
+        {
+            Id = baril.Id,
+            IdErabliere = baril.IdErabliere,
+            DF = baril.DF,
+            QE = baril.QE,
+            Q = baril.Q
+        }, token);
 
         await _depot.SaveChangesAsync(token);
 
@@ -78,14 +87,28 @@ public class BarilController : ControllerBase
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à modifier.</response>
     [HttpPut]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, Baril baril, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, PutBaril baril, CancellationToken token)
     {
         if (id != baril.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id du baril à modifier.");
         }
 
-        _depot.Update(baril);
+        if (baril.Id == null)
+        {
+            return BadRequest("L'id du baril à modifier est requis.");
+        }
+
+        var entity = await _depot.Barils.FindAsync([baril.Id], token);
+
+        if (entity == null || entity.IdErabliere != id)
+        {
+            return NotFound();
+        }
+
+        entity.DF = baril.DF;
+        entity.QE = baril.QE;
+        entity.Q = baril.Q;
 
         await _depot.SaveChangesAsync(token);
 

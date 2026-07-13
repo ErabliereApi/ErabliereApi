@@ -63,7 +63,7 @@ Instead:
 - **PUT/PATCH**: load the existing entity with `FindAsync`, verify it belongs to the route's érablière (`entity.IdErabliere != id → NotFound()`), then assign only the allowed fields. Do **not** call `_depot.Update(bodyEntity)` — it attaches the whole graph.
 - Validate any FK the client supplies (e.g. `IdArbre`, `IdLigneTubelure`) belongs to the same érablière before saving.
 
-This rule is enforced by `WriteEndpointsBindDtoNotEntityTest` in `ErabliereApi.Test`, which reflects over every controller and fails the build if a `POST`/`PUT`/`PATCH` action binds a type tracked as a `DbSet<>` on `ErabliereDbContext`. Several legacy controllers (`Baril`, `Dompeux`, `Alerte`, `DonneeCapteur`, `AlerteCapteur`, `ChirpStackSrvConfig`, `Donnee`, `IpInfo`) are grandfathered as known tech debt in that test's `ExceptionsConnues` list — do not add to it; migrate those to DTOs when you touch them (removing an entry is enforced too: a second test fails if an exception no longer matches a real violation).
+This rule is enforced by `WriteEndpointsBindDtoNotEntityTest` in `ErabliereApi.Test`, which reflects over every controller and fails the build if a `POST`/`PUT`/`PATCH` action binds a type tracked as a `DbSet<>` on `ErabliereDbContext`. Two admin-only endpoints (`Chirpstack` server-config create/edit and `IpInfo` import) remain grandfathered as assumed tech debt in that test's `ExceptionsConnues` list — they're reachable only by administrators, so the multi-tenant over-posting risk is low. Do not add to that list; migrate those to DTOs when you touch them (removing an entry is enforced too: a second test fails if an exception no longer matches a real violation).
 
 ## CI
 

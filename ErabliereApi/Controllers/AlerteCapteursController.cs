@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -89,7 +90,7 @@ public class AlerteCapteursController : ControllerBase
     /// <response code="400">Le capteur n'existe pas</response>
     [HttpPost]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Ajouter(Guid id, AlerteCapteur alerte, CancellationToken token)
+    public async Task<IActionResult> Ajouter(Guid id, PostAlerteCapteur alerte, CancellationToken token)
     {
         if (id != alerte.IdCapteur)
         {
@@ -101,12 +102,18 @@ public class AlerteCapteursController : ControllerBase
             return BadRequest("Le capteur n'existe pas");
         }
 
-        if (!alerte.DC.HasValue)
+        var entity = await _depot.AlerteCapteurs.AddAsync(new AlerteCapteur
         {
-            alerte.DC = DateTime.Now;
-        }
-
-        var entity = await _depot.AlerteCapteurs.AddAsync(alerte, token);
+            Id = alerte.Id,
+            IdCapteur = alerte.IdCapteur,
+            Nom = alerte.Nom,
+            EnvoyerA = alerte.EnvoyerA,
+            TexterA = alerte.TexterA,
+            MinValue = alerte.MinValue,
+            MaxValue = alerte.MaxValue,
+            IsEnable = alerte.IsEnable,
+            DC = alerte.DC ?? DateTime.Now
+        }, token);
 
         await _depot.SaveChangesAsync(token);
 
