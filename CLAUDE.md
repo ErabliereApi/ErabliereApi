@@ -53,6 +53,18 @@ Local secrets go through `dotnet user-secrets`, not appsettings.
 - Cross-cutting concerns: `Authorization/` (API keys, customer access to érablières), `Middlewares/`, `Services/` (AI, ApiKey, Checkout/Stripe, IpInfo, LoRaWAN/ChirpStack, Nmap, Notifications, Users, Weather), Prometheus metrics, health checks, MiniProfiler.
 - The API serves the built Angular app from `wwwroot/`; building the UI into it (`ng build --output-path="..\ErabliereApi\wwwroot\."`) gives a same-origin setup that preserves the custom `x-ddr`/`x-dde` delta-range headers used to minimize transferred sensor data.
 
+### No entity binding on write endpoints (anti over-posting) — REQUIRED
+
+Never bind an EF entity from `ErabliereApi.Donnees` (e.g. `Erabliere`, `Capteur`, `Arbre`, `Entaille`, `LigneTubelure`, ...) directly as the body parameter of a `POST`/`PUT`/`PATCH` action. Because EF Core traverses the object graph on `AddAsync`/`Update`, an authenticated attacker can populate an entity's **navigation properties** (`Erabliere`, `Entailles`, `Arbre`, ...) to create or modify rows in an érablière they don't own — bypassing `ValiderOwnership` and the sibling controllers' checks (this is what happened on the tubelure feature). The `ValiderOwnership("id")` filter and the `id != body.IdErabliere` guard only protect the root entity, never the nested children.
+
+Instead:
+- **Bind a dedicated DTO** from `ErabliereApi.Donnees.Action.Post` / `.Put` that contains only scalar fields and foreign-key ids — **no navigation properties** (see `PostEntaille`, `PutLigneTubelure`, `PostCapteur`, ...).
+- **POST**: build the entity explicitly field-by-field before `AddAsync` (or `MapTo<TEntity>()`, which copies by name and thus can't set navigations the DTO doesn't have).
+- **PUT/PATCH**: load the existing entity with `FindAsync`, verify it belongs to the route's érablière (`entity.IdErabliere != id → NotFound()`), then assign only the allowed fields. Do **not** call `_depot.Update(bodyEntity)` — it attaches the whole graph.
+- Validate any FK the client supplies (e.g. `IdArbre`, `IdLigneTubelure`) belongs to the same érablière before saving.
+
+This rule is enforced by `WriteEndpointsBindDtoNotEntityTest` in `ErabliereApi.Test`, which reflects over every controller and fails the build if a `POST`/`PUT`/`PATCH` action binds a type tracked as a `DbSet<>` on `ErabliereDbContext`. Several legacy controllers (`Baril`, `Dompeux`, `Alerte`, `DonneeCapteur`, `AlerteCapteur`, `ChirpStackSrvConfig`, `Donnee`, `IpInfo`) are grandfathered as known tech debt in that test's `ExceptionsConnues` list — do not add to it; migrate those to DTOs when you touch them (removing an entry is enforced too: a second test fails if an exception no longer matches a real violation).
+
 ## CI
 
 GitHub Actions (`.github/workflows/`): `api-image.yml` (docker image), `api-test-demo.yml` (tests), `codeql-analysis.yml`, `proxy-publish.yaml` (NuGet proxy package).
