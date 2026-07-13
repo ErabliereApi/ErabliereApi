@@ -1,6 +1,8 @@
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -50,24 +52,32 @@ public class EntaillesController : ControllerBase
     /// <response code="400">La validation de l'entaille a échoué.</response>
     [HttpPost]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Ajouter(Guid id, Entaille entaille, CancellationToken token)
+    public async Task<IActionResult> Ajouter(Guid id, PostEntaille entaille, CancellationToken token)
     {
         if (id != entaille.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'entaille à ajouter.");
         }
 
-        var erreur = await ValiderEntaille(id, entaille, token);
+        var erreur = await ValiderEntaille(id, entaille.Latitude, entaille.Longitude, entaille.IdArbre, entaille.IdLigneTubelure, token);
 
         if (erreur != null)
         {
             return BadRequest(erreur);
         }
 
-        entaille.DC = DateTimeOffset.Now;
-        entaille.DM = DateTimeOffset.Now;
-
-        var entity = await _depot.Entailles.AddAsync(entaille, token);
+        var entity = await _depot.Entailles.AddAsync(new Entaille
+        {
+            Id = entaille.Id,
+            IdErabliere = entaille.IdErabliere,
+            Nom = entaille.Nom,
+            Latitude = entaille.Latitude,
+            Longitude = entaille.Longitude,
+            IdArbre = entaille.IdArbre,
+            IdLigneTubelure = entaille.IdLigneTubelure,
+            DC = DateTimeOffset.Now,
+            DM = DateTimeOffset.Now
+        }, token);
 
         await _depot.SaveChangesAsync(token);
 
@@ -84,23 +94,38 @@ public class EntaillesController : ControllerBase
     /// <response code="400">La validation de l'entaille a échoué.</response>
     [HttpPut]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, Entaille entaille, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, PutEntaille entaille, CancellationToken token)
     {
         if (id != entaille.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'entaille à modifier.");
         }
 
-        var erreur = await ValiderEntaille(id, entaille, token);
+        if (entaille.Id == null)
+        {
+            return BadRequest("L'id de l'entaille à modifier est requis.");
+        }
+
+        var erreur = await ValiderEntaille(id, entaille.Latitude, entaille.Longitude, entaille.IdArbre, entaille.IdLigneTubelure, token);
 
         if (erreur != null)
         {
             return BadRequest(erreur);
         }
 
-        entaille.DM = DateTimeOffset.Now;
+        var entity = await _depot.Entailles.FindAsync([entaille.Id], token);
 
-        _depot.Update(entaille);
+        if (entity == null || entity.IdErabliere != id)
+        {
+            return NotFound();
+        }
+
+        entity.Nom = entaille.Nom;
+        entity.Latitude = entaille.Latitude;
+        entity.Longitude = entaille.Longitude;
+        entity.IdArbre = entaille.IdArbre;
+        entity.IdLigneTubelure = entaille.IdLigneTubelure;
+        entity.DM = DateTimeOffset.Now;
 
         await _depot.SaveChangesAsync(token);
 
@@ -138,16 +163,16 @@ public class EntaillesController : ControllerBase
     /// L'arbre et la ligne de tubelure référencés doivent exister et appartenir à la même érablière.
     /// </summary>
     /// <returns>Un message d'erreur, ou null si l'entaille est valide</returns>
-    private async Task<string?> ValiderEntaille(Guid id, Entaille entaille, CancellationToken token)
+    private async Task<string?> ValiderEntaille(Guid id, double latitude, double longitude, Guid? idArbre, Guid? idLigneTubelure, CancellationToken token)
     {
-        if (!ArbresController.CoordonneesValides(entaille.Latitude, entaille.Longitude))
+        if (!ArbresController.CoordonneesValides(latitude, longitude))
         {
             return "L'entaille doit avoir une longitude entre -180 et 180 et une latitude entre -90 et 90.";
         }
 
-        if (entaille.IdArbre != null)
+        if (idArbre != null)
         {
-            var arbre = await _depot.Arbres.FindAsync([entaille.IdArbre], token);
+            var arbre = await _depot.Arbres.FindAsync([idArbre], token);
 
             if (arbre == null || arbre.IdErabliere != id)
             {
@@ -155,9 +180,9 @@ public class EntaillesController : ControllerBase
             }
         }
 
-        if (entaille.IdLigneTubelure != null)
+        if (idLigneTubelure != null)
         {
-            var ligne = await _depot.LignesTubelure.FindAsync([entaille.IdLigneTubelure], token);
+            var ligne = await _depot.LignesTubelure.FindAsync([idLigneTubelure], token);
 
             if (ligne == null || ligne.IdErabliere != id)
             {

@@ -1,6 +1,8 @@
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Donnees.Action.Put;
 using ErabliereApi.Donnees.Contantes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,25 +59,30 @@ public class LignesTubelureController : ControllerBase
     /// <response code="400">La validation de la ligne a échoué.</response>
     [HttpPost]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Ajouter(Guid id, LigneTubelure ligne, CancellationToken token)
+    public async Task<IActionResult> Ajouter(Guid id, PostLigneTubelure ligne, CancellationToken token)
     {
         if (id != ligne.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de la ligne à ajouter.");
         }
 
-        var erreur = ValiderLigne(ligne);
+        var erreur = ValiderLigne(ligne.TypeLigne, ligne.CoordonneesJson);
 
         if (erreur != null)
         {
             return BadRequest(erreur);
         }
 
-        ligne.TypeLigne = ligne.TypeLigne?.ToLowerInvariant();
-        ligne.DC = DateTimeOffset.Now;
-        ligne.DM = DateTimeOffset.Now;
-
-        var entity = await _depot.LignesTubelure.AddAsync(ligne, token);
+        var entity = await _depot.LignesTubelure.AddAsync(new LigneTubelure
+        {
+            Id = ligne.Id,
+            IdErabliere = ligne.IdErabliere,
+            Nom = ligne.Nom,
+            TypeLigne = ligne.TypeLigne?.ToLowerInvariant(),
+            CoordonneesJson = ligne.CoordonneesJson,
+            DC = DateTimeOffset.Now,
+            DM = DateTimeOffset.Now
+        }, token);
 
         await _depot.SaveChangesAsync(token);
 
@@ -92,24 +99,36 @@ public class LignesTubelureController : ControllerBase
     /// <response code="400">La validation de la ligne a échoué.</response>
     [HttpPut]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, LigneTubelure ligne, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, PutLigneTubelure ligne, CancellationToken token)
     {
         if (id != ligne.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de la ligne à modifier.");
         }
 
-        var erreur = ValiderLigne(ligne);
+        if (ligne.Id == null)
+        {
+            return BadRequest("L'id de la ligne à modifier est requis.");
+        }
+
+        var erreur = ValiderLigne(ligne.TypeLigne, ligne.CoordonneesJson);
 
         if (erreur != null)
         {
             return BadRequest(erreur);
         }
 
-        ligne.TypeLigne = ligne.TypeLigne?.ToLowerInvariant();
-        ligne.DM = DateTimeOffset.Now;
+        var entity = await _depot.LignesTubelure.FindAsync([ligne.Id], token);
 
-        _depot.Update(ligne);
+        if (entity == null || entity.IdErabliere != id)
+        {
+            return NotFound();
+        }
+
+        entity.Nom = ligne.Nom;
+        entity.TypeLigne = ligne.TypeLigne?.ToLowerInvariant();
+        entity.CoordonneesJson = ligne.CoordonneesJson;
+        entity.DM = DateTimeOffset.Now;
 
         await _depot.SaveChangesAsync(token);
 
@@ -156,14 +175,14 @@ public class LignesTubelureController : ControllerBase
     /// Valider le type et les coordonnées d'une ligne de tubelure.
     /// </summary>
     /// <returns>Un message d'erreur, ou null si la ligne est valide</returns>
-    internal static string? ValiderLigne(LigneTubelure ligne)
+    internal static string? ValiderLigne(string? typeLigne, string? coordonneesJson)
     {
-        if (!TypeLigneTubelure.EstValide(ligne.TypeLigne))
+        if (!TypeLigneTubelure.EstValide(typeLigne))
         {
             return $"Le type de ligne doit être une des valeurs suivantes : {string.Join(", ", TypeLigneTubelure.Tous)}.";
         }
 
-        if (string.IsNullOrWhiteSpace(ligne.CoordonneesJson))
+        if (string.IsNullOrWhiteSpace(coordonneesJson))
         {
             return "Les coordonnées de la ligne sont requises.";
         }
@@ -172,7 +191,7 @@ public class LignesTubelureController : ControllerBase
 
         try
         {
-            coordonnees = JsonSerializer.Deserialize<double[][]>(ligne.CoordonneesJson);
+            coordonnees = JsonSerializer.Deserialize<double[][]>(coordonneesJson);
         }
         catch (JsonException)
         {

@@ -1,6 +1,8 @@
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Post;
+using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -50,7 +52,7 @@ public class ArbresController : ControllerBase
     /// <response code="400">La validation de l'arbre a échoué.</response>
     [HttpPost]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Ajouter(Guid id, Arbre arbre, CancellationToken token)
+    public async Task<IActionResult> Ajouter(Guid id, PostArbre arbre, CancellationToken token)
     {
         if (id != arbre.IdErabliere)
         {
@@ -62,10 +64,17 @@ public class ArbresController : ControllerBase
             return BadRequest("L'arbre doit avoir une longitude entre -180 et 180 et une latitude entre -90 et 90.");
         }
 
-        arbre.DC = DateTimeOffset.Now;
-        arbre.DM = DateTimeOffset.Now;
-
-        var entity = await _depot.Arbres.AddAsync(arbre, token);
+        var entity = await _depot.Arbres.AddAsync(new Arbre
+        {
+            Id = arbre.Id,
+            IdErabliere = arbre.IdErabliere,
+            Nom = arbre.Nom,
+            Espece = arbre.Espece,
+            Latitude = arbre.Latitude,
+            Longitude = arbre.Longitude,
+            DC = DateTimeOffset.Now,
+            DM = DateTimeOffset.Now
+        }, token);
 
         await _depot.SaveChangesAsync(token);
 
@@ -82,11 +91,16 @@ public class ArbresController : ControllerBase
     /// <response code="400">La validation de l'arbre a échoué.</response>
     [HttpPut]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, Arbre arbre, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, PutArbre arbre, CancellationToken token)
     {
         if (id != arbre.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'arbre à modifier.");
+        }
+
+        if (arbre.Id == null)
+        {
+            return BadRequest("L'id de l'arbre à modifier est requis.");
         }
 
         if (!CoordonneesValides(arbre.Latitude, arbre.Longitude))
@@ -94,9 +108,18 @@ public class ArbresController : ControllerBase
             return BadRequest("L'arbre doit avoir une longitude entre -180 et 180 et une latitude entre -90 et 90.");
         }
 
-        arbre.DM = DateTimeOffset.Now;
+        var entity = await _depot.Arbres.FindAsync([arbre.Id], token);
 
-        _depot.Update(arbre);
+        if (entity == null || entity.IdErabliere != id)
+        {
+            return NotFound();
+        }
+
+        entity.Nom = arbre.Nom;
+        entity.Espece = arbre.Espece;
+        entity.Latitude = arbre.Latitude;
+        entity.Longitude = arbre.Longitude;
+        entity.DM = DateTimeOffset.Now;
 
         await _depot.SaveChangesAsync(token);
 
