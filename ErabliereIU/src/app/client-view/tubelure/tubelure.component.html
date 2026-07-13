@@ -1,0 +1,203 @@
+<div class="border-top">
+    @if (error) {
+    <div class="alert alert-danger alert-dismissible m-2 mb-0" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" aria-label="Fermer" (click)="error = undefined"></button>
+    </div>
+    }
+    @if (erreurGps) {
+    <div class="alert alert-warning alert-dismissible m-2 mb-0" role="alert">
+        {{ erreurGps }}
+        <button type="button" class="btn-close" aria-label="Fermer" (click)="erreurGps = undefined"></button>
+    </div>
+    }
+
+    <div class="carte-wrapper">
+        <div id="map-tubelure"></div>
+
+        <div class="legende card p-2">
+            <strong>Légende</strong>
+            @for (type of typesLigne; track type) {
+            <span><span class="trait" [style.background]="couleursLigne[type]"></span> {{ libellesLigne[type] }}</span>
+            }
+            <span><span class="pastille" style="background: #2ca02c;"></span> Arbre</span>
+            <span><span class="pastille" style="background: #8c564b;"></span> Entaille</span>
+        </div>
+
+        @if (gpsFix) {
+        <span class="badge badge-gps" [class.text-bg-success]="gpsFix.accuracy <= 15"
+            [class.text-bg-warning]="gpsFix.accuracy > 15">
+            GPS ± {{ gpsFix.accuracy | number: '1.0-0' }} m
+        </span>
+        }
+
+        @if (loadingInProgress) {
+        <div class="chargement">
+            <div class="spinner-border text-primary">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+        </div>
+        }
+
+        <div class="toolbar p-2">
+            @if (mode === 'idle') {
+            @if (afficherChoixType) {
+            <div class="d-flex flex-column gap-2 mb-2">
+                @for (type of typesLigne; track type) {
+                <button type="button" class="btn btn-lg text-white" [style.background]="couleursLigne[type]"
+                    (click)="commencerLigne(type)">
+                    {{ libellesLigne[type] }}
+                </button>
+                }
+            </div>
+            }
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-primary btn-lg" (click)="afficherChoixType = !afficherChoixType">
+                    ➕ Ligne
+                </button>
+                <button type="button" class="btn btn-success btn-lg" (click)="commencerPoint('arbre')">
+                    🌳 Arbre
+                </button>
+                <button type="button" class="btn btn-secondary btn-lg" (click)="commencerPoint('entaille')">
+                    💧 Entaille
+                </button>
+            </div>
+            }
+            @else if (mode === 'ligne') {
+            <div class="d-flex gap-2 flex-wrap align-items-center mb-2">
+                <label for="nomLigne" class="badge fs-6 text-white" [style.background]="couleursLigne[typeLigneEnCours]">
+                    {{ libellesLigne[typeLigneEnCours] }} — {{ pointsEnCours.length }} point(s)
+                </label>
+                <input type="text" class="form-control form-control-lg nom-ligne" placeholder="Nom de la ligne (ex: M-01)"
+                    [(ngModel)]="nomLigneEnCours" name="nomLigne" id="nomLigne" />
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-primary btn-lg" (click)="ajouterPointGps()" [disabled]="!gpsFix"
+                    title="Ajouter un point à la position GPS actuelle">
+                    📍 Point GPS
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-lg" (click)="annulerDernierPoint()"
+                    [disabled]="pointsEnCours.length === 0">
+                    ↩ Retirer
+                </button>
+                <button type="button" class="btn btn-success btn-lg" (click)="enregistrerLigne()"
+                    [disabled]="pointsEnCours.length < 2 || enregistrementEnCours">
+                    💾 Enregistrer
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-lg" (click)="annulerSaisie()">
+                    Annuler
+                </button>
+            </div>
+            <small class="text-muted d-block mt-1">Touchez la carte ou utilisez le GPS pour ajouter des points. Glissez un
+                point pour le déplacer.</small>
+            }
+            @else {
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <span class="badge fs-6" [class.text-bg-success]="mode === 'arbre'"
+                    [class.text-bg-secondary]="mode === 'entaille'">
+                    {{ mode === 'arbre' ? '🌳 Nouvel arbre' : '💧 Nouvelle entaille' }}
+                </span>
+                <button type="button" class="btn btn-primary btn-lg" (click)="ajouterPointGps()" [disabled]="!gpsFix">
+                    📍 Position GPS
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-lg" (click)="annulerSaisie()">
+                    Annuler
+                </button>
+            </div>
+            <small class="text-muted d-block mt-1">Touchez la carte à l'emplacement voulu ou utilisez votre position
+                GPS.</small>
+            }
+        </div>
+    </div>
+</div>
+
+@if (modal === 'arbre') {
+<emodal title="Nouvel arbre" [displayFooter]="false" (closeModal)="fermerModal()">
+    <div class="mb-3">
+        <label class="form-label" for="nomArbre">Nom / identifiant</label>
+        <input id="nomArbre" type="text" class="form-control" [(ngModel)]="formNom" name="nomArbre" maxlength="100" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="especeArbre">Espèce</label>
+        <input id="especeArbre" type="text" class="form-control" [(ngModel)]="formEspece" name="especeArbre"
+            maxlength="50" placeholder="Érable à sucre" />
+    </div>
+    <div class="mb-3 d-flex gap-2 align-items-end">
+        <div>
+            <label class="form-label" for="latArbre">Latitude</label>
+            <input id="latArbre" type="number" class="form-control" [(ngModel)]="formLat" name="latArbre" step="any" />
+        </div>
+        <div>
+            <label class="form-label" for="lngArbre">Longitude</label>
+            <input id="lngArbre" type="number" class="form-control" [(ngModel)]="formLng" name="lngArbre" step="any" />
+        </div>
+        <button type="button" class="btn btn-outline-primary" (click)="utiliserPositionGpsModal()" [disabled]="!gpsFix">
+            📍 Ma position
+        </button>
+    </div>
+    <div class="d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-secondary" (click)="fermerModal()">Annuler</button>
+        <button type="button" class="btn btn-success" (click)="enregistrerArbre()"
+            [disabled]="enregistrementEnCours">Enregistrer</button>
+    </div>
+</emodal>
+}
+
+@if (modal === 'entaille') {
+<emodal title="Nouvelle entaille" [displayFooter]="false" (closeModal)="fermerModal()">
+    <div class="mb-3">
+        <label class="form-label" for="nomEntaille">Nom / identifiant</label>
+        <input id="nomEntaille" type="text" class="form-control" [(ngModel)]="formNom" name="nomEntaille"
+            maxlength="100" />
+    </div>
+    <div class="mb-3 d-flex gap-2 align-items-end">
+        <div>
+            <label class="form-label" for="latEntaille">Latitude</label>
+            <input id="latEntaille" type="number" class="form-control" [(ngModel)]="formLat" name="latEntaille"
+                step="any" />
+        </div>
+        <div>
+            <label class="form-label" for="lngEntaille">Longitude</label>
+            <input id="lngEntaille" type="number" class="form-control" [(ngModel)]="formLng" name="lngEntaille"
+                step="any" />
+        </div>
+        <button type="button" class="btn btn-outline-primary" (click)="utiliserPositionGpsModal()" [disabled]="!gpsFix">
+            📍 Ma position
+        </button>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="arbreEntaille">Arbre (optionnel)</label>
+        <select id="arbreEntaille" class="form-select" [(ngModel)]="formIdArbre" name="arbreEntaille">
+            <option value="">Aucun</option>
+            @for (arbre of arbres; track arbre.id) {
+            <option [value]="arbre.id">{{ arbre.nom || arbre.id }}</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="ligneEntaille">Ligne de tubelure (optionnel)</label>
+        <select id="ligneEntaille" class="form-select" [(ngModel)]="formIdLigne" name="ligneEntaille">
+            <option value="">Aucune</option>
+            @for (ligne of lignes; track ligne.id) {
+            <option [value]="ligne.id">{{ ligne.nom || libellesLigne[ligne.typeLigne ?? ''] || ligne.id }}</option>
+            }
+        </select>
+    </div>
+    <div class="d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-secondary" (click)="fermerModal()">Annuler</button>
+        <button type="button" class="btn btn-success" (click)="enregistrerEntaille()"
+            [disabled]="enregistrementEnCours">Enregistrer</button>
+    </div>
+</emodal>
+}
+
+@if (modal === 'suppression') {
+<emodal title="Confirmer la suppression" [displayFooter]="false" (closeModal)="fermerModal()">
+    <p>Voulez-vous vraiment supprimer {{ libelleSuppression() }}</p>
+    <div class="d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-secondary" (click)="fermerModal()">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmerSuppression()"
+            [disabled]="enregistrementEnCours">Supprimer</button>
+    </div>
+</emodal>
+}

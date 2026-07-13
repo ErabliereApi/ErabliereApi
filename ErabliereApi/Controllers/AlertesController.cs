@@ -3,6 +3,7 @@ using ErabliereApi.Action.Post;
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -97,22 +98,39 @@ public class AlertesController : ControllerBase
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à modifier.</response>
     [HttpPut]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Modifier(Guid id, Alerte alerte, CancellationToken token)
+    public async Task<IActionResult> Modifier(Guid id, PutAlerte alerte, CancellationToken token)
     {
         if (id != alerte.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à modifier.");
         }
-        if (alerte.Erabliere != null)
+        if (alerte.Id == null)
         {
-            return BadRequest("L'érablière ne peut pas être modifié via cette route.");
+            return BadRequest("L'id de l'alerte à modifier est requis.");
         }
 
-        var entity = _depot.Update(alerte);
+        var entity = await _depot.Alertes.FindAsync([alerte.Id], cancellationToken: token);
+
+        if (entity == null || entity.IdErabliere != id)
+        {
+            return NotFound();
+        }
+
+        entity.Nom = alerte.Nom;
+        entity.EnvoyerA = alerte.EnvoyerA;
+        entity.TexterA = alerte.TexterA;
+        entity.TemperatureThresholdLow = alerte.TemperatureThresholdLow;
+        entity.TemperatureThresholdHight = alerte.TemperatureThresholdHight;
+        entity.VacciumThresholdLow = alerte.VacciumThresholdLow;
+        entity.VacciumThresholdHight = alerte.VacciumThresholdHight;
+        entity.NiveauBassinThresholdLow = alerte.NiveauBassinThresholdLow;
+        entity.NiveauBassinThresholdHight = alerte.NiveauBassinThresholdHight;
+        entity.IsEnable = alerte.IsEnable;
+        entity.DM = DateTimeOffset.UtcNow;
 
         await _depot.SaveChangesAsync(token);
 
-        return Ok(entity.Entity);
+        return Ok(entity);
     }
 
     /// <summary>

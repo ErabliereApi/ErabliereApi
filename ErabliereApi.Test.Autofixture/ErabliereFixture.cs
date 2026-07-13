@@ -51,7 +51,20 @@ public static class ErabliereFixture
                                            .Without(e => e.Capteurs)
                                            .Without(e => e.Inspections)
                                            .Without(e => e.CustomerErablieres)
-                                           .Without(e => e.Horaires));
+                                           .Without(e => e.Horaires)
+                                           .Without(e => e.LignesTubelure)
+                                           .Without(e => e.Arbres)
+                                           .Without(e => e.Entailles));
+
+        fixture.Customize<LigneTubelure>(c => c.Without(l => l.Erabliere)
+                                               .Without(l => l.Entailles));
+
+        fixture.Customize<Arbre>(c => c.Without(a => a.Erabliere)
+                                       .Without(a => a.Entailles));
+
+        fixture.Customize<Entaille>(c => c.Without(e => e.Erabliere)
+                                          .Without(e => e.Arbre)
+                                          .Without(e => e.LigneTubelure));
 
         fixture.Customize<Donnee>(c => c.With(d => d.D, RandomDate(from: MinDate, to: MaxDate))
                                         .Without(d => d.Erabliere)

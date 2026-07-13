@@ -156,6 +156,21 @@ public class Erabliere : IIdentifiable<Guid?, Erabliere>, IUserOwnable, ILocaliz
     public List<Horaire>? Horaires { get; set; }
 
     /// <summary>
+    /// Les lignes du réseau de tubelure de l'érablière
+    /// </summary>
+    public List<LigneTubelure>? LignesTubelure { get; set; }
+
+    /// <summary>
+    /// Les arbres cartographiés de l'érablière
+    /// </summary>
+    public List<Arbre>? Arbres { get; set; }
+
+    /// <summary>
+    /// Les entailles cartographiées de l'érablière
+    /// </summary>
+    public List<Entaille>? Entailles { get; set; }
+
+    /// <summary>
     /// Liste de jonction entre l'utilisateurs et ses érablières
     /// </summary>
     public List<CustomerErabliere>? CustomerErablieres { get; set; }

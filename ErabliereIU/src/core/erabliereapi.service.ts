@@ -35,6 +35,9 @@ import { Appareil } from 'src/model/appareil';
 import { IpInfo } from 'src/model/ipinfo';
 import { WeatherProviderResponse } from 'src/model/weatherProviderResponse';
 import { ChirpstackSrvConfig } from 'src/model/chripstacksrvconfig';
+import { LigneTubelure } from 'src/model/ligneTubelure';
+import { Arbre } from 'src/model/arbre';
+import { Entaille } from 'src/model/entaille';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
@@ -700,6 +703,74 @@ export class ErabliereApi {
         }
 
         return await firstValueFrom(this._httpClient.get<any>(url, { headers: header }));
+    }
+
+    async getTubelureGeoJson(idErabliereSelectionnee: any): Promise<any> {
+        const headers = await this.getHeaders();
+        return await firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Tubelure/GeoJson', { headers: headers }));
+    }
+
+    async getLignesTubelure(idErabliereSelectionnee: any): Promise<LigneTubelure[]> {
+        const headers = await this.getHeaders();
+        const rtn = firstValueFrom(this._httpClient.get<LigneTubelure[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/LignesTubelure?$orderby=Nom', { headers: headers }));
+        return rtn ?? [];
+    }
+
+    async postLigneTubelure(idErabliereSelectionnee: any, ligne: LigneTubelure): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.post<any>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/LignesTubelure', ligne, { headers: headers }));
+    }
+
+    async putLigneTubelure(idErabliereSelectionnee: any, ligne: LigneTubelure): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<any>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/LignesTubelure', ligne, { headers: headers }));
+    }
+
+    async deleteLigneTubelure(idErabliereSelectionnee: any, idLigne: any): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/LignesTubelure/' + idLigne, { headers: headers }));
+    }
+
+    async getArbres(idErabliereSelectionnee: any): Promise<Arbre[]> {
+        const headers = await this.getHeaders();
+        const rtn = firstValueFrom(this._httpClient.get<Arbre[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Arbres?$orderby=Nom', { headers: headers }));
+        return rtn ?? [];
+    }
+
+    async postArbre(idErabliereSelectionnee: any, arbre: Arbre): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.post<any>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Arbres', arbre, { headers: headers }));
+    }
+
+    async putArbre(idErabliereSelectionnee: any, arbre: Arbre): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<any>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Arbres', arbre, { headers: headers }));
+    }
+
+    async deleteArbre(idErabliereSelectionnee: any, idArbre: any): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Arbres/' + idArbre, { headers: headers }));
+    }
+
+    async getEntailles(idErabliereSelectionnee: any): Promise<Entaille[]> {
+        const headers = await this.getHeaders();
+        const rtn = firstValueFrom(this._httpClient.get<Entaille[]>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Entailles?$orderby=Nom', { headers: headers }));
+        return rtn ?? [];
+    }
+
+    async postEntaille(idErabliereSelectionnee: any, entaille: Entaille): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.post<any>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Entailles', entaille, { headers: headers }));
+    }
+
+    async putEntaille(idErabliereSelectionnee: any, entaille: Entaille): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<any>(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Entailles', entaille, { headers: headers }));
+    }
+
+    async deleteEntaille(idErabliereSelectionnee: any, idEntaille: any): Promise<any> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + '/Entailles/' + idEntaille, { headers: headers }));
     }
 
     async getApiKeys(): Promise<ApiKey[]> {

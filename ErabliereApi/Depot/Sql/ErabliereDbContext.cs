@@ -153,6 +153,21 @@ namespace ErabliereApi.Depot.Sql
         /// </summary>
         public DbSet<ChirpStackMessage> ChirpstackMessageHistory { get; private set; }
 
+        /// <summary>
+        /// Table des lignes du réseau de tubelure
+        /// </summary>
+        public DbSet<LigneTubelure> LignesTubelure { get; private set; }
+
+        /// <summary>
+        /// Table des arbres cartographiés
+        /// </summary>
+        public DbSet<Arbre> Arbres { get; private set; }
+
+        /// <summary>
+        /// Table des entailles cartographiées
+        /// </summary>
+        public DbSet<Entaille> Entailles { get; private set; }
+
 #pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />
