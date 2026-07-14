@@ -3,6 +3,7 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Services;
+using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Services.Users;
 using ErabliereApi.Test.Autofixture;
 using Microsoft.AspNetCore.Hosting;
@@ -90,6 +91,7 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
                             sp.GetRequiredService<ILogger<StripeCheckoutService>>(),
                             sp.GetRequiredService<IUserService>(),
                             sp.GetRequiredService<IApiKeyService>(),
+                            sp.GetRequiredService<IAbonnementService>(),
                             CancellationToken.None);
                     });
                 });

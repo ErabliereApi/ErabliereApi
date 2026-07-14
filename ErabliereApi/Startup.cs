@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ErabliereApi.Services.StripeIntegration;
 using ErabliereApi.Services;
+using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Services.Nmap;
 using ErabliereApi.Authorization.Customers;
 using ErabliereApi.Middlewares;
@@ -122,6 +123,7 @@ public class Startup
 
             services.AddTransient<ICheckoutService, StripeCheckoutService>()
                     .AddTransient<IApiKeyService, ApiApiKeyService>()
+                    .AddTransient<IAbonnementService, AbonnementService>()
                     .AddTransient<ApiKeyMiddleware>();
 
             // Authorization

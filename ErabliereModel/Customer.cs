@@ -88,4 +88,9 @@ public class Customer
     /// Liste de jonction entre l'utilisateurs et ses érablières
     /// </summary>
     public List<CustomerErabliere>? CustomerErablieres { get; set; }
+
+    /// <summary>
+    /// La liste des abonnements de l'utilisateur
+    /// </summary>
+    public List<Abonnement>? Abonnements { get; set; }
 }

@@ -10,6 +10,7 @@ import { EButtonComponent } from "src/generic/ebutton.component";
 import { ApiKey } from "src/model/apikey";
 import { EModalComponent } from "src/generic/modal/emodal.component";
 import { EinputComponent } from "src/generic/einput.component";
+import { GestionAbonnementComponent } from "./gestion-abonnement/gestion-abonnement.component";
 import {
     ReactiveFormsModule,
     FormsModule,
@@ -27,9 +28,10 @@ import {
         CurrencyPipe,
         DatePipe, 
         EButtonComponent, 
-        EModalComponent, 
-        EinputComponent, 
-        ReactiveFormsModule, 
+        EModalComponent,
+        EinputComponent,
+        GestionAbonnementComponent,
+        ReactiveFormsModule,
         FormsModule
     ],
 })

@@ -1,0 +1,28 @@
+<h3>Gestion de l'abonnement</h3>
+<div class="btn-group mb-3">
+    <ebutton class="ms-2" type="info" (clicked)="chargerAbonnements()" [inProgress]="chargementEnCours"
+        tooltip="Rafraîchir l'abonnement">⟳</ebutton>
+</div>
+<span class="text-danger">{{ error }}</span>
+@if (abonnementCourant != null) {
+<p><strong>Forfait actuel:</strong> {{ libelleForfait(abonnementCourant.plan) }}</p>
+<p><strong>Statut:</strong> {{ libelleStatut(abonnementCourant.statut) }}</p>
+@if (abonnementCourant.dateDebut) {
+<p><strong>Date de début:</strong> {{ abonnementCourant.dateDebut | date:'yyyy-MM-dd' }}</p>
+}
+@if (abonnementCourant.dateFin) {
+<p><strong>Date de fin:</strong> {{ abonnementCourant.dateFin | date:'yyyy-MM-dd' }}</p>
+}
+<div>
+    <ebutton type="danger" (clicked)="annulerAbonnement()" [inProgress]="actionEnCours">Annuler l'abonnement</ebutton>
+</div>
+} @else {
+<p>Vous n'avez aucun abonnement en cours. Forfaits disponibles :</p>
+@for (forfait of forfaits; track forfait.plan) {
+<div class="mb-3">
+    <p class="mb-1"><strong>{{ forfait.titre }}</strong> — {{ forfait.description }}</p>
+    <ebutton type="success" (clicked)="choisirForfait(forfait.plan)" [inProgress]="actionEnCours">
+        Choisir le forfait {{ forfait.titre }}</ebutton>
+</div>
+}
+}

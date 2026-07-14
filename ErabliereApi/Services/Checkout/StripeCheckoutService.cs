@@ -2,6 +2,7 @@
 using Stripe;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Donnees;
+using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Services.StripeIntegration;
 using ErabliereApi.Services.Users;
 using ErabliereApi.Donnees.Action.Post;
@@ -19,6 +20,7 @@ public class StripeCheckoutService : ICheckoutService
     private readonly ILogger<StripeCheckoutService> _logger;
     private readonly IUserService _userService;
     private readonly IApiKeyService _apiKeyService;
+    private readonly IAbonnementService _abonnementService;
     private readonly UsageContext _usageContext;
 
     /// <summary>
@@ -29,12 +31,14 @@ public class StripeCheckoutService : ICheckoutService
     /// <param name="logger"></param>
     /// <param name="userService"></param>
     /// <param name="apiKeyService"></param>
+    /// <param name="abonnementService"></param>
     /// <param name="usageContext"></param>
     public StripeCheckoutService(IOptions<StripeOptions> options,
                                  IHttpContextAccessor accessor,
                                  ILogger<StripeCheckoutService> logger,
                                  IUserService userService,
                                  IApiKeyService apiKeyService,
+                                 IAbonnementService abonnementService,
                                  UsageContext usageContext)
     {
         _options = options;
@@ -42,6 +46,7 @@ public class StripeCheckoutService : ICheckoutService
         _logger = logger;
         _userService = userService;
         _apiKeyService = apiKeyService;
+        _abonnementService = abonnementService;
         _usageContext = usageContext;
     }
 
@@ -176,6 +181,7 @@ public class StripeCheckoutService : ICheckoutService
             _logger,
             _userService,
             _apiKeyService,
+            _abonnementService,
             _accessor.HttpContext?.RequestAborted ?? CancellationToken.None);
     }
 
@@ -186,12 +192,14 @@ public class StripeCheckoutService : ICheckoutService
     /// <param name="logger"></param>
     /// <param name="userService"></param>
     /// <param name="apiKeyService"></param>
+    /// <param name="abonnementService"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     public static async Task WebHookSwitchCaseLogic(Event stripeEvent,
         ILogger logger,
         IUserService userService,
         IApiKeyService apiKeyService,
+        IAbonnementService abonnementService,
         CancellationToken token)
     {
         switch (stripeEvent.Type)
@@ -220,6 +228,21 @@ public class StripeCheckoutService : ICheckoutService
                 await apiKeyService.SetSubscriptionKeyAsync(
                     customer, subscription.Items.First().Id, token);
                 logger.LogInformation("End of customer.subscription.created");
+
+                logger.LogInformation("Begin of abonnement activation");
+                await abonnementService.ActiverAbonnementStripeAsync(customer, subscription, token);
+                logger.LogInformation("End of abonnement activation");
+                break;
+
+            case "customer.subscription.updated":
+            case "customer.subscription.deleted":
+                logger.LogInformation("Begin of {EventType}", stripeEvent.Type);
+
+                var subscriptionModifiee = stripeEvent.Data.Object as Subscription
+                    ?? throw new ArgumentNullException(nameof(stripeEvent), "Stripe.Data.Object event is null");
+
+                await abonnementService.SynchroniserStatutStripeAsync(subscriptionModifiee, token);
+                logger.LogInformation("End of {EventType}", stripeEvent.Type);
                 break;
 
             default:
@@ -252,6 +275,16 @@ public class StripeCheckoutService : ICheckoutService
         });
 
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public async Task CancelSubscriptionAsync(string subscriptionId, CancellationToken token)
+    {
+        StripeConfiguration.ApiKey = _options.Value.ApiKey;
+
+        var service = new SubscriptionService();
+
+        await service.CancelAsync(subscriptionId, cancellationToken: token);
     }
 
     /// <inheritdoc />

@@ -38,6 +38,7 @@ import { ChirpstackSrvConfig } from 'src/model/chripstacksrvconfig';
 import { LigneTubelure } from 'src/model/ligneTubelure';
 import { Arbre } from 'src/model/arbre';
 import { Entaille } from 'src/model/entaille';
+import { Abonnement, PostAbonnement, PostAbonnementResponse, PutAbonnement } from 'src/model/abonnement';
 
 @Injectable({ providedIn: 'root' })
 export class ErabliereApi {
@@ -937,7 +938,27 @@ export class ErabliereApi {
     async getUpcomingInvoice(subscriptionId: string) {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.get<any>(this._environmentService.apiUrl + '/Checkout/UpcomingInvoice?subscriptionId=' + subscriptionId, { headers: headers }));
-    }  
+    }
+
+    async getAbonnements() {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<Abonnement[]>(this._environmentService.apiUrl + '/api/abonnements', { headers: headers }));
+    }
+
+    async postAbonnement(abonnement: PostAbonnement) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.post<PostAbonnementResponse>(this._environmentService.apiUrl + '/api/abonnements', abonnement, { headers: headers }));
+    }
+
+    async putAbonnement(idAbonnement: string, abonnement: PutAbonnement) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.put<void>(this._environmentService.apiUrl + '/api/abonnements/' + idAbonnement, abonnement, { headers: headers }));
+    }
+
+    async annulerAbonnement(idAbonnement: string) {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.delete<void>(this._environmentService.apiUrl + '/api/abonnements/' + idAbonnement, { headers: headers }));
+    }
 
     async getChirpstackSrvConfig() {
         const headers = await this.getHeaders();

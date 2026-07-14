@@ -46,4 +46,9 @@ public interface ICheckoutService
     /// Get the customer's upcoming invoice
     /// </summary>
     Task<object> GetCustomerUpcomingInvoiceAsync(string subscriptionId, CancellationToken token);
+
+    /// <summary>
+    /// Cancel a subscription on the payment provider side
+    /// </summary>
+    Task CancelSubscriptionAsync(string subscriptionId, CancellationToken token);
 }
