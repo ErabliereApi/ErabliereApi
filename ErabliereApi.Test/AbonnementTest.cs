@@ -1,5 +1,6 @@
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Services;
 using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Test.Autofixture;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -189,6 +190,28 @@ public class AbonnementTest
 
     #endregion
 
+    #region Fréquences de facturation
+
+    [Theory]
+    [InlineData("mensuelle")]
+    [InlineData("annuelle")]
+    [InlineData("Annuelle")]
+    public void FrequencesFacturation_FrequenceConnue_EstValide(string frequence)
+    {
+        Assert.True(FrequencesFacturation.EstValide(frequence));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("hebdomadaire")]
+    public void FrequencesFacturation_FrequenceInconnue_EstInvalide(string? frequence)
+    {
+        Assert.False(FrequencesFacturation.EstValide(frequence));
+    }
+
+    #endregion
+
     #region Synchronisation Stripe (AbonnementService)
 
     private static async Task<Customer> AjouterCustomerAsync(ErabliereDbContext context)
@@ -252,6 +275,92 @@ public class AbonnementTest
     }
 
     [Theory, AutoApiData]
+    public async Task ActiverAbonnementStripe_PrixAnnuel_DeduitLaFrequenceAnnuelle(ErabliereDbContext context)
+    {
+        var customer = await AjouterCustomerAsync(context);
+        Assert.NotNull(customer.Id);
+
+        context.Abonnements.Add(new Abonnement
+        {
+            CustomerId = customer.Id.Value,
+            Plan = ForfaitsAbonnement.Base,
+            Statut = StatutAbonnement.EnAttente,
+            DC = DateTimeOffset.Now
+        });
+        await context.SaveChangesAsync();
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        await service.ActiverAbonnementStripeAsync(
+            customer, SubscriptionAvecIntervalle("sub_annuel1", "year"), CancellationToken.None);
+
+        var abonnement = context.Abonnements.Single(a => a.CustomerId == customer.Id);
+        Assert.Equal(FrequencesFacturation.Annuelle, abonnement.FrequenceFacturation);
+    }
+
+    [Theory, AutoApiData]
+    public async Task ActiverAbonnementStripe_PrixMensuelSansAbonnementEnAttente_CreeAvecFrequenceMensuelle(ErabliereDbContext context)
+    {
+        var customer = await AjouterCustomerAsync(context);
+        Assert.NotNull(customer.Id);
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        await service.ActiverAbonnementStripeAsync(
+            customer, SubscriptionAvecIntervalle("sub_mensuel1", "month"), CancellationToken.None);
+
+        var abonnement = context.Abonnements.Single(a => a.CustomerId == customer.Id && a.StripeSubscriptionId == "sub_mensuel1");
+        Assert.Equal(FrequencesFacturation.Mensuelle, abonnement.FrequenceFacturation);
+    }
+
+    [Theory, AutoApiData]
+    public async Task ActiverAbonnementStripe_FrequenceDejaChoisie_NEstPasEcrasee(ErabliereDbContext context)
+    {
+        var customer = await AjouterCustomerAsync(context);
+        Assert.NotNull(customer.Id);
+
+        context.Abonnements.Add(new Abonnement
+        {
+            CustomerId = customer.Id.Value,
+            Plan = ForfaitsAbonnement.Base,
+            FrequenceFacturation = FrequencesFacturation.Mensuelle,
+            Statut = StatutAbonnement.EnAttente,
+            DC = DateTimeOffset.Now
+        });
+        await context.SaveChangesAsync();
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        await service.ActiverAbonnementStripeAsync(
+            customer, SubscriptionAvecIntervalle("sub_mensuel2", "year"), CancellationToken.None);
+
+        var abonnement = context.Abonnements.Single(a => a.CustomerId == customer.Id);
+        Assert.Equal(FrequencesFacturation.Mensuelle, abonnement.FrequenceFacturation);
+    }
+
+    private static Stripe.Subscription SubscriptionAvecIntervalle(string id, string interval)
+    {
+        return new Stripe.Subscription
+        {
+            Id = id,
+            Items = new Stripe.StripeList<Stripe.SubscriptionItem>
+            {
+                Data =
+                [
+                    new Stripe.SubscriptionItem
+                    {
+                        Price = new Stripe.Price
+                        {
+                            Id = $"price_{id}",
+                            Recurring = new Stripe.PriceRecurring { Interval = interval }
+                        }
+                    }
+                ]
+            }
+        };
+    }
+
+    [Theory, AutoApiData]
     public async Task SynchroniserStatutStripe_AbonnementStripeAnnule_AnnuleLAbonnementLocal(ErabliereDbContext context)
     {
         var customer = await AjouterCustomerAsync(context);
@@ -275,6 +384,73 @@ public class AbonnementTest
         var abonnement = context.Abonnements.Single(a => a.StripeSubscriptionId == "sub_test789");
         Assert.Equal(StatutAbonnement.Annule, abonnement.Statut);
         Assert.NotNull(abonnement.DateFin);
+    }
+
+    #endregion
+
+    #region Distinction abonnement de compte vs clé d'API (webhook)
+
+    [Theory]
+    [InlineData("price_mensuel")]
+    [InlineData("price_annuel")]
+    public void EstAbonnementCompte_PrixAbonnementConfigure_RetourneVrai(string priceId)
+    {
+        var options = new StripeOptions
+        {
+            BasePlanPriceId = "price_cle_api",
+            AbonnementMensuelPriceId = "price_mensuel",
+            AbonnementAnnuelPriceId = "price_annuel"
+        };
+
+        var subscription = SubscriptionAvecPriceId(priceId);
+
+        Assert.True(StripeCheckoutService.EstAbonnementCompte(subscription, options));
+    }
+
+    [Fact]
+    public void EstAbonnementCompte_PrixCleApi_RetourneFaux()
+    {
+        var options = new StripeOptions
+        {
+            BasePlanPriceId = "price_cle_api",
+            AbonnementMensuelPriceId = "price_mensuel",
+            AbonnementAnnuelPriceId = "price_annuel"
+        };
+
+        var subscription = SubscriptionAvecPriceId("price_cle_api");
+
+        Assert.False(StripeCheckoutService.EstAbonnementCompte(subscription, options));
+    }
+
+    [Fact]
+    public void EstAbonnementCompte_PrixAbonnementNonConfigures_RetourneFaux()
+    {
+        var options = new StripeOptions
+        {
+            BasePlanPriceId = "price_cle_api"
+        };
+
+        var subscription = SubscriptionAvecPriceId("price_cle_api");
+
+        Assert.False(StripeCheckoutService.EstAbonnementCompte(subscription, options));
+    }
+
+    private static Stripe.Subscription SubscriptionAvecPriceId(string priceId)
+    {
+        return new Stripe.Subscription
+        {
+            Id = "sub_test",
+            Items = new Stripe.StripeList<Stripe.SubscriptionItem>
+            {
+                Data =
+                [
+                    new Stripe.SubscriptionItem
+                    {
+                        Price = new Stripe.Price { Id = priceId }
+                    }
+                ]
+            }
+        };
     }
 
     #endregion

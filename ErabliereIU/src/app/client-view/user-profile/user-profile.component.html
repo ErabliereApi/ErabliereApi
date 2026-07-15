@@ -70,27 +70,11 @@
         </div>
     </div>
     <div class="col-md-4 card">
-        <h3>Abonnements</h3>
-        <div class="btn-group mb-3">
-            <ebutton class="ms-2" type="info" (clicked)="getSubscriptions()" [inProgress]="loadUserProfileClicked"
-                title="Rafraîchir abonnement">⟳</ebutton>
-        </div>
-        @if (subscriptions != null) {
-        @for (subscription of subscriptions; track subscription.id) {
-        <p><strong>ID:</strong> {{ subscription.id }} <copy-id-button [text]="subscription.id"
-                title="Copier l'id de mon abonnement"></copy-id-button></p>
-        <p><strong>Type:</strong> {{ subscription.billing_mode.type }}</p>
-        <p><strong>Statut:</strong> {{ subscription.status }}</p>
-        <p><strong>Date de début:</strong> {{ subscription.start_date * 1000 | date:'yyyy-MM-dd' }}</p>
-        <p><strong>Date de fin:</strong> {{ subscription.end_date * 1000 | date:'yyyy-MM-dd' }}</p>
-        <hr />
-        }
-        }@else {
-        <p>L'utilisateur ne possède pas d'abonnement</p>
-        }
-    </div>
-    <div class="col-md-4 card">
         <h3>Coûts</h3>
+        <div class="btn-group mb-3">
+            <ebutton class="ms-2" type="info" (clicked)="getSubscriptions()" [inProgress]="gettingSubscriptions"
+                title="Rafraîchir les coûts">⟳</ebutton>
+        </div>
         @if (subscriptions == null || subscriptions.length == 0) {
         <p>L'utilisateur ne possède pas d'abonnement. Aucun coût disponible.</p>
         }

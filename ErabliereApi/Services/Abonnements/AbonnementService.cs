@@ -40,6 +40,7 @@ public class AbonnementService : IAbonnementService
             abonnement.ChangerStatut(StatutAbonnement.Actif);
             abonnement.StripeSubscriptionId = subscription.Id;
             abonnement.DateDebut ??= DateTimeOffset.Now;
+            abonnement.FrequenceFacturation ??= FrequenceDepuisStripe(subscription);
         }
         else
         {
@@ -47,6 +48,7 @@ public class AbonnementService : IAbonnementService
             {
                 CustomerId = customer.Id.Value,
                 Plan = ForfaitsAbonnement.Base,
+                FrequenceFacturation = FrequenceDepuisStripe(subscription),
                 Statut = StatutAbonnement.Actif,
                 DateDebut = DateTimeOffset.Now,
                 StripeSubscriptionId = subscription.Id,
@@ -56,6 +58,24 @@ public class AbonnementService : IAbonnementService
         }
 
         await _depot.SaveChangesAsync(token);
+    }
+
+    /// <summary>
+    /// Déduit la fréquence de facturation locale de l'intervalle de récurrence
+    /// du prix de l'abonnement Stripe.
+    /// </summary>
+    private static string? FrequenceDepuisStripe(Subscription subscription)
+    {
+        var interval = subscription.Items?.Data?
+            .Select(i => i.Price?.Recurring?.Interval)
+            .FirstOrDefault(i => i != null);
+
+        return interval switch
+        {
+            "month" => FrequencesFacturation.Mensuelle,
+            "year" => FrequencesFacturation.Annuelle,
+            _ => null
+        };
     }
 
     /// <inheritdoc />

@@ -44,6 +44,13 @@ public class Abonnement : IIdentifiable<Guid?, Abonnement>, IDatesInfo
     public DateTimeOffset? DateFin { get; set; }
 
     /// <summary>
+    /// La fréquence de facturation d'un forfait payant. Voir <see cref="FrequencesFacturation" />
+    /// pour les valeurs permises. Null pour un forfait gratuit.
+    /// </summary>
+    [MaxLength(50)]
+    public string? FrequenceFacturation { get; set; }
+
+    /// <summary>
     /// Le statut de l'abonnement
     /// </summary>
     public StatutAbonnement Statut { get; set; } = StatutAbonnement.EnAttente;

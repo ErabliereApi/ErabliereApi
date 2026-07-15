@@ -26,9 +26,19 @@ public class StripeOptions
     public string? CancelUrl { get; set; }
 
     /// <summary>
-    /// L'id stripe du plan de base
+    /// L'id stripe du plan de base des clés d'API, facturé à l'utilisation
     /// </summary>
     public string? BasePlanPriceId { get; set; }
+
+    /// <summary>
+    /// L'id stripe du prix mensuel (16 $/mois) de l'abonnement d'un compte utilisateur
+    /// </summary>
+    public string? AbonnementMensuelPriceId { get; set; }
+
+    /// <summary>
+    /// L'id stripe du prix annuel (166 $/an) de l'abonnement d'un compte utilisateur
+    /// </summary>
+    public string? AbonnementAnnuelPriceId { get; set; }
 
     /// <summary>
     /// Le secret webhook

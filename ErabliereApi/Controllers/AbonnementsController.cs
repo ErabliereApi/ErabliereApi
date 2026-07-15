@@ -103,6 +103,14 @@ public class AbonnementsController : ControllerBase
             return BadRequest("La date de début doit précéder la date de fin.");
         }
 
+        var estPayant = ForfaitsAbonnement.EstPayant(abonnement.Plan);
+
+        if (estPayant && !FrequencesFacturation.EstValide(abonnement.FrequenceFacturation))
+        {
+            return BadRequest($"La fréquence de facturation '{abonnement.FrequenceFacturation}' n'est pas valide " +
+                              $"pour un forfait payant. Les fréquences valides sont : {string.Join(", ", FrequencesFacturation.Toutes)}.");
+        }
+
         var customer = await GetCustomerAuthentifieAsync(token);
 
         if (customer == null)
@@ -120,17 +128,34 @@ public class AbonnementsController : ControllerBase
                               "Annulez l'abonnement en cours avant d'en créer un nouveau.");
         }
 
-        var estPayant = ForfaitsAbonnement.EstPayant(abonnement.Plan);
-
         if (estPayant && !_configuration.StripeIsEnabled())
         {
             return BadRequest("Le paiement n'est pas activé sur ce serveur. Impossible de créer un abonnement payant.");
+        }
+
+        string? checkoutUrl = null;
+
+        if (estPayant)
+        {
+            var checkoutService = HttpContext.RequestServices.GetRequiredService<ICheckoutService>();
+
+            try
+            {
+                var session = await checkoutService.CreateAbonnementSessionAsync(abonnement.FrequenceFacturation!, token);
+
+                checkoutUrl = session.Url;
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         var entity = await _depot.Abonnements.AddAsync(new Abonnement
         {
             CustomerId = customer.Id!.Value,
             Plan = abonnement.Plan!.ToLowerInvariant(),
+            FrequenceFacturation = estPayant ? abonnement.FrequenceFacturation!.ToLowerInvariant() : null,
             DateDebut = abonnement.DateDebut ?? (estPayant ? null : DateTimeOffset.Now),
             DateFin = abonnement.DateFin,
             Statut = estPayant ? StatutAbonnement.EnAttente : StatutAbonnement.Actif,
@@ -140,13 +165,9 @@ public class AbonnementsController : ControllerBase
 
         await _depot.SaveChangesAsync(token);
 
-        if (estPayant && _configuration.StripeIsEnabled())
+        if (checkoutUrl != null)
         {
-            var checkoutService = HttpContext.RequestServices.GetRequiredService<ICheckoutService>();
-
-            var session = await checkoutService.CreateSessionAsync(token);
-
-            return Ok(new { id = entity.Entity.Id, checkoutUrl = session.Url });
+            return Ok(new { id = entity.Entity.Id, checkoutUrl });
         }
 
         return Ok(new { id = entity.Entity.Id });

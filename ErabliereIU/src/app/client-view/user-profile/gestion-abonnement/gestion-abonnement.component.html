@@ -6,6 +6,9 @@
 <span class="text-danger">{{ error }}</span>
 @if (abonnementCourant != null) {
 <p><strong>Forfait actuel:</strong> {{ libelleForfait(abonnementCourant.plan) }}</p>
+@if (libelleTarif(abonnementCourant.plan, abonnementCourant.frequenceFacturation); as tarif) {
+<p><strong>Tarif:</strong> {{ tarif }}</p>
+}
 <p><strong>Statut:</strong> {{ libelleStatut(abonnementCourant.statut) }}</p>
 @if (abonnementCourant.dateDebut) {
 <p><strong>Date de début:</strong> {{ abonnementCourant.dateDebut | date:'yyyy-MM-dd' }}</p>
@@ -21,8 +24,15 @@
 @for (forfait of forfaits; track forfait.plan) {
 <div class="mb-3">
     <p class="mb-1"><strong>{{ forfait.titre }}</strong> — {{ forfait.description }}</p>
+    @if (forfait.tarifs) {
+    @for (tarif of forfait.tarifs; track tarif.frequence) {
+    <ebutton type="success" class="me-2" (clicked)="choisirForfait(forfait.plan, tarif.frequence)"
+        [inProgress]="actionEnCours">{{ forfait.titre }} — {{ tarif.libelle }}</ebutton>
+    }
+    } @else {
     <ebutton type="success" (clicked)="choisirForfait(forfait.plan)" [inProgress]="actionEnCours">
         Choisir le forfait {{ forfait.titre }}</ebutton>
+    }
 </div>
 }
 }

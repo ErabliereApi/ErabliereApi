@@ -18,6 +18,13 @@ public class PostAbonnement
     public string? Plan { get; set; }
 
     /// <summary>
+    /// La fréquence de facturation, requise pour un forfait payant.
+    /// Voir <see cref="FrequencesFacturation" /> pour les valeurs permises.
+    /// </summary>
+    [MaxLength(50, ErrorMessage = "La fréquence de facturation ne peut pas dépasser 50 caractères.")]
+    public string? FrequenceFacturation { get; set; }
+
+    /// <summary>
     /// La date de début de l'abonnement. Si null, la date courante est utilisée.
     /// </summary>
     public DateTimeOffset? DateDebut { get; set; }

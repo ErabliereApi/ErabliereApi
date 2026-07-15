@@ -2,6 +2,7 @@ export class Abonnement {
     id?: string
     customerId?: string
     plan?: string
+    frequenceFacturation?: string
     dateDebut?: string
     dateFin?: string
     statut?: string
@@ -12,6 +13,7 @@ export class Abonnement {
 
 export class PostAbonnement {
     plan?: string
+    frequenceFacturation?: string
     dateDebut?: string
     dateFin?: string
 }

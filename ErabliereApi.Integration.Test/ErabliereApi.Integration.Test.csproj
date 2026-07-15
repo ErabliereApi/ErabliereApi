@@ -36,6 +36,9 @@
     <None Update="StripeWebhookJson\StripeWebhookTest\NominalFlow\customer.created.body.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="StripeWebhookJson\StripeWebhookTest\NominalFlow\customer.subscription.created.abonnement.body.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="StripeWebhookJson\StripeWebhookTest\NominalFlow\customer.subscription.created.body.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

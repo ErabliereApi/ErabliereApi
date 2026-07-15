@@ -52,6 +52,41 @@ public class StripeWebhookTest : IClassFixture<StripeEnabledApplicationFactory<S
         AssertCustomerExist();
         AssertCustomerApiKey();
         AssertApiKeySubscriptionKey();
+        AssertAucunAbonnementCompte();
+
+        // Souscription à un abonnement de compte utilisateur (prix annuel) :
+        // doit activer un abonnement local sans créer de clé d'API supplémentaire.
+        await Step("customer.subscription.created.abonnement", client);
+        AssertAbonnementCompteActif();
+        AssertApiKeySubscriptionKey();
+    }
+
+    private void AssertAucunAbonnementCompte()
+    {
+        using var scope = _factory.Services.CreateScope();
+
+        var database = scope.ServiceProvider.GetRequiredService<ErabliereDbContext>();
+
+        var customer = database.Customers.AsNoTracking().Single(c => c.Email == "john@doe.com");
+
+        Assert.Empty(database.Abonnements.AsNoTracking().Where(a => a.CustomerId == customer.Id));
+    }
+
+    private void AssertAbonnementCompteActif()
+    {
+        using var scope = _factory.Services.CreateScope();
+
+        var database = scope.ServiceProvider.GetRequiredService<ErabliereDbContext>();
+
+        var customer = database.Customers.AsNoTracking().Single(c => c.Email == "john@doe.com");
+
+        var abonnement = Assert.Single(
+            database.Abonnements.AsNoTracking().Where(a => a.CustomerId == customer.Id));
+
+        Assert.Equal(Donnees.ForfaitsAbonnement.Base, abonnement.Plan);
+        Assert.Equal(Donnees.FrequencesFacturation.Annuelle, abonnement.FrequenceFacturation);
+        Assert.Equal(Donnees.StatutAbonnement.Actif, abonnement.Statut);
+        Assert.Equal("sub_AbonnementCompteAnnuel1", abonnement.StripeSubscriptionId);
     }
 
     private void AssertApiKeySubscriptionKey()

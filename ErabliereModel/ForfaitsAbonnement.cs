@@ -13,8 +13,10 @@ public static class ForfaitsAbonnement
     public const string Gratuit = "gratuit";
 
     /// <summary>
-    /// Le forfait de base, payant. Correspond au plan Stripe configuré
-    /// par la clé de configuration 'Stripe.BasePlanPriceId'.
+    /// Le forfait de base, payant. Contrairement aux clés d'API facturées à
+    /// l'utilisation ('Stripe.BasePlanPriceId'), ce forfait est facturé à fréquence
+    /// fixe selon la <see cref="FrequencesFacturation" /> choisie : 16 $/mois
+    /// ('Stripe.AbonnementMensuelPriceId') ou 166 $/an ('Stripe.AbonnementAnnuelPriceId').
     /// </summary>
     public const string Base = "base";
 

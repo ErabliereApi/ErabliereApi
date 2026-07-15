@@ -4,10 +4,16 @@ import { ErabliereApi } from "src/core/erabliereapi.service";
 import { Abonnement } from "src/model/abonnement";
 import { EButtonComponent } from "src/generic/ebutton.component";
 
+interface TarifOption {
+    frequence: string;
+    libelle: string;
+}
+
 interface ForfaitOption {
     plan: string;
     titre: string;
     description: string;
+    tarifs?: TarifOption[];
 }
 
 @Component({
@@ -32,7 +38,11 @@ export class GestionAbonnementComponent implements OnInit {
         {
             plan: 'base',
             titre: 'Base',
-            description: 'Les fonctionnalités complètes, incluant ErabliereAI. Facturé via Stripe.'
+            description: 'Les fonctionnalités complètes, incluant ErabliereAI. Facturé via Stripe.',
+            tarifs: [
+                { frequence: 'mensuelle', libelle: '16 $/mois' },
+                { frequence: 'annuelle', libelle: '166 $/an' },
+            ]
         },
     ];
 
@@ -58,10 +68,10 @@ export class GestionAbonnementComponent implements OnInit {
         });
     }
 
-    choisirForfait(plan: string): void {
+    choisirForfait(plan: string, frequence?: string): void {
         this.actionEnCours = true;
         this.error = null;
-        this.api.postAbonnement({ plan: plan }).then(response => {
+        this.api.postAbonnement({ plan: plan, frequenceFacturation: frequence }).then(response => {
             if (response.checkoutUrl) {
                 globalThis.location.href = response.checkoutUrl;
             } else {
@@ -107,5 +117,11 @@ export class GestionAbonnementComponent implements OnInit {
     libelleForfait(plan?: string): string {
         const forfait = this.forfaits.find(f => f.plan === plan?.toLowerCase());
         return forfait?.titre ?? plan ?? '';
+    }
+
+    libelleTarif(plan?: string, frequence?: string): string | null {
+        const forfait = this.forfaits.find(f => f.plan === plan?.toLowerCase());
+        const tarif = forfait?.tarifs?.find(t => t.frequence === frequence?.toLowerCase());
+        return tarif?.libelle ?? null;
     }
 }

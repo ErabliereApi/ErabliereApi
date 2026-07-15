@@ -114,6 +114,8 @@ public class Startup
                 o.SuccessUrl = Configuration["Stripe.SuccessUrl"];
                 o.CancelUrl = Configuration["Stripe.CancelUrl"];
                 o.BasePlanPriceId = Configuration["Stripe.BasePlanPriceId"];
+                o.AbonnementMensuelPriceId = Configuration["Stripe.AbonnementMensuelPriceId"];
+                o.AbonnementAnnuelPriceId = Configuration["Stripe.AbonnementAnnuelPriceId"];
                 o.WebhookSecret = Configuration["Stripe.WebhookSecret"];
                 o.WebhookSiginSecret = Configuration["Stripe.WebhookSiginSecret"];
                 o.TimeSpanSendUsage = TimeSpan.FromSeconds(Convert.ToDouble(Configuration["StripeUsageReccord.TimeSpanSendUsageInSeconds"] ?? "300"));
