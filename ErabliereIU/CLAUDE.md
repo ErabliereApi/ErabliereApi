@@ -56,7 +56,7 @@ Routing lives in `src/app/app.routes.ts`. Top-level view shells each have their 
 - Bootstrap 5 (global CSS/JS from `node_modules`, configured in `angular.json`) + `bootstrap-icons`.
 - Charts via `ng2-charts` / `chart.js` with the `chartjs-adapter-date-fns` time adapter (registered globally in `app.config.ts`).
 - `ngx-mask` for input masking.
-- Component selectors use the `app` prefix (kebab-case elements, camelCase attribute directives — enforced by `.eslintrc.json`).
+- Component selectors use the `app` prefix (kebab-case elements, camelCase attribute directives — flagged as warnings by `eslint.config.js`; many legacy generic components like `ebutton`/`einput`/`emodal` predate the rule). `npm run lint` must stay at 0 errors; warnings are existing debt (`==` in templates, leftover `*ngIf`, selector prefixes) — reduce them when touching a file, don't add new ones. `prefer-inject` and `prefer-on-push-component-change-detection` are intentionally off (constructor injection is the project convention, and MSAL-driven components require `ChangeDetectionStrategy.Eager`).
 
 ### i18n
 

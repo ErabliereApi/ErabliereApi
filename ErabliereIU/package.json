@@ -51,11 +51,13 @@
     "@types/node": "26.0.0",
     "@typescript-eslint/eslint-plugin": "8.62.0",
     "@typescript-eslint/parser": "8.62.0",
+    "angular-eslint": "^22.0.0",
     "babel-loader": "10.1.1",
     "cypress": "15.17.0",
     "eslint": "9.39.4",
     "ts-node": "~10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.0"
   },
   "readme": "README.md",
   "_id": "erabliere-iu@3.0.0"
