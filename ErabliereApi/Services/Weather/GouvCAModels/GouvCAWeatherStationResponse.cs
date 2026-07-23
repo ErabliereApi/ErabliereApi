@@ -58,8 +58,10 @@ public class DailyFcst
 
 public class Datestamp
 {
-    public DateTime timeStamp { get; set; }
-    public string? timeStampText { get; set; }
+    public DateTime? startTimeStamp { get; set; }
+    public string? startTimeStampText { get; set; }
+    public DateTime? endTimeStamp { get; set; }
+    public string? endTimeStampText { get; set; }
 }
 
 public class Dewpoint
@@ -129,10 +131,12 @@ public class Frost
     public string? textSummary { get; set; }
 }
 
-public class HighTemperature
+public class ObservedValue
 {
-    public double imperial { get; set; }
-    public double metric { get; set; }
+    public double? value { get; set; }
+    public string? uom { get; set; }
+    public bool? trace { get; set; }
+    public int? qa { get; set; }
 }
 
 public class Hour
@@ -175,12 +179,6 @@ public class Imperial
     public int highTemp { get; set; }
     public int lowTemp { get; set; }
     public string? text { get; set; }
-}
-
-public class LowTemperature
-{
-    public double imperial { get; set; }
-    public double metric { get; set; }
 }
 
 public class Metric
@@ -238,12 +236,6 @@ public class PeakWind
     public int? metric { get; set; }
     public int? nautical { get; set; }
     public string? directionCardinal { get; set; }
-}
-
-public class Precip
-{
-    public double imperial { get; set; }
-    public double metric { get; set; }
 }
 
 public class Pressure
@@ -400,10 +392,10 @@ public class WindSpeed
 public class YesterdayObs
 {
     public Station? station { get; set; }
-    public Datestamp? datestamp { get; set; }
-    public HighTemperature? highTemperature { get; set; }
-    public LowTemperature? lowTemperature { get; set; }
-    public Precip? precip { get; set; }
+    public Datestamp? dateStamp { get; set; }
+    public List<ObservedValue>? highTemperature { get; set; }
+    public List<ObservedValue>? lowTemperature { get; set; }
+    public List<ObservedValue>? precipitation { get; set; }
     public Rainfall? rainfall { get; set; }
     public Snowfall? snowfall { get; set; }
     public PeakWind? peakWind { get; set; }

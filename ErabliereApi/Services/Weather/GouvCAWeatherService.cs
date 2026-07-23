@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using ErabliereApi.Extensions;
 using ErabliereApi.Services.AccuWeatherModels;
@@ -76,9 +77,8 @@ public class GouvCAWeatherService : IWeaterService
         try
         {
             var culture = lang;
-            lang = lang == "fr-ca" ? "fr" : lang;
 
-            string url = $"/api/app/v3/{lang}/Location/{location}";
+            string url = $"/api/app/v3/{SanitizeLang(lang)}/Location/{SanitizeLocation(location)}";
 
             var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCA");
 
@@ -103,6 +103,36 @@ public class GouvCAWeatherService : IWeaterService
             _logger.LogCritical(ex, "Error retrieving weather forecast: {Message}", ex.Message);
             return new WeatherForecastResponse();
         }
+    }
+
+    /// <summary>
+    /// L'API du gouvernement du Canada ne supporte que le français et l'anglais.
+    /// Retourne toujours une valeur d'une liste fermée pour éviter d'injecter
+    /// des données utilisateur dans le chemin de l'URL.
+    /// </summary>
+    private static string SanitizeLang(string lang)
+    {
+        return lang is "fr" or "fr-ca" ? "fr" : "en";
+    }
+
+    /// <summary>
+    /// Le code de localisation doit être une paire "latitude,longitude".
+    /// La valeur est reconstruite à partir des coordonnées numériques pour éviter
+    /// d'injecter des données utilisateur dans le chemin de l'URL.
+    /// </summary>
+    private static string SanitizeLocation(string location)
+    {
+        var parts = location.Split(',');
+
+        if (parts.Length != 2 ||
+            !double.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var lat) ||
+            !double.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var lon) ||
+            lat is < -90 or > 90 || lon is < -180 or > 180)
+        {
+            throw new ArgumentException($"Code de localisation invalide : {location}", nameof(location));
+        }
+
+        return string.Create(CultureInfo.InvariantCulture, $"{lat:F3},{lon:F3}");
     }
 
     private async Task<GouvCAWeatherStationResponse[]> DeserializeWeatherCAResponse(HttpResponseMessage response, CancellationToken token)
@@ -138,9 +168,8 @@ public class GouvCAWeatherService : IWeaterService
         try
         {
             var culture = lang;
-            lang = lang == "fr-ca" ? "fr" : lang;
 
-            string url = $"/api/app/v3/{lang}/Location/{location}";
+            string url = $"/api/app/v3/{SanitizeLang(lang)}/Location/{SanitizeLocation(location)}";
 
             var _httpClient = _httpClientFactory.CreateClient("WeatherStationGouvCA");
 
