@@ -132,7 +132,7 @@ public class GouvCAWeatherService : IWeaterService
             throw new ArgumentException($"Code de localisation invalide : {location}", nameof(location));
         }
 
-        return FormattableString.Invariant($"{lat:F3},{lon:F3}");
+        return string.Create(CultureInfo.InvariantCulture, $"{lat:F3},{lon:F3}");
     }
 
     private async Task<GouvCAWeatherStationResponse[]> DeserializeWeatherCAResponse(HttpResponseMessage response, CancellationToken token)
