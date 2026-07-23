@@ -2,6 +2,7 @@
 using Stripe;
 using Microsoft.Extensions.Options;
 using ErabliereApi.Donnees;
+using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Services.StripeIntegration;
 using ErabliereApi.Services.Users;
 using ErabliereApi.Donnees.Action.Post;
@@ -19,6 +20,7 @@ public class StripeCheckoutService : ICheckoutService
     private readonly ILogger<StripeCheckoutService> _logger;
     private readonly IUserService _userService;
     private readonly IApiKeyService _apiKeyService;
+    private readonly IAbonnementService _abonnementService;
     private readonly UsageContext _usageContext;
 
     /// <summary>
@@ -29,12 +31,14 @@ public class StripeCheckoutService : ICheckoutService
     /// <param name="logger"></param>
     /// <param name="userService"></param>
     /// <param name="apiKeyService"></param>
+    /// <param name="abonnementService"></param>
     /// <param name="usageContext"></param>
     public StripeCheckoutService(IOptions<StripeOptions> options,
                                  IHttpContextAccessor accessor,
                                  ILogger<StripeCheckoutService> logger,
                                  IUserService userService,
                                  IApiKeyService apiKeyService,
+                                 IAbonnementService abonnementService,
                                  UsageContext usageContext)
     {
         _options = options;
@@ -42,6 +46,7 @@ public class StripeCheckoutService : ICheckoutService
         _logger = logger;
         _userService = userService;
         _apiKeyService = apiKeyService;
+        _abonnementService = abonnementService;
         _usageContext = usageContext;
     }
 
@@ -75,6 +80,78 @@ public class StripeCheckoutService : ICheckoutService
         {
             Url = session.Url,
         };
+    }
+
+    /// <inheritdoc />
+    public async Task<PostCheckoutObjResponse> CreateAbonnementSessionAsync(string frequenceFacturation, CancellationToken token)
+    {
+        StripeConfiguration.ApiKey = _options.Value.ApiKey;
+
+        var priceId = GetAbonnementPriceId(_options.Value, frequenceFacturation);
+
+        if (string.IsNullOrWhiteSpace(priceId))
+        {
+            throw new InvalidOperationException(
+                $"Aucun prix Stripe n'est configuré pour la fréquence de facturation '{frequenceFacturation}'. " +
+                "Vérifiez les clés de configuration 'Stripe.AbonnementMensuelPriceId' et 'Stripe.AbonnementAnnuelPriceId'.");
+        }
+
+        var options = new SessionCreateOptions
+        {
+            SuccessUrl = _options.Value.SuccessUrl,
+            CancelUrl = _options.Value.CancelUrl,
+            LineItems = new List<SessionLineItemOptions>
+            {
+                new SessionLineItemOptions
+                {
+                    Price = priceId,
+                    Quantity = 1,
+                }
+            },
+            Mode = "subscription",
+            PaymentMethodTypes = new List<string>() { "card" }
+        };
+
+        var service = new SessionService();
+        var session = await service.CreateAsync(options, cancellationToken: token);
+
+        return new PostCheckoutObjResponse
+        {
+            Url = session.Url,
+        };
+    }
+
+    /// <summary>
+    /// Retourne le price id Stripe correspondant à la fréquence de facturation reçue.
+    /// </summary>
+    private static string? GetAbonnementPriceId(StripeOptions options, string? frequenceFacturation)
+    {
+        if (string.Equals(frequenceFacturation, FrequencesFacturation.Mensuelle, StringComparison.OrdinalIgnoreCase))
+        {
+            return options.AbonnementMensuelPriceId;
+        }
+
+        if (string.Equals(frequenceFacturation, FrequencesFacturation.Annuelle, StringComparison.OrdinalIgnoreCase))
+        {
+            return options.AbonnementAnnuelPriceId;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Indique si l'abonnement Stripe reçu correspond à un abonnement de compte
+    /// utilisateur (prix mensuel ou annuel) plutôt qu'à une clé d'API facturée à l'utilisation.
+    /// </summary>
+    public static bool EstAbonnementCompte(Subscription subscription, StripeOptions options)
+    {
+        var priceIds = subscription.Items?.Data?
+            .Select(i => i.Price?.Id)
+            .Where(id => !string.IsNullOrWhiteSpace(id)) ?? [];
+
+        return priceIds.Any(id =>
+            (options.AbonnementMensuelPriceId != null && id == options.AbonnementMensuelPriceId) ||
+            (options.AbonnementAnnuelPriceId != null && id == options.AbonnementAnnuelPriceId));
     }
 
     /// <inheritdoc />
@@ -176,6 +253,8 @@ public class StripeCheckoutService : ICheckoutService
             _logger,
             _userService,
             _apiKeyService,
+            _abonnementService,
+            _options.Value,
             _accessor.HttpContext?.RequestAborted ?? CancellationToken.None);
     }
 
@@ -186,12 +265,17 @@ public class StripeCheckoutService : ICheckoutService
     /// <param name="logger"></param>
     /// <param name="userService"></param>
     /// <param name="apiKeyService"></param>
+    /// <param name="abonnementService"></param>
+    /// <param name="stripeOptions">Les options Stripe, utilisées pour distinguer les abonnements
+    /// de compte utilisateur des abonnements de clé d'API selon le price id</param>
     /// <param name="token"></param>
     /// <returns></returns>
     public static async Task WebHookSwitchCaseLogic(Event stripeEvent,
         ILogger logger,
         IUserService userService,
         IApiKeyService apiKeyService,
+        IAbonnementService abonnementService,
+        StripeOptions stripeOptions,
         CancellationToken token)
     {
         switch (stripeEvent.Type)
@@ -212,14 +296,34 @@ public class StripeCheckoutService : ICheckoutService
                 await userService.UpdateEnsureStripeInfoAsync(customer, customerMapped.StripeId, token);
                 logger.LogInformation("End of create customer");
 
-                logger.LogInformation("Begin of create API Key");
-                await apiKeyService.CreateApiKeyAsync(new CreateApiKeyParameters { Customer = customer }, token);
-                logger.LogInformation("End of create API Key");
+                if (EstAbonnementCompte(subscription, stripeOptions))
+                {
+                    logger.LogInformation("Begin of abonnement activation");
+                    await abonnementService.ActiverAbonnementStripeAsync(customer, subscription, token);
+                    logger.LogInformation("End of abonnement activation");
+                }
+                else
+                {
+                    logger.LogInformation("Begin of create API Key");
+                    await apiKeyService.CreateApiKeyAsync(new CreateApiKeyParameters { Customer = customer }, token);
+                    logger.LogInformation("End of create API Key");
 
-                logger.LogInformation("Begin of customer.subscription.created");
-                await apiKeyService.SetSubscriptionKeyAsync(
-                    customer, subscription.Items.First().Id, token);
-                logger.LogInformation("End of customer.subscription.created");
+                    logger.LogInformation("Begin of customer.subscription.created");
+                    await apiKeyService.SetSubscriptionKeyAsync(
+                        customer, subscription.Items.First().Id, token);
+                    logger.LogInformation("End of customer.subscription.created");
+                }
+                break;
+
+            case "customer.subscription.updated":
+            case "customer.subscription.deleted":
+                logger.LogInformation("Begin of {EventType}", stripeEvent.Type);
+
+                var subscriptionModifiee = stripeEvent.Data.Object as Subscription
+                    ?? throw new ArgumentNullException(nameof(stripeEvent), "Stripe.Data.Object event is null");
+
+                await abonnementService.SynchroniserStatutStripeAsync(subscriptionModifiee, token);
+                logger.LogInformation("End of {EventType}", stripeEvent.Type);
                 break;
 
             default:
@@ -252,6 +356,16 @@ public class StripeCheckoutService : ICheckoutService
         });
 
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public async Task CancelSubscriptionAsync(string subscriptionId, CancellationToken token)
+    {
+        StripeConfiguration.ApiKey = _options.Value.ApiKey;
+
+        var service = new SubscriptionService();
+
+        await service.CancelAsync(subscriptionId, cancellationToken: token);
     }
 
     /// <inheritdoc />

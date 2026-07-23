@@ -106,9 +106,16 @@ Avec powershell core en tant qu'administrateur executer le script ```.\deploieme
   "Stripe.SuccessUrl": "https://...",
   "Stripe.CancelUrl": "https://...",
   "Stripe.BasePlanPriceId": "price_...",
+  "Stripe.AbonnementMensuelPriceId": "price_...",
+  "Stripe.AbonnementAnnuelPriceId": "price_...",
   "Stripe.WebhookSecret": "secure-...",
   "Stripe.WebhookSiginSecret": "whsec_...",
 ```
+
+`Stripe.BasePlanPriceId` est le prix facturé à l'utilisation des clés d'API. Les abonnements
+de compte utilisateur utilisent plutôt deux prix récurrents à fréquence fixe :
+`Stripe.AbonnementMensuelPriceId` (16 $/mois) et `Stripe.AbonnementAnnuelPriceId` (166 $/an).
+Le webhook distingue les deux produits selon le price id de la souscription Stripe.
 
 Et démarrer le stripe CLI dans un terminal :
 

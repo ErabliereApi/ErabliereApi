@@ -1,5 +1,6 @@
 using Azure;
 using Azure.AI.OpenAI;
+using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Patch;
@@ -27,6 +28,7 @@ namespace ErabliereApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Authorize(Roles = "ErabliereAIUser", Policy = "TenantIdPrincipal")]
+[ValiderAbonnement(ForfaitsAbonnement.Base)]
 public class ErabliereAIController : ControllerBase
 {
     private readonly ErabliereDbContext _depot;

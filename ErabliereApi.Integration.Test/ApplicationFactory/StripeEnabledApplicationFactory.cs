@@ -3,6 +3,7 @@ using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Services;
+using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Services.Users;
 using ErabliereApi.Test.Autofixture;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using Stripe;
 using System;
@@ -30,6 +32,8 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
         var config = new Dictionary<string, string?>
         {
             { "Stripe.ApiKey", "abcd" },
+            { "Stripe.AbonnementMensuelPriceId", "price_abonnement_mensuel_test" },
+            { "Stripe.AbonnementAnnuelPriceId", "price_abonnement_annuel_test" },
             { "StripeUsageReccord.SkipRecord", "true" },
             { "ErabliereApiUserService.TestMode", "true" },
             { "USE_SQL", "false" },
@@ -90,6 +94,8 @@ public class StripeEnabledApplicationFactory<TStartup> : ErabliereApiApplication
                             sp.GetRequiredService<ILogger<StripeCheckoutService>>(),
                             sp.GetRequiredService<IUserService>(),
                             sp.GetRequiredService<IApiKeyService>(),
+                            sp.GetRequiredService<IAbonnementService>(),
+                            sp.GetRequiredService<IOptions<StripeOptions>>().Value,
                             CancellationToken.None);
                     });
                 });

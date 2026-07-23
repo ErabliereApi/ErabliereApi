@@ -15,6 +15,15 @@ public interface ICheckoutService
     Task<PostCheckoutObjResponse> CreateSessionAsync(CancellationToken token);
 
     /// <summary>
+    /// Create a checkout session for a user account subscription, billed at a
+    /// fixed frequency (see <see cref="FrequencesFacturation" />) as opposed to
+    /// the usage-based billing of API keys.
+    /// </summary>
+    /// <param name="frequenceFacturation">The billing frequency chosen by the user</param>
+    /// <param name="token">Cancellation token</param>
+    Task<PostCheckoutObjResponse> CreateAbonnementSessionAsync(string frequenceFacturation, CancellationToken token);
+
+    /// <summary>
     /// Get the customer's subscription status
     /// </summary>
     Task<object?> GetCustomerSubscriptionStatusAsync(CancellationToken token);
@@ -46,4 +55,9 @@ public interface ICheckoutService
     /// Get the customer's upcoming invoice
     /// </summary>
     Task<object> GetCustomerUpcomingInvoiceAsync(string subscriptionId, CancellationToken token);
+
+    /// <summary>
+    /// Cancel a subscription on the payment provider side
+    /// </summary>
+    Task CancelSubscriptionAsync(string subscriptionId, CancellationToken token);
 }

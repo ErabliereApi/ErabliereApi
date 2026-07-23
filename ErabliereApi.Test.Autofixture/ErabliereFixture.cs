@@ -101,7 +101,8 @@ public static class ErabliereFixture
         fixture.Customize<Customer>(c =>
             c.With(c => c.Email, RandomEmail)
              .Without(c => c.ApiKeys)
-             .Without(c => c.CustomerErablieres));
+             .Without(c => c.CustomerErablieres)
+             .Without(c => c.Abonnements));
 
         if (!modelOnly)
         {
