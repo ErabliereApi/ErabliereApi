@@ -34,5 +34,9 @@
     <None Update="docker-entrypoint.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <!-- Explicit because this is Microsoft.NET.Sdk, not Microsoft.NET.Sdk.Web: only
+         the web sdk includes appsettings*.json on its own, and without this the plan
+         gating configuration would never reach the published output. -->
+    <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

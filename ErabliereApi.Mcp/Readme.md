@@ -11,9 +11,11 @@ Two transports, one tool set:
 | **stdio** (default) | no argument, or `--stdio` | the MCP client, as a child process | `ERABLIEREAPI_APIKEY`, once, at startup |
 | **Streamable HTTP** | `--http`, or `ERABLIEREAPI_MCP_TRANSPORT=http` | you, as a hosted service | the `X-ErabliereApi-ApiKey` header of each request |
 
-The tool classes are shared verbatim; only the transport and the api key plumbing differ.
+The tool classes are shared verbatim; only the transport, the api key plumbing and the
+[plan gate](#plan-gating) differ — the hosted transport can be restricted to the subscription plans
+that include MCP access, the self-hosted one never is.
 
-Phases 1 to 3 expose read-only tools only.
+All the tools are read-only.
 
 ## Tools
 
@@ -34,6 +36,7 @@ place.
 | `get_rapport` | Gets one report with its aggregates and its daily rows. |
 | `get_barils` | Lists the barrels closed over a range with their syrup grades. |
 | `get_horaire` | Gets the weekly opening hours. |
+| `get_my_plan` | Gets the subscription plan of the account owning the API key and what it grants on this server. |
 
 All of them are annotated `readOnlyHint` / `idempotentHint`, so a client may run them without asking
 for confirmation.
@@ -101,6 +104,11 @@ follows the same convention.
 The server exits with code `1` and prints what is missing on stderr when a variable is absent or
 malformed. Restrict the key to the `GET` verb when creating it: the server never writes.
 
+The **plan gate** of the HTTP transport is the one thing configured through `appsettings.json`
+rather than the environment, because it is a mapping and not a scalar. See
+[Plan gating](#plan-gating) below. Every key of it stays overridable the usual way
+(`Mcp__PlanGating__Enabled=true`).
+
 ## HTTP transport
 
 ```powershell
@@ -110,7 +118,7 @@ dotnet run --project ErabliereApi.Mcp\ErabliereApi.Mcp.csproj -- --http
 
 | Endpoint | Api key | Description |
 | --- | --- | --- |
-| `POST /mcp` | **required** | The MCP [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports) endpoint. |
+| `POST /mcp` | **required** | The MCP [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports) endpoint. Restricted by subscription plan when the [plan gate](#plan-gating) is on. |
 | `GET /live` | no | Liveness: the process is serving. |
 | `GET /health` | no | Readiness: the process is serving **and** ErabliereAPI answers on its own `/health`. |
 
@@ -123,8 +131,98 @@ The header is required by the whole `/mcp` endpoint, not only by the tool calls:
 `tools/list` are gated too, because the tool catalog describes the maple grove features of an
 account. A request without the header gets a `401` and a `WWW-Authenticate: ApiKey` response.
 
-The server never validates the key. ErabliereAPI owns the api key table and answers `401`/`403` on
-the first call, which keeps one authority for revocation and usage tracking.
+The server never validates the key by itself. ErabliereAPI owns the api key table and answers
+`401`/`403` on the first call, which keeps one authority for revocation and usage tracking. With the
+plan gate on, that first call happens before the request is served, so a revoked key is caught on
+`initialize`.
+
+### Plan gating
+
+A hosted server answers whoever holds an api key, and the tools it exposes cost real queries on the
+API. The gate restricts it to the subscription plans that include MCP access.
+
+It is **off by default**: an existing deployment upgrades without a change in behaviour, and does not
+pay one extra call to ErabliereAPI per request. Same progressive rollout as the API's own
+`Abonnement.ValiderPlan`.
+
+```json
+{
+  "Mcp": {
+    "PlanGating": {
+      "Enabled": true,
+      "RequiredCapability": "mcp",
+      "DefaultPlan": "gratuit",
+      "CacheDuration": "00:05:00",
+      "SubscriptionUrl": "https://erabliereapi.freddycoder.com/abonnement",
+      "PlanCapabilities": {
+        "gratuit": [],
+        "base": [ "mcp" ]
+      }
+    }
+  }
+}
+```
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `Enabled` | `false` | Turns the gate on. Everything below is only read when it is on. |
+| `RequiredCapability` | `mcp` | The capability a plan must hold to connect. |
+| `DefaultPlan` | `gratuit` | Plan of an account carrying no active subscription. |
+| `PlanCapabilities` | – | What each plan may do, keyed by the plan name of `ForfaitsAbonnement` (`gratuit`, `base`). A plan absent from the map is granted nothing. |
+| `CacheDuration` | `00:05:00` | How long a resolved plan is reused before ErabliereAPI is asked again. `00:00:00` disables the cache. |
+| `SubscriptionUrl` | – | Optional link added to the denial message. |
+
+In a container, the same values as environment variables:
+
+```
+Mcp__PlanGating__Enabled=true
+Mcp__PlanGating__PlanCapabilities__base__0=mcp
+```
+
+**Where the plan comes from.** No plan logic lives in this project. The server calls
+`GET /api/Abonnements/Courant` with the caller's own api key, and that endpoint answers from the very
+`IAbonnementService` the API's `ValiderAbonnementAttribute` uses, so the two can never disagree on
+who is on what plan.
+
+**What a denied caller gets.** A JSON-RPC error, not a bare `403`:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32003,
+    "message": "This account has no active subscription, so it is on the 'gratuit' plan, which does not include access to the ErabliereAPI MCP server. Reaching it requires the 'base' plan. Subscribe at https://erabliereapi.freddycoder.com/abonnement.",
+    "data": { "currentPlan": "gratuit", "requiredCapability": "mcp", "plansGrantingAccess": "base", "subscriptionUrl": "…" }
+  }
+}
+```
+
+An MCP client turns a non-2xx answer into a transport failure and usually drops the body, so a `403`
+would reach the user as "the server returned 403" and never as the sentence telling them what to
+subscribe to. The status stays `200` and the reason is also copied on the
+`X-ErabliereApi-Mcp-Denied-Reason` response header, for logs and monitoring. Code `-32004` is the
+neighbouring case: the plan could not be read at all (key refused, account not identifiable, API
+unreachable).
+
+**It gates the whole endpoint**, `initialize` and `tools/list` included: a plan that opens nothing
+should not read the tool catalog either, since it names the features of an account.
+
+**It fails closed.** When ErabliereAPI cannot be reached the plan is unknown, and letting an unknown
+plan through would make the gate a suggestion: a client pointed at an unreachable API would gain the
+access the configuration denies it.
+
+**Stdio is never gated.** A stdio server is started by the user on their own machine, with their own
+key, and answers no one else; charging a plan to run a process they host would gate nothing. The
+gate is a piece of the HTTP pipeline, and a stdio server has no HTTP pipeline.
+
+**Requires the Stripe integration to be on.** ErabliereAPI only ties an api key back to a customer
+when Stripe is enabled (`UsersUtils.GetUniqueName`). Without it, `GET /api/Abonnements/Courant`
+answers `404` and every caller is refused with the `-32004` message, which says as much. A server
+running without Stripe has no subscriptions to gate on and should leave `Enabled` at `false`.
+
+The server refuses to start when the gate is on and no plan holds the required capability: that
+configuration locks out every caller, operator included.
 
 ### Why it runs stateless
 
@@ -287,9 +385,36 @@ The inspector opens a web page: connect, open the *Tools* tab, then
 5. call it again over a month to see `truncated` turn true and the `summary` ask for a narrower
    range;
 6. call it with `endDate` before `startDate`, and with a missing `startDate`, to check the errors
-   come back as readable sentences rather than stack traces.
+   come back as readable sentences rather than stack traces;
+7. run `get_my_plan` and check `data.plan` matches the subscription of the account owning the key.
 
 A local ErabliereAPI can be started with `.\start-light.ps1` at the root of the repository.
+
+### Checking the plan gate by hand
+
+Start the API with Stripe enabled and the subscriptions on, then the MCP server with the gate on:
+
+```powershell
+$env:ERABLIEREAPI_URL = "https://localhost:5001"
+$env:ASPNETCORE_URLS = "http://localhost:5099"
+$env:Mcp__PlanGating__Enabled = "true"
+dotnet run --project ErabliereApi.Mcp\ErabliereApi.Mcp.csproj -- --http
+```
+
+With an api key of an account **without** an active `base` subscription:
+
+```powershell
+curl -s -X POST http://localhost:5099/mcp `
+  -H "X-ErabliereApi-ApiKey: <your-api-key>" `
+  -H "Content-Type: application/json" `
+  -H "Accept: application/json, text/event-stream" `
+  -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}'
+```
+
+The answer is `200` carrying a JSON-RPC `error` of code `-32003` naming the `base` plan. Subscribe
+the account under *Profil -> Abonnement* in the web application, wait out `CacheDuration`, and the
+same call answers the tool list. The `Accept` header is not optional: the Streamable HTTP transport
+answers `406` without both media types.
 
 ## Implementation notes
 
@@ -334,6 +459,23 @@ A local ErabliereAPI can be started with `.\start-light.ps1` at the root of the 
 - **Sensor readings are capped at the source.** `GET /Capteurs/{id}/DonneesCapteurV2` applies no
   limit of its own when `top` is omitted, so `get_donnees_capteur` always sends one. Hitting that cap
   flags the response as `truncated` rather than quietly summarizing a partial window.
+- **The plan gate consumes the subscriptions, it does not reimplement them.** `GET
+  /api/Abonnements/Courant` was added to ErabliereAPI for it and answers from `IAbonnementService`,
+  the same service `ValiderAbonnementAttribute` now calls, so the rule "what plan is this user on"
+  lives at exactly one place. The endpoint also had to recognise an api key caller, which meant
+  reading `ApiKeyAuthorizationContext` from the request scope: it is registered `Scoped` and filled
+  by `ApiKeyMiddleware` in that scope, so a child scope created with `CreateScope()` receives an
+  empty instance and identifies no one.
+- **The plan is not read through `ErabliereAPI.Proxy`.** The proxy is generated with NSwag Studio
+  from the OpenAPI document and predates the subscription feature, so the call is a plain
+  `HttpClient` one on the named client the tools use — which means it carries the caller's key and
+  is retried like the rest. It should move to the proxy the next time it is regenerated.
+- **A resolved plan is cached for five minutes, per key.** An MCP session sends many requests and a
+  plan changes a few times a year; without the cache every `tools/call` would cost an extra round
+  trip and a database query. The cache key is a SHA-256 of the api key, never the key itself: a
+  cache entry can end up in a dump, and a credential should not. The expiry is absolute and not
+  sliding, otherwise a busy session would never re-check and a cancelled subscription would keep its
+  access forever.
 - **`get_dompeux` reads ascending.** The API implements its descending order as a `Reverse()` over an
   unordered EF query, which is not something to depend on, so the tool always asks for `o=c` and says
   in its description that a recent range needs a later `startDate`.

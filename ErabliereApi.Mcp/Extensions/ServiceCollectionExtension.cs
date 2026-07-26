@@ -4,6 +4,7 @@ using ErabliereApi.Mcp.Health;
 using ErabliereApi.Mcp.Hosting;
 using ErabliereApi.Mcp.Http;
 using ErabliereApi.Mcp.Serialization;
+using ErabliereApi.Mcp.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -50,6 +51,14 @@ public static class ServiceCollectionExtension
         {
             services.AddSingleton<IApiKeyAccessor, ConfiguredApiKeyAccessor>();
         }
+
+        services.AddOptions<McpPlanGatingOptions>()
+                .Bind(configuration.GetSection(McpPlanGatingOptions.SectionName));
+
+        // Registered for both transports: the gate is HTTP only, but get_my_plan is
+        // offered by both, so the tool set stays identical whatever the transport.
+        services.AddMemoryCache();
+        services.AddScoped<ISubscriptionPlanResolver, ErabliereApiSubscriptionPlanResolver>();
 
         services.AddTransient<ApiKeyHandler>();
         services.AddTransient(sp =>

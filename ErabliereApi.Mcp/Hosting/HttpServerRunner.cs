@@ -53,9 +53,14 @@ public static class HttpServerRunner
         var configurationErrors = app.Services
                                      .GetRequiredService<IOptions<ErabliereApiMcpOptions>>()
                                      .Value
-                                     .Validate(McpTransportMode.Http);
+                                     .Validate(McpTransportMode.Http)
+                                     .Concat(app.Services
+                                                .GetRequiredService<IOptions<McpPlanGatingOptions>>()
+                                                .Value
+                                                .Validate())
+                                     .ToArray();
 
-        if (configurationErrors.Count > 0)
+        if (configurationErrors.Length > 0)
         {
             await StdioServerRunner.WriteConfigurationErrorsAsync(configurationErrors);
 
@@ -105,7 +110,14 @@ public static class HttpServerRunner
         // orchestrator can reach them without holding a key.
         app.UseWhen(
             context => context.Request.Path.StartsWithSegments(McpPath),
-            branch => branch.UseMiddleware<RequireApiKeyMiddleware>());
+            branch =>
+            {
+                branch.UseMiddleware<RequireApiKeyMiddleware>();
+
+                // Order matters: the plan is read with the caller's api key, so the
+                // key has to be known to be there first.
+                branch.UseMiddleware<RequirePlanMiddleware>();
+            });
 
         app.MapMcp(McpPath);
 
