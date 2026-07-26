@@ -43,7 +43,8 @@ public class RequireApiKeyMiddleware
             context.Response.ContentType = "application/json";
 
             await context.Response.WriteAsync(
-                $"{{\"error\":\"The {ApiKeyHandler.XApiKeyHeader} header is required. Create an api key in the ErabliereAPI web application under Profil -> Clés d'api.\"}}");
+                $"{{\"error\":\"The {ApiKeyHandler.XApiKeyHeader} header is required. Create an api key in the ErabliereAPI web application under Profil -> Clés d'api.\"}}",
+                context.RequestAborted);
 
             return;
         }
