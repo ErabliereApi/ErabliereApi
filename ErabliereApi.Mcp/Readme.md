@@ -145,6 +145,11 @@ Build from the **root of the repository**: the context needs `ErabliereAPI.Proxy
 the unit and integration tests during the build, serves HTTP on `8080` and declares a `HEALTHCHECK`
 on `/live`.
 
+The container runs as the unprivileged `app` user (uid 1654) of the dotnet base images, not as
+root: the server listens on the network, so a compromise of it should not be able to rewrite the
+image or install packages. Only `/usr/local/share/ca-certificates` and `/etc/ssl/certs` are owned
+by `app`, because the entrypoint writes the mounted development CA there.
+
 `docker-compose.yaml` at the root starts it next to the API as `erabliere-mcp`, published on
 `http://localhost:5011`:
 

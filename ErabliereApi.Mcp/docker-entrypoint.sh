@@ -9,8 +9,10 @@ set -e
 # certificate, so the block is simply skipped.
 if [ -f /https-root/aspnetapp-root-cert.cer ]; then
     echo "trust certificate"
-    openssl x509 -inform DER -in /https-root/aspnetapp-root-cert.cer -out /https-root/aspnetapp-root-cert.crt
-    cp /https-root/aspnetapp-root-cert.crt /usr/local/share/ca-certificates/
+    # The PEM goes to /tmp, not next to the .cer: the container runs unprivileged
+    # and the mount point directory belongs to root.
+    openssl x509 -inform DER -in /https-root/aspnetapp-root-cert.cer -out /tmp/aspnetapp-root-cert.crt
+    cp /tmp/aspnetapp-root-cert.crt /usr/local/share/ca-certificates/
     update-ca-certificates
 fi
 
