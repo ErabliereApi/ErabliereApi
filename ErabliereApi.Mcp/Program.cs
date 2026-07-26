@@ -1,52 +1,18 @@
-using ErabliereApi.Mcp.Configuration;
-using ErabliereApi.Mcp.Extensions;
-using ErabliereApi.Mcp.Serialization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using ErabliereApi.Mcp.Hosting;
 
-var builder = Host.CreateApplicationBuilder(args);
+// stdio is the default: an MCP client that starts this executable with no
+// argument keeps getting the child process server of phases 1 and 2. HTTP is
+// opt-in with --http or ERABLIEREAPI_MCP_TRANSPORT=http.
+var transportMode = McpTransportSelector.Resolve(
+    args,
+    Environment.GetEnvironmentVariable(McpTransportSelector.TransportEnvironmentVariable));
 
-// The stdio transport writes the JSON-RPC frames on stdout, so every log entry
-// must be redirected to stderr, otherwise the MCP client fails to parse the stream.
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole(options =>
+// The transport switches never reach the host builder: the command line
+// configuration provider expects --key=value pairs and throws on a lone --http.
+var hostArgs = McpTransportSelector.StripTransportSwitches(args);
+
+return transportMode switch
 {
-    options.LogToStandardErrorThreshold = LogLevel.Trace;
-});
-
-builder.Services.AddErabliereApiProxy(builder.Configuration);
-
-builder.Services.AddMcpServer()
-                .WithStdioServerTransport()
-                // Passing the shared options is what makes the response budget a
-                // guarantee: the payload ToolResponse measures is byte for byte
-                // the payload written here.
-                .WithToolsFromAssembly(typeof(ToolJson).Assembly, ToolJson.Options);
-
-var host = builder.Build();
-
-// Fail fast with a readable message instead of an options validation stack trace:
-// the MCP client only shows the process output when the server refuses to start.
-var configurationErrors = host.Services
-                              .GetRequiredService<IOptions<ErabliereApiMcpOptions>>()
-                              .Value
-                              .Validate();
-
-if (configurationErrors.Count > 0)
-{
-    await Console.Error.WriteLineAsync("ErabliereApi.Mcp cannot start:");
-
-    foreach (var error in configurationErrors)
-    {
-        await Console.Error.WriteLineAsync($"  - {error}");
-    }
-
-    return 1;
-}
-
-await host.RunAsync();
-
-return 0;
+    McpTransportMode.Http => await HttpServerRunner.RunAsync(hostArgs),
+    _ => await StdioServerRunner.RunAsync(hostArgs)
+};

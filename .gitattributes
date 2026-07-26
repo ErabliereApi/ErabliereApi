@@ -4,6 +4,14 @@
 * text=auto
 
 ###############################################################################
+# Shell scripts always keep LF endings.
+#
+# They are copied as-is into the linux container images (docker-entrypoint.sh),
+# where a CRLF ending makes the shebang line fail to parse.
+###############################################################################
+*.sh text eol=lf
+
+###############################################################################
 # Set default behavior for command prompt diff.
 #
 # This is need for earlier builds of msysgit that does not have it on by

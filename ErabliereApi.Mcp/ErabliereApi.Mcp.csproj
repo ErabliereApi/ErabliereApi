@@ -11,14 +11,28 @@
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
+    <!-- The project stays a console application (Microsoft.NET.Sdk): stdio is the
+         default transport and the HTTP one is opt-in, so the web bits are pulled in
+         explicitly rather than by switching to Microsoft.NET.Sdk.Web. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="ModelContextProtocol" Version="1.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.4.1" />
+    <!-- Microsoft.Extensions.Hosting and Microsoft.Extensions.Http used to be
+         referenced here; the Microsoft.AspNetCore.App framework reference above
+         now ships both (NU1510). -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErabliereAPI.Proxy\ErabliereAPI.Proxy.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="ErabliereApi.Mcp.Test" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Entrypoint of the container image, same convention as ErabliereApi.csproj. -->
+    <None Update="docker-entrypoint.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

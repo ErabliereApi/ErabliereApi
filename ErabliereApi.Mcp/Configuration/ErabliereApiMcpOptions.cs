@@ -1,3 +1,5 @@
+using ErabliereApi.Mcp.Hosting;
+
 namespace ErabliereApi.Mcp.Configuration;
 
 /// <summary>
@@ -30,6 +32,8 @@ public class ErabliereApiMcpOptions
 
     /// <summary>
     /// Api key created from the ErabliereAPI user interface (Profil -> Clés d'api).
+    /// Required by the stdio transport only: over HTTP each MCP client sends its
+    /// own key on every request.
     /// </summary>
     public string ApiKey { get; set; } = "";
 
@@ -47,7 +51,12 @@ public class ErabliereApiMcpOptions
     /// <summary>
     /// Validates the options and returns the error messages, if any.
     /// </summary>
-    public IReadOnlyList<string> Validate()
+    /// <param name="transportMode">
+    /// Transport the server is about to start with. Over HTTP the api key is not
+    /// configuration at all: it travels on each incoming request, so requiring
+    /// one here would force an operator to invent a key the server never uses.
+    /// </param>
+    public IReadOnlyList<string> Validate(McpTransportMode transportMode = McpTransportMode.Stdio)
     {
         var errors = new List<string>();
 
@@ -61,7 +70,7 @@ public class ErabliereApiMcpOptions
             errors.Add($"The environment variable {BaseUrlEnvironmentVariable} must be an absolute http or https url. Current value: '{BaseUrl}'.");
         }
 
-        if (string.IsNullOrWhiteSpace(ApiKey))
+        if (transportMode == McpTransportMode.Stdio && string.IsNullOrWhiteSpace(ApiKey))
         {
             errors.Add($"The environment variable {ApiKeyEnvironmentVariable} is required.");
         }

@@ -1,4 +1,5 @@
 using ErabliereApi.Mcp.Configuration;
+using ErabliereApi.Mcp.Hosting;
 using Shouldly;
 
 namespace ErabliereApi.Mcp.Test;
@@ -41,6 +42,26 @@ public class ErabliereApiMcpOptionsTest
         options.BaseUrl = baseUrl;
 
         options.Validate().ShouldContain(error => error.Contains("absolute http or https url"));
+    }
+
+    [Fact]
+    public void Validate_InHttpMode_DoesNotRequireAnApiKey()
+    {
+        // Over HTTP the api key is not configuration: every MCP client sends its
+        // own on every request, so requiring one here would force an operator to
+        // invent a key the server never uses.
+        var options = ValidOptions();
+        options.ApiKey = "";
+
+        options.Validate(McpTransportMode.Http).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Validate_InHttpMode_StillRequiresTheUrl()
+    {
+        var errors = new ErabliereApiMcpOptions().Validate(McpTransportMode.Http);
+
+        errors.ShouldHaveSingleItem().ShouldContain(ErabliereApiMcpOptions.BaseUrlEnvironmentVariable);
     }
 
     [Fact]

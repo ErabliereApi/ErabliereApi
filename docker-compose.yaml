@@ -44,6 +44,26 @@ services:
       - sql
       - identite-api
     entrypoint: /app/docker-entrypoint.sh
+  erabliere-mcp:
+    build:
+      context: .
+      dockerfile: ErabliereApi.Mcp/Dockerfile
+    image: "erabliereapi/erabliereapi-mcp:v3-dev"
+    environment:
+      ERABLIEREAPI_MCP_TRANSPORT: "http"
+      # Reached over the default compose network, so the service name is the host.
+      # No ERABLIEREAPI_APIKEY here: over HTTP every MCP client sends its own key
+      # in the X-ErabliereApi-ApiKey header of each request.
+      ERABLIEREAPI_URL: "https://erabliere-api"
+      ASPNETCORE_HTTP_PORTS: "8080"
+    ports:
+      - "5011:8080"
+    volumes:
+      - type: bind # The entrypoint trusts this CA: erabliere-api serves https with the dev certificate.
+        source: ./certs/aspnetapp-root-cert.cer
+        target: /https-root/aspnetapp-root-cert.cer
+    depends_on:
+      - erabliere-api
   identite-api:
     image: "erabliereapi/serveuridentite:latest"
     environment:
