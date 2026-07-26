@@ -1,5 +1,6 @@
 using ErabliereApi.Mcp.Configuration;
 using ErabliereApi.Mcp.Extensions;
+using ErabliereApi.Mcp.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,7 +21,10 @@ builder.Services.AddErabliereApiProxy(builder.Configuration);
 
 builder.Services.AddMcpServer()
                 .WithStdioServerTransport()
-                .WithToolsFromAssembly();
+                // Passing the shared options is what makes the response budget a
+                // guarantee: the payload ToolResponse measures is byte for byte
+                // the payload written here.
+                .WithToolsFromAssembly(typeof(ToolJson).Assembly, ToolJson.Options);
 
 var host = builder.Build();
 

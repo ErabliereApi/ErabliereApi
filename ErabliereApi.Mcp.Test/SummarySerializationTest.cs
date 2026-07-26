@@ -108,6 +108,79 @@ public class SummarySerializationTest
     }
 
     [Fact]
+    public void NoteSummary_NeverLeaksTheAttachedFile()
+    {
+        // A single photograph serialized in base 64 is worth more tokens than a
+        // whole response is allowed to be, so the bytes must not reach the model
+        // even though the proxy DTO carries them.
+        var summary = NoteSummary.From(new Note
+        {
+            Id = Guid.NewGuid(),
+            Title = "Entaille bouchée",
+            Text = "Remplacée ce matin.",
+            FileName = "photo.jpg",
+            FileExtension = ".jpg",
+            FileSize = 2_400_000,
+            File = new byte[4096]
+        });
+
+        var json = JsonNode.Parse(JsonSerializer.Serialize(summary, Options))!.AsObject();
+
+        json.ContainsKey("file").ShouldBeFalse();
+        json["fileName"]!.GetValue<string>().ShouldBe("photo.jpg");
+        json["fileSize"]!.GetValue<int>().ShouldBe(2_400_000);
+    }
+
+    [Fact]
+    public void NoteSummary_CutsALongBodyAndSaysSo()
+    {
+        var summary = NoteSummary.From(new Note { Id = Guid.NewGuid(), Text = new string('a', 2000) });
+
+        summary.Text!.Length.ShouldBe(NoteSummary.MaxTextLength + "… (truncated)".Length);
+        summary.Text.ShouldEndWith("… (truncated)");
+    }
+
+    [Fact]
+    public void NoteSummary_WhenTheBodyIsShort_LeavesItUntouched()
+    {
+        var summary = NoteSummary.From(new Note { Id = Guid.NewGuid(), Text = "Coulée forte." });
+
+        summary.Text.ShouldBe("Coulée forte.");
+    }
+
+    [Fact]
+    public void RapportSummary_OnAListing_LeavesOutTheRows()
+    {
+        var rapport = new Rapport
+        {
+            Id = Guid.NewGuid(),
+            Nom = "Degré-jour 2026",
+            Donnees = [new RapportDonnees { Date = DateTimeOffset.Now, Somme = 12 }]
+        };
+
+        RapportSummary.From(rapport, includeDonnees: false).Donnees.ShouldBeNull();
+        RapportSummary.From(rapport, includeDonnees: true).Donnees!.Count.ShouldBe(1);
+    }
+
+    [Fact]
+    public void RapportSummary_DoesNotLeakTheCapteurNavigationProperty()
+    {
+        var idCapteur = Guid.NewGuid();
+
+        var summary = RapportSummary.From(new Rapport
+        {
+            Id = Guid.NewGuid(),
+            Capteur = new Capteur { Id = idCapteur, Nom = "Température extérieure", DonneesCapteur = [new DonneeCapteur()] }
+        }, includeDonnees: false);
+
+        var json = JsonNode.Parse(JsonSerializer.Serialize(summary, Options))!.AsObject();
+
+        json.ContainsKey("capteur").ShouldBeFalse();
+        json["idCapteur"]!.GetValue<Guid>().ShouldBe(idCapteur);
+        json["capteurNom"]!.GetValue<string>().ShouldBe("Température extérieure");
+    }
+
+    [Fact]
     public void Summaries_KeepTheNullValues_SoTheModelSeesTheAbsentFields()
     {
         var summary = ErabliereSummary.From(new Erabliere { Id = Guid.NewGuid(), Nom = "Sucrerie du Nord" });

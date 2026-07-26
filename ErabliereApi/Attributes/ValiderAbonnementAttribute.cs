@@ -1,5 +1,6 @@
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Extensions;
 using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -61,7 +62,7 @@ public class ValiderAbonnementAttribute : ActionFilterAttribute
             var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderAbonnementAttribute>>();
             using var scope = context.HttpContext.RequestServices.CreateScope();
             logger.LogWarning("Access denied on {Path} : user {User} has no active subscription in plans [{Plans}]",
-                context.HttpContext.Request.Path,
+                context.HttpContext.Request.Path.ToString().Sanatize(),
                 UsersUtils.GetUniqueName(scope, context.HttpContext.User),
                 string.Join(", ", _plansPermis));
         }
