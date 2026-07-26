@@ -45,7 +45,7 @@ public class ErabliereToolsTest
 
         var result = await ErabliereTools.ListErablieresAsync(proxy);
 
-        result.Count.ShouldBe(1);
+        result.Data.Count.ShouldBe(1);
         await proxy.Received(1).ErablieresAllAsync(
             ProxyArg.NullString(), ProxyArg.NullString(), ProxyArg.NullString(),
             ProxyArg.Int(ToolArguments.DefaultTop), ProxyArg.NullInt(), ProxyArg.NullBool(), ProxyArg.NullString(),
@@ -71,7 +71,7 @@ public class ErabliereToolsTest
         var id = Guid.NewGuid();
         var proxy = CreateProxy(CreateErabliere(id));
 
-        var summary = (await ErabliereTools.ListErablieresAsync(proxy)).Single();
+        var summary = (await ErabliereTools.ListErablieresAsync(proxy)).Data.Single();
 
         summary.Id.ShouldBe(id);
         summary.Nom.ShouldBe("Sucrerie du Nord");
@@ -119,7 +119,7 @@ public class ErabliereToolsTest
 
         var result = await ErabliereTools.GetErabliereAsync(proxy, id.ToString());
 
-        result.Id.ShouldBe(id);
+        result.Data.Id.ShouldBe(id);
         await proxy.Received(1).ErablieresAllAsync(
             ProxyArg.NullString(), ProxyArg.NullString(), ProxyArg.String($"id eq {id}"),
             ProxyArg.Int(1), ProxyArg.NullInt(), ProxyArg.NullBool(), ProxyArg.NullString(),

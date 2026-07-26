@@ -74,7 +74,7 @@ public class AlerteToolsTest
 
         var result = await AlerteTools.GetAlertesAsync(proxy, id.ToString());
 
-        result.Count.ShouldBe(1);
+        result.Data.Count.ShouldBe(1);
         await proxy.Received(1).AlertesAllAsync(
             Arg.Is(id),
             ProxyArg.NullString(), ProxyArg.NullString(), ProxyArg.Int(ToolArguments.DefaultTop), ProxyArg.NullInt(),
@@ -89,7 +89,7 @@ public class AlerteToolsTest
         var alerte = CreateAlerte(id);
         var proxy = CreateProxy(alerte);
 
-        var summary = (await AlerteTools.GetAlertesAsync(proxy, id.ToString())).Single();
+        var summary = (await AlerteTools.GetAlertesAsync(proxy, id.ToString())).Data.Single();
 
         summary.Id.ShouldBe(alerte.Id);
         summary.IdErabliere.ShouldBe(id);

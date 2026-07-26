@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Reflection;
+using ErabliereApi.Mcp.Models;
 using ErabliereApi.Mcp.Tools;
 using ModelContextProtocol.Server;
 using Shouldly;
@@ -32,7 +33,88 @@ public class ToolDiscoveryTest
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToArray();
 
-        names.ShouldBe(["get_alertes", "get_erabliere", "list_erablieres"]);
+        names.ShouldBe([
+            "get_alertes",
+            "get_barils",
+            "get_dompeux",
+            "get_donnees_capteur",
+            "get_erabliere",
+            "get_horaire",
+            "get_notes",
+            "get_rapport",
+            "list_capteurs",
+            "list_erablieres",
+            "list_rapports"
+        ]);
+    }
+
+    [Fact]
+    public void TheToolSetStaysCurated()
+    {
+        // A tool set that grows to one entry per controller stops being usable: the
+        // model spends its context reading tool definitions and picks the wrong one.
+        // Adding a tool beyond this bound is a design decision, not a detail.
+        ToolMethods().Count().ShouldBeLessThanOrEqualTo(12);
+    }
+
+    [Fact]
+    public void EveryToolReturnsTheStandardEnvelope()
+    {
+        foreach (var method in ToolMethods())
+        {
+            var name = method.GetCustomAttribute<McpServerToolAttribute>()!.Name;
+
+            // Task<ToolResponse<T>> is the shared contract, so a model that learned
+            // to read {summary, data, truncated} on one tool can read them all.
+            var returnType = method.ReturnType;
+
+            returnType.IsGenericType.ShouldBeTrue($"The tool {name} must return a Task.");
+            returnType.GetGenericTypeDefinition().ShouldBe(typeof(Task<>), $"The tool {name} must return a Task.");
+
+            var payload = returnType.GetGenericArguments()[0];
+
+            payload.IsGenericType.ShouldBeTrue($"The tool {name} must return a ToolResponse<T>.");
+            payload.GetGenericTypeDefinition().ShouldBe(typeof(ToolResponse<>), $"The tool {name} must return a ToolResponse<T>, not a bare payload.");
+        }
+    }
+
+    [Fact]
+    public void EveryToolDescriptionSaysWhatItDoesAndWhenToUseIt()
+    {
+        foreach (var method in ToolMethods())
+        {
+            var name = method.GetCustomAttribute<McpServerToolAttribute>()!.Name;
+            var description = method.GetCustomAttribute<DescriptionAttribute>()!.Description;
+
+            // The convention of this server: one sentence on what the tool returns,
+            // one telling the model when to reach for it.
+            var saysWhenToUseIt = description.Contains("Use this", StringComparison.Ordinal) ||
+                                  description.Contains("Call this", StringComparison.Ordinal);
+
+            saysWhenToUseIt.ShouldBeTrue(
+                $"The description of {name} must tell the model when to use the tool, not only what it does.");
+
+            // Both sentences plus the parameter guidance never fit in less.
+            description.Length.ShouldBeGreaterThan(150,
+                $"The description of {name} is too short to cover what it does and when to use it.");
+        }
+    }
+
+    [Fact]
+    public void EveryToolTakingADateDocumentsTheExpectedFormat()
+    {
+        var dateParameters = ToolMethods()
+            .SelectMany(method => method.GetParameters(), (method, parameter) => (method, parameter))
+            .Where(pair => pair.parameter.Name is not null &&
+                           pair.parameter.Name.EndsWith("Date", StringComparison.Ordinal));
+
+        foreach (var (method, parameter) in dateParameters)
+        {
+            var description = parameter.GetCustomAttribute<DescriptionAttribute>()!.Description;
+
+            description.ShouldContain("ISO 8601", Case.Sensitive,
+                $"The parameter {parameter.Name} of {method.Name} must state the date format the model has to produce.");
+        }
     }
 
     [Fact]
@@ -68,8 +150,8 @@ public class ToolDiscoveryTest
     [Fact]
     public void EveryToolIsMarkedReadOnly()
     {
-        // Phase 1 only exposes read-only tools, an MCP client may use the hint
-        // to skip the confirmation prompt.
+        // Phases 1 and 2 only expose read-only tools, an MCP client may use the
+        // hint to skip the confirmation prompt.
         foreach (var method in ToolMethods())
         {
             var attribute = method.GetCustomAttribute<McpServerToolAttribute>()!;
