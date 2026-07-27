@@ -415,3 +415,7 @@ Infrastructure/helpers/*.txt
 
 # code coverage output
 coveragereport/
+
+# Claude Code: local machine state, and vendored skills that carry their own .git
+.claude/settings.local.json
+.claude/skills/
