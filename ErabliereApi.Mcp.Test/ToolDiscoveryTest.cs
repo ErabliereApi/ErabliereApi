@@ -40,6 +40,7 @@ public class ToolDiscoveryTest
             "get_donnees_capteur",
             "get_erabliere",
             "get_horaire",
+            "get_my_plan",
             "get_notes",
             "get_rapport",
             "list_capteurs",

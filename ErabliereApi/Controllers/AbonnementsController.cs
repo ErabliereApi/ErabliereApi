@@ -1,9 +1,11 @@
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
 using ErabliereApi.Extensions;
 using ErabliereApi.Services;
+using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,6 +59,43 @@ public class AbonnementsController : ControllerBase
             .ToArrayAsync(token);
 
         return Ok(abonnements);
+    }
+
+    /// <summary>
+    /// Consulter le forfait courant de l'utilisateur authentifié.
+    ///
+    /// Cet endpoint est la source de vérité du forfait pour les composants externes
+    /// qui doivent restreindre une fonctionnalité par abonnement sans accéder à la
+    /// base de données, comme le serveur MCP (ErabliereApi.Mcp). Il répond donc aussi
+    /// bien à un utilisateur authentifié par jeton qu'à un appel par clé d'api.
+    /// </summary>
+    /// <param name="token">Le token d'annulation</param>
+    /// <response code="200">Le forfait courant. Le forfait gratuit est retourné lorsqu'aucun abonnement n'est actif.</response>
+    /// <response code="404">L'utilisateur derrière la requête n'a pas pu être identifié.</response>
+    [HttpGet("Courant")]
+    [ProducesResponseType(typeof(GetAbonnementCourant), 200)]
+    public async Task<IActionResult> Courant(CancellationToken token)
+    {
+        var customer = await GetCustomerAuthentifieAsync(token, reconnaitreCleApi: true);
+
+        if (customer?.Id == null)
+        {
+            return NotFound("Utilisateur non trouvé.");
+        }
+
+        var abonnementService = HttpContext.RequestServices.GetRequiredService<IAbonnementService>();
+
+        var abonnement = await abonnementService.ObtenirAbonnementCourantAsync(
+            customer.Id.Value, DateTimeOffset.Now, token);
+
+        return Ok(new GetAbonnementCourant
+        {
+            Plan = abonnement?.Plan ?? ForfaitsAbonnement.Gratuit,
+            AbonnementActif = abonnement != null,
+            DateDebut = abonnement?.DateDebut,
+            DateFin = abonnement?.DateFin,
+            FrequenceFacturation = abonnement?.FrequenceFacturation
+        });
     }
 
     /// <summary>
@@ -310,11 +349,31 @@ public class AbonnementsController : ControllerBase
     /// <summary>
     /// Retrouve le customer de l'utilisateur authentifié à partir de ses claims.
     /// </summary>
-    private async Task<Customer?> GetCustomerAuthentifieAsync(CancellationToken token)
+    /// <param name="token">Le token d'annulation</param>
+    /// <param name="reconnaitreCleApi">
+    /// Lorsque vrai, une requête authentifiée par clé d'api est rattachée au client
+    /// propriétaire de la clé. Cela demande de lire <c>ApiKeyAuthorizationContext</c>
+    /// dans la portée de la requête, où <c>ApiKeyMiddleware</c> l'a rempli, plutôt que
+    /// dans une portée enfant qui en recevrait une instance vide.
+    ///
+    /// Faux par défaut : seule la consultation du forfait courant est ouverte aux clés
+    /// d'api. La gestion des abonnements (création, modification, annulation) reste
+    /// réservée à un utilisateur authentifié par jeton, comme avant.
+    /// </param>
+    private async Task<Customer?> GetCustomerAuthentifieAsync(CancellationToken token, bool reconnaitreCleApi = false)
     {
-        using var scope = HttpContext.RequestServices.CreateScope();
+        string? uniqueName;
 
-        var uniqueName = UsersUtils.GetUniqueName(scope, User);
+        if (reconnaitreCleApi)
+        {
+            uniqueName = UsersUtils.GetUniqueName(HttpContext.RequestServices, User);
+        }
+        else
+        {
+            using var scope = HttpContext.RequestServices.CreateScope();
+
+            uniqueName = UsersUtils.GetUniqueName(scope, User);
+        }
 
         if (string.IsNullOrWhiteSpace(uniqueName))
         {

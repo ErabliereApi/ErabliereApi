@@ -1,6 +1,7 @@
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Extensions;
+using ErabliereApi.Services.Abonnements;
 using ErabliereApi.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -85,19 +86,19 @@ public class ValiderAbonnementAttribute : ActionFilterAttribute
         var customer = await dbContext.Customers.AsNoTracking()
             .FirstOrDefaultAsync(c => c.UniqueName == uniqueName, token);
 
-        if (customer == null)
+        if (customer?.Id == null)
         {
             return false;
         }
 
-        var abonnements = await dbContext.Abonnements.AsNoTracking()
-            .Where(a => a.CustomerId == customer.Id && a.Statut == StatutAbonnement.Actif)
-            .ToArrayAsync(token);
+        // Le forfait courant vient du service d'abonnement plutôt que d'une requête
+        // écrite ici : la règle « quel forfait cet utilisateur a-t-il en ce moment »
+        // doit rester à un seul endroit, aussi consommé par GET /api/Abonnements/Courant
+        // et par le serveur MCP.
+        var abonnementService = context.HttpContext.RequestServices.GetRequiredService<IAbonnementService>();
 
-        var maintenant = DateTimeOffset.Now;
+        var plan = await abonnementService.ObtenirPlanCourantAsync(customer.Id.Value, DateTimeOffset.Now, token);
 
-        return Array.Exists(abonnements, a =>
-            a.EstActif(maintenant) &&
-            Array.Exists(_plansPermis, p => string.Equals(p, a.Plan, StringComparison.OrdinalIgnoreCase)));
+        return Array.Exists(_plansPermis, p => string.Equals(p, plan, StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -20,6 +20,22 @@ internal static class UsersUtils
     /// <returns></returns>
     internal static string? GetUniqueName(IServiceScope scope, ClaimsPrincipal? user)
     {
+        return GetUniqueName(scope.ServiceProvider, user);
+    }
+
+    /// <summary>
+    /// Même chose que <see cref="GetUniqueName(IServiceScope, ClaimsPrincipal)" />, mais
+    /// à partir d'un fournisseur de services plutôt que d'une portée.
+    ///
+    /// La distinction compte pour une requête authentifiée par clé d'api :
+    /// <see cref="ApiKeyAuthorizationContext" /> est enregistré en <c>Scoped</c> et
+    /// c'est <c>ApiKeyMiddleware</c> qui le remplit dans la portée de la requête.
+    /// Une portée enfant créée avec <c>CreateScope()</c> en reçoit une instance
+    /// neuve et vide, donc un appelant qui doit reconnaître un utilisateur par clé
+    /// d'api doit passer <c>HttpContext.RequestServices</c> ici.
+    /// </summary>
+    internal static string? GetUniqueName(IServiceProvider serviceProvider, ClaimsPrincipal? user)
+    {
         if (user?.Identity?.IsAuthenticated == true)
         {
             var uniqueName = user.FindFirst("unique_name")?.Value ?? "";
@@ -37,11 +53,11 @@ internal static class UsersUtils
             return uniqueName;
         }
 
-        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var config = serviceProvider.GetRequiredService<IConfiguration>();
 
         if (config.StripeIsEnabled())
         {
-            var apiKeyAuthContext = scope.ServiceProvider.GetRequiredService<ApiKeyAuthorizationContext>();
+            var apiKeyAuthContext = serviceProvider.GetRequiredService<ApiKeyAuthorizationContext>();
 
             return apiKeyAuthContext?.Customer?.UniqueName;
         }

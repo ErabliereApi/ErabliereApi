@@ -27,6 +27,7 @@ Le suivit du projet est effectué dans AzureDevOps : https://dev.azure.com/fredd
 - ErabliereIU : Application angular pour l'affichage des données
 - ErabliereModel : Projet du modèles de données
 - ErabliereApi.Proxy : Proxy pour le web API disponible soous forme de nuget
+- ErabliereApi.Mcp : Serveur MCP exposant l'API aux assistants IA (voir la section Serveur MCP)
 - Infrastructure : Fichier relié à la configuration de l'infrastructure	kubernetes ou autres
 - PythonScripts : Script python pour alimenter l'API
 
@@ -62,6 +63,38 @@ docker run -d -p 9001:80 erabliereapi/erabliereapi
 ```
 
 Une librairie proxy est disponible sur nuget.org: ```ErabliereAPI.Proxy```.
+
+## Serveur MCP
+
+Le projet `ErabliereApi.Mcp` est un serveur [Model Context Protocol](https://modelcontextprotocol.io)
+qui expose les données d'une érablière à un assistant IA (Claude Code, Claude Desktop, ...) sous
+forme d'outils en lecture seule : liste des érablières, capteurs et leurs données résumées, alertes,
+dompeux, notes, rapports, barils et horaire.
+
+Deux façons de l'utiliser :
+
+- **Serveur hébergé, en HTTP.** Rien à installer, l'assistant se connecte à l'url du serveur avec
+  votre clé d'api :
+
+  ```powershell
+  claude mcp add --transport http erabliereapi https://mcp.erabliereapi.freddycoder.com/mcp --header "X-ErabliereApi-ApiKey: <votre-clé-d-api>"
+  ```
+
+- **Serveur local, en stdio.** L'assistant démarre lui-même le serveur comme processus enfant. Voir
+  le [Readme du projet](ErabliereApi.Mcp/Readme.md) pour la configuration de `.mcp.json` et de
+  Claude Desktop.
+
+La clé d'api se crée dans l'application web sous *Profil -> Clés d'api*. Restreignez-la au verbe
+`GET` : le serveur MCP n'écrit jamais.
+
+**Forfait requis.** Le serveur **hébergé** peut être restreint aux forfaits d'abonnement qui
+incluent l'accès MCP ; sur `erabliereapi.freddycoder.com`, c'est le forfait `base`. L'outil
+`get_my_plan` répond quel forfait est associé à votre clé et ce qu'il donne accès. Un appel refusé
+reçoit un message expliquant le forfait à souscrire. Le serveur **local** (stdio), que vous hébergez
+vous-même avec votre propre clé, n'est jamais restreint.
+
+La correspondance forfait -> accès est configurable (`Mcp:PlanGating` dans `appsettings.json`) et le
+gating est désactivé par défaut. Détails dans le [Readme du projet](ErabliereApi.Mcp/Readme.md).
 
 ## Persistance des données
 

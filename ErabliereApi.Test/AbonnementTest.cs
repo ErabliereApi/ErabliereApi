@@ -454,4 +454,137 @@ public class AbonnementTest
     }
 
     #endregion
+
+    #region Forfait courant (source de vérité du gating par forfait)
+
+    private static async Task<Customer> AjouterCustomerAvecAbonnementAsync(
+        ErabliereDbContext context,
+        string plan,
+        StatutAbonnement statut = StatutAbonnement.Actif,
+        DateTimeOffset? dateDebut = null,
+        DateTimeOffset? dateFin = null)
+    {
+        var customer = await AjouterCustomerAsync(context);
+
+        context.Abonnements.Add(new Abonnement
+        {
+            CustomerId = customer.Id!.Value,
+            Plan = plan,
+            Statut = statut,
+            DateDebut = dateDebut,
+            DateFin = dateFin,
+            DC = DateTimeOffset.Now
+        });
+        await context.SaveChangesAsync();
+
+        return customer;
+    }
+
+    [Theory, AutoApiData]
+    public async Task ObtenirPlanCourant_AbonnementActif_RetourneSonForfait(ErabliereDbContext context)
+    {
+        var customer = await AjouterCustomerAvecAbonnementAsync(context, ForfaitsAbonnement.Base);
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        var plan = await service.ObtenirPlanCourantAsync(customer.Id!.Value, DateTimeOffset.Now, CancellationToken.None);
+
+        Assert.Equal(ForfaitsAbonnement.Base, plan);
+    }
+
+    [Theory, AutoApiData]
+    public async Task ObtenirPlanCourant_AucunAbonnement_RetourneLeForfaitGratuit(ErabliereDbContext context)
+    {
+        // Un utilisateur sans abonnement n'est pas un cas d'erreur pour les appelants :
+        // il est simplement sur le forfait gratuit.
+        var customer = await AjouterCustomerAsync(context);
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        var plan = await service.ObtenirPlanCourantAsync(customer.Id!.Value, DateTimeOffset.Now, CancellationToken.None);
+
+        Assert.Equal(ForfaitsAbonnement.Gratuit, plan);
+        Assert.Null(await service.ObtenirAbonnementCourantAsync(customer.Id.Value, DateTimeOffset.Now, CancellationToken.None));
+    }
+
+    [Theory, AutoApiData]
+    public async Task ObtenirPlanCourant_AbonnementNonActif_RetourneLeForfaitGratuit(ErabliereDbContext context)
+    {
+        // Un abonnement payé mais non confirmé, annulé ou expiré ne donne aucun droit.
+        var statuts = new[] { StatutAbonnement.EnAttente, StatutAbonnement.Annule, StatutAbonnement.Expire };
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        foreach (var statut in statuts)
+        {
+            var customer = await AjouterCustomerAvecAbonnementAsync(context, ForfaitsAbonnement.Base, statut);
+
+            var plan = await service.ObtenirPlanCourantAsync(customer.Id!.Value, DateTimeOffset.Now, CancellationToken.None);
+
+            Assert.Equal(ForfaitsAbonnement.Gratuit, plan);
+        }
+    }
+
+    [Theory, AutoApiData]
+    public async Task ObtenirPlanCourant_AbonnementPasEncoreCommence_RetourneLeForfaitGratuit(ErabliereDbContext context)
+    {
+        var customer = await AjouterCustomerAvecAbonnementAsync(
+            context, ForfaitsAbonnement.Base, dateDebut: DateTimeOffset.Now.AddDays(1));
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        var plan = await service.ObtenirPlanCourantAsync(customer.Id!.Value, DateTimeOffset.Now, CancellationToken.None);
+
+        Assert.Equal(ForfaitsAbonnement.Gratuit, plan);
+    }
+
+    [Theory, AutoApiData]
+    public async Task ObtenirPlanCourant_AbonnementEchu_RetourneLeForfaitGratuit(ErabliereDbContext context)
+    {
+        // Le statut n'a pas encore été synchronisé, mais la date de fin est passée :
+        // c'est Abonnement.EstActif qui tranche, pas le statut seul.
+        var customer = await AjouterCustomerAvecAbonnementAsync(
+            context,
+            ForfaitsAbonnement.Base,
+            dateDebut: DateTimeOffset.Now.AddYears(-1),
+            dateFin: DateTimeOffset.Now.AddDays(-1));
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        var plan = await service.ObtenirPlanCourantAsync(customer.Id!.Value, DateTimeOffset.Now, CancellationToken.None);
+
+        Assert.Equal(ForfaitsAbonnement.Gratuit, plan);
+    }
+
+    [Theory, AutoApiData]
+    public async Task ObtenirPlanCourant_AbonnementDUnAutreClient_NeFuitPas(ErabliereDbContext context)
+    {
+        var abonne = await AjouterCustomerAvecAbonnementAsync(context, ForfaitsAbonnement.Base);
+        var autre = await AjouterCustomerAsync(context);
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        Assert.Equal(ForfaitsAbonnement.Base,
+            await service.ObtenirPlanCourantAsync(abonne.Id!.Value, DateTimeOffset.Now, CancellationToken.None));
+        Assert.Equal(ForfaitsAbonnement.Gratuit,
+            await service.ObtenirPlanCourantAsync(autre.Id!.Value, DateTimeOffset.Now, CancellationToken.None));
+    }
+
+    [Theory, AutoApiData]
+    public async Task ObtenirAbonnementCourant_RetourneLesDetailsDeLAbonnement(ErabliereDbContext context)
+    {
+        var debut = DateTimeOffset.Now.AddMonths(-2);
+
+        var customer = await AjouterCustomerAvecAbonnementAsync(context, ForfaitsAbonnement.Base, dateDebut: debut);
+
+        var service = new AbonnementService(context, NullLogger<AbonnementService>.Instance);
+
+        var abonnement = await service.ObtenirAbonnementCourantAsync(customer.Id!.Value, DateTimeOffset.Now, CancellationToken.None);
+
+        Assert.NotNull(abonnement);
+        Assert.Equal(ForfaitsAbonnement.Base, abonnement.Plan);
+        Assert.Equal(StatutAbonnement.Actif, abonnement.Statut);
+    }
+
+    #endregion
 }

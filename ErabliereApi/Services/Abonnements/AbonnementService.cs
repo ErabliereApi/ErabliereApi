@@ -120,4 +120,27 @@ public class AbonnementService : IAbonnementService
 
         await _depot.SaveChangesAsync(token);
     }
+
+    /// <inheritdoc />
+    public async Task<Abonnement?> ObtenirAbonnementCourantAsync(Guid customerId, DateTimeOffset maintenant, CancellationToken token)
+    {
+        // Le filtre sur le statut est traduit en SQL, la plage de dates ne l'est pas :
+        // Abonnement.EstActif est la règle du modèle et doit rester la seule, donc les
+        // abonnements actifs du client sont matérialisés avant d'être filtrés. Un client
+        // en possède au plus quelques-uns.
+        var abonnements = await _depot.Abonnements.AsNoTracking()
+            .Where(a => a.CustomerId == customerId && a.Statut == StatutAbonnement.Actif)
+            .OrderByDescending(a => a.DC)
+            .ToArrayAsync(token);
+
+        return Array.Find(abonnements, a => a.EstActif(maintenant));
+    }
+
+    /// <inheritdoc />
+    public async Task<string> ObtenirPlanCourantAsync(Guid customerId, DateTimeOffset maintenant, CancellationToken token)
+    {
+        var abonnement = await ObtenirAbonnementCourantAsync(customerId, maintenant, token);
+
+        return abonnement?.Plan ?? ForfaitsAbonnement.Gratuit;
+    }
 }
