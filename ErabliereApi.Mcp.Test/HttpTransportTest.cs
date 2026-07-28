@@ -132,6 +132,7 @@ public class HttpTransportTest : IAsyncLifetime
              .OrderBy(name => name, StringComparer.Ordinal)
              .ShouldBe([
                  "get_alertes",
+                 "get_alertes_capteur",
                  "get_barils",
                  "get_dompeux",
                  "get_donnees_capteur",

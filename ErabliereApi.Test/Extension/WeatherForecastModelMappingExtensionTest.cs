@@ -26,6 +26,60 @@ public class WeatherForecastModelMappingExtensionTest
         Console.WriteLine(d.ToString(format));
     }
 
+    [Theory]
+    // Format exact retourné par l'API du gouvernement du Canada : aucun point après
+    // l'abréviation, contrairement aux abréviations de la culture fr-CA.
+    [InlineData("jeu, 1 janv", 1, 1)]
+    [InlineData("dim, 15 févr", 2, 15)]
+    [InlineData("mar, 3 mars", 3, 3)]
+    [InlineData("sam, 18 avr", 4, 18)]
+    [InlineData("ven, 8 mai", 5, 8)]
+    [InlineData("lun, 1 juin", 6, 1)]
+    [InlineData("mer, 22 juil", 7, 22)]
+    [InlineData("sam, 1 août", 8, 1)]
+    [InlineData("mar, 30 sept", 9, 30)]
+    [InlineData("ven, 9 oct", 10, 9)]
+    [InlineData("lun, 2 nov", 11, 2)]
+    [InlineData("jeu, 25 déc", 12, 25)]
+    public void ParseDateCourte_ShouldParse_WhenGouvCAFormat(string date, int mois, int jour)
+    {
+        var d = WeatherForecastModelMappingExtension.ParseDateCourte(date, new CultureInfo("fr-CA"), 2026);
+
+        d.Month.ShouldBe(mois);
+        d.Day.ShouldBe(jour);
+        d.Year.ShouldBe(2026);
+    }
+
+    [Theory]
+    [InlineData("Sat, 18 Apr", 4, 18)]
+    [InlineData("Sat, 1 Aug", 8, 1)]
+    [InlineData("Thu, Dec 25", 12, 25)]
+    public void ParseDateCourte_ShouldParse_WhenEnglishFormat(string date, int mois, int jour)
+    {
+        var d = WeatherForecastModelMappingExtension.ParseDateCourte(date, new CultureInfo("en-CA"), 2026);
+
+        d.Month.ShouldBe(mois);
+        d.Day.ShouldBe(jour);
+    }
+
+    [Theory]
+    [InlineData("sam., 1 août.")] // Ancien format « corrigé » avec des points superflus
+    [InlineData("1 août")]        // Sans le jour de la semaine
+    public void ParseDateCourte_ShouldParse_WhenPonctuationVarie(string date)
+    {
+        var d = WeatherForecastModelMappingExtension.ParseDateCourte(date, new CultureInfo("fr-CA"), 2026);
+
+        d.Month.ShouldBe(8);
+        d.Day.ShouldBe(1);
+    }
+
+    [Fact]
+    public void ParseDateCourte_ShouldThrowFormatException_WhenMoisInconnu()
+    {
+        Should.Throw<FormatException>(() =>
+            WeatherForecastModelMappingExtension.ParseDateCourte("sam, 1 xyz", new CultureInfo("fr-CA"), 2026));
+    }
+
     [Fact]
     public void MapModelDaily_ShouldNotFailed_WhenValidInput()
     {

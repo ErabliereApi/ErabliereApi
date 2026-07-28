@@ -108,6 +108,42 @@ public class SummarySerializationTest
     }
 
     [Fact]
+    public void AlerteCapteurSummary_FlattensTheSensorAndDoesNotLeakIt()
+    {
+        // The sensor is asked for with include=Capteur, but only its name and its
+        // unit are meaningful here: the rest of the DTO carries the readings.
+        var idCapteur = Guid.NewGuid();
+
+        var summary = AlerteCapteurSummary.From(new AlerteCapteur
+        {
+            Id = Guid.NewGuid(),
+            IdCapteur = idCapteur,
+            Nom = "Gel",
+            IsEnable = true,
+            MinValue = -2.5,
+            MaxValue = 24,
+            Capteur = new Capteur
+            {
+                Id = idCapteur,
+                Nom = "Température extérieure",
+                Symbole = "°C",
+                DonneesCapteur = [new DonneeCapteur()]
+            }
+        });
+
+        var json = JsonNode.Parse(JsonSerializer.Serialize(summary, Options))!.AsObject();
+
+        json.ContainsKey("capteur").ShouldBeFalse();
+        json["idCapteur"]!.GetValue<Guid>().ShouldBe(idCapteur);
+        json["capteurNom"]!.GetValue<string>().ShouldBe("Température extérieure");
+        json["capteurSymbole"]!.GetValue<string>().ShouldBe("°C");
+        json["nom"]!.GetValue<string>().ShouldBe("Gel");
+        json["isEnable"]!.GetValue<bool>().ShouldBeTrue();
+        json["minValue"]!.GetValue<double>().ShouldBe(-2.5);
+        json["maxValue"]!.GetValue<double>().ShouldBe(24);
+    }
+
+    [Fact]
     public void NoteSummary_NeverLeaksTheAttachedFile()
     {
         // A single photograph serialized in base 64 is worth more tokens than a

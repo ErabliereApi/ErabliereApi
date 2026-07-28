@@ -28,6 +28,7 @@ place.
 | `list_erablieres` | Lists the maple groves the configured API key can read. Optional `nameContains` filter and `top` (1-100, default 25). |
 | `get_erabliere` | Gets a single maple grove by identifier (`erabliereId`, a GUID). |
 | `get_alertes` | Lists the alerts of a maple grove: thresholds, recipients, enabled state, last occurrence. |
+| `get_alertes_capteur` | Lists the alerts configured on the **sensors** of a maple grove: min/max bound, watched sensor, recipients, enabled state, last occurrence. |
 | `list_capteurs` | Lists the sensors with their **unit**, kind, connectivity and battery level. Required to get a sensor identifier. |
 | `get_donnees_capteur` | Summarizes the readings of one sensor over a **mandatory** date range. Never returns a raw dump. |
 | `get_dompeux` | Lists the dumping events (tank emptying cycles) with their duration. |
@@ -43,6 +44,12 @@ for confirmation.
 
 > `get_erabliere` is implemented with the OData filter of the list endpoint, because ErabliereAPI
 > has no `GET /Erablieres/{id}` route.
+
+> Alerts come in two kinds and so do the tools. An `Alerte` belongs to the maple grove and carries one
+> threshold per kind of measurement (temperature, vacuum, tank level) — that is `get_alertes`. An
+> `AlerteCapteur` watches **one** sensor between a `minValue` and a `maxValue` expressed in the unit
+> of that sensor — that is `get_alertes_capteur`. Merging them would have produced a payload where
+> half the fields are always null.
 
 ### Response envelope
 
@@ -376,8 +383,10 @@ npx @modelcontextprotocol/inspector
 The inspector opens a web page: connect, open the *Tools* tab, then
 
 1. run `list_erablieres` and copy an `id` from `data`;
-2. call `get_erabliere`, `get_alertes`, `get_horaire`, `get_notes`, `list_rapports` and `get_barils`
-   with it;
+2. call `get_erabliere`, `get_alertes`, `get_alertes_capteur`, `get_horaire`, `get_notes`,
+   `list_rapports` and `get_barils` with it — on `get_alertes_capteur`, check every entry carries a
+   `capteurNom` and a `capteurSymbole`, and that lowering `top` below the number of alerts turns
+   `truncated` true;
 3. run `list_capteurs` with the same id and copy a sensor `id`;
 4. call `get_donnees_capteur` with both ids and a range covering a day the sensor was reporting,
    for example `startDate=2026-03-12` and `endDate=2026-03-13`; check `data.count`, `data.unit` and
@@ -476,6 +485,14 @@ answers `406` without both media types.
   cache entry can end up in a dump, and a credential should not. The expiry is absolute and not
   sliding, otherwise a busy session would never re-check and a cancelled subscription would keep its
   access forever.
+- **`get_alertes_capteur` includes the sensor, and paginates itself.** `GET
+  /Erablieres/{id}/AlertesCapteur` takes no OData argument at all: no `$top`, no `$orderby`. The
+  bound of a sensor alert is a bare number, meaningless without the name and the unit of what it
+  watches, so the tool asks for `include=Capteur` — the same call the web application makes on that
+  route — and flattens the sensor into `capteurNom` / `capteurSymbole`. The order and the `top` are
+  then applied client-side: sorting by sensor groups the alerts the way a producer reads them, and
+  makes the tail that gets cut off the same one on two identical calls. Cutting the list sets
+  `truncated` and the summary says how many alerts exist in total.
 - **`get_dompeux` reads ascending.** The API implements its descending order as a `Reverse()` over an
   unordered EF query, which is not something to depend on, so the tool always asks for `o=c` and says
   in its description that a recent range needs a later `startDate`.

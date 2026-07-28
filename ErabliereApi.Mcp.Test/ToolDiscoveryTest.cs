@@ -35,6 +35,7 @@ public class ToolDiscoveryTest
 
         names.ShouldBe([
             "get_alertes",
+            "get_alertes_capteur",
             "get_barils",
             "get_dompeux",
             "get_donnees_capteur",
@@ -55,7 +56,7 @@ public class ToolDiscoveryTest
         // A tool set that grows to one entry per controller stops being usable: the
         // model spends its context reading tool definitions and picks the wrong one.
         // Adding a tool beyond this bound is a design decision, not a detail.
-        ToolMethods().Count().ShouldBeLessThanOrEqualTo(12);
+        ToolMethods().Count().ShouldBeLessThanOrEqualTo(13);
     }
 
     [Fact]
