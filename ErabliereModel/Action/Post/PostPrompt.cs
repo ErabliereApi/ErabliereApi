@@ -38,6 +38,28 @@ public class PostPrompt
     /// Les pièces jointes du prompt
     /// </summary>
     public PromptAttachment[]? Attachments { get; set; }
+
+    /// <summary>
+    /// L'identifiant de l'érablière que l'utilisateur consulte au moment d'écrire le
+    /// prompt, lorsque la conversation est ouverte à partir d'une page d'érablière.
+    ///
+    /// Cette valeur est un indice donné au modèle pour qu'il cesse de deviner les
+    /// identifiants; ce n'est jamais une autorisation. Les outils appelés ensuite
+    /// sont authentifiés comme l'appelant et l'API refuse ce qu'il ne possède pas.
+    /// </summary>
+    public Guid? ErabliereId { get; set; }
+
+    /// <summary>
+    /// Le nom de l'érablière consultée, utilisé uniquement pour rendre la phrase
+    /// système lisible.
+    /// </summary>
+    public string? ErabliereNom { get; set; }
+
+    /// <summary>
+    /// Identifiant généré par le client pour suivre l'activité des outils pendant que
+    /// la réponse se construit. Voir GET /ErabliereAI/Prompt/Status/{activityId}.
+    /// </summary>
+    public Guid? ActivityId { get; set; }
 }
 
 /// <summary>

@@ -29,6 +29,14 @@ public class AzureOpenAIService : IAIService
 
     /// <inheritdoc />
     /// <remarks>
+    /// The chat completion api of OpenAI is the contract <see cref="AIResponse" /> was
+    /// modelled on: the tool calls come back as such and the assistant and tool
+    /// messages of the next turn are understood natively.
+    /// </remarks>
+    public bool SupportsToolCalling => true;
+
+    /// <inheritdoc />
+    /// <remarks>
     /// <paramref name="chatCompletion" /> is forwarded as is, so the tools and the tool
     /// choice declared by the caller reach the model untouched.
     /// </remarks>

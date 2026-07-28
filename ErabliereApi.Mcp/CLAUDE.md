@@ -48,6 +48,15 @@ docker build -t erabliereapi/erabliereapi-mcp:local -f ErabliereApi.Mcp\Dockerfi
 The docker build runs the unit **and** integration tests, so a failing MCP test fails the image build.
 The build context needs `ErabliereAPI.Proxy`, hence the repo root.
 
+## The tool set has two consumers
+
+`ErabliereApi` references this project and hands the same `[McpServerTool]` methods to the
+ErabliereAI chat (`ErabliereApi/Services/AI/Tools/`). Changing a tool name, description or schema
+changes what the chat can do, not only what an MCP client sees. `ErabliereApi.Test/ErabliereAiToolCatalogTest.cs`
+pins the exposed set and fails on anything not marked `ReadOnly`.
+
+→ [Diagrams/ErabliereAI-Outils-MCP.md](../Diagrams/ErabliereAI-Outils-MCP.md)
+
 ## Depends on the API, in both directions
 
 Tools call the API through the proxy. The plan gate calls `GET /api/Abonnements/Courant`, which was

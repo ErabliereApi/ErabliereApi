@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
-import { Conversation, Message, PostPrompt } from 'src/model/conversation';
+import { Conversation, ErabliereAICapabilities, Message, PostPrompt } from 'src/model/conversation';
+import { ErabliereContextService } from './erabliere-context.service';
 
 /**
  * Holds the state of an ErabliereAI chat and talks to the API on behalf of the view.
@@ -12,6 +13,9 @@ import { Conversation, Message, PostPrompt } from 'src/model/conversation';
 export class ErabliereAiChatService {
     readonly defaultSystemPhrase = "Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique.";
 
+    /** Intervalle entre deux lectures de l'avancement, en millisecondes. */
+    private static readonly statusPollingInterval = 1000;
+
     conversations: Conversation[] = [];
     currentConversation?: Conversation;
     messages: Message[] = [];
@@ -19,12 +23,21 @@ export class ErabliereAiChatService {
     typePrompt = 'Chat';
     currentSystemPhrase?: string = this.defaultSystemPhrase;
 
+    /** Ce que l'assistant a le droit de faire, chargé à l'ouverture de la conversation. */
+    capabilities?: ErabliereAICapabilities;
+
+    /** Ce que l'assistant est en train de faire, affiché pendant l'attente. */
+    activityLabel = '';
+
     top = 8;
     skip = 0;
     search = '';
     private lastSearch = '';
+    private statusPolling?: ReturnType<typeof setInterval>;
 
-    constructor(private readonly api: ErabliereApi) { }
+    constructor(
+        private readonly api: ErabliereApi,
+        private readonly erabliereContext: ErabliereContextService) { }
 
     /**
      * Load the first page of conversations, and the messages of the selected one.
@@ -52,6 +65,24 @@ export class ErabliereAiChatService {
     }
 
     /**
+     * Charge ce que le forfait de l'utilisateur ouvre. Un échec laisse simplement
+     * l'interface muette sur le sujet plutôt que de casser la conversation.
+     */
+    async fetchCapabilities(): Promise<void> {
+        try {
+            this.capabilities = await this.api.getErabliereAICapabilities();
+        }
+        catch {
+            this.capabilities = undefined;
+        }
+    }
+
+    /** Vrai lorsqu'il faut inviter discrètement l'utilisateur à s'abonner. */
+    get shouldSuggestUpgrade(): boolean {
+        return this.capabilities?.planGateEnabled === true && this.capabilities?.toolsEnabled === false;
+    }
+
+    /**
      * Select a conversation, or start a new one when null is passed.
      */
     async selectConversation(conversation?: Conversation, updateSystemPhrase = true): Promise<void> {
@@ -73,14 +104,21 @@ export class ErabliereAiChatService {
      * Send a prompt and refresh the messages of the conversation with the answer.
      */
     async sendMessage(newMessage: string): Promise<void> {
+        const context = this.erabliereContext.getContext();
+        const activityId = this.newActivityId();
+
         const prompt: PostPrompt = {
             Prompt: newMessage,
             ConversationId: this.currentConversation?.id,
             PromptType: this.typePrompt,
-            SystemMessage: this.currentConversation?.systemMessage ?? this.currentSystemPhrase
+            SystemMessage: this.currentConversation?.systemMessage ?? this.currentSystemPhrase,
+            ErabliereId: context?.id,
+            ErabliereNom: context?.nom,
+            ActivityId: activityId
         };
 
         this.aiIsThinking = true;
+        this.startStatusPolling(activityId);
 
         try {
             const response = await this.api.postPrompt(prompt);
@@ -98,6 +136,7 @@ export class ErabliereAiChatService {
                 ?? await this.api.getMessages(this.currentConversation?.id) ?? [];
         }
         finally {
+            this.stopStatusPolling();
             this.aiIsThinking = false;
         }
     }
@@ -167,5 +206,49 @@ export class ErabliereAiChatService {
 
     resetSystemPhrase(): void {
         this.currentSystemPhrase = this.defaultSystemPhrase;
+    }
+
+    /**
+     * Interroge l'avancement du prompt pendant que la réponse se construit.
+     *
+     * Le suivi est du confort : si l'instance interrogée n'est pas celle qui traite
+     * le prompt, la réponse revient vide et l'interface garde son libellé générique.
+     */
+    private startStatusPolling(activityId: string): void {
+        this.stopStatusPolling();
+        this.activityLabel = '';
+
+        this.statusPolling = setInterval(() => {
+            this.api.getPromptStatus(activityId)
+                .then(activity => {
+                    if (activity?.completed) {
+                        this.stopStatusPolling();
+                        return;
+                    }
+
+                    const lastStep = activity?.steps?.[activity.steps.length - 1];
+                    this.activityLabel = lastStep?.label ?? '';
+                })
+                .catch(() => { /* un libellé manquant ne coûte rien */ });
+        }, ErabliereAiChatService.statusPollingInterval);
+    }
+
+    private stopStatusPolling(): void {
+        if (this.statusPolling) {
+            clearInterval(this.statusPolling);
+            this.statusPolling = undefined;
+        }
+
+        this.activityLabel = '';
+    }
+
+    private newActivityId(): string {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID();
+        }
+
+        // Contexte non sécurisé : l'identifiant ne sert qu'à retrouver un suivi
+        // d'affichage, une valeur pseudo aléatoire suffit.
+        return `${Date.now().toString(16)}-${Math.floor(Math.random() * 0xffffffff).toString(16)}`;
     }
 }

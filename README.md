@@ -96,6 +96,51 @@ vous-même avec votre propre clé, n'est jamais restreint.
 La correspondance forfait -> accès est configurable (`Mcp:PlanGating` dans `appsettings.json`) et le
 gating est désactivé par défaut. Détails dans le [Readme du projet](ErabliereApi.Mcp/Readme.md).
 
+## ErabliereAI répond avec vos données
+
+La conversation ErabliereAI de l'application web utilise **le même jeu d'outils** que le serveur MCP.
+Une question comme « Quelle était la température de mon érablière hier ? » n'est plus répondue de
+mémoire : l'assistant appelle `get_donnees_capteur`, lit les vrais relevés et cite les valeurs. Les
+réponses construites ainsi portent une pastille *Données réelles*, et le détail des consultations est
+repliable sous la réponse.
+
+Douze outils sont offerts à la conversation, tous en lecture seule : `list_erablieres`,
+`get_erabliere`, `list_capteurs`, `get_donnees_capteur`, `get_alertes`, `get_alertes_capteur`,
+`get_notes`, `get_barils`, `get_dompeux`, `get_horaire`, `list_rapports`, `get_rapport`. Aucun outil
+d'écriture ou de suppression n'est exposé, et `get_my_plan` est écarté (il répond sur le client MCP,
+pas sur l'érablière).
+
+**L'assistant ne voit que vos données.** Il ne détient aucune identité : chaque appel d'outil
+rappelle ErabliereAPI en transportant les identifiants de la requête en cours (jeton ou clé d'api),
+et repasse donc par l'authentification, l'autorisation et les filtres de propriété habituels. Aucune
+clé de service n'existe, donc aucun chemin ne permet à la conversation de lire une érablière que son
+utilisateur ne pourrait pas lire lui-même. Voir la
+[note d'architecture](Diagrams/ErabliereAI-Outils-MCP.md).
+
+**Forfait requis.** L'accès aux outils depuis la conversation réutilise la configuration
+`Mcp:PlanGating` : la capacité `mcp` ouvre les deux. Sans elle, la conversation fonctionne comme
+avant — le modèle répond de ses propres connaissances — et l'interface affiche une invitation
+discrète à s'abonner.
+
+### Configuration
+
+| Clé | Défaut | Rôle |
+|---|---|---|
+| `ErabliereAI:Tools:Enabled` | `true` | Interrupteur général. À `false`, aucun outil n'est déclaré. |
+| `ErabliereAI:Tools:MaxRounds` | `5` | Nombre maximal d'allers-retours modèle -> outils -> modèle par question. |
+| `ErabliereAI:Tools:ToolTimeout` | `00:00:20` | Délai accordé à un appel d'outil avant abandon. |
+| `ErabliereAI:Tools:TokenBudget` | `12000` | Plafond de jetons que les résultats d'outils peuvent occuper. |
+| `ErabliereAI:Tools:ExcludedTools` | `["get_my_plan"]` | Outils volontairement non offerts. |
+| `ErabliereAI:Tools:ApiBaseUrl` | *(vide)* | Adresse interne de l'API. Vide, l'adresse de la requête servie est utilisée. |
+| `Mcp:PlanGating` | *(voir plus haut)* | Forfaits ouvrant la capacité `mcp`, partagés avec le serveur MCP. |
+
+Chaque limite se termine de la même façon : un dernier tour **sans outil**, où le modèle répond avec
+ce qu'il a recueilli. Une limite atteinte ne produit donc jamais d'erreur pour l'utilisateur.
+
+Le fournisseur Gemini reste sans outil tant que `GoogleGenAIEnableToolCalling` n'est pas à `true` :
+la traduction des messages de résultat d'outil n'y est pas implémentée, et la conversation dégrade
+proprement plutôt que d'envoyer au modèle une conversation subtilement fausse.
+
 ## Persistance des données
 
 Deux mode sont possible. 

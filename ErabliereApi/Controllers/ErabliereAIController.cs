@@ -3,10 +3,12 @@ using Azure.AI.OpenAI;
 using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Patch;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Extensions;
 using ErabliereApi.Services.AI;
+using ErabliereApi.Services.AI.Tools;
 using ErabliereApi.Services.Users;
 using ErabliereModel.Action.Post;
 using Microsoft.AspNetCore.Authorization;
@@ -133,9 +135,11 @@ public class ErabliereAIController : ControllerBase
     [ProducesResponseType(200, Type = typeof(PostPromptResponse))]
     public async Task<IActionResult> EnvoyerPrompt([FromBody] PostPrompt prompt, CancellationToken cancellationToken)
     {
-        using var scope = HttpContext.RequestServices.CreateScope();
-
-        var userId = UsersUtils.GetUniqueName(scope, HttpContext.User);
+        // RequestServices plutôt qu'une portée enfant : ApiKeyAuthorizationContext est
+        // enregistré en Scoped et rempli par ApiKeyMiddleware dans la portée de la
+        // requête, donc une portée enfant en donnerait une instance vide et la
+        // conversation d'un appelant par clé d'api serait créée sans propriétaire.
+        var userId = UsersUtils.GetUniqueName(HttpContext.RequestServices, HttpContext.User);
 
         try
         {
@@ -147,6 +151,68 @@ public class ErabliereAIController : ControllerBase
         {
             return BadRequest(ToValidationProblemDetails(e.ClientResult));
         }
+    }
+
+    /// <summary>
+    /// Indique ce qu'ErabliereAI peut faire pour l'utilisateur authentifié :
+    /// notamment si l'assistant a le droit de consulter ses données réelles.
+    /// </summary>
+    /// <remarks>
+    /// L'interface appelle cette ressource à l'ouverture de la conversation. Lorsque
+    /// les outils sont fermés, la conversation fonctionne exactement comme avant et
+    /// une invitation discrète à s'abonner est affichée.
+    /// </remarks>
+    [HttpGet("Capabilities")]
+    [ProducesResponseType(200, Type = typeof(GetErabliereAICapabilities))]
+    public async Task<IActionResult> Capabilities(
+        [FromServices] IErabliereAiCapabilityService capabilityService,
+        CancellationToken token)
+    {
+        var capabilities = await capabilityService.GetCapabilitiesAsync(token);
+
+        return Ok(new GetErabliereAICapabilities
+        {
+            ToolsEnabled = capabilities.ToolsEnabled,
+            Plan = capabilities.Plan,
+            PlanGateEnabled = capabilities.PlanGateEnabled,
+            PlansGrantingAccess = capabilities.PlansGrantingAccess,
+            SubscriptionUrl = capabilities.SubscriptionUrl
+        });
+    }
+
+    /// <summary>
+    /// Retourne l'avancement d'un prompt en cours de traitement.
+    /// </summary>
+    /// <remarks>
+    /// L'identifiant est généré par le client et envoyé avec le prompt
+    /// (<see cref="PostPrompt.ActivityId" />). Il ne donne accès à aucune donnée :
+    /// la réponse ne contient que des libellés d'étapes.
+    /// </remarks>
+    [HttpGet("Prompt/Status/{activityId}")]
+    [ProducesResponseType(200, Type = typeof(GetErabliereAIToolActivity))]
+    public IActionResult PromptStatus(Guid activityId, [FromServices] IToolActivityTracker activityTracker)
+    {
+        var activity = activityTracker.Get(activityId);
+
+        if (activity == null)
+        {
+            // Rien de publié : soit le prompt n'a pas encore commencé, soit cette
+            // instance n'est pas celle qui le traite. Dans les deux cas le client
+            // continue d'attendre sa réponse, il affiche simplement le libellé
+            // générique.
+            return Ok(new GetErabliereAIToolActivity());
+        }
+
+        return Ok(new GetErabliereAIToolActivity
+        {
+            Completed = activity.Completed,
+            Steps = [.. activity.Steps.Select(s => new GetErabliereAIToolActivityStep
+            {
+                Round = s.Round,
+                ToolName = s.ToolName,
+                Label = s.Label
+            })]
+        });
     }
 
     private static ValidationProblemDetails ToValidationProblemDetails(ClientResultException e)

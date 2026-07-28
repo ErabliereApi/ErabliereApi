@@ -1,4 +1,5 @@
 using ErabliereApi.Depot.Sql;
+using ErabliereApi.Services.AI.Tools;
 using ErabliereApi.Services.IpInfo;
 using Microsoft.EntityFrameworkCore;
 using static System.Boolean;
@@ -103,12 +104,29 @@ public static class ApplicationBuilderExtensions
             Console.WriteLine("Using in-memory database, semaphore added");
 
             var semaphore = new SemaphoreSlim(1, 1);
+            var loopback = app.ApplicationServices.GetRequiredService<LoopbackRequestMarker>();
 
             app.Use(async (context, next) =>
             {
+                // Une requête imbriquée — ErabliereAI rappelle l'API pour exécuter ses
+                // outils avec les identifiants de l'appelant — est servie pendant que
+                // la requête externe l'attend. La faire attendre le sémaphore que
+                // l'externe détient bloquerait les deux jusqu'à l'expiration du délai.
+                // La laisser passer reste sûr : l'externe n'utilise pas la base tant
+                // qu'elle attend l'interne.
+                if (loopback.IsLoopback(context.Request))
+                {
+                    await next();
+                    return;
+                }
+
+                var acquis = false;
+
                 try
                 {
                     await semaphore.WaitAsync(context.RequestAborted);
+
+                    acquis = true;
 
                     await next();
                 }
@@ -119,7 +137,12 @@ public static class ApplicationBuilderExtensions
                 }
                 finally
                 {
-                    semaphore.Release();
+                    // Seulement si l'attente a réussi : relâcher un sémaphore jamais
+                    // acquis lève SemaphoreFullException et casse la requête suivante.
+                    if (acquis)
+                    {
+                        semaphore.Release();
+                    }
                 }
             });
         }

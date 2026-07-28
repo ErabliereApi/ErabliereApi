@@ -29,6 +29,7 @@ This file routes; it holds no rules of its own. Follow the link for the area you
 | Env-var toggles, secrets, migrations, running the stack | [`.claude/_shared/configuration.md`](.claude/_shared/configuration.md) |
 | Which test project, which command, CI | [`.claude/_shared/testing.md`](.claude/_shared/testing.md) |
 | Building a feature end to end | [`.claude/workflows/feature-slice.md`](.claude/workflows/feature-slice.md) |
+| ErabliereAI calling the MCP tools, and why it only sees the caller's data | [`Diagrams/ErabliereAI-Outils-MCP.md`](Diagrams/ErabliereAI-Outils-MCP.md) |
 
 ## Solution layout
 

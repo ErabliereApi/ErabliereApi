@@ -1,4 +1,6 @@
 using ErabliereApi.Services.AI;
+using System;
+using System.Globalization;
 using Xunit;
 
 namespace ErabliereApi.Test;
@@ -46,5 +48,69 @@ public class SystemPromptBuilderTest
     public void BuildForCompletion_AvecPhrase_RetourneLaPhraseDeLaConversation()
     {
         Assert.Equal("Vous êtes un botaniste.", _builder.BuildForCompletion("Vous êtes un botaniste."));
+    }
+
+    [Fact]
+    public void BuildForCompletion_SansOutil_NeParlePasDOutils()
+    {
+        var prompt = _builder.BuildForCompletion(null, new ErabliereAiPromptContext(false));
+
+        Assert.Equal(DefaultSystemPrompt, prompt);
+    }
+
+    [Fact]
+    public void BuildForCompletion_AvecOutils_ExpliqueQuandSEnServir()
+    {
+        var prompt = _builder.BuildForCompletion(null, new ErabliereAiPromptContext(true));
+
+        Assert.StartsWith(DefaultSystemPrompt, prompt);
+        Assert.Contains("lecture seule", prompt);
+        Assert.Contains("n'inventez jamais de données", prompt);
+
+        // La date du jour : sans elle, « hier » et « la semaine dernière » n'ont
+        // aucun sens pour un modèle dont les poids sont figés.
+        Assert.Contains(DateTimeOffset.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), prompt);
+    }
+
+    [Fact]
+    public void BuildForCompletion_AvecErabliereCourante_NommeLIdentifiantAuModele()
+    {
+        var id = Guid.NewGuid();
+
+        var prompt = _builder.BuildForCompletion(null, new ErabliereAiPromptContext(true, id, "Sucrerie du Nord"));
+
+        Assert.Contains(id.ToString(), prompt);
+        Assert.Contains("Sucrerie du Nord", prompt);
+    }
+
+    [Fact]
+    public void BuildForCompletion_AvecErabliereSansNom_NommeQuandMemeLIdentifiant()
+    {
+        var id = Guid.NewGuid();
+
+        var prompt = _builder.BuildForCompletion(null, new ErabliereAiPromptContext(true, id));
+
+        Assert.Contains(id.ToString(), prompt);
+    }
+
+    [Fact]
+    public void BuildForCompletion_SansErabliereCourante_NAjouteAucunIdentifiant()
+    {
+        var prompt = _builder.BuildForCompletion(null, new ErabliereAiPromptContext(true, Guid.Empty));
+
+        Assert.DoesNotContain("identifiant est", prompt);
+    }
+
+    [Fact]
+    public void BuildForCompletion_ContexteErabliereSansOutil_NommeQuandMemeLErabliere()
+    {
+        // Le forfait peut fermer les outils sans que la question « de quelle érablière
+        // parle-t-on » disparaisse.
+        var id = Guid.NewGuid();
+
+        var prompt = _builder.BuildForCompletion(null, new ErabliereAiPromptContext(false, id, "Sucrerie du Nord"));
+
+        Assert.Contains(id.ToString(), prompt);
+        Assert.DoesNotContain("lecture seule", prompt);
     }
 }

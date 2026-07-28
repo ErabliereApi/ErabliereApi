@@ -23,6 +23,20 @@ public class GeminiAIService : IAIService
 
     /// <inheritdoc />
     /// <remarks>
+    /// Off unless <c>GoogleGenAIEnableToolCalling</c> is set to "true". The outbound half
+    /// of the loop is implemented — the tool declarations and the function calls of the
+    /// answer are translated both ways — but the return leg is not: a
+    /// <see cref="ToolChatMessage" /> carrying a tool result is mapped here like any other
+    /// message, not as the function response part Gemini expects. Rather than feed the
+    /// model a subtly wrong conversation, the chat degrades to no tools at all on this
+    /// provider, which is the phase 7 behaviour and never breaks. Flip the switch once the
+    /// mapping below understands tool messages.
+    /// </remarks>
+    public bool SupportsToolCalling =>
+        string.Equals(_config["GoogleGenAIEnableToolCalling"], "true", StringComparison.OrdinalIgnoreCase);
+
+    /// <inheritdoc />
+    /// <remarks>
     /// The tools declared on <paramref name="chatCompletion" /> are translated into Gemini
     /// function declarations, and the function calls of the answer are translated back into
     /// <see cref="AIResponse.ToolCalls" />, so both providers expose the same contract.

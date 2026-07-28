@@ -171,18 +171,8 @@ public class Startup
         // IpInfo Middleware and Service
         services.AddIpInfoServices(Configuration);
 
-        // AIService
-        if (string.Equals(Configuration["PrimaryAIService"]?.Trim(), "Google", StringComparison.OrdinalIgnoreCase))
-        {
-            services.AddTransient<IAIService, GeminiAIService>();
-        }
-        else
-        {
-            services.AddTransient<IAIService, AzureOpenAIService>();
-        }
-
-        services.AddTransient<ISystemPromptBuilder, SystemPromptBuilder>();
-        services.AddTransient<IConversationAIService, ConversationAIService>();
+        // ErabliereAI: the provider, the prompt builder and the read-only tool set
+        services.AddErabliereAI(Configuration);
     }
 
     /// <summary>
