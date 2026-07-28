@@ -32,6 +32,12 @@ public class ErabliereAIApplicationFactory<TStartup> : StripeEnabledApplicationF
 
         var config = new Dictionary<string, string?>
         {
+            // ErabliereApiControllerFeatureProvider n'enregistre ErabliereAIController
+            // que si une clé de fournisseur est configurée. Sans cette valeur, la
+            // route n'existe pas et les tests passent ou échouent selon que la machine
+            // qui les exécute a des secrets utilisateur — ce qui n'est pas un test.
+            // Aucune clé n'est jamais utilisée : IAIService est remplacé plus bas.
+            { "AzureOpenAIUri", "https://exemple.invalid/openai" },
             { "LLMDefaultTemperature", "1" },
             // Les outils rappellent l'API par le gestionnaire du TestServer, dont
             // l'hôte est localhost.

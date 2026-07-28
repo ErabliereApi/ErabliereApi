@@ -160,10 +160,14 @@ public class ErabliereAIToolsTest : IClassFixture<ErabliereAIApplicationFactory<
 
         using var response = await client.SendAsync(request);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var contenu = await response.Content.ReadAsStringAsync();
 
-        var capacites = JsonSerializer.Deserialize<GetErabliereAICapabilities>(
-            await response.Content.ReadAsStringAsync(), JsonOptions);
+        // Une réponse en HTML signifie que la route n'existe pas et que le repli SPA
+        // a répondu : c'est ce qui arrive quand ErabliereAIController est filtré.
+        Assert.True(response.StatusCode == HttpStatusCode.OK && !contenu.StartsWith('<'),
+            $"GET /ErabliereAI/Capabilities a répondu {response.StatusCode} : {Tronquer(contenu)}");
+
+        var capacites = JsonSerializer.Deserialize<GetErabliereAICapabilities>(contenu, JsonOptions);
 
         Assert.NotNull(capacites);
 
@@ -226,15 +230,23 @@ public class ErabliereAIToolsTest : IClassFixture<ErabliereAIApplicationFactory<
             PromptType = "Chat"
         });
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var contenu = await response.Content.ReadAsStringAsync();
 
-        var body = JsonSerializer.Deserialize<PostPromptResponse>(
-            await response.Content.ReadAsStringAsync(), JsonOptions);
+        // Le corps est dans le message : « Actual: InternalServerError » tout seul
+        // n'apprend rien, et ces tests échouent surtout pour des raisons d'hôte.
+        Assert.True(response.StatusCode == HttpStatusCode.OK, $"POST /ErabliereAI/Prompt a répondu {response.StatusCode} : {Tronquer(contenu)}");
+
+        var body = JsonSerializer.Deserialize<PostPromptResponse>(contenu, JsonOptions);
 
         Assert.NotNull(body);
         Assert.NotNull(body.Conversation);
 
         return body;
+    }
+
+    private static string Tronquer(string contenu)
+    {
+        return contenu.Length <= 800 ? contenu : contenu[..800] + "…";
     }
 
     private async Task<List<Message>> LireMessagesAsync(Guid conversationId)
