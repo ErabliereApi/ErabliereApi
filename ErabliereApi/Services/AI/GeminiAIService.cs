@@ -1,5 +1,5 @@
-﻿using OpenAI.Chat;
-using System.ClientModel;
+using OpenAI.Chat;
+using System.Text.Json;
 using Google.GenAI;
 using Google.GenAI.Types;
 
@@ -22,6 +22,11 @@ public class GeminiAIService : IAIService
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// The tools declared on <paramref name="chatCompletion" /> are translated into Gemini
+    /// function declarations, and the function calls of the answer are translated back into
+    /// <see cref="AIResponse.ToolCalls" />, so both providers expose the same contract.
+    /// </remarks>
     public async Task<AIResponse?> CompleteChatAsync(IEnumerable<ChatMessage> messages, ChatCompletionOptions chatCompletion, CancellationToken token)
     {
         var gemini = new Client(apiKey: _config["GoogleGenAIKey"]);
@@ -42,17 +47,70 @@ public class GeminiAIService : IAIService
                     }).ToList()
                 };
             }).ToList(),
-            new GenerateContentConfig 
-            { 
+            new GenerateContentConfig
+            {
                 Temperature = chatCompletion.Temperature,
                 FrequencyPenalty = chatCompletion.FrequencyPenalty,
-                PresencePenalty = chatCompletion.PresencePenalty
+                PresencePenalty = chatCompletion.PresencePenalty,
+                Tools = MapTools(chatCompletion)
             },
             token);
 
         return new AIResponse
         {
-            Text = response.Text
+            Text = response.Text,
+            FinishReason = response.Candidates?.FirstOrDefault()?.FinishReason?.ToString(),
+            ToolCalls = MapToolCalls(response)
         };
+    }
+
+    /// <summary>
+    /// Translate the OpenAI tool declarations into Gemini function declarations.
+    /// Returns null when the caller declared no tool, so the request stays unchanged.
+    /// </summary>
+    private static List<Tool>? MapTools(ChatCompletionOptions chatCompletion)
+    {
+        if (chatCompletion.Tools == null || chatCompletion.Tools.Count == 0)
+        {
+            return null;
+        }
+
+        var declarations = chatCompletion.Tools
+            .Select(t => new FunctionDeclaration
+            {
+                Name = t.FunctionName,
+                Description = t.FunctionDescription,
+                Parameters = MapParameters(t)
+            })
+            .ToList();
+
+        return [new Tool { FunctionDeclarations = declarations }];
+    }
+
+    private static Schema? MapParameters(ChatTool tool)
+    {
+        var parameters = tool.FunctionParameters?.ToString();
+
+        if (string.IsNullOrWhiteSpace(parameters))
+        {
+            return null;
+        }
+
+        return Schema.FromJson(parameters);
+    }
+
+    private static IReadOnlyList<AIToolCall> MapToolCalls(GenerateContentResponse response)
+    {
+        var functionCalls = response.FunctionCalls;
+
+        if (functionCalls == null || functionCalls.Count == 0)
+        {
+            return [];
+        }
+
+        return [.. functionCalls.Select(fc => new AIToolCall(
+            fc.Id ?? "",
+            fc.Name ?? "",
+            fc.Args == null ? "" : JsonSerializer.Serialize(fc.Args)))];
     }
 }

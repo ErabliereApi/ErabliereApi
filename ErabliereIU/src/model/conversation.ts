@@ -26,6 +26,14 @@ export class PromptResponse {
     response?: any;
 }
 
+/** Corps de la requête POST /ErabliereAI/Prompt */
+export interface PostPrompt {
+    Prompt: string;
+    ConversationId?: any;
+    PromptType?: string;
+    SystemMessage?: string;
+}
+
 export class MessagePart {
     id: any;
     messageId?: any;

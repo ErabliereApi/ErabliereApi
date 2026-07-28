@@ -28,6 +28,10 @@ public class AzureOpenAIService : IAIService
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// <paramref name="chatCompletion" /> is forwarded as is, so the tools and the tool
+    /// choice declared by the caller reach the model untouched.
+    /// </remarks>
     public async Task<AIResponse?> CompleteChatAsync(IEnumerable<ChatMessage> messages, ChatCompletionOptions chatCompletion, CancellationToken token)
     {
         var result = await _chat.CompleteChatAsync(messages, chatCompletion, token);
@@ -39,7 +43,22 @@ public class AzureOpenAIService : IAIService
             Text = c?.Text,
             Refusal = c?.Refusal,
             ImageUri = c?.ImageUri,
-            Kind = c?.Kind.ToString()
+            Kind = c?.Kind.ToString(),
+            FinishReason = result.Value?.FinishReason.ToString(),
+            ToolCalls = MapToolCalls(result.Value)
         };
+    }
+
+    private static IReadOnlyList<AIToolCall> MapToolCalls(ChatCompletion? completion)
+    {
+        if (completion?.ToolCalls == null || completion.ToolCalls.Count == 0)
+        {
+            return [];
+        }
+
+        return [.. completion.ToolCalls.Select(tc => new AIToolCall(
+            tc.Id,
+            tc.FunctionName,
+            tc.FunctionArguments?.ToString() ?? ""))];
     }
 }
