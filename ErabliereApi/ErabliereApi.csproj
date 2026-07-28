@@ -40,8 +40,9 @@
     <ProjectReference Include="..\ErabliereModel\ErabliereApi.Donnees.csproj" />
     <!-- ErabliereAI calls the very tools the MCP server exposes, rather than owning a
          second copy of their descriptions and schemas. The reference is to the tool
-         set only; no MCP server nor transport is started inside the API. -->
-    <ProjectReference Include="..\ErabliereApi.Mcp\ErabliereApi.Mcp.csproj" />
+         library, not to the server executable: no MCP server nor transport is started
+         inside the API, and none of the executable's content files reach its output. -->
+    <ProjectReference Include="..\ErabliereApi.Mcp.Tools\ErabliereApi.Mcp.Tools.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="docker-entrypoint.sh">

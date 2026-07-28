@@ -10,13 +10,20 @@ RUN npm run build:prod
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-api-env
 WORKDIR /app
 
+# ErabliereApi.Mcp.Tools est référencé par ErabliereApi pour son jeu d'outils, et il
+# tire lui-même ErabliereAPI.Proxy : les deux font donc partie du contexte de build de
+# l'api, même si aucun serveur MCP n'est démarré dans l'image.
 COPY ErabliereModel/*.csproj ./ErabliereModel/
+COPY ErabliereAPI.Proxy/*.csproj ./ErabliereAPI.Proxy/
+COPY ErabliereApi.Mcp.Tools/*.csproj ./ErabliereApi.Mcp.Tools/
 COPY ErabliereApi/*.csproj ./ErabliereApi/
 COPY ErabliereApi.Test/*.csproj ./ErabliereApi.Test/
 COPY ErabliereApi.Integration.Test/*.csproj ./ErabliereApi.Integration.Test/
 COPY ErabliereApi.Test.Autofixture/*.csproj ./ErabliereApi.Test.Autofixture/
 
 COPY ErabliereModel/. ./ErabliereModel/
+COPY ErabliereAPI.Proxy/. ./ErabliereAPI.Proxy/
+COPY ErabliereApi.Mcp.Tools/. ./ErabliereApi.Mcp.Tools/
 COPY ErabliereApi/. ./ErabliereApi/
 COPY ErabliereApi.Test/. ./ErabliereApi.Test/
 COPY ErabliereApi.Integration.Test/. ./ErabliereApi.Integration.Test/

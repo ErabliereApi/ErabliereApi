@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- Les types gardent leurs espaces de noms ErabliereApi.Mcp.* : ce projet est un
+         découpage de l'assemblage, pas un renommage. -->
+    <RootNamespace>ErabliereApi.Mcp</RootNamespace>
+    <AssemblyName>ErabliereApi.Mcp.Tools</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- IHttpClientFactory, IMemoryCache, ILogger, IOptions : les mêmes que ceux dont
+         le serveur MCP disposait par ce FrameworkReference avant le découpage. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="1.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ErabliereAPI.Proxy\ErabliereAPI.Proxy.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ErabliereApi.Mcp.Test" />
+  </ItemGroup>
+</Project>

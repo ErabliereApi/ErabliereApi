@@ -29,13 +29,12 @@ public class ErabliereAiCapabilityService : IErabliereAiCapabilityService
 
     /// <summary>
     /// Constructeur par initialisation
+    ///
+    /// <paramref name="serviceProvider" /> sert à résoudre <see cref="IAbonnementService" />,
+    /// qui n'est enregistré que lorsque l'intégration Stripe est activée. Une dépendance
+    /// déclarée au constructeur ferait échouer le démarrage d'un déploiement sans
+    /// abonnements, alors que ce cas a une réponse simple : personne n'est abonné.
     /// </summary>
-    /// <param name="serviceProvider">
-    /// Sert à résoudre <see cref="IAbonnementService" />, qui n'est enregistré que
-    /// lorsque l'intégration Stripe est activée. Une dépendance déclarée au
-    /// constructeur ferait échouer le démarrage d'un déploiement sans abonnements,
-    /// alors que ce cas a une réponse simple : personne n'est abonné.
-    /// </param>
     public ErabliereAiCapabilityService(
         ErabliereDbContext depot,
         IServiceProvider serviceProvider,

@@ -38,7 +38,8 @@ This file routes; it holds no rules of its own. Follow the link for the area you
 | `ErabliereApi/` | The web API. Main project, .NET 9. Serves the built Angular app from `wwwroot/`. |
 | `ErabliereModel/` | Data model (`ErabliereApi.Donnees`). One entity per file; `Erabliere` is the root of the hierarchy. |
 | `ErabliereIU/` | Angular 22 front-end. |
-| `ErabliereApi.Mcp/` | MCP server exposing the API to MCP clients. Read-only tools, stdio + HTTP transports. |
+| `ErabliereApi.Mcp.Tools/` | The curated read-only tool set, its projections and the plan resolution. A library, because both the MCP server **and** the ErabliereAI chat consume it. |
+| `ErabliereApi.Mcp/` | MCP server exposing the tool set to MCP clients. stdio + HTTP transports, plan gate, hosting. |
 | `ErabliereAPI.Proxy/` | NSwag-generated C# client, published to NuGet. |
 | `ErabliereApi.Test/` | Unit tests + the architecture guards. |
 | `ErabliereApi.Integration.Test/` | `WebApplicationFactory` + AngleSharp; Stripe webhook fixtures. |

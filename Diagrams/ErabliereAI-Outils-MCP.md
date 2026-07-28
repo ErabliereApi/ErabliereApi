@@ -7,7 +7,8 @@ elle ne peut lire que les siennes.
 
 Deux intégrations étaient possibles.
 
-**Retenue — en processus.** `ErabliereApi` référence `ErabliereApi.Mcp` et transforme les méthodes
+**Retenue — en processus.** `ErabliereApi` référence `ErabliereApi.Mcp.Tools` — la bibliothèque
+qui porte le jeu d'outils, et non l'exécutable du serveur — et transforme les méthodes
 `[McpServerTool]` en définitions d'outils pour le modèle. Les corps d'outils, eux, sont inchangés :
 ils lisent ErabliereAPI par `IErabliereAPIProxy`, dont l'instance enregistrée par l'API pointe vers
 l'API elle-même et **transporte les identifiants de la requête en cours**.
@@ -33,12 +34,12 @@ exactement comme le reste de l'API.
                                                 │      │                                    │
                                                 │      ▼                                    │
                                                 │  McpErabliereAiToolset                    │
-                                                │      │  (outils de ErabliereApi.Mcp)      │
+                                                │      │  (ErabliereApi.Mcp.Tools)          │
                                                 │      ▼                                    │
                                                 │  IErabliereAPIProxy                       │
                                                 │      │                                    │
                                                 │      │ CallerCredentialsHandler recopie   │
-                                                │      │ les en-têtes de la requête servie   │
+                                                │      │ les en-têtes de la requête servie  │
                                                 │      ▼                                    │
                                                 │  GET /Erablieres, /Capteurs, …            │
                                                 │  ► authentification                       │

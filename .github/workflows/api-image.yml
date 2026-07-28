@@ -16,7 +16,6 @@ on:
       - '*.yaml'
       - '*.md'
       - Diagrams/**
-      - ErabliereAPI.Proxy/**
   pull_request:
     types: [opened, synchronize, reopened]
     paths-ignore:
@@ -31,7 +30,6 @@ on:
       - '*.yaml'
       - '*.md'
       - Diagrams/**
-      - ErabliereAPI.Proxy/**
   workflow_dispatch:
 
 env:

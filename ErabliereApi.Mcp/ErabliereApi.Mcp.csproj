@@ -17,14 +17,19 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ModelContextProtocol" Version="1.4.1" />
+    <!-- ModelContextProtocol arrives through ErabliereApi.Mcp.Tools; only the
+         transport package is specific to the executable. -->
     <PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.4.1" />
     <!-- Microsoft.Extensions.Hosting and Microsoft.Extensions.Http used to be
          referenced here; the Microsoft.AspNetCore.App framework reference above
          now ships both (NU1510). -->
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ErabliereAPI.Proxy\ErabliereAPI.Proxy.csproj" />
+    <!-- The tool set, the projections and the plan resolution live in a class
+         library so ErabliereApi can consume them without referencing an executable.
+         Referencing one made the api inherit this project's docker-entrypoint.sh and
+         appsettings.json, which collide with its own on publish (NETSDK1152). -->
+    <ProjectReference Include="..\ErabliereApi.Mcp.Tools\ErabliereApi.Mcp.Tools.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="ErabliereApi.Mcp.Test" />

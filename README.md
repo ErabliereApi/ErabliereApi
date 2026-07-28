@@ -27,6 +27,7 @@ Le suivit du projet est effectué dans AzureDevOps : https://dev.azure.com/fredd
 - ErabliereIU : Application angular pour l'affichage des données
 - ErabliereModel : Projet du modèles de données
 - ErabliereApi.Proxy : Proxy pour le web API disponible soous forme de nuget
+- ErabliereApi.Mcp.Tools : Le jeu d'outils en lecture seule, partagé par le serveur MCP et la conversation ErabliereAI
 - ErabliereApi.Mcp : Serveur MCP exposant l'API aux assistants IA (voir la section Serveur MCP)
 - Infrastructure : Fichier relié à la configuration de l'infrastructure	kubernetes ou autres
 - PythonScripts : Script python pour alimenter l'API
