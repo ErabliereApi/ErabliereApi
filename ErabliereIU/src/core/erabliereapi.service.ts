@@ -7,7 +7,7 @@ import { Alerte } from 'src/model/alerte';
 import { AlerteCapteur } from 'src/model/alerteCapteur';
 import { Baril } from 'src/model/baril';
 import { Capteur } from 'src/model/capteur';
-import { Conversation, Message } from 'src/model/conversation';
+import { Conversation, Message, PostPrompt, PromptResponse } from 'src/model/conversation';
 import { Customer } from 'src/model/customer';
 import { CustomerAccess } from 'src/model/customerAccess';
 import { Documentation } from 'src/model/documentation';
@@ -521,9 +521,9 @@ export class ErabliereApi {
         return await firstValueFrom(this._httpClient.post<any>(this._environmentService.apiUrl + "/Checkout", {}, {}));
     }
 
-    async postPrompt(prompt: { Prompt: string; ConversationId: any; }) {
+    async postPrompt(prompt: PostPrompt): Promise<PromptResponse> {
         const headers = await this.getHeaders();
-        return firstValueFrom(this._httpClient.post<any>(this._environmentService.apiUrl + "/ErabliereAI/Prompt", prompt, { headers: headers }));
+        return firstValueFrom(this._httpClient.post<PromptResponse>(this._environmentService.apiUrl + "/ErabliereAI/Prompt", prompt, { headers: headers }));
     }
 
     async getConversations(search?: string, top?: number, skip?: number): Promise<Conversation[]> {

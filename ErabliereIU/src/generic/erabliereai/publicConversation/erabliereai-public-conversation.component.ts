@@ -15,7 +15,7 @@ import { Conversation } from 'src/model/conversation';
                         Phrase système : {{ conversation?.systemMessage }}
                     </p>
                 </div>
-                <erabliereai-message-list [conversation]="conversation" [isPublicDisplay]="true"></erabliereai-message-list>
+                <erabliereai-message-list [messages]="conversation?.messages" [isPublicDisplay]="true"></erabliereai-message-list>
             </div>
         </div>
     `,

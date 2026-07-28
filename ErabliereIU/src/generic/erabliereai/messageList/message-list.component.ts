@@ -1,13 +1,14 @@
-
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { MarkdownRendererComponent } from 'src/generic/eapi-markdown.component';
-import { Conversation, Message } from 'src/model/conversation';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { ErabliereApi } from 'src/core/erabliereapi.service';
+import { Message } from 'src/model/conversation';
 import { EButtonComponent } from "src/generic/ebutton.component";
+import { formatMessageDate } from 'src/core/erabliereai/message-date';
 import { marked } from 'marked';
 
+/**
+ * Renders the messages it is given. It owns no state and calls no API:
+ * loading and translating are the responsibility of the parent.
+ */
 @Component({
     selector: 'erabliereai-message-list',
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -26,7 +27,7 @@ import { marked } from 'marked';
                   <eapi-markdown [content]="message.content"></eapi-markdown>
                 </div>
                 @if (enableTranslation && !message.isUser) {
-                  <button class="btn btn-link" (click)="traduire(message.content, i)">
+                  <button class="btn btn-link" (click)="translateRequested.emit(i)">
                     Traduire <span style="font-size: 1.2em;">🌐</span>
                   </button>
                 }
@@ -39,64 +40,15 @@ import { marked } from 'marked';
     standalone: true,
     imports: [MarkdownRendererComponent, EButtonComponent],
 })
-export class MessageListComponent implements OnInit, OnChanges {
-    @Input() conversation?: Conversation;
+export class MessageListComponent {
     @Input() messages?: Message[];
     @Input() enableTranslation: boolean = false;
     @Input() isPublicDisplay: boolean = false;
 
-    constructor(private readonly api: ErabliereApi) { }
+    /** Emits the index of the message the user wants translated. */
+    @Output() translateRequested = new EventEmitter<number>();
 
-    ngOnInit(): void {
-        if (this.conversation) {
-            if (this.conversation.messages) {
-                this.messages = this.conversation.messages;
-            }
-            else {
-                this.api.getMessages(this.conversation.id).then((messages) => {
-                    if (messages) {
-                        this.messages = messages;
-                    }
-                });
-            }
-        }
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        const conversationChange: SimpleChange = changes['conversation'];
-        if (conversationChange?.currentValue) {
-            this.conversation = conversationChange.currentValue;
-            this.messages = conversationChange.currentValue.messages;
-            if (this.messages == null && this.conversation?.id) {
-                this.api.getMessages(this.conversation.id).then((messages) => {
-                    if (messages) {
-                        this.messages = messages;
-                    }
-                });
-            }
-        }
-    }
-
-    formatMessageDate(date?: Date | string) {
-        if (!date) {
-            return '';
-        }
-        return formatDistanceToNow(new Date(date), { addSuffix: true, locale: fr });
-    }
-
-    traduire(message: string | undefined, index: number) {
-        if (!message) {
-            return;
-        }
-        this.api.traduire(message).then((response: any) => {
-            if (this.messages == null) {
-                return;
-            }
-            this.messages[index].content = response[0].translations[0].text;
-        }).catch((error: any) => {
-            alert('Error sending message ' + JSON.stringify(error));
-        });
-    }
+    protected readonly formatMessageDate = formatMessageDate;
 
     convertToWord(content?: string, fileName = 'erabliereai-message') {
         // Enveloppe HTML recommandée pour Word

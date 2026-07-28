@@ -180,6 +180,9 @@ public class Startup
         {
             services.AddTransient<IAIService, AzureOpenAIService>();
         }
+
+        services.AddTransient<ISystemPromptBuilder, SystemPromptBuilder>();
+        services.AddTransient<IConversationAIService, ConversationAIService>();
     }
 
     /// <summary>

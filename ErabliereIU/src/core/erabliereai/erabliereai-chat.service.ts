@@ -1,0 +1,171 @@
+import { Injectable } from '@angular/core';
+import { ErabliereApi } from 'src/core/erabliereapi.service';
+import { Conversation, Message, PostPrompt } from 'src/model/conversation';
+
+/**
+ * Holds the state of an ErabliereAI chat and talks to the API on behalf of the view.
+ *
+ * Provided at the component level, not in root: the chat widget and the /ai route
+ * each get their own conversation state.
+ */
+@Injectable()
+export class ErabliereAiChatService {
+    readonly defaultSystemPhrase = "Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique.";
+
+    conversations: Conversation[] = [];
+    currentConversation?: Conversation;
+    messages: Message[] = [];
+    aiIsThinking = false;
+    typePrompt = 'Chat';
+    currentSystemPhrase?: string = this.defaultSystemPhrase;
+
+    top = 8;
+    skip = 0;
+    search = '';
+    private lastSearch = '';
+
+    constructor(private readonly api: ErabliereApi) { }
+
+    /**
+     * Load the first page of conversations, and the messages of the selected one.
+     */
+    async fetchConversations(): Promise<void> {
+        const conversations = await this.api.getConversations(this.search, this.top, this.skip);
+
+        if (this.currentConversation == null || this.search != this.lastSearch) {
+            this.conversations = conversations;
+            if (this.conversations.length > 0) {
+                await this.selectConversation(this.conversations[0], false);
+            }
+        }
+        else {
+            const refreshed = conversations.find(c => c.id === this.currentConversation?.id);
+            if (refreshed) {
+                await this.selectConversation(refreshed, false);
+            }
+            else {
+                this.conversations = conversations;
+            }
+        }
+
+        this.lastSearch = this.search;
+    }
+
+    /**
+     * Select a conversation, or start a new one when null is passed.
+     */
+    async selectConversation(conversation?: Conversation, updateSystemPhrase = true): Promise<void> {
+        this.currentConversation = conversation ?? undefined;
+
+        if (!this.currentConversation) {
+            this.messages = [];
+            return;
+        }
+
+        if (updateSystemPhrase) {
+            this.currentSystemPhrase = this.currentConversation.systemMessage ?? this.currentSystemPhrase;
+        }
+
+        this.messages = await this.api.getMessages(this.currentConversation.id) ?? [];
+    }
+
+    /**
+     * Send a prompt and refresh the messages of the conversation with the answer.
+     */
+    async sendMessage(newMessage: string): Promise<void> {
+        const prompt: PostPrompt = {
+            Prompt: newMessage,
+            ConversationId: this.currentConversation?.id,
+            PromptType: this.typePrompt,
+            SystemMessage: this.currentConversation?.systemMessage ?? this.currentSystemPhrase
+        };
+
+        this.aiIsThinking = true;
+
+        try {
+            const response = await this.api.postPrompt(prompt);
+
+            const conversation = response.conversation;
+
+            if (this.currentConversation == null && conversation) {
+                this.currentConversation = conversation;
+                this.conversations.unshift(conversation);
+            }
+
+            // La réponse ne porte pas toujours les messages, on les recharge au besoin
+            // pour que la liste affiche l'échange qui vient d'avoir lieu.
+            this.messages = conversation?.messages
+                ?? await this.api.getMessages(this.currentConversation?.id) ?? [];
+        }
+        finally {
+            this.aiIsThinking = false;
+        }
+    }
+
+    async deleteConversation(conversation: Conversation): Promise<void> {
+        await this.api.deleteConversation(conversation.id);
+
+        if (conversation.id === this.currentConversation?.id) {
+            this.currentConversation = undefined;
+            this.messages = [];
+        }
+
+        await this.fetchConversations();
+    }
+
+    async loadMore(): Promise<void> {
+        this.skip += this.top;
+        const conversations = await this.api.getConversations(this.search, this.top, this.skip);
+        this.conversations = this.conversations.concat(conversations);
+    }
+
+    /**
+     * Reset the paging before a new search.
+     */
+    updateSearch(search: string): void {
+        this.skip = 0;
+        this.top = 8;
+        this.search = search;
+    }
+
+    async clearSearch(): Promise<void> {
+        this.search = '';
+        await this.fetchConversations();
+    }
+
+    async toggleVisibilityCurrentConversation(): Promise<void> {
+        if (this.currentConversation == null) {
+            return;
+        }
+
+        const newState = !this.currentConversation.isPublic;
+        await this.api.patchConversation(this.currentConversation.id, { isPublic: newState });
+        this.currentConversation.isPublic = newState;
+    }
+
+    getShareLink(): string | undefined {
+        if (this.currentConversation == null) {
+            return undefined;
+        }
+
+        return `${window.location.origin}/ai/public/${this.currentConversation.id}`;
+    }
+
+    /**
+     * Translate a message in place, the message list only renders what it is given.
+     */
+    async translateMessage(index: number): Promise<void> {
+        const message = this.messages[index];
+
+        if (!message?.content) {
+            return;
+        }
+
+        const response = await this.api.traduire(message.content);
+        this.messages[index].content = response[0].translations[0].text;
+    }
+
+    resetSystemPhrase(): void {
+        this.currentSystemPhrase = this.defaultSystemPhrase;
+    }
+}
