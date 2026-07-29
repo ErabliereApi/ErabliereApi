@@ -6,7 +6,7 @@ Four test projects, all xUnit. Pick by what you're proving.
 |---|---|---|
 | `ErabliereApi.Test` | Controller and extension unit tests, plus the architecture guards. | `WriteEndpointsBindDtoNotEntityTest`, `ValiderIPRulesAttributeTest`, `EqualityComparer/`, `Extension/` |
 | `ErabliereApi.Integration.Test` | In-memory `WebApplicationFactory` + AngleSharp, end-to-end through the pipeline. | `ApplicationFactory/`, `StripeWebhookJson/` fixtures, `OverPostingMigrationTest`, `TubelureTest`, `OdataHttpQueryTest` |
-| `ErabliereApi.Mcp.Test` | The MCP server: tools, transports, plan gate, response budget. | `HttpTransportTest`, `PlanGateTest`, `ToolResponseTest`, `ToolDiscoveryTest` |
+| `ErabliereApi.Mcp.Test` | The MCP server and the `ErabliereApi.Mcp.Tools` library: tools, transports, plan gate, response budget. | `HttpTransportTest`, `PlanGateTest`, `ToolResponseTest`, `ToolDiscoveryTest` |
 | `ErabliereApi.Test.Autofixture` | Shared fixtures consumed by the others — not a test suite itself. | `AutoApiData`, `ErabliereFixture`, `DbContextExtension` |
 
 The Angular app has **no unit-test runner**. All its automated tests are Cypress E2E specs in

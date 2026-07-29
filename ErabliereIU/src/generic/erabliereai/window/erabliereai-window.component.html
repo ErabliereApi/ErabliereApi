@@ -104,12 +104,22 @@
             (translateRequested)="traduire($event)"></erabliereai-message-list>
           }
 
+          @if (chat.shouldSuggestUpgrade) {
+          <p class="small text-white-50 mb-3">
+            💡 Avec un forfait supérieur, ErabliereAI peut consulter les données réelles de votre érablière
+            pour répondre à vos questions.
+            @if (chat.capabilities?.subscriptionUrl; as subscriptionUrl) {
+            <a class="link-light" [href]="subscriptionUrl" target="_blank" rel="noopener">En savoir plus</a>
+            }
+          </p>
+          }
+
           @if (chat.aiIsThinking) {
           <div>
             <div class="spinner-border text-success">
               <span class="visually-hidden">Pensif...</span>
             </div>
-            <p class="text-white">ÉrabliereAI réfléchit...</p>
+            <p class="text-white">{{ chat.activityLabel || 'ÉrabliereAI réfléchit...' }}</p>
           </div>
           }
 

@@ -1,5 +1,4 @@
 using OpenAI.Chat;
-using System.Text.Json;
 using Google.GenAI;
 using Google.GenAI.Types;
 
@@ -23,94 +22,39 @@ public class GeminiAIService : IAIService
 
     /// <inheritdoc />
     /// <remarks>
-    /// The tools declared on <paramref name="chatCompletion" /> are translated into Gemini
-    /// function declarations, and the function calls of the answer are translated back into
-    /// <see cref="AIResponse.ToolCalls" />, so both providers expose the same contract.
+    /// Both halves of the loop are implemented by <see cref="GeminiRequestMapper" />:
+    /// the tool declarations and the function calls of the answer are translated, and
+    /// so are the assistant and tool messages carrying the results on the next turn.
+    /// Set <c>GoogleGenAIEnableToolCalling</c> to "false" to take the tools away from
+    /// this provider without changing the rest of the configuration; the chat then
+    /// answers from the model's own knowledge, as it did before tool calling existed.
     /// </remarks>
+    public bool SupportsToolCalling =>
+        !string.Equals(_config["GoogleGenAIEnableToolCalling"], "false", StringComparison.OrdinalIgnoreCase);
+
+    /// <inheritdoc />
     public async Task<AIResponse?> CompleteChatAsync(IEnumerable<ChatMessage> messages, ChatCompletionOptions chatCompletion, CancellationToken token)
     {
         var gemini = new Client(apiKey: _config["GoogleGenAIKey"]);
 
         var response = await gemini.Models.GenerateContentAsync(
             _config["GoogleGenAIModel"] ?? "gemini-2.5-flash",
-            messages.Select(m =>
-            {
-                return new Content
-                {
-                    Role = m.GetType().Name == "UserChatMessage" ? "user" : "model",
-                    Parts = m.Content.Select(c =>
-                    {
-                        return new Part
-                        {
-                            Text = c.Text
-                        };
-                    }).ToList()
-                };
-            }).ToList(),
+            GeminiRequestMapper.MapContents(messages),
             new GenerateContentConfig
             {
                 Temperature = chatCompletion.Temperature,
                 FrequencyPenalty = chatCompletion.FrequencyPenalty,
                 PresencePenalty = chatCompletion.PresencePenalty,
-                Tools = MapTools(chatCompletion)
+                SystemInstruction = GeminiRequestMapper.MapSystemInstruction(messages),
+                Tools = GeminiRequestMapper.MapTools(chatCompletion)
             },
             token);
 
         return new AIResponse
         {
-            Text = response.Text,
+            Text = GeminiRequestMapper.MapText(response),
             FinishReason = response.Candidates?.FirstOrDefault()?.FinishReason?.ToString(),
-            ToolCalls = MapToolCalls(response)
+            ToolCalls = GeminiRequestMapper.MapToolCalls(response)
         };
-    }
-
-    /// <summary>
-    /// Translate the OpenAI tool declarations into Gemini function declarations.
-    /// Returns null when the caller declared no tool, so the request stays unchanged.
-    /// </summary>
-    private static List<Tool>? MapTools(ChatCompletionOptions chatCompletion)
-    {
-        if (chatCompletion.Tools == null || chatCompletion.Tools.Count == 0)
-        {
-            return null;
-        }
-
-        var declarations = chatCompletion.Tools
-            .Select(t => new FunctionDeclaration
-            {
-                Name = t.FunctionName,
-                Description = t.FunctionDescription,
-                Parameters = MapParameters(t)
-            })
-            .ToList();
-
-        return [new Tool { FunctionDeclarations = declarations }];
-    }
-
-    private static Schema? MapParameters(ChatTool tool)
-    {
-        var parameters = tool.FunctionParameters?.ToString();
-
-        if (string.IsNullOrWhiteSpace(parameters))
-        {
-            return null;
-        }
-
-        return Schema.FromJson(parameters);
-    }
-
-    private static IReadOnlyList<AIToolCall> MapToolCalls(GenerateContentResponse response)
-    {
-        var functionCalls = response.FunctionCalls;
-
-        if (functionCalls == null || functionCalls.Count == 0)
-        {
-            return [];
-        }
-
-        return [.. functionCalls.Select(fc => new AIToolCall(
-            fc.Id ?? "",
-            fc.Name ?? "",
-            fc.Args == null ? "" : JsonSerializer.Serialize(fc.Args)))];
     }
 }

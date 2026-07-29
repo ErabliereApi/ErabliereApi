@@ -18,14 +18,22 @@ this file only routes.
 | Debugging by hand | [Manual verification with the MCP inspector](Readme.md#manual-verification-with-the-mcp-inspector) |
 | Any non-obvious design choice | [Implementation notes](Readme.md#implementation-notes) |
 
-## Layout
+## Two projects
 
-| Folder | Contents |
+The tool set is a **library**, `ErabliereApi.Mcp.Tools`, because it has two consumers: this server,
+and the ErabliereAI chat inside `ErabliereApi`. The executable keeps only what is about *being a
+server*. Referencing the executable instead would drag its `appsettings.json` and
+`docker-entrypoint.sh` into the API's publish output, where they collide with its own (NETSDK1152).
+
+| Project / folder | Contents |
 |---|---|
-| `Tools/` | The curated tool set — `ErabliereTools`, `CapteurTools`, `AlerteTools`, `NoteTools`, `RapportTools`, `BarilTools`, `DompeuxTools`, `HoraireTools`, `PlanTools`, `ToolArguments`. |
-| `Hosting/` | `StdioServerRunner`, `HttpServerRunner`, `McpTransportSelector`. `Program.cs` only picks a transport. |
-| `Http/` | `ApiKeyHandler`, the two `IApiKeyAccessor` implementations, `RequireApiKeyMiddleware`, `RequirePlanMiddleware`, `JsonRpcErrorWriter`. |
-| `Models/`, `Serialization/`, `Configuration/`, `Health/`, `Extensions/` | Projections, `ToolJson`, options, health endpoints. |
+| **`ErabliereApi.Mcp.Tools`** `Tools/` | The curated tool set — `ErabliereTools`, `CapteurTools`, `AlerteTools`, `NoteTools`, `RapportTools`, `BarilTools`, `DompeuxTools`, `HoraireTools`, `PlanTools`, `ToolArguments`. |
+| `Models/`, `Serialization/` | Projections, `ToolResponse`, `ToolJson`. |
+| `Services/`, `Configuration/` | `DonneesCapteurSummarizer`, the plan resolution, `ErabliereApiMcpOptions`, `McpPlanGatingOptions`. |
+| `Http/`, `Hosting/` | `IApiKeyAccessor`, `ApiKeyHandler`, `McpTransportMode` — the parts the options and the tools need. |
+| **`ErabliereApi.Mcp`** `Hosting/` | `StdioServerRunner`, `HttpServerRunner`, `McpTransportSelector`. `Program.cs` only picks a transport. |
+| `Http/` | The two `IApiKeyAccessor` implementations, `RequireApiKeyMiddleware`, `RequirePlanMiddleware`, `JsonRpcErrorWriter`. |
+| `Health/`, `Extensions/`, `appsettings.json` | Health endpoints, registration, plan gating configuration. |
 
 ## Three rules that break things silently
 
@@ -40,13 +48,22 @@ this file only routes.
 ## Commands
 
 ```powershell
-dotnet build ErabliereApi.Mcp\ErabliereApi.Mcp.csproj
+dotnet build ErabliereApi.Mcp\ErabliereApi.Mcp.csproj      # tire ErabliereApi.Mcp.Tools
 dotnet test ErabliereApi.Mcp.Test\ErabliereApi.Mcp.Test.csproj
 docker build -t erabliereapi/erabliereapi-mcp:local -f ErabliereApi.Mcp\Dockerfile .   # from the REPO ROOT
 ```
 
 The docker build runs the unit **and** integration tests, so a failing MCP test fails the image build.
 The build context needs `ErabliereAPI.Proxy`, hence the repo root.
+
+## The tool set has two consumers
+
+`ErabliereApi` references `ErabliereApi.Mcp.Tools` and hands the same `[McpServerTool]` methods to
+the ErabliereAI chat (`ErabliereApi/Services/AI/Tools/`). Changing a tool name, description or schema
+changes what the chat can do, not only what an MCP client sees. `ErabliereApi.Test/ErabliereAiToolCatalogTest.cs`
+pins the exposed set and fails on anything not marked `ReadOnly`.
+
+→ [Diagrams/ErabliereAI-Outils-MCP.md](../Diagrams/ErabliereAI-Outils-MCP.md)
 
 ## Depends on the API, in both directions
 

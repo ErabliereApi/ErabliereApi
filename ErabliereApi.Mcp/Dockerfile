@@ -8,12 +8,14 @@ WORKDIR /app
 COPY global.json ./
 
 COPY ErabliereAPI.Proxy/*.csproj ./ErabliereAPI.Proxy/
+COPY ErabliereApi.Mcp.Tools/*.csproj ./ErabliereApi.Mcp.Tools/
 COPY ErabliereApi.Mcp/*.csproj ./ErabliereApi.Mcp/
 COPY ErabliereApi.Mcp.Test/*.csproj ./ErabliereApi.Mcp.Test/
 
 RUN dotnet restore ErabliereApi.Mcp.Test/ErabliereApi.Mcp.Test.csproj
 
 COPY ErabliereAPI.Proxy/. ./ErabliereAPI.Proxy/
+COPY ErabliereApi.Mcp.Tools/. ./ErabliereApi.Mcp.Tools/
 COPY ErabliereApi.Mcp/. ./ErabliereApi.Mcp/
 COPY ErabliereApi.Mcp.Test/. ./ErabliereApi.Mcp.Test/
 

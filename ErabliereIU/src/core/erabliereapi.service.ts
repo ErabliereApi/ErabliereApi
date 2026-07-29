@@ -7,7 +7,7 @@ import { Alerte } from 'src/model/alerte';
 import { AlerteCapteur } from 'src/model/alerteCapteur';
 import { Baril } from 'src/model/baril';
 import { Capteur } from 'src/model/capteur';
-import { Conversation, Message, PostPrompt, PromptResponse } from 'src/model/conversation';
+import { Conversation, ErabliereAICapabilities, Message, PostPrompt, PromptResponse, ToolActivity } from 'src/model/conversation';
 import { Customer } from 'src/model/customer';
 import { CustomerAccess } from 'src/model/customerAccess';
 import { Documentation } from 'src/model/documentation';
@@ -524,6 +524,26 @@ export class ErabliereApi {
     async postPrompt(prompt: PostPrompt): Promise<PromptResponse> {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.post<PromptResponse>(this._environmentService.apiUrl + "/ErabliereAI/Prompt", prompt, { headers: headers }));
+    }
+
+    /**
+     * Ce qu'ErabliereAI peut faire pour l'utilisateur : notamment si l'assistant
+     * a le droit de consulter ses données réelles avec les outils MCP.
+     */
+    async getErabliereAICapabilities(): Promise<ErabliereAICapabilities> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<ErabliereAICapabilities>(
+            this._environmentService.apiUrl + "/ErabliereAI/Capabilities", { headers: headers }));
+    }
+
+    /**
+     * L'avancement d'un prompt en cours de traitement, pour afficher ce que
+     * l'assistant est en train de consulter.
+     */
+    async getPromptStatus(activityId: string): Promise<ToolActivity> {
+        const headers = await this.getHeaders();
+        return firstValueFrom(this._httpClient.get<ToolActivity>(
+            this._environmentService.apiUrl + "/ErabliereAI/Prompt/Status/" + activityId, { headers: headers }));
     }
 
     async getConversations(search?: string, top?: number, skip?: number): Promise<Conversation[]> {

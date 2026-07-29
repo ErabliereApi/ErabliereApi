@@ -16,7 +16,7 @@ Bind a DTO from `ErabliereModel/Action/`.
 | `Controllers/` | 32 controllers, one per resource, French names. `Base/ErabliereApiBaseController.cs` is the shared base. |
 | `Depot/Sql/` | The single EF Core `ErabliereDbContext`, `EntityConfiguration/`, `Migrations/`. See its `Readme.md`. |
 | `Extensions/` | Service registration. `ServiceCollectionExtension.cs` is where new services get wired. |
-| `Services/` | `AI`, `Abonnements`, `ApiKey`, `Checkout` (Stripe), `IpInfo`, `LoRaWAN` (ChirpStack), `Nmap`, `Notifications`, `Users`, `Weather`. |
+| `Services/` | `AI` (dont `AI/Tools/`, les outils MCP appelés par la conversation), `Abonnements`, `ApiKey`, `Checkout` (Stripe), `IpInfo`, `LoRaWAN` (ChirpStack), `Nmap`, `Notifications`, `Users`, `Weather`. |
 | `Authorization/` | `ApiKeyAuthorization/` (middleware, handler, scoped `ApiKeyAuthorizationContext`), `Customers/`, `Policies/`. |
 | `Attributes/` | `ValiderOwnershipAttribute`, `ValiderAbonnementAttribute`, `ValiderIPRulesAttributes`, `SecureEnableQueryAttribute`, the `TriggerAlert` family (V3/V4), `Validators/`. |
 | `Middlewares/` | `GlobalExceptionHandler`, `IpInfoMiddleware`, `ODataCountHeaderMiddleware`, `ChaosEngineeringMiddleware`. |
@@ -47,6 +47,11 @@ client-supplied FK yourself.
 
 `ApiKeyAuthorizationContext` is registered **Scoped** and filled by `ApiKeyMiddleware` in the request
 scope. A child scope from `CreateScope()` gets an empty instance and identifies nobody.
+
+**ErabliereAI is not an exception to any of this.** Its tools call the API back over HTTP with the
+caller's own `Authorization` / `X-ErabliereApi-ApiKey` header (`Services/AI/Tools/CallerCredentialsHandler.cs`).
+The AI holds no credential of its own, so it reaches exactly what its user reaches — never give it
+one. → [Diagrams/ErabliereAI-Outils-MCP.md](../Diagrams/ErabliereAI-Outils-MCP.md)
 
 ## Commands
 

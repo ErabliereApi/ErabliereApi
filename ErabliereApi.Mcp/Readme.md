@@ -17,6 +17,22 @@ that include MCP access, the self-hosted one never is.
 
 All the tools are read-only.
 
+### A third consumer: the ErabliereAI chat
+
+`ErabliereApi` references `ErabliereApi.Mcp.Tools` — the library holding the tool set, not this
+executable — and turns the same `[McpServerTool]` methods into tool definitions for the chat of the
+web application, so a user asking "quelle était la température de mon érablière hier ?" gets an answer
+read from their real data. No MCP server and no transport is started inside the API: only the tool
+classes are reused, and their `IErabliereAPIProxy` is one pointing back at the API with the
+credentials of the user being served.
+
+That means **a change to a tool here changes what the chat can do**, and the tool descriptions are
+read by two audiences. Two guards live on the API side: `ErabliereAiToolCatalogTest` pins the exposed
+set (12 of the 13 — `get_my_plan` is not offered, it answers about the MCP client rather than about
+the maple grove) and refuses anything not marked `ReadOnly`.
+
+Details and the authorization argument: [Diagrams/ErabliereAI-Outils-MCP.md](../Diagrams/ErabliereAI-Outils-MCP.md).
+
 ## Tools
 
 The set is deliberately **curated**: it is not one tool per controller. A model spends context

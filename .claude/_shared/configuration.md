@@ -45,6 +45,26 @@ dotnet ef --startup-project . migrations add <Name> `
 in `appsettings.json` because it's a mapping rather than a scalar. Full table in
 [`ErabliereApi.Mcp/Readme.md`](../../ErabliereApi.Mcp/Readme.md#configuration).
 
+## ErabliereAI tools
+
+`ErabliereAI:Tools:*` in `appsettings.json` bounds the tool calling loop of the chat — `Enabled`,
+`MaxRounds`, `ToolTimeout`, `TokenBudget`, `Temperature`, `ExcludedTools`, `ApiBaseUrl`,
+`ActivityRetention`. `Temperature` overrides `LLMDefaultTemperature` for the completions of a tool
+driven exchange only: the platform default of 1 suits a conversation and makes a tool loop invent
+search terms and date ranges. Which
+plans may use the tools is **not** configured there: the chat reads the same `Mcp:PlanGating` section
+as the MCP server, so one deployment decision covers both. Table in
+[`README.md`](../../README.md#configuration), rationale in
+[`Diagrams/ErabliereAI-Outils-MCP.md`](../../Diagrams/ErabliereAI-Outils-MCP.md).
+
+`ApiBaseUrl` is the one to reach for when the tools stop working behind a proxy: left empty, they
+call back the address of the request being served, which a TLS-terminating ingress can make
+unreachable from inside the cluster.
+
+`PrimaryAIService` picks the provider — `Google` for Gemini (`GoogleGenAIKey`, `GoogleGenAIModel`),
+anything else for Azure OpenAI. Both run the tool loop; `GoogleGenAIEnableToolCalling=false` takes
+the tools away from Gemini alone, leaving the chat answering from the model's own knowledge.
+
 ## Auth templates
 
 `config/oauth-oidc.template.json` and `config/oauth-oidc.template.aad.json`. The Angular app fetches

@@ -17,7 +17,7 @@ namespace Depot.Sql.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1271,8 +1271,23 @@ namespace Depot.Sql.Migrations
                     b.Property<bool>("IsUser")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MessageType")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<string>("Refusal")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToolCallId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ToolName")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool>("UsedLiveData")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

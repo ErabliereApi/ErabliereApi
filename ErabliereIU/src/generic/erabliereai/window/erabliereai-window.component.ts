@@ -32,6 +32,7 @@ export class ErabliereAiWindowComponent implements OnInit {
 
     ngOnInit(): void {
         this.fetchConversations();
+        this.chat.fetchCapabilities();
     }
 
     fetchConversations() {
