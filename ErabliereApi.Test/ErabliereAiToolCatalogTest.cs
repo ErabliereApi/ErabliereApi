@@ -1,8 +1,10 @@
 using ErabliereApi.Services.AI.Tools;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ErabliereApi.Test;
@@ -96,6 +98,31 @@ public class ErabliereAiToolCatalogTest
         Assert.False(proprietes.TryGetProperty("proxy", out _));
         Assert.False(proprietes.TryGetProperty("cancellationToken", out _));
         Assert.True(proprietes.TryGetProperty("erabliereId", out _));
+    }
+
+    [Fact]
+    public void LeSchemaNExposePasLesDependancesMemeConstruitEnParallele()
+    {
+        // AIFunctionFactory mémorise le schéma d'une méthode dans un état partagé par
+        // le processus, et cette mémorisation n'est pas sûre à froid : construits
+        // concurremment, les premiers catalogues revenaient avec le 'proxy' que
+        // BindServiceParameters devait cacher. Un verrou dans le constructeur ferme
+        // la course; ce test est ce qui empêche de le retirer par mégarde.
+        var fautifs = new ConcurrentBag<string>();
+
+        Parallel.For(0, 64, _ =>
+        {
+            var proprietes = JsonDocument
+                .Parse(CreateCatalog().ChatTools.Single(t => t.FunctionName == "list_capteurs").FunctionParameters.ToString())
+                .RootElement.GetProperty("properties");
+
+            if (proprietes.TryGetProperty("proxy", out JsonElement _))
+            {
+                fautifs.Add(proprietes.ToString());
+            }
+        });
+
+        Assert.True(fautifs.IsEmpty, $"{fautifs.Count} catalogues sur 64 exposent 'proxy'. Exemple : {fautifs.FirstOrDefault()}");
     }
 
     [Fact]

@@ -22,6 +22,23 @@ namespace ErabliereApi.Services.AI.Tools;
 /// </remarks>
 public class ErabliereAiToolCatalog
 {
+    /// <summary>
+    /// Serializes the construction of the catalog across the whole process.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="AIFunctionFactory" /> memoizes the schema it generates for a method
+    /// in process wide state, and that memoization is not safe to populate from two
+    /// threads at once: the first catalogs built concurrently come back with the
+    /// parameters that were meant to be hidden — <c>IErabliereAPIProxy</c> among them —
+    /// present in the schema. A model reading that schema would believe it chooses
+    /// what the tool reads the data with.
+    /// <para>
+    /// Costs nothing where it matters: this type is registered as a singleton and is
+    /// therefore built exactly once per process.
+    /// </para>
+    /// </remarks>
+    private static readonly Lock BuildLock = new();
+
     private readonly Dictionary<string, AIFunction> _functions;
     private readonly IReadOnlyList<ChatTool> _chatTools;
 
@@ -30,8 +47,11 @@ public class ErabliereAiToolCatalog
     /// </summary>
     public ErabliereAiToolCatalog(IOptions<ErabliereAiToolOptions> options)
     {
-        _functions = BuildFunctions(options.Value);
-        _chatTools = [.. _functions.Values.Select(ToChatTool)];
+        lock (BuildLock)
+        {
+            _functions = BuildFunctions(options.Value);
+            _chatTools = [.. _functions.Values.Select(ToChatTool)];
+        }
     }
 
     /// <summary>
