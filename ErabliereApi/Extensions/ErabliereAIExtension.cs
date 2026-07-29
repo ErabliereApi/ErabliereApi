@@ -60,6 +60,7 @@ public static class ErabliereAIExtension
         services.AddSingleton<IToolActivityTracker, MemoryCacheToolActivityTracker>();
         services.AddScoped<IErabliereAiCapabilityService, ErabliereAiCapabilityService>();
         services.AddScoped<IErabliereAiToolset, McpErabliereAiToolset>();
+        services.AddScoped<IErabliereAiCapteurCatalog, ErabliereAiCapteurCatalog>();
 
         services.AddTransient<CallerCredentialsHandler>();
 

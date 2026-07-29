@@ -128,9 +128,10 @@ discrète à s'abonner.
 | Clé | Défaut | Rôle |
 |---|---|---|
 | `ErabliereAI:Tools:Enabled` | `true` | Interrupteur général. À `false`, aucun outil n'est déclaré. |
-| `ErabliereAI:Tools:MaxRounds` | `5` | Nombre maximal d'allers-retours modèle -> outils -> modèle par question. |
+| `ErabliereAI:Tools:MaxRounds` | `8` | Nombre maximal d'allers-retours modèle -> outils -> modèle par question. |
 | `ErabliereAI:Tools:ToolTimeout` | `00:00:20` | Délai accordé à un appel d'outil avant abandon. |
 | `ErabliereAI:Tools:TokenBudget` | `12000` | Plafond de jetons que les résultats d'outils peuvent occuper. |
+| `ErabliereAI:Tools:Temperature` | `0.2` | Température des complétions d'un échange avec outils, à la place de `LLMDefaultTemperature`. Lire des données n'est pas rédiger. |
 | `ErabliereAI:Tools:ExcludedTools` | `["get_my_plan"]` | Outils volontairement non offerts. |
 | `ErabliereAI:Tools:ApiBaseUrl` | *(vide)* | Adresse interne de l'API. Vide, l'adresse de la requête servie est utilisée. |
 | `Mcp:PlanGating` | *(voir plus haut)* | Forfaits ouvrant la capacité `mcp`, partagés avec le serveur MCP. |
@@ -138,9 +139,10 @@ discrète à s'abonner.
 Chaque limite se termine de la même façon : un dernier tour **sans outil**, où le modèle répond avec
 ce qu'il a recueilli. Une limite atteinte ne produit donc jamais d'erreur pour l'utilisateur.
 
-Le fournisseur Gemini reste sans outil tant que `GoogleGenAIEnableToolCalling` n'est pas à `true` :
-la traduction des messages de résultat d'outil n'y est pas implémentée, et la conversation dégrade
-proprement plutôt que d'envoyer au modèle une conversation subtilement fausse.
+Les deux fournisseurs outillent la conversation. Azure OpenAI parle nativement le contrat de la
+boucle ; pour Gemini, `GeminiRequestMapper` traduit la conversation dans les deux sens — instruction
+système, appels d'outils, résultats et schémas de paramètres. Mettre `GoogleGenAIEnableToolCalling`
+à `false` retire les outils à ce fournisseur sans toucher au reste de la configuration.
 
 ## Persistance des données
 

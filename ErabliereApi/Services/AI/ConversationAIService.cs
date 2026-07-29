@@ -34,6 +34,7 @@ public class ConversationAIService : IConversationAIService
     private readonly IAIService _aiService;
     private readonly ISystemPromptBuilder _systemPromptBuilder;
     private readonly IErabliereAiToolset _toolset;
+    private readonly IErabliereAiCapteurCatalog _capteurCatalog;
     private readonly IErabliereAiCapabilityService _capabilityService;
     private readonly IToolActivityTracker _activityTracker;
     private readonly IOptions<ErabliereAiToolOptions> _toolOptions;
@@ -48,6 +49,7 @@ public class ConversationAIService : IConversationAIService
         IAIService aiService,
         ISystemPromptBuilder systemPromptBuilder,
         IErabliereAiToolset toolset,
+        IErabliereAiCapteurCatalog capteurCatalog,
         IErabliereAiCapabilityService capabilityService,
         IToolActivityTracker activityTracker,
         IOptions<ErabliereAiToolOptions> toolOptions,
@@ -58,6 +60,7 @@ public class ConversationAIService : IConversationAIService
         _aiService = aiService;
         _systemPromptBuilder = systemPromptBuilder;
         _toolset = toolset;
+        _capteurCatalog = capteurCatalog;
         _capabilityService = capabilityService;
         _activityTracker = activityTracker;
         _toolOptions = toolOptions;
@@ -99,11 +102,18 @@ public class ConversationAIService : IConversationAIService
     {
         var tools = await ResolveToolsAsync(token);
 
+        // Read as the caller, before the model is asked anything: it is one call, it
+        // saves the round the model would have spent listing them, and it removes the
+        // guess that a sensor whose name shares no word with the question is missing.
+        var capteurs = tools.Count > 0 && prompt.ErabliereId is { } erabliereId ?
+            await _capteurCatalog.ReadAsync(erabliereId, token) :
+            [];
+
         var messagesPrompt = new List<ChatMessage>
         {
             new SystemChatMessage(_systemPromptBuilder.BuildForCompletion(
                 conversation.SystemMessage,
-                new ErabliereAiPromptContext(tools.Count > 0, prompt.ErabliereId, prompt.ErabliereNom)))
+                new ErabliereAiPromptContext(tools.Count > 0, prompt.ErabliereId, prompt.ErabliereNom, capteurs)))
         };
 
         var messages = await _depot.Messages
@@ -178,7 +188,7 @@ public class ConversationAIService : IConversationAIService
 
             var response = await _aiService.CompleteChatAsync(
                 messagesPrompt,
-                BuildCompletionOptions(conversation, tools),
+                BuildCompletionOptions(conversation, tools, toolExchange: true),
                 token);
 
             if (response is null || response.ToolCalls.Count == 0)
@@ -226,7 +236,13 @@ public class ConversationAIService : IConversationAIService
     {
         messagesPrompt.Add(new SystemChatMessage(LimitReachedInstruction));
 
-        return await _aiService.CompleteChatAsync(messagesPrompt, BuildCompletionOptions(conversation), token);
+        // Still the temperature of a tool exchange: this is the turn that writes the
+        // numbers that were read into a sentence, which is exactly where an invented
+        // one would do the most damage.
+        return await _aiService.CompleteChatAsync(
+            messagesPrompt,
+            BuildCompletionOptions(conversation, toolExchange: true),
+            token);
     }
 
     /// <summary>
@@ -261,11 +277,25 @@ public class ConversationAIService : IConversationAIService
         return _aiService.CompleteChatAsync([prompt.Prompt], BuildCompletionOptions(conversation), token);
     }
 
-    private ChatCompletionOptions BuildCompletionOptions(Conversation conversation, IReadOnlyList<ChatTool>? tools = null)
+    /// <summary>
+    /// The options of one completion.
+    /// </summary>
+    /// <param name="conversation">The conversation being answered.</param>
+    /// <param name="tools">The tools to declare, none when the model must answer.</param>
+    /// <param name="toolExchange">
+    /// True on every completion of a tool driven exchange, the rounds that declare
+    /// tools and the one that closes them alike. It lowers the temperature, because
+    /// reading data and writing what was read both want the model to stick to what is
+    /// in front of it rather than to be inventive.
+    /// </param>
+    private ChatCompletionOptions BuildCompletionOptions(
+        Conversation conversation,
+        IReadOnlyList<ChatTool>? tools = null,
+        bool toolExchange = false)
     {
         var options = new ChatCompletionOptions
         {
-            Temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature"),
+            Temperature = ResolveTemperature(toolExchange),
             FrequencyPenalty = 0,
             PresencePenalty = 0,
             EndUserId = MD5Hash(conversation.UserId)
@@ -280,6 +310,17 @@ public class ConversationAIService : IConversationAIService
         }
 
         return options;
+    }
+
+    /// <summary>
+    /// The temperature of a completion: the one of the tool options during a tool
+    /// exchange, the one of the platform otherwise.
+    /// </summary>
+    private float ResolveTemperature(bool toolExchange)
+    {
+        var temperature = _configuration.GetRequiredValue<float>("LLMDefaultTemperature");
+
+        return toolExchange ? _toolOptions.Value.Temperature ?? temperature : temperature;
     }
 
     /// <summary>

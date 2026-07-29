@@ -48,20 +48,45 @@ public interface ISystemPromptBuilder
 /// <param name="ErabliereNom">
 /// The name of that maple grove, only ever used to make the prompt readable.
 /// </param>
+/// <param name="Capteurs">
+/// The sensors of that maple grove, read before the model was called. Empty when
+/// there is no maple grove in context or when the read failed, in which case the
+/// model lists them itself.
+/// </param>
 /// <remarks>
 /// <paramref name="ErabliereId" /> and <paramref name="ErabliereNom" /> come from the
 /// client and are never an authorization input: they are written into the prompt so
 /// the model stops guessing identifiers, and a caller who sends an identifier they do
 /// not own gains nothing, because the tool call it leads to is still authenticated as
 /// them and refused by the API.
+/// <para>
+/// <paramref name="Capteurs" /> is not client supplied: it is read from the API as the
+/// caller, so an identifier they do not own yields an empty list rather than the names
+/// of somebody else's sensors.
+/// </para>
 /// </remarks>
 public readonly record struct ErabliereAiPromptContext(
     bool ToolsEnabled,
     Guid? ErabliereId = null,
-    string? ErabliereNom = null)
+    string? ErabliereNom = null,
+    IReadOnlyList<ErabliereAiCapteur>? Capteurs = null)
 {
     /// <summary>
     /// A prompt with no tools and no maple grove in sight, the phase 7 behaviour.
     /// </summary>
     public static ErabliereAiPromptContext None => new(false);
 }
+
+/// <summary>
+/// One sensor, reduced to what the model needs to recognize it in a question and
+/// then read it.
+/// </summary>
+/// <param name="Id">Identifier to pass to get_donnees_capteur.</param>
+/// <param name="Nom">Name its owner gave it, which is what the model has to match against.</param>
+/// <param name="Symbole">Unit of its readings, null when it has none.</param>
+/// <param name="Online">True when it was still reporting at the last check.</param>
+public readonly record struct ErabliereAiCapteur(
+    Guid Id,
+    string Nom,
+    string? Symbole = null,
+    bool? Online = null);

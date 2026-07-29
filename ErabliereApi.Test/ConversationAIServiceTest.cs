@@ -25,7 +25,11 @@ namespace ErabliereApi.Test;
 /// </summary>
 public class ConversationAIServiceTest
 {
-    private const string DefaultSystemPrompt = "Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique.";
+    /// <summary>
+    /// The persona, read from the builder rather than copied: these tests are about
+    /// which system message reaches the model, not about how it is worded.
+    /// </summary>
+    private static readonly string DefaultSystemPrompt = new SystemPromptBuilder().DefaultSystemPrompt;
 
     [Fact]
     public async Task SendPromptAsync_SansConversation_CreeLaConversationAvecLeUserId()
@@ -116,7 +120,7 @@ public class ConversationAIServiceTest
         Assert.NotNull(envoyes);
         Assert.Equal(4, envoyes.Count);
         Assert.IsType<SystemChatMessage>(envoyes[0]);
-        Assert.Equal("Vous êtes un botaniste.", envoyes[0].Content[0].Text);
+        Assert.StartsWith("Vous êtes un botaniste.", envoyes[0].Content[0].Text);
         Assert.IsType<UserChatMessage>(envoyes[1]);
         Assert.IsType<AssistantChatMessage>(envoyes[2]);
         Assert.IsType<UserChatMessage>(envoyes[3]);
@@ -150,7 +154,10 @@ public class ConversationAIServiceTest
             CancellationToken.None);
 
         Assert.NotNull(envoyes);
-        Assert.Equal(DefaultSystemPrompt, envoyes[0].Content[0].Text);
+
+        // StartsWith : la phrase système envoyée est la personnalité suivie des
+        // consignes de réponse, que SystemPromptBuilder ajoute à chaque complétion.
+        Assert.StartsWith(DefaultSystemPrompt, envoyes[0].Content[0].Text);
     }
 
     [Fact]
@@ -704,6 +711,7 @@ public class ConversationAIServiceTest
             harness.AiService,
             new SystemPromptBuilder(),
             harness.Toolset,
+            harness.CapteurCatalog,
             harness.Capabilities,
             tracker,
             Options.Create(harness.Options),
@@ -735,6 +743,7 @@ public class ConversationAIServiceTest
             harness.AiService,
             new SystemPromptBuilder(),
             harness.Toolset,
+            harness.CapteurCatalog,
             harness.Capabilities,
             tracker,
             Options.Create(harness.Options),
@@ -771,6 +780,7 @@ public class ConversationAIServiceTest
         ErabliereDbContext Context,
         IAIService AiService,
         IErabliereAiToolset Toolset,
+        IErabliereAiCapteurCatalog CapteurCatalog,
         IErabliereAiCapabilityService Capabilities,
         ErabliereAiToolOptions Options);
 
@@ -792,7 +802,11 @@ public class ConversationAIServiceTest
 
         var aiService = Substitute.For<IAIService>();
         var toolset = Substitute.For<IErabliereAiToolset>();
+        var capteurCatalog = Substitute.For<IErabliereAiCapteurCatalog>();
         var capabilities = Substitute.For<IErabliereAiCapabilityService>();
+
+        capteurCatalog.ReadAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+                      .Returns(Task.FromResult<IReadOnlyList<ErabliereAiCapteur>>([]));
 
         var toolOptions = new ErabliereAiToolOptions();
         configureTools?.Invoke(toolOptions);
@@ -803,12 +817,13 @@ public class ConversationAIServiceTest
             aiService,
             new SystemPromptBuilder(),
             toolset,
+            capteurCatalog,
             capabilities,
             Substitute.For<IToolActivityTracker>(),
             Options.Create(toolOptions),
             NullLogger<ConversationAIService>.Instance);
 
-        return new Harness(service, context, aiService, toolset, capabilities, toolOptions);
+        return new Harness(service, context, aiService, toolset, capteurCatalog, capabilities, toolOptions);
     }
 
     /// <summary>

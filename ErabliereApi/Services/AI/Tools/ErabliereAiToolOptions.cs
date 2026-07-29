@@ -35,7 +35,30 @@ public class ErabliereAiToolOptions
     /// The round that hits the bound is answered without tools, so the user gets an
     /// answer built on what was gathered instead of an error.
     /// </summary>
-    public int MaxRounds { get; set; } = 5;
+    /// <remarks>
+    /// A real question costs more rounds than it looks: naming the maple grove,
+    /// listing its sensors, reading two of them and noticing one came back truncated
+    /// is already five. A model that spends them one call at a time — which is what a
+    /// small model does unless the prompt tells it to batch — runs out before it can
+    /// answer, and the user reads an evasive answer rather than an error. The token
+    /// budget below is the bound that actually protects the context; this one only
+    /// stops a loop that goes nowhere.
+    /// </remarks>
+    public int MaxRounds { get; set; } = 8;
+
+    /// <summary>
+    /// Temperature used on the completions of a tool driven exchange, overriding
+    /// <c>LLMDefaultTemperature</c>. Left null, the default temperature applies.
+    /// </summary>
+    /// <remarks>
+    /// Reading data is not writing prose. At a high temperature the model invents
+    /// plausible arguments — a search term the user never wrote, a date range nobody
+    /// asked for — and the answer is then built on whatever those calls happened to
+    /// return. The default of the platform is 1, which is a reasonable setting for a
+    /// conversation and a poor one for a tool loop, so the loop lowers it for itself
+    /// instead of forcing a single value on both.
+    /// </remarks>
+    public float? Temperature { get; set; } = 0.2f;
 
     /// <summary>
     /// Time a single tool call is given before it is abandoned. The loop carries on
