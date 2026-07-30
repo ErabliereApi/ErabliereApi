@@ -8,6 +8,7 @@
     <UserSecretsId>d4ae6949-765d-4e41-bc51-14250b956a19</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Anthropic" Version="12.39.0" />
     <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="Google.GenAI" Version="1.15.0" />

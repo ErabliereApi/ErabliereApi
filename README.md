@@ -139,10 +139,31 @@ discrète à s'abonner.
 Chaque limite se termine de la même façon : un dernier tour **sans outil**, où le modèle répond avec
 ce qu'il a recueilli. Une limite atteinte ne produit donc jamais d'erreur pour l'utilisateur.
 
-Les deux fournisseurs outillent la conversation. Azure OpenAI parle nativement le contrat de la
+Les trois fournisseurs outillent la conversation. Azure OpenAI parle nativement le contrat de la
 boucle ; pour Gemini, `GeminiRequestMapper` traduit la conversation dans les deux sens — instruction
-système, appels d'outils, résultats et schémas de paramètres. Mettre `GoogleGenAIEnableToolCalling`
-à `false` retire les outils à ce fournisseur sans toucher au reste de la configuration.
+système, appels d'outils, résultats et schémas de paramètres ; pour Anthropic (Claude),
+`AnthropicRequestMapper` fait de même — les identifiants d'appels d'outils sont natifs et les
+schémas passent presque tels quels. Mettre `GoogleGenAIEnableToolCalling` ou
+`AnthropicEnableToolCalling` à `false` retire les outils au fournisseur concerné sans toucher au
+reste de la configuration.
+
+### Fournisseur LLM
+
+`PrimaryAIService` choisit le fournisseur : `Google` pour Gemini, `Anthropic` pour Claude, toute
+autre valeur pour Azure OpenAI (défaut).
+
+| Clé | Défaut | Rôle |
+|---|---|---|
+| `AzureOpenAIUri`, `AzureOpenAIKey`, `AzureOpenAIDeploymentChatModelName` | — | Accès Azure OpenAI. |
+| `GoogleGenAIKey` | — | Clé d'api Gemini. |
+| `GoogleGenAIModel` | `gemini-2.5-flash` | Modèle Gemini. |
+| `AnthropicApiKey` | — | Clé d'api Anthropic. |
+| `AnthropicModel` | `claude-opus-5` | Modèle Claude. |
+| `AnthropicMaxTokens` | `16000` | Plafond de jetons de sortie — obligatoire pour l'api d'Anthropic, réflexion du modèle comprise. |
+
+La température (`LLMDefaultTemperature`, `ErabliereAI:Tools:Temperature`) ne s'applique pas au
+fournisseur Anthropic : les modèles Claude courants refusent ce paramètre, et le mappeur ne le
+transmet pas.
 
 ## Persistance des données
 

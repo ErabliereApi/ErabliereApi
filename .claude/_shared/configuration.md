@@ -62,8 +62,12 @@ call back the address of the request being served, which a TLS-terminating ingre
 unreachable from inside the cluster.
 
 `PrimaryAIService` picks the provider — `Google` for Gemini (`GoogleGenAIKey`, `GoogleGenAIModel`),
-anything else for Azure OpenAI. Both run the tool loop; `GoogleGenAIEnableToolCalling=false` takes
-the tools away from Gemini alone, leaving the chat answering from the model's own knowledge.
+`Anthropic` for Claude (`AnthropicApiKey`, `AnthropicModel`, `AnthropicMaxTokens` — required by
+Anthropic's api, default 16000), anything else for Azure OpenAI. All three run the tool loop;
+`GoogleGenAIEnableToolCalling=false` / `AnthropicEnableToolCalling=false` takes the tools away from
+that provider alone, leaving the chat answering from the model's own knowledge. Temperature settings
+do not apply to the Anthropic provider — current Claude models reject the parameter, so the mapper
+never forwards it.
 
 ## Auth templates
 

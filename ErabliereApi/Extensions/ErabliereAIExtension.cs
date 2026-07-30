@@ -17,9 +17,15 @@ public static class ErabliereAIExtension
     /// </summary>
     public static IServiceCollection AddErabliereAI(this IServiceCollection services, IConfiguration configuration)
     {
-        if (string.Equals(configuration["PrimaryAIService"]?.Trim(), "Google", StringComparison.OrdinalIgnoreCase))
+        var primaryAIService = configuration["PrimaryAIService"]?.Trim();
+
+        if (string.Equals(primaryAIService, "Google", StringComparison.OrdinalIgnoreCase))
         {
             services.AddTransient<IAIService, GeminiAIService>();
+        }
+        else if (string.Equals(primaryAIService, "Anthropic", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddTransient<IAIService, AnthropicAIService>();
         }
         else
         {
