@@ -39,7 +39,7 @@ public class ErabliereApiEmailService : IEmailService
     /// <inheritdoc />
     public async Task SendEmailAsync(MimeMessage mimeMessage, CancellationToken token)
     {
-        if (!_smtpClient.IsConnected)
+        if (!_smtpClient.IsConnected && _config.SmtpServer != null)
         {
             await _smtpClient.ConnectAsync(_config.SmtpServer, _config.SmtpPort, SecureSocketOptions.StartTls, token);
         }
@@ -48,7 +48,7 @@ public class ErabliereApiEmailService : IEmailService
         {
             await OAuthAuthenticateAsync(token);
         }
-        else
+        else if (_config.Email != null)
         {
             await _smtpClient.AuthenticateAsync(_config.Email, _config.Password, token);
         }
@@ -84,10 +84,15 @@ public class ErabliereApiEmailService : IEmailService
 
         var authToken = await confidentialClientApplication.AcquireTokenForClient(scopes).ExecuteAsync(token);
 
-        var sasl = new SaslMechanismOAuth2(_config.Email, authToken.AccessToken);
-
         try
         {
+            if (_config.Email == null)
+            {
+                throw new InvalidOperationException("Email configuration is missing. Cannot authenticate with OAuth.");
+            }
+
+            var sasl = new SaslMechanismOAuth2(_config.Email, authToken.AccessToken);
+
             await _smtpClient.AuthenticateAsync(sasl, token);
         }
         catch (Exception ex)
