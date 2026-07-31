@@ -1,3 +1,4 @@
+import type * as mapboxgl from 'mapbox-gl/esm';
 import { Component, OnInit, OnDestroy, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 
@@ -40,7 +41,7 @@ export class IpinfoMapComponent implements OnInit, OnDestroy {
         }
 
         // Dynamically import Mapbox GL JS with default export.
-        const mapboxgl = (await import('mapbox-gl')).default;
+        const mapboxgl = await import('mapbox-gl/esm');
 
         this.map = new mapboxgl.Map({
             accessToken: this.token,
