@@ -4,7 +4,8 @@
     "outDir": "./out-tsc/app",
     "types": [
       "node",
-      "@angular/localize"
+      "@angular/localize",
+      "geojson"
     ],
     "typeRoots": [
       "node_modules/@types"

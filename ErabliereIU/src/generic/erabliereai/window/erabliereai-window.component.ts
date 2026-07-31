@@ -58,7 +58,7 @@ export class ErabliereAiWindowComponent implements OnInit {
 
     keyDownNewConversation($event: KeyboardEvent) {
         if ($event.key === 'Enter') {
-            this.selectConversation(undefined);
+            this.selectConversation();
         }
     }
 

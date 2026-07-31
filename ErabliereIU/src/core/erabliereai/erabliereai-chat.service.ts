@@ -11,8 +11,6 @@ import { ErabliereContextService } from './erabliere-context.service';
  */
 @Injectable()
 export class ErabliereAiChatService {
-    readonly defaultSystemPhrase = "Vous êtes un acériculteur expérimenté avec des connaissance scientifique et pratique.";
-
     /** Intervalle entre deux lectures de l'avancement, en millisecondes. */
     private static readonly statusPollingInterval = 1000;
 
@@ -21,7 +19,7 @@ export class ErabliereAiChatService {
     messages: Message[] = [];
     aiIsThinking = false;
     typePrompt = 'Chat';
-    currentSystemPhrase?: string = this.defaultSystemPhrase;
+    currentSystemPhrase: string = "";
 
     /** Ce que l'assistant a le droit de faire, chargé à l'ouverture de la conversation. */
     capabilities?: ErabliereAICapabilities;
@@ -205,7 +203,7 @@ export class ErabliereAiChatService {
     }
 
     resetSystemPhrase(): void {
-        this.currentSystemPhrase = this.defaultSystemPhrase;
+        this.currentSystemPhrase = "";
     }
 
     /**
@@ -226,7 +224,7 @@ export class ErabliereAiChatService {
                         return;
                     }
 
-                    const lastStep = activity?.steps?.[activity.steps.length - 1];
+                    const lastStep = activity?.steps?.at(-1);
                     this.activityLabel = lastStep?.label ?? '';
                 })
                 .catch(() => { /* un libellé manquant ne coûte rien */ });
