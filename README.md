@@ -1,20 +1,12 @@
 # ErabliereApi
 Solution de monitoring pour érablière. Contient un REST API ainsi qu'un application web pour la gestion des données et d'autre script permettant de connecter divers appareils.
 
-L'application est accessible à l'url: https://erabliereapi.freddycoder.com/ une authentification est nécessare pour la majorité des fonctionnalités. Pour obtenir un compte, veuillez accéder au instruction dans la section À propos.
-
 Un démo est accessible à l'url: https://erabliereapi-demo.azurewebsites.net/ qui ne nécessite pas d'authentification.
-
-Page de présentation: https://erabliereapi.ca
 
 ## But
 Le but de ce projet est d'analyser, lever des alertes et automatiser certain mecanisme. Basé sur les données receuillis et de façon centralisé.
 
 L'information pourrait aussi bien venir d'appeil ayant la capacité de faire des requêtes http ou d'interaction humaine.
-
-## Suivit du projet
-
-Le suivit du projet est effectué dans AzureDevOps : https://dev.azure.com/freddycoder/ErabliereAPI
 
 ## Structure
 
@@ -78,7 +70,7 @@ Deux façons de l'utiliser :
   votre clé d'api :
 
   ```powershell
-  claude mcp add --transport http erabliereapi https://mcp.erabliereapi.freddycoder.com/mcp --header "X-ErabliereApi-ApiKey: <votre-clé-d-api>"
+  claude mcp add --transport http erabliereapi https://<your-domaine>/mcp --header "X-ErabliereApi-ApiKey: <votre-clé-d-api>"
   ```
 
 - **Serveur local, en stdio.** L'assistant démarre lui-même le serveur comme processus enfant. Voir
