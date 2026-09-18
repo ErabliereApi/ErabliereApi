@@ -42,6 +42,7 @@ export class UserProfileComponent implements OnInit {
     errorCustomer: string | null = null;
     errorApiKey: string | null = null;
     editApiKeyNameForm: any;
+    checkoutEnabled: boolean = false;
     private readonly authSvc: IAuthorisationSerivce;
 
     constructor(authSvcFactory: AuthorisationFactoryService, private readonly api: ErabliereApi, private readonly fb: UntypedFormBuilder) {
@@ -61,6 +62,12 @@ export class UserProfileComponent implements OnInit {
         this.loadUserProfile();
         this.authSvc.loginChanged.subscribe(() => {
             this.loadUserProfile();
+        });
+        this.api.getOpenApiSpec().then(spec => {
+            this.checkoutEnabled = spec.paths['/Checkout'] !== undefined;
+        })
+        .catch(err => {
+            console.error(err);
         });
     }
 

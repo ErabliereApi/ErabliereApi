@@ -29,8 +29,10 @@
     <div class="card col-md-4">
         <h3>Clés API</h3>
         <div class="btn-group mb-3">
+            @if (checkoutEnabled) {
             <ebutton type="success" (clicked)="buyApiKey()" [inProgress]="buyApiKeyClicked">Obtenir une clé d'api
             </ebutton>
+            }
             <ebutton class="ms-2" type="info" (clicked)="loadUserProfile()" [inProgress]="loadUserProfileClicked"
                 title="Rafraîchir clé d'api">⟳</ebutton>
         </div>
@@ -69,6 +71,7 @@
             </table>
         </div>
     </div>
+    @if (checkoutEnabled) {
     <div class="col-md-4 card">
         <h3>Coûts</h3>
         <div class="btn-group mb-3">
@@ -79,23 +82,24 @@
         <p>L'utilisateur ne possède pas d'abonnement. Aucun coût disponible.</p>
         }
         @if (errorGettingUpcomingInvoices != null) {
-            <p class="text-danger">{{ errorGettingUpcomingInvoices }}</p>
+        <p class="text-danger">{{ errorGettingUpcomingInvoices }}</p>
         } @else if (upcomingInvoices != null && allInvoicesLoaded(upcomingInvoices)) {
-            @for (upcomingInvoice of upcomingInvoices; track upcomingInvoice.id) {
-            <p><strong>Montant total à venir:</strong> {{ upcomingInvoice.amount_due / 100 | currency:'CAD' }}</p>
-            <p><strong>Date de facturation:</strong> {{ upcomingInvoice.next_payment_attempt * 1000 | date:'yyyy-MM-dd' }}
-            </p>
-            <p><strong>Détails:</strong></p>
-            <ul>
-                @for (item of upcomingInvoice.lines.data; track item.id) {
-                <li>{{ item.description }} - {{ item.amount / 100 | currency:'CAD' }}</li>
-                }
-            </ul>
-            <hr />
+        @for (upcomingInvoice of upcomingInvoices; track upcomingInvoice.id) {
+        <p><strong>Montant total à venir:</strong> {{ upcomingInvoice.amount_due / 100 | currency:'CAD' }}</p>
+        <p><strong>Date de facturation:</strong> {{ upcomingInvoice.next_payment_attempt * 1000 | date:'yyyy-MM-dd' }}
+        </p>
+        <p><strong>Détails:</strong></p>
+        <ul>
+            @for (item of upcomingInvoice.lines.data; track item.id) {
+            <li>{{ item.description }} - {{ item.amount / 100 | currency:'CAD' }}</li>
             }
+        </ul>
+        <hr />
+        }
         }
     </div>
     <app-gestion-abonnement class="col-md-4 card"></app-gestion-abonnement>
+}
     <div class="col-md-4 card">
         <h3>ErabliereAI</h3>
         @if (user?.roles?.includes('ErabliereAIUser')) {

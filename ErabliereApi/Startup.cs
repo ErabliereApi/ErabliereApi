@@ -104,8 +104,14 @@ public class Startup
         // Prometheus
         services.AddSingleton(Metrics.DefaultRegistry);
 
+        // ApiKey
+        services.AddScoped<ApiKeyAuthorizationContext>()
+                .AddTransient<ApiKeyMiddleware>()
+                .AddTransient<IApiKeyService, ApiApiKeyService>()
+                .AddTransient<IAbonnementService, AbonnementService>()
+                .AddSingleton<IAuthorizationHandler, ApiKeyAuthrizationHandler>();
+
         // Stripe
-        services.AddScoped<ApiKeyAuthorizationContext>();
         if (Configuration.StripeIsEnabled())
         {
             services.Configure<StripeOptions>(o =>
@@ -123,13 +129,7 @@ public class Startup
                     Convert.ToBoolean(Configuration["Stripe.ThrowOnApiMissMatch"] ?? "true");
             });
 
-            services.AddTransient<ICheckoutService, StripeCheckoutService>()
-                    .AddTransient<IApiKeyService, ApiApiKeyService>()
-                    .AddTransient<IAbonnementService, AbonnementService>()
-                    .AddTransient<ApiKeyMiddleware>();
-
-            // Authorization
-            services.AddSingleton<IAuthorizationHandler, ApiKeyAuthrizationHandler>();
+            services.AddTransient<ICheckoutService, StripeCheckoutService>();
 
             // Context and usage reccorder
             services.AddSingleton<UsageContext>();
@@ -255,10 +255,7 @@ public class Startup
 
         app.AddSemaphoreOnInMemoryDatabase(Configuration);
 
-        if (Configuration.StripeIsEnabled())
-        {
-            app.UseMiddleware<ApiKeyMiddleware>();
-        }
+        app.UseMiddleware<ApiKeyMiddleware>();
 
         if (Configuration.IsAuthEnabled())
         {
