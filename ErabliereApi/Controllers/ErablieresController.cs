@@ -895,7 +895,9 @@ public class ErablieresController : ErabliereApiBaseController
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeleteErablieresAdmin(Guid id, CancellationToken token)
     {
-        var entity = await _context.Erabliere.Include(e => e.CustomerErablieres).FirstOrDefaultAsync(e => e.Id == id, token);
+        var entity = await _context.Erabliere
+            .Include(e => e.Horaires)
+            .Include(e => e.CustomerErablieres).FirstOrDefaultAsync(e => e.Id == id, token);
 
         if (entity != null)
         {
