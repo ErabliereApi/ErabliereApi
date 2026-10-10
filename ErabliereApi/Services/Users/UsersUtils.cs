@@ -10,8 +10,10 @@ internal static class UsersUtils
     /// Permet d'obtenir le nom unique de l'utilisateur.
     /// 
     /// Si l'utilisateur est authentifié, on utilise les claims pour obtenir le nom unique.
-    /// Par ordre d'importance, la claim unique_name est cherché, puis preferred_username.
-    /// 
+    /// Par ordre d'importance, la claim unique_name est cherché, puis preferred_username
+    /// (jetons v2), puis upn et name sous leur forme mappée (jetons v1), et en dernier
+    /// recours l'identifiant d'objet.
+    ///
     /// Si l'utilisateur n'est pas authentifié, mais on utilise un clé d'api, va chercher
     /// le nom unique de l'utilisateur dans le contexte d'autorisation.
     /// </summary>
@@ -43,6 +45,18 @@ internal static class UsersUtils
             if (string.IsNullOrWhiteSpace(uniqueName))
             {
                 uniqueName = user.FindFirst("preferred_username")?.Value ?? "";
+            }
+
+            // Jetons v1 : pas de preferred_username, et le mappage des claims entrants
+            // renomme upn et unique_name vers leur forme longue.
+            if (string.IsNullOrWhiteSpace(uniqueName))
+            {
+                uniqueName = user.FindFirst(ClaimTypes.Upn)?.Value ?? "";
+            }
+
+            if (string.IsNullOrWhiteSpace(uniqueName))
+            {
+                uniqueName = user.FindFirst(ClaimTypes.Name)?.Value ?? "";
             }
 
             if (string.IsNullOrWhiteSpace(uniqueName))
