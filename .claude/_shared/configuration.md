@@ -74,3 +74,7 @@ never forwards it.
 `config/oauth-oidc.template.json` and `config/oauth-oidc.template.aad.json`. The Angular app fetches
 its own copy at **runtime** from `/assets/config/oauth-oidc.json` — changing the target API or auth
 mode there needs no rebuild. See `ErabliereIU/CLAUDE.md`.
+
+The API's Entra ID app registration must issue **v2** access tokens (`api.requestedAccessTokenVersion: 2`
+in its manifest), or the caller's email is not found in the token — see
+[`Infrastructure/Readme.md`](../../Infrastructure/Readme.md).

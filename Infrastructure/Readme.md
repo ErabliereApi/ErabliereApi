@@ -20,6 +20,22 @@ az ad sp create-for-rbac --name "deploy-erabliereapi-2023-2024" --role contribut
 
 > Dans la version 1 et la version 2 du projet Les configurations de la BD sont basé sur ce cours : https://app.pluralsight.com/library/courses/microsoft-azure-deploying-sql-server-containers pour la version 3, la BD est dans Azure SQL avec la version serverless.
 
+### Inscription d'application Entra ID : version du jeton d'accès
+
+L'inscription d'application de l'**API** (celle qui expose le scope `api://<api-clientId>/...`, pas celle de l'IU) doit émettre des jetons d'accès **v2**. Dans le manifeste de l'inscription :
+
+```
+"api": {
+    "requestedAccessTokenVersion": 2
+}
+```
+
+> Dans l'ancien format de manifeste, la propriété s'appelle `accessTokenAcceptedVersion`.
+
+Une nouvelle inscription à tenant unique a cette valeur à `null`, ce qui donne des jetons v1. Les jetons v1 ne contiennent pas la claim `preferred_username`, utilisée par `ErabliereApi/Services/Users/UsersUtils.cs` pour identifier l'utilisateur. Le symptôme : le courriel de l'utilisateur connecté n'est plus trouvé, et un `Customer` peut être créé avec un identifiant d'objet (GUID) comme `UniqueName` et `Email`, ce qui lui fait perdre l'accès à ses érablières.
+
+Pour vérifier, coller un jeton d'accès dans https://jwt.ms : la claim `ver` doit être `2.0` et `preferred_username` doit être présente.
+
 ### Fonctionnalité d'alerte
 
 > Ceci est géré dans le script de déploiement. Cette section est conserver a des fins de documentation.
