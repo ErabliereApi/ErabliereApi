@@ -27,7 +27,6 @@ sudo apt update
 sudo apt install python3-gpiozero
 sudo apt install python3-pip
 sudo pip3 install apscheduler
-sudo pip3 install pytz
 ```
 
 ### Lancer le script au démarrage du raspberry
