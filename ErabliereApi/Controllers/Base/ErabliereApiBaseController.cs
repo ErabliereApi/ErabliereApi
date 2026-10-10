@@ -52,11 +52,12 @@ public abstract class ErabliereApiBaseController : ControllerBase
             return (true, "Bearer", customer);
         }
 
-        if (_config.StripeIsEnabled())
-        {
-            var apiKeyAuthContext = HttpContext?.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
+        // Les clés d'api fonctionnent même si Stripe n'est pas activé.
+        var apiKeyAuthContext = HttpContext?.RequestServices?.GetService<ApiKeyAuthorizationContext>();
 
-            return (apiKeyAuthContext?.Authorize == true, "ApiKey", apiKeyAuthContext?.Customer);
+        if (apiKeyAuthContext?.ApiKey != null)
+        {
+            return (apiKeyAuthContext.Authorize, "ApiKey", apiKeyAuthContext.Customer);
         }
 
         return (false, "", null);

@@ -67,15 +67,9 @@ internal static class UsersUtils
             return uniqueName;
         }
 
-        var config = serviceProvider.GetRequiredService<IConfiguration>();
+        // Les clés d'api fonctionnent même si Stripe n'est pas activé.
+        var apiKeyAuthContext = serviceProvider.GetRequiredService<ApiKeyAuthorizationContext>();
 
-        if (config.StripeIsEnabled())
-        {
-            var apiKeyAuthContext = serviceProvider.GetRequiredService<ApiKeyAuthorizationContext>();
-
-            return apiKeyAuthContext?.Customer?.UniqueName;
-        }
-
-        return null;
+        return apiKeyAuthContext?.Customer?.UniqueName;
     }
 }
