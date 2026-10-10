@@ -3,7 +3,6 @@
 from gpiozero import MotionSensor
 import json
 import requests
-import pytz
 import threading
 import sys
 from datetime import datetime as dt
