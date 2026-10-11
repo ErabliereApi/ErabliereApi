@@ -36,7 +36,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/.well-know",
+              "src/.well-known",
               {
                 "glob": "*.js",
                 "input": "node_modules/mapbox-gl/dist/esm",
