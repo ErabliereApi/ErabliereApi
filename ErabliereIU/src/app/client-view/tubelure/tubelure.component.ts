@@ -1,4 +1,5 @@
 import type * as mapboxgl from 'mapbox-gl/esm';
+import { chargerMapboxgl } from 'src/core/mapbox';
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -96,7 +97,7 @@ export class TubelureComponent implements OnInit, OnChanges, OnDestroy {
         try {
             const accessToken = await this._api.getMapAccessToken('mapbox');
 
-            const mapboxgl = await import('mapbox-gl/esm');
+            const mapboxgl = await chargerMapboxgl();
             this._mapboxgl = mapboxgl;
 
             this.map = new mapboxgl.Map({

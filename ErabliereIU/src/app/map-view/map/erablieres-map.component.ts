@@ -1,4 +1,5 @@
 import type * as mapboxgl from 'mapbox-gl/esm';
+import { chargerMapboxgl } from 'src/core/mapbox';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ErabliereApi } from 'src/core/erabliereapi.service';
 import { FormsModule } from '@angular/forms';
@@ -101,7 +102,7 @@ export class ErablieresMapComponent implements OnInit {
         this.duration = this.duration / 1000;
 
         // Dynamically import Mapbox GL JS with default export.
-        const mapboxgl = await import('mapbox-gl/esm');
+        const mapboxgl = await chargerMapboxgl();
 
         this.map = new mapboxgl.Map({
             accessToken: accessToken.accessToken,

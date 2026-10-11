@@ -12,6 +12,8 @@ booleans) read in `ErabliereApi/Startup.cs` and `ErabliereApi/Extensions/Service
 | `SQL_CONNEXION_STRING` | The connection string when `USE_SQL=true`. |
 | `SQL_USE_STARTUP_MIGRATION` | `true` applies migrations at API startup. |
 | `USE_CORS`, `USE_HSTS` | Transport-level toggles. Note CORS strips the `x-ddr`/`x-dde` headers. |
+| `USE_SECURITY_HEADERS` | `true` by default. `SecurityHeadersMiddleware` adds CSP, `X-Frame-Options`, `Permissions-Policy`… to **every** response. `USE_X_FRAME_OPTIONS_DENY` and `Cross-Origin-Opener-Policy` override its defaults (`SAMEORIGIN`, `same-origin-allow-popups`). A new external origin (CDN, map tiles, IdP) must be added to the CSP there. |
+| `Forwarded_headers`, `KNOW_NETWORKS` | Required with `USE_HSTS` behind a TLS-terminating proxy: without the forwarded scheme the API sees plain HTTP, sends no HSTS header and redirects in a loop. |
 | `LOG_SQL`, `MiniProfiler.Enable` | Diagnostics. |
 | `Stripe.*` | Stripe integration; webhooks arrive at `/Checkout/Webhook` via the Stripe CLI. |
 

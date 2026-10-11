@@ -200,6 +200,11 @@ public class Startup
 
         app.UseErabliereAPIForwardedHeadersRules(logger, Configuration);
 
+        if (string.Equals(Configuration["USE_SECURITY_HEADERS"]?.Trim(), TrueString, InvariantCultureIgnoreCase))
+        {
+            app.UseMiddleware<SecurityHeadersMiddleware>();
+        }
+
         app.UseStatusCodePages(); // Formats status code errors as ProblemDetails
         app.UseExceptionHandler(new ExceptionHandlerOptions
         {
@@ -218,13 +223,7 @@ public class Startup
         }
 
         app.UseDefaultFiles();
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            OnPrepareResponse = context =>
-            {
-                context.Context.Response.OnStarting(GenerateOnStaticFileResponseStartFunc(context.Context));
-            }
-        });
+        app.UseStaticFiles();
 
         var localizeOption = app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>();
         app.UseRequestLocalization(localizeOption.Value);
@@ -297,16 +296,6 @@ public class Startup
             });
         });
 
-        if (string.Equals(Configuration["USE_SECURITY_HEADERS"]?.Trim(), TrueString, InvariantCultureIgnoreCase))
-        {
-            app.Use(async (context, next) =>
-            {
-                context.Response.OnStarting(GenerateOnStaticFileResponseStartFunc(context));
-
-                await next();
-            });
-        }
-
         app.UtiliserSwagger(Configuration);
 
         if (string.Equals(Configuration["USE_CONTENT_TYPE_FOR_SPA"], TrueString, InvariantCultureIgnoreCase))
@@ -329,53 +318,4 @@ public class Startup
 
         });
     }
-
-    private Func<Task> GenerateOnStaticFileResponseStartFunc(HttpContext context)
-    {
-        return () =>
-        {
-            if (string.Equals(Configuration["USE_SECURITY_HEADERS"]?.Trim(), TrueString, InvariantCultureIgnoreCase))
-            {
-                context.Response.Headers.Append("Content-Security-Policy", cspHeaderValue);
-
-                if (string.Equals(Configuration["USE_X_FRAME_OPTIONS_DENY"]?.Trim(), TrueString, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    context.Response.Headers.Append("X-Frame-Options", "DENY");
-                }
-
-                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-
-                context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
-
-                context.Response.Headers.Append("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=()");
-
-                if (!string.IsNullOrWhiteSpace(Configuration["Cross-Origin-Opener-Policy"]))
-                {
-                    context.Response.Headers.Append("Cross-Origin-Opener-Policy", Configuration["Cross-Origin-Opener-Policy"]);
-                }
-
-                context.Response.Headers.Append("Cross-Origin-Resource-Policy", "cross-origin");
-            }
-
-            return Task.CompletedTask;
-        };
-    }
-
-    private static List<string> cspPolicy = new List<string>
-    {
-        "default-src 'self'",
-        $"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com",
-        $"style-src 'self' 'unsafe-inline' https://api.mapbox.com",
-        "img-src 'self' data:",
-        "font-src 'self'",
-        "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://login.microsoftonline.com",
-        "frame-src 'none' https://login.microsoftonline.com",
-        "object-src 'none'",
-        "base-uri 'self'",
-        "form-action 'self' https://login.microsoftonline.com",
-        "frame-ancestors 'self' https://login.microsoftonline.com",
-        "worker-src 'self' blob:"
-    };
-
-    private static string cspHeaderValue = string.Join("; ", cspPolicy);
 }
