@@ -90,4 +90,4 @@ pillow==12.3.0 \
     --hash=sha256:ffd0c5368496f41b0944be820fcb7a838aa6e623d250b01acf2643939c3f99d7
 pytesseract==0.3.10
 flask-restful==0.3.10
-werkzeug==3.1.6
+werkzeug==3.1.9
