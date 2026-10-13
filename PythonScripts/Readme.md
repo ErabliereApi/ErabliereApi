@@ -89,6 +89,41 @@ ou en utilisant un environnement virtuel
 
 > Afin de récupérer l'id du capteur, il est possible de le récupérer dans la page capteur de l'api. Utiliser le bouton dans la colonne 'id' pour copier l'id du capteur.
 
+## monitorUps.py
+
+Publie l'état d'une batterie de secours (UPS) branchée en USB : charge, alimentation (1 = secteur, 0 = panne en cours) et autonomie en minutes. Utilise [NUT](https://networkupstools.org/).
+
+```bash
+sudo apt install nut
+```
+
+Dans `/etc/nut/ups.conf`
+```
+[ups]
+  driver = usbhid-ups
+  port = auto
+```
+
+Dans `/etc/nut/nut.conf`, mettre `MODE=standalone`, puis
+```bash
+sudo systemctl restart nut-driver.target nut-server
+upsc ups@localhost
+```
+
+Lecture seulement
+```
+python3 monitorUps.py ups@localhost
+```
+Avec envoi des données, le dernier capteur (autonomie) est optionnel
+```
+python3 monitorUps.py ups@localhost https://erabliereapi.freddycoder.com AzureAD <capteur-charge-id> <capteur-alimentation-id> <capteur-autonomie-id>
+```
+
+Crontab, à chaque minute
+```bash
+* * * * * cd $EAPIPATH && ./my-venv/bin/python3 monitorUps.py ups@localhost https://erabliereapi.freddycoder.com AzureAD <capteur-charge-id> <capteur-alimentation-id>
+```
+
 ## Mise à jour automatique des scripts
 
 Afin de mettre à jour automatiquement les scripts, il est possible de créer un cron job sous linux.
