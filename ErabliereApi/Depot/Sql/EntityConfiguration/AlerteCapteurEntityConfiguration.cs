@@ -14,5 +14,9 @@ public class AlerteCapteurEntityConfiguration : IEntityTypeConfiguration<AlerteC
     {
         builder.Ignore(e => e.OwnerId);
         builder.Ignore(e => e.Owner);
+
+        // Deux requêtes simultanées ne peuvent pas appliquer le même changement d'état :
+        // la seconde échoue et n'envoie pas de message.
+        builder.Property(e => e.DateChangementEtat).IsConcurrencyToken();
     }
 }

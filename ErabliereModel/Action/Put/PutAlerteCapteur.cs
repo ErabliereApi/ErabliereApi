@@ -51,6 +51,12 @@ public class PutAlerteCapteur
     public decimal? MaxValue { get; set; }
 
     /// <summary>
+    /// Marge de retour (hystérésis) évitant une rafale de messages quand la valeur oscille autour du seuil
+    /// </summary>
+    [Range(0, double.MaxValue)]
+    public decimal? Marge { get; set; }
+
+    /// <summary>
     /// Indique si l'alerte est activé
     /// </summary>
     public bool IsEnable { get; set; }

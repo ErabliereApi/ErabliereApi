@@ -1,12 +1,7 @@
-﻿using ErabliereApi.Depot.Sql;
-using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using Microsoft.AspNetCore.Mvc.Filters;
 using static System.Text.Json.JsonSerializer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using ErabliereApi.Services;
-using static ErabliereApi.Services.AlerteHelper;
+using ErabliereApi.Services.Notifications;
 
 namespace ErabliereApi.Attributes;
 
@@ -28,21 +23,16 @@ public class TriggerAlertV4Attribute : ActionFilterAttribute
     /// <inheritdoc />
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        GetIdAndPostInfo(context);
+        GetPostInfo(context);
     }
 
-    private static void GetIdAndPostInfo(ActionExecutingContext context)
+    private static void GetPostInfo(ActionExecutingContext context)
     {
-        string id = context.ActionArguments["id"]?.ToString() ??
-            throw new InvalidOperationException("Le paramètre Id est requis dans la route pour utiliser l'attribue 'TriggerAlertV4'.");
-
-        var _idErabliere = Guid.Parse(id);
-
         try
         {
-            var _donnee = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonneeCapteurV2[])) as PostDonneeCapteurV2;
+            var _donnees = context.ActionArguments.Values.Single(a => a?.GetType() == typeof(PostDonneeCapteurV2[])) as PostDonneeCapteurV2[];
 
-            context.HttpContext.Items.Add("TriggerAlertV4Attribute", (_idErabliere, _donnee));
+            context.HttpContext.Items.Add("TriggerAlertV4Attribute", _donnees);
         }
         catch (InvalidOperationException e)
         {
@@ -59,109 +49,36 @@ public class TriggerAlertV4Attribute : ActionFilterAttribute
     {
         var result = await next();
 
-        if (!result.Canceled)
+        // Un lot refusé (400, 403, 404) n'a pas été enregistré et ne change l'état d'aucune alerte.
+        // Un lot accepté ne contient que des capteurs de l'érablière de la route, le contrôleur l'a validé.
+        if (!result.Canceled && context.HttpContext.Response.StatusCode is >= 200 and < 300)
         {
             try
             {
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV4Attribute>>();
-                var depot = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
-                var emailConfig = context.HttpContext.RequestServices.GetRequiredService<IOptions<EmailConfig>>();
-                var emailService = context.HttpContext.RequestServices.GetRequiredService<IEmailService>();
-                var smsConfig = context.HttpContext.RequestServices.GetRequiredService<IOptions<SMSConfig>>();
-                var smsService = context.HttpContext.RequestServices.GetRequiredService<ISmsService>();
+                var alerteCapteurService = context.HttpContext.RequestServices.GetRequiredService<AlerteCapteurService>();
 
-                var contextTupple = context.HttpContext.Items["TriggerAlertV4Attribute"];
-
-                if (contextTupple == null)
+                if (context.HttpContext.Items["TriggerAlertV4Attribute"] is not PostDonneeCapteurV2[] _donnees)
                 {
-                    throw new InvalidOperationException("Les informations de l'attribue 'TriggerAlertV3' n'ont pas été trouvé dans le contexte.");
+                    throw new InvalidOperationException("Les informations de l'attribue 'TriggerAlertV4' n'ont pas été trouvé dans le contexte.");
                 }
 
-                var (_idErabliere, _donnees) = ((Guid, PostDonneeCapteurV2[]?))contextTupple;
-
-                if (_donnees == null)
+                // En ordre chronologique : un lot envoyé en différé peut contenir une panne et son retour.
+                foreach (var donnee in _donnees.Where(d => d.IdCapteur.HasValue).OrderBy(d => d.D))
                 {
-                    throw new InvalidOperationException("Le paramètre '_donnees' doit être initialisé pour utiliser la fonction d'alertage.");
-                }
-
-                foreach (var donnee in _donnees)
-                {
-                    var alertes = await depot.AlerteCapteurs.AsNoTracking()
-                        .Where(a => a.OwnerId == _idErabliere &&
-                                    a.IdCapteur == donnee.IdCapteur && 
-                                    a.IsEnable)
-                        .ToArrayAsync();
-
-                    for (int i = 0; i < alertes.Length; i++)
-                    {
-                        var alerte = alertes[i];
-
-                        await MaybeTriggerAlerte(
-                            alerte,
-                            logger,
-                            emailConfig.Value,
-                            emailService,
-                            smsConfig.Value,
-                            smsService,
-                            donnee);
-                    }
+                    // Pas le jeton de la requête : un client qui abandonne ne doit pas interrompre le changement d'état.
+                    await alerteCapteurService.EvaluerAsync(
+                        donnee.IdCapteur!.Value,
+                        donnee.V,
+                        donnee.D ?? DateTimeOffset.Now,
+                        CancellationToken.None);
                 }
             }
             catch (Exception e)
             {
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV3Attribute>>();
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<TriggerAlertV4Attribute>>();
 
-                logger.LogCritical(new EventId(92837485, "TriggerAlertV3Attribute.OnActionExecuted"), e, "Une erreur imprévue est survenu lors de l'execution de la fonction d'alertage.");
+                logger.LogCritical(new EventId(92837485, "TriggerAlertV4Attribute.OnActionExecuted"), e, "Une erreur imprévue est survenu lors de l'execution de la fonction d'alertage.");
             }
-        }
-    }
-
-    private static async Task MaybeTriggerAlerte(
-        AlerteCapteur alerte,
-        ILogger<TriggerAlertV4Attribute> logger,
-        EmailConfig emailConfig,
-        IEmailService emailService,
-        SMSConfig smsConfig,
-        ISmsService smsService,
-        PostDonneeCapteurV2? _donnee)
-    {
-        if (_donnee == null)
-        {
-            throw new InvalidOperationException("Le paramètre '_donnee' doit être initialisé pour utiliser la fonction d'alertage.");
-        }
-
-        var validationCount = 0;
-        var conditionMet = 0;
-
-        if (alerte.MinValue.HasValue)
-        {
-            validationCount++;
-
-            if (_donnee.V <= alerte.MinValue.Value)
-            {
-                conditionMet++;
-            }
-        }
-
-        if (alerte.MaxValue.HasValue)
-        {
-            validationCount++;
-
-            if (_donnee.V >= alerte.MaxValue.Value)
-            {
-                conditionMet++;
-            }
-        }
-
-        if (conditionMet > 0)
-        {
-            await TriggerAlerteCourriel(alerte, logger, emailConfig, emailService, _donnee);
-            await TriggerAlerteSMS(alerte, logger, smsConfig, smsService, _donnee);
-        }
-        else
-        {
-            logger.LogInformation("Alerte {AlerteId} {AlerteNom} not trigger", alerte.Id, alerte.Nom);
-            logger.LogInformation("Validation count greater that 0 {ValidationCountGt0} && validation count eqal conditionMet {ValidationCount} == {ConditionMet} = false", validationCount > 0, validationCount, conditionMet);
         }
     }
 }

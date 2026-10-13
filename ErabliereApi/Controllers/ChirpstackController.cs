@@ -11,8 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Text.Json;
 using static ErabliereApi.Services.LoRaWAN.LoRaWANPacketDecoder;
-using static ErabliereApi.Services.AlerteHelper;
-using Microsoft.Extensions.Options;
+using ErabliereApi.Services.Notifications;
 
 namespace ErabliereApi.Controllers;
 
@@ -27,10 +26,7 @@ public class ChirpstackController : ErabliereApiBaseController
     private readonly ErabliereDbContext _context;
     private readonly IConfiguration _config;
     private readonly ILogger<ChirpstackController> _logger;
-    private readonly IOptions<EmailConfig> _emailConfig;
-    private readonly IOptions<SMSConfig> _smsConfig;
-    private readonly IEmailService _emailService;
-    private readonly ISmsService _smsService;
+    private readonly AlerteCapteurService _alerteCapteurService;
 
     /// <summary>
     /// Constructeur
@@ -39,28 +35,19 @@ public class ChirpstackController : ErabliereApiBaseController
     /// <param name="config"></param>
     /// <param name="serviceProvider"></param>
     /// <param name="logger"></param>
-    /// <param name="emailConfig"></param>
-    /// <param name="smsConfig"></param>
-    /// <param name="emailService"></param>
-    /// <param name="smsService"></param>
+    /// <param name="alerteCapteurService"></param>
     public ChirpstackController(
         ErabliereDbContext context,
         IConfiguration config,
         IServiceProvider serviceProvider,
         ILogger<ChirpstackController> logger,
-        IOptions<EmailConfig> emailConfig,
-        IOptions<SMSConfig> smsConfig,
-        IEmailService emailService,
-        ISmsService smsService)
+        AlerteCapteurService alerteCapteurService)
          : base(serviceProvider, context, config)
     {
         _context = context;
         _config = config;
         _logger = logger;
-        _emailConfig = emailConfig;
-        _smsConfig = smsConfig;
-        _emailService = emailService;
-        _smsService = smsService;
+        _alerteCapteurService = alerteCapteurService;
     }
 
     /// <summary>
@@ -206,6 +193,8 @@ public class ChirpstackController : ErabliereApiBaseController
 
             var mesurementsResponse = TryDecodeData(eventInfo.data, _logger);
 
+            var nouvellesDonnees = new List<DonneeCapteur>();
+
             if (mesurementsResponse.Mesurements != null)
             {
                 // Enregistrer en BD
@@ -260,7 +249,7 @@ public class ChirpstackController : ErabliereApiBaseController
 
                         await _context.DonneesCapteur.AddAsync(newDonneesCapteur, token);
 
-                        await ExecuteAlerteFeatureAsync(ca, newDonneesCapteur, token);
+                        nouvellesDonnees.Add(newDonneesCapteur);
                     }
                     else
                     {
@@ -279,6 +268,8 @@ public class ChirpstackController : ErabliereApiBaseController
 
 
             await _context.SaveChangesAsync(token);
+
+            await ExecuteAlerteFeatureAsync(nouvellesDonnees);
         }
         finally
         {
@@ -288,66 +279,26 @@ public class ChirpstackController : ErabliereApiBaseController
         return Ok();
     }
 
-    private async Task ExecuteAlerteFeatureAsync(Capteur ca, DonneeCapteur newDonneesCapteur, CancellationToken token)
+    private async Task ExecuteAlerteFeatureAsync(List<DonneeCapteur> nouvellesDonnees)
     {
         try
         {
-            var alertes = await _context.AlerteCapteurs
-                        .AsNoTracking()
-                        .Where(a => a.IdCapteur == ca.Id && a.IsEnable)
-                        .ToArrayAsync(token);
-
-            for (int i = 0; i < alertes.Length; i++)
+            foreach (var donnee in nouvellesDonnees)
             {
-                var alerte = alertes[i];
-
-                await MaybeTriggerAlerte(
-                    alerte,
-                    newDonneesCapteur);
+                if (donnee.IdCapteur.HasValue && donnee.Valeur.HasValue && donnee.D.HasValue)
+                {
+                    // Pas le jeton de la requête : un client qui abandonne ne doit pas interrompre le changement d'état.
+                    await _alerteCapteurService.EvaluerAsync(
+                        donnee.IdCapteur.Value,
+                        donnee.Valeur.Value,
+                        donnee.D.Value,
+                        CancellationToken.None);
+                }
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error in ExecuteAlerteFeatureAsync of ChirpstackController");   
-        }
-    }
-
-    private async Task MaybeTriggerAlerte(
-        AlerteCapteur alerte,
-        DonneeCapteur donnee)
-    {
-        var validationCount = 0;
-        var conditionMet = 0;
-
-        if (alerte.MinValue.HasValue)
-        {
-            validationCount++;
-
-            if (donnee.Valeur <= alerte.MinValue.Value)
-            {
-                conditionMet++;
-            }
-        }
-
-        if (alerte.MaxValue.HasValue)
-        {
-            validationCount++;
-
-            if (donnee.Valeur >= alerte.MaxValue.Value)
-            {
-                conditionMet++;
-            }
-        }
-
-        if (conditionMet > 0)
-        {
-            await TriggerAlerteCourriel(alerte, _logger, _emailConfig.Value, _emailService, donnee);
-            await TriggerAlerteSMS(alerte, _logger, _smsConfig.Value, _smsService, donnee);
-        }
-        else
-        {
-            _logger.LogInformation("Alerte {AlerteId} {AlerteNom} not trigger", alerte.Id, alerte.Nom);
-            _logger.LogInformation("Validation count greater that 0 {ValidationCountGt0} && validation count eqal conditionMet {ValidationCount} == {ConditionMet} = false", validationCount > 0, validationCount, conditionMet);
+            _logger.LogError(e, "Error in ExecuteAlerteFeatureAsync of ChirpstackController");
         }
     }
 

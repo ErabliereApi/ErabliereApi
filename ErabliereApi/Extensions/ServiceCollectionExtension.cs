@@ -5,6 +5,7 @@ using ErabliereApi.Middlewares;
 using ErabliereApi.Services;
 using ErabliereApi.Services.Emails;
 using ErabliereApi.Services.IpInfo;
+using ErabliereApi.Services.Notifications;
 using ErabliereApi.Services.SMS;
 using MailKit;
 using MailKit.Net.Smtp;
@@ -259,6 +260,19 @@ public static class ServiceCollectionExtension
                 }
             }
         });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Ajoute les services des alertes de capteur : le suivi de l'état des alertes, la file
+    /// d'attente des messages et le service d'arrière-plan qui les envoie.
+    /// </summary>
+    public static IServiceCollection AddAlerteCapteurServices(this IServiceCollection services)
+    {
+        services.AddSingleton<FileNotificationsAlerte>();
+        services.AddScoped<AlerteCapteurService>();
+        services.AddHostedService<EnvoiNotificationsAlerteService>();
 
         return services;
     }

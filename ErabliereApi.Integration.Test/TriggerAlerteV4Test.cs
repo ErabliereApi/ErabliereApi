@@ -1,13 +1,16 @@
-﻿using AutoFixture;
+using AutoFixture;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Integration.Test.ApplicationFactory;
 using ErabliereApi.Services;
+using ErabliereApi.Services.Notifications;
 using ErabliereApi.Test.Autofixture;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using MimeKit;
 using NSubstitute;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -35,105 +38,158 @@ public class TriggerAlerteV4Test : IClassFixture<ErabliereApiApplicationFactory<
     [Fact]
     public async Task WhenMinIsSet()
     {
-        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = true,
-            HandleCookies = true,
-            MaxAutomaticRedirections = 7
-        });
+        var client = CreateClient();
 
         var id = await CreateErabiere(client);
 
         // When only min is set
         var capteurId = await CréerCapteurEtAlerte(client, id, 40m, null);
-        await EnvoyerPlusieursDonneesCapeur(client, id, [
-            new()
-            {
-                IdCapteur = capteurId,
-                V = 100
-            },
-            new()
-            {
-                IdCapteur = capteurId,
-                V = 550
-            }
-        ], noAlerte: true);
+
+        Assert.Empty(await EnvoyerPlusieursDonneesCapeur(client, id, [
+            new() { IdCapteur = capteurId, V = 100 },
+            new() { IdCapteur = capteurId, V = 550 }
+        ]));
+
+        // Deux données sous le seuil dans le même lot : un seul message
+        Assert.StartsWith("Début d'alerte : Humidité sous-sol", Assert.Single(await EnvoyerPlusieursDonneesCapeur(client, id, [
+            new() { IdCapteur = capteurId, V = 10 },
+            new() { IdCapteur = capteurId, V = 20 }
+        ])));
     }
 
     [Fact]
     public async Task WhenMaxIsSet()
     {
-        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = true,
-            HandleCookies = true,
-            MaxAutomaticRedirections = 7
-        });
+        var client = CreateClient();
 
         var id = await CreateErabiere(client);
 
         // When only max is set
         var capteurId = await CréerCapteurEtAlerte(client, id, null, 40m);
-        await EnvoyerPlusieursDonneesCapeur(client, id, [
-        new() {
-            IdCapteur = capteurId,
-            V = 100
-        }, new() {
-            IdCapteur = capteurId,
-            V = 550
-        }
-        ], noAlerte: true);
+
+        Assert.StartsWith("Début d'alerte", Assert.Single(await EnvoyerPlusieursDonneesCapeur(client, id, [
+            new() { IdCapteur = capteurId, V = 100 },
+            new() { IdCapteur = capteurId, V = 550 }
+        ])));
+
+        Assert.StartsWith("Fin d'alerte", Assert.Single(await EnvoyerPlusieursDonneesCapeur(client, id, [
+            new() { IdCapteur = capteurId, V = 10 }
+        ])));
     }
 
     [Fact]
     public async Task WhenBothMinMaxAreSet()
     {
-        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = true,
-            HandleCookies = true,
-            MaxAutomaticRedirections = 7
-        });
+        var client = CreateClient();
 
         var id = await CreateErabiere(client);
 
         // When both values are set on valid values are in between
         var capteurId = await CréerCapteurEtAlerte(client, id, 40m, 70m);
-        await EnvoyerPlusieursDonneesCapeur(client, id, [
-        new() {
-            IdCapteur = capteurId,
-            V = 100
-        }, new()
-        {
-            IdCapteur = capteurId,
-            V = 900
-        },
-        new()
-        {
-            IdCapteur = capteurId,
-            V = 550
-        }], noAlerte: true);
+
+        var debut = DateTimeOffset.Now;
+
+        var sujets = await EnvoyerPlusieursDonneesCapeur(client, id, [
+            new() { IdCapteur = capteurId, V = 10, D = debut },
+            new() { IdCapteur = capteurId, V = 90, D = debut.AddMinutes(1) },
+            new() { IdCapteur = capteurId, V = 55, D = debut.AddMinutes(2) }
+        ]);
+
+        Assert.Equal(2, sujets.Length);
+        Assert.StartsWith("Début d'alerte", sujets[0]);
+        Assert.StartsWith("Fin d'alerte", sujets[1]);
     }
 
-    private async Task EnvoyerPlusieursDonneesCapeur(HttpClient client, Guid idErabliere, PostDonneeCapteur[] postmanyDonneeCapteur, bool noAlerte = false)
+    [Fact]
+    public async Task UnLotEnDiffereEtDesordonneEstEvalueEnOrdreChronologique()
+    {
+        var client = CreateClient();
+
+        var id = await CreateErabiere(client);
+
+        var capteurId = await CréerCapteurEtAlerte(client, id, 0m, null);
+
+        var panne = DateTimeOffset.Now.AddHours(-6);
+
+        // L'appareil envoie après coup la panne et le retour, le retour en premier
+        var sujets = await EnvoyerPlusieursDonneesCapeur(client, id, [
+            new() { IdCapteur = capteurId, V = 1, D = panne.AddMinutes(30) },
+            new() { IdCapteur = capteurId, V = 0, D = panne.AddMinutes(10) },
+            new() { IdCapteur = capteurId, V = 0, D = panne }
+        ]);
+
+        Assert.Equal(2, sujets.Length);
+        Assert.StartsWith("Début d'alerte", sujets[0]);
+        Assert.StartsWith("Fin d'alerte", sujets[1]);
+    }
+
+    [Fact]
+    public async Task UnLotRefuseNeDeclenchePasLAlerte()
+    {
+        var client = CreateClient();
+
+        var id = await CreateErabiere(client);
+        var autreErabliere = await CreateErabiere(client);
+
+        var capteurId = await CréerCapteurEtAlerte(client, id, 0m, null);
+
+        // Le capteur n'appartient pas à l'érablière de la route : 404, rien n'est enregistré
+        var response = await client.PostAsJsonAsync(
+            $"Erablieres/{autreErabliere}/Capteurs/DonneesCapteurV2/PostMany",
+            new PostDonneeCapteurV2[] { new() { IdCapteur = capteurId, V = 0 } });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        await AttendreEnvois();
+
+        Assert.Empty(_factory.Services.GetRequiredService<IEmailService>().ReceivedCalls());
+    }
+
+    private HttpClient CreateClient()
+    {
+        return _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = true,
+            HandleCookies = true,
+            MaxAutomaticRedirections = 7
+        });
+    }
+
+    /// <summary>
+    /// Envoie un lot de données et retourne les sujets des courriels d'alerte qu'il a causés.
+    /// </summary>
+    private async Task<string[]> EnvoyerPlusieursDonneesCapeur(HttpClient client, Guid idErabliere, PostDonneeCapteurV2[] postmanyDonneeCapteur)
     {
         var response = await client.PostAsJsonAsync($"Erablieres/{idErabliere}/Capteurs/DonneesCapteurV2/PostMany", postmanyDonneeCapteur);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
+        await AttendreEnvois();
+
         var emailService = _factory.Services.GetRequiredService<IEmailService>();
 
-        if (noAlerte)
+        var sujets = emailService.ReceivedCalls()
+                                 .Select(c => ((MimeMessage)c.GetArguments()[0]!).Subject)
+                                 .ToArray();
+
+        emailService.ClearReceivedCalls();
+
+        return sujets;
+    }
+
+    /// <summary>
+    /// L'envoi se fait en arrière-plan : attend que la file des messages soit vide.
+    /// </summary>
+    private async Task AttendreEnvois()
+    {
+        var file = _factory.Services.GetRequiredService<FileNotificationsAlerte>();
+
+        for (var i = 0; i < 400 && file.EnAttente > 0; i++)
         {
-            var calls = emailService.ReceivedCalls();
-            Assert.Empty(calls);
+            await Task.Delay(25);
         }
-        else
-        {
-            var calls = emailService.ReceivedCalls();
-            Assert.NotEmpty(calls);
-            emailService.ClearReceivedCalls();
-        }
+
+        Assert.Equal(0, file.EnAttente);
     }
 
     private async Task<Guid> CréerCapteurEtAlerte(HttpClient client, Guid id, decimal? min, decimal? max)

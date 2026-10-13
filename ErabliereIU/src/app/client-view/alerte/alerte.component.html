@@ -59,6 +59,9 @@
                             Max.
                         </th>
                         <th>
+                            Marge de retour
+                        </th>
+                        <th>
                             Capteur
                         </th>
                         <th></th>
@@ -81,6 +84,11 @@
                             @else {
                             <span>Désactivé</span>
                             }
+                            @if (alerte.isEnable && alerte.estEnAlerte) {
+                            <div>
+                                <span class="badge text-bg-danger">En alerte depuis {{formatDate(alerte.lastOccurence)}}</span>
+                            </div>
+                            }
                         </td>
                         <td>
                             <alerte-destinataires [destinataires]="alerte.envoyerA ?? ''">
@@ -95,6 +103,9 @@
                         </td>
                         <td>
                             {{formatNumber(alerte.maxValue, alerte.capteur?.symbole, true)}}
+                        </td>
+                        <td>
+                            {{formatNumber(alerte.marge, alerte.capteur?.symbole, true)}}
                         </td>
                         <td>
                             {{alerte.capteur?.nom}}
