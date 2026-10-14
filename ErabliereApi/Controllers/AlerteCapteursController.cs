@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Delete;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
@@ -145,12 +146,15 @@ public class AlerteCapteursController : ControllerBase
             return NotFound("L'alerte de capteur n'existe pas");
         }
 
-        if (alerteCapteur.MinValue != alerte.MinValue ||
-            alerteCapteur.MaxValue != alerte.MaxValue ||
-            alerteCapteur.Marge != alerte.Marge ||
-            (alerteCapteur.IsEnable && !alerte.IsEnable))
+        if (alerteCapteur.IsEnable && !alerte.IsEnable)
         {
-            ReinitialiserEtat(alerteCapteur);
+            await ReinitialiserEtatAsync(alerteCapteur, RaisonFinEpisode.AlerteDesactivee, token);
+        }
+        else if (alerteCapteur.MinValue != alerte.MinValue ||
+                 alerteCapteur.MaxValue != alerte.MaxValue ||
+                 alerteCapteur.Marge != alerte.Marge)
+        {
+            await ReinitialiserEtatAsync(alerteCapteur, RaisonFinEpisode.AlerteModifiee, token);
         }
 
         alerteCapteur.IsEnable = alerte.IsEnable;
@@ -234,7 +238,7 @@ public class AlerteCapteursController : ControllerBase
         if (entity is not null && entity.IdCapteur == id)
         {
             entity.IsEnable = false;
-            ReinitialiserEtat(entity);
+            await ReinitialiserEtatAsync(entity, RaisonFinEpisode.AlerteDesactivee, token);
 
             await _depot.SaveChangesAsync(token);
 
@@ -248,11 +252,58 @@ public class AlerteCapteursController : ControllerBase
     /// Remet l'alerte à l'état normal sans envoyer de message. Les seuils ayant changé ou l'alerte
     /// ayant été désactivée, l'état sera réévalué à la prochaine donnée. La date empêche une
     /// donnée envoyée en différé de relancer l'alerte sur la base de l'ancienne configuration.
+    /// L'épisode en cours est fermé à cette date, sans valeur : sa fin n'a pas été mesurée.
     /// </summary>
-    private static void ReinitialiserEtat(AlerteCapteur alerte)
+    private async Task ReinitialiserEtatAsync(AlerteCapteur alerte, RaisonFinEpisode raison, CancellationToken token)
     {
+        var maintenant = DateTimeOffset.Now;
+
         alerte.EstEnAlerte = false;
-        alerte.DateChangementEtat = DateTimeOffset.Now;
+        alerte.DateChangementEtat = maintenant;
+
+        await FermerEpisodesSansMesureAsync(alerte.Id, maintenant, raison, token);
+    }
+
+    /// <summary>
+    /// Ferme les épisodes en cours d'une alerte à une date qui n'est pas celle d'une donnée.
+    /// </summary>
+    private async Task FermerEpisodesSansMesureAsync(Guid? idAlerte, DateTimeOffset date, RaisonFinEpisode raison, CancellationToken token)
+    {
+        var episodes = await _depot.EpisodesAlerteCapteur
+            .Where(e => e.IdAlerteCapteur == idAlerte && e.DateFin == null)
+            .ToArrayAsync(token);
+
+        foreach (var episode in episodes)
+        {
+            episode.DateFin = date;
+            episode.ValeurFin = null;
+            episode.RaisonFin = raison;
+        }
+    }
+
+    /// <summary>
+    /// Ferme les épisodes en cours de l'alerte et les détache d'elle : l'historique des épisodes
+    /// survit à la suppression de l'alerte.
+    /// </summary>
+    private async Task DetacherEpisodesAsync(Guid? idAlerte, CancellationToken token)
+    {
+        var episodes = await _depot.EpisodesAlerteCapteur
+            .Where(e => e.IdAlerteCapteur == idAlerte)
+            .ToArrayAsync(token);
+
+        var maintenant = DateTimeOffset.Now;
+
+        foreach (var episode in episodes)
+        {
+            if (episode.DateFin == null)
+            {
+                episode.DateFin = maintenant;
+                episode.ValeurFin = null;
+                episode.RaisonFin = RaisonFinEpisode.AlerteSupprimee;
+            }
+
+            episode.IdAlerteCapteur = null;
+        }
     }
 
     /// <summary>
@@ -263,16 +314,28 @@ public class AlerteCapteursController : ControllerBase
     /// <param name="token">Jeton d'annulation de la tâche</param>
     /// <response code="204">L'alerte a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.</response>
+    /// <response code="404">L'alerte n'existe pas sur ce capteur.</response>
     [HttpDelete]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Supprimer(Guid id, AlerteCapteur alerte, CancellationToken token)
+    public async Task<IActionResult> Supprimer(Guid id, DeleteAlerteCapteur alerte, CancellationToken token)
     {
         if (id != alerte.IdCapteur)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.");
         }
 
-        _depot.Remove(alerte);
+        // ValiderOwnership ne protège que le capteur de la route : l'alerte est chargée par le
+        // serveur et doit lui appartenir, sinon l'id du corps viserait l'alerte d'un autre client.
+        var entity = await _depot.AlerteCapteurs.FirstOrDefaultAsync(a => a.Id == alerte.Id && a.IdCapteur == id, token);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        await DetacherEpisodesAsync(entity.Id, token);
+
+        _depot.Remove(entity);
 
         await _depot.SaveChangesAsync(token);
 
@@ -302,6 +365,8 @@ public class AlerteCapteursController : ControllerBase
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.");
         }
+
+        await DetacherEpisodesAsync(alerte.Id, token);
 
         _depot.Remove(alerte);
 

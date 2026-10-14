@@ -9,12 +9,13 @@ import { ActivatedRoute } from "@angular/router";
 import { Erabliere } from "src/model/erabliere";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 import { AlerteDestinatairesComponent } from "./alerte-destinataires.component";
+import { EpisodesAlerteCapteurComponent } from "./episodes-alerte-capteur.component";
 
 @Component({
   selector: 'alerte-page',
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './alerte.component.html',
-  imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent, AlerteDestinatairesComponent]
+  imports: [AjouterAlerteComponent, ModifierAlerteComponent, CopyTextButtonComponent, AlerteDestinatairesComponent, EpisodesAlerteCapteurComponent]
 })
 export class AlerteComponent implements OnInit {
   alertes?: Array<Alerte>;
@@ -23,6 +24,7 @@ export class AlerteComponent implements OnInit {
   alertesCapteur?: Array<AlerteCapteur>;
   alertesCapteurIsLoading: boolean = false;
   alertesCapteurLoadingError: string | null = null;
+  capteurHistorique?: { id: any, nom?: string, symbole?: string };
 
   idErabliereSelectionee: any
   erabliere?: Erabliere;
@@ -141,6 +143,14 @@ export class AlerteComponent implements OnInit {
     this.displayEditFormSubject.next("alerteCapteur");
     this.editAlerte = false;
     this.editAlerteCapteur = true;
+  }
+
+  onButtonHistoriqueAlerteCapteurClick(alerte: AlerteCapteur) {
+    this.capteurHistorique = {
+      id: alerte.idCapteur,
+      nom: alerte.capteur?.nom,
+      symbole: alerte.capteur?.symbole
+    };
   }
 
   onButtonDeleteClick(alerteId: any) {

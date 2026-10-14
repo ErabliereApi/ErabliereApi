@@ -120,6 +120,8 @@
                                 <button class="btn btn-outline-success"
                                     (click)="onButtonActiverAlerteCapteurClick(alerte.idCapteur, alerte.id)">activer</button>
                                 }
+                                <button class="btn btn-outline-secondary"
+                                    (click)="onButtonHistoriqueAlerteCapteurClick(alerte)">historique</button>
                                 <button class="btn btn-info"
                                     (click)="onButtonModifierAlerteCapteurClick(alerte.id)">modifier</button>
                                 <button class="btn btn-danger"
@@ -132,6 +134,13 @@
                 </tbody>
             </table>
         </div>
+        @if (capteurHistorique) {
+        <div class="mb-4">
+            <app-episodes-alerte-capteur [idCapteur]="capteurHistorique.id" [nomCapteur]="capteurHistorique.nom"
+                [symbole]="capteurHistorique.symbole">
+            </app-episodes-alerte-capteur>
+        </div>
+        }
     </div>
     }
 

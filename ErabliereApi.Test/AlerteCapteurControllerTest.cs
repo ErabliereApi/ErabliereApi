@@ -2,7 +2,11 @@
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
 using ErabliereApi.Test.Autofixture;
+using ErabliereApi.Donnees.Action.Delete;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -63,5 +67,55 @@ public class AlerteCapteurControllerTest
         var result = Assert.IsType<OkObjectResult>(response);
 
         var alerteCapteurResponse = Assert.IsType<AlerteCapteur>(result.Value);
+    }
+
+    [Fact]
+    public async Task Supprimer_AlerteDUnAutreCapteur_RetourneNotFoundEtNeSupprimeRien()
+    {
+        var nomBD = Guid.NewGuid().ToString();
+        var options = new DbContextOptionsBuilder<ErabliereDbContext>().UseInMemoryDatabase(nomBD).Options;
+        var monCapteur = Guid.NewGuid();
+        var capteurDuVoisin = Guid.NewGuid();
+        var alerteDuVoisin = Guid.NewGuid();
+
+        using (var depot = new ErabliereDbContext(options))
+        {
+            depot.Capteurs.Add(new Capteur { Id = monCapteur, IdErabliere = Guid.NewGuid(), Nom = "Secteur" });
+            depot.Capteurs.Add(new Capteur { Id = capteurDuVoisin, IdErabliere = Guid.NewGuid(), Nom = "Secteur" });
+            depot.AlerteCapteurs.Add(new AlerteCapteur { Id = alerteDuVoisin, IdCapteur = capteurDuVoisin, Nom = "Panne" });
+            await depot.SaveChangesAsync();
+        }
+
+        // La route vise mon capteur (ValiderOwnership passe), le corps vise l'alerte du voisin
+        var response = await new AlerteCapteursController(new ErabliereDbContext(options)).Supprimer(
+            monCapteur,
+            new DeleteAlerteCapteur { Id = alerteDuVoisin, IdCapteur = monCapteur },
+            CancellationToken.None);
+
+        Assert.IsType<NotFoundResult>(response);
+        Assert.True(await new ErabliereDbContext(options).AlerteCapteurs.AnyAsync(a => a.Id == alerteDuVoisin));
+    }
+
+    [Fact]
+    public async Task Supprimer_AlerteDuCapteur_LaSupprime()
+    {
+        var options = new DbContextOptionsBuilder<ErabliereDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        var idCapteur = Guid.NewGuid();
+        var idAlerte = Guid.NewGuid();
+
+        using (var depot = new ErabliereDbContext(options))
+        {
+            depot.Capteurs.Add(new Capteur { Id = idCapteur, IdErabliere = Guid.NewGuid(), Nom = "Secteur" });
+            depot.AlerteCapteurs.Add(new AlerteCapteur { Id = idAlerte, IdCapteur = idCapteur, Nom = "Panne" });
+            await depot.SaveChangesAsync();
+        }
+
+        var response = await new AlerteCapteursController(new ErabliereDbContext(options)).Supprimer(
+            idCapteur,
+            new DeleteAlerteCapteur { Id = idAlerte, IdCapteur = idCapteur },
+            CancellationToken.None);
+
+        Assert.IsType<NoContentResult>(response);
+        Assert.False(await new ErabliereDbContext(options).AlerteCapteurs.AnyAsync());
     }
 }

@@ -1,6 +1,6 @@
 # No entity binding on write endpoints — REQUIRED
 
-Applies to: every `POST` / `PUT` / `PATCH` action in `ErabliereApi/Controllers/`.
+Applies to: every `POST` / `PUT` / `PATCH` / `DELETE` action in `ErabliereApi/Controllers/`.
 Enforced by: `ErabliereApi.Test/WriteEndpointsBindDtoNotEntityTest.cs` (build fails on violation).
 
 ## The rule
@@ -28,6 +28,12 @@ They never protect nested children.
 - **PUT / PATCH** — load the existing entity with `FindAsync`, verify it belongs to the route's
   érablière (`entity.IdErabliere != id → NotFound()`), then assign only the allowed fields.
   Do **not** call `_depot.Update(bodyEntity)` — that attaches the whole graph.
+- **DELETE with a body** — bind a DTO from `Action/Delete/` (ids only, see `DeleteAlerteCapteur`),
+  load the entity filtered on **both** its id and the route's owner
+  (`a.Id == body.Id && a.IdCapteur == id`), `NotFound()` otherwise, then remove the loaded entity.
+  `_depot.Remove(bodyEntity)` deletes by key alone: the route check proves nothing about that key,
+  so it deletes another tenant's row. This was the hole in `AlerteCapteurs`, `Baril`, `Dompeux` and
+  `DonneesCapteur`.
 - **Validate every client-supplied FK** (`IdArbre`, `IdLigneTubelure`, …) belongs to the same
   érablière before saving.
 

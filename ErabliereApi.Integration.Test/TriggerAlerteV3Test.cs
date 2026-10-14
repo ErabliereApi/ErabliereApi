@@ -147,6 +147,90 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
         Assert.Empty(_factory.Services.GetRequiredService<IEmailService>().ReceivedCalls());
     }
 
+    [Fact]
+    public async Task LaPanneEstHistoriseeCommeUnEpisode()
+    {
+        var client = CreateClient();
+
+        var id = await CreateErabiere(client);
+
+        var capteurId = await CréerCapteurEtAlerte(client, id, 0m, null);
+        var debut = new DateTimeOffset(2026, 10, 13, 13, 46, 0, TimeSpan.FromHours(-4));
+
+        await EnvoyerDonneeDatee(client, capteurId, 0m, debut);
+
+        var enCours = Assert.Single(await LireEpisodes(client, $"Capteurs/{capteurId}/EpisodesAlerte"));
+        Assert.Equal(debut, enCours.DateDebut);
+        Assert.Null(enCours.DateFin);
+
+        await EnvoyerDonneeDatee(client, capteurId, 1m, debut.AddMinutes(8));
+
+        var termine = Assert.Single(await LireEpisodes(client, $"Erablieres/{id}/EpisodesAlerte"));
+        Assert.Equal(capteurId, termine.IdCapteur);
+        Assert.Equal(debut.AddMinutes(8), termine.DateFin);
+        Assert.Equal(RaisonFinEpisode.RetourNormale, termine.RaisonFin);
+
+        Assert.Empty(await LireEpisodes(client, $"Capteurs/{capteurId}/EpisodesAlerte?debut={Uri.EscapeDataString(debut.AddDays(1).ToString("O"))}"));
+    }
+
+    [Fact]
+    public async Task SupprimerAvecUnCorps_NeSupprimeQueLesAlertesDuCapteurDeLaRoute()
+    {
+        var client = CreateClient();
+
+        var id = await CreateErabiere(client);
+
+        var monCapteur = await CréerCapteurEtAlerte(client, id, 0m, null);
+        var autreCapteur = await CréerCapteurEtAlerte(client, id, 0m, null);
+
+        var alertes = await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{autreCapteur}/AlerteCapteurs", _serializerOptions);
+        var alerteAutre = Assert.Single(alertes!);
+
+        // Le corps complet, comme l'envoie le proxy, mais avec l'alerte d'un autre capteur
+        alerteAutre.IdCapteur = monCapteur;
+        var refuse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"Capteurs/{monCapteur}/AlerteCapteurs")
+        {
+            Content = JsonContent.Create(alerteAutre, options: _serializerOptions)
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, refuse.StatusCode);
+        Assert.Single((await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{autreCapteur}/AlerteCapteurs", _serializerOptions))!);
+
+        var mienne = Assert.Single((await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{monCapteur}/AlerteCapteurs", _serializerOptions))!);
+        var accepte = await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"Capteurs/{monCapteur}/AlerteCapteurs")
+        {
+            Content = JsonContent.Create(mienne, options: _serializerOptions)
+        });
+
+        Assert.Equal(HttpStatusCode.NoContent, accepte.StatusCode);
+        Assert.Empty((await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{monCapteur}/AlerteCapteurs", _serializerOptions))!);
+    }
+
+    private async Task EnvoyerDonneeDatee(HttpClient client, Guid capteurId, decimal valeur, DateTimeOffset date)
+    {
+        var response = await client.PostAsJsonAsync($"Capteurs/{capteurId}/DonneesCapteurV2", new PostDonneeCapteurV2
+        {
+            IdCapteur = capteurId,
+            V = valeur,
+            D = date
+        });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        await AttendreEnvois();
+
+        _factory.Services.GetRequiredService<IEmailService>().ClearReceivedCalls();
+    }
+
+    private async Task<EpisodeAlerteCapteur[]> LireEpisodes(HttpClient client, string url)
+    {
+        var episodes = await client.GetFromJsonAsync<EpisodeAlerteCapteur[]>(url, _serializerOptions);
+
+        Assert.NotNull(episodes);
+
+        return episodes;
+    }
+
     private HttpClient CreateClient()
     {
         return _factory.CreateClient(new WebApplicationFactoryClientOptions

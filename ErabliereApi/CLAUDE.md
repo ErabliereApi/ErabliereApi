@@ -3,7 +3,7 @@
 The main project. Targets .NET 9 (`global.json` pins SDK 10 with `rollForward: latestMajor`). Also
 serves the built Angular app from `wwwroot/`.
 
-## Before you write a POST, PUT, or PATCH
+## Before you write a POST, PUT, PATCH, or DELETE with a body
 
 Read **[.claude/_shared/write-endpoint-dto.md](../.claude/_shared/write-endpoint-dto.md)**. Binding
 an EF entity on a write endpoint fails the build and, worse, opens a cross-tenant over-posting hole.
