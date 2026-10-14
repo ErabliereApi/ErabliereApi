@@ -144,9 +144,16 @@ namespace Depot.Sql.Migrations
                     b.Property<DateTimeOffset?>("DM")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("DateChangementEtat")
+                        .IsConcurrencyToken()
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("EnvoyerA")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("EstEnAlerte")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("IdCapteur")
                         .HasColumnType("uniqueidentifier");
@@ -156,6 +163,10 @@ namespace Depot.Sql.Migrations
 
                     b.Property<DateTimeOffset?>("LastOccurence")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("Marge")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
 
                     b.Property<decimal?>("MaxValue")
                         .HasPrecision(18, 6)

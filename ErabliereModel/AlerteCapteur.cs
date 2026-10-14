@@ -74,7 +74,25 @@ public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnab
     public bool IsEnable { get; set; }
 
     /// <summary>
-    /// Dernière occurence de l'alerte
+    /// Marge de retour (hystérésis). Une alerte commencée sous <see cref="MinValue"/> ne se termine
+    /// qu'au-dessus de MinValue + Marge, et une alerte commencée au-dessus de <see cref="MaxValue"/>
+    /// qu'en dessous de MaxValue - Marge. Null équivaut à 0.
+    /// </summary>
+    public decimal? Marge { get; set; }
+
+    /// <summary>
+    /// Indique si l'alerte est présentement en cours. Géré par le serveur.
+    /// </summary>
+    public bool EstEnAlerte { get; set; }
+
+    /// <summary>
+    /// Date de la donnée qui a causé le dernier changement d'état. Une donnée plus ancienne
+    /// ne peut pas renverser l'état. Géré par le serveur.
+    /// </summary>
+    public DateTimeOffset? DateChangementEtat { get; set; }
+
+    /// <summary>
+    /// Date de la donnée qui a commencé la dernière alerte
     /// </summary>
     public DateTimeOffset? LastOccurence { get; set; }
 

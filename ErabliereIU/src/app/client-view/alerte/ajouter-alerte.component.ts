@@ -81,6 +81,7 @@ export class AjouterAlerteComponent implements OnInit {
             destinataireSMS: '',
             min: '',
             max: '',
+            marge: '',
             idCapteur: ''
         });
     }
@@ -178,6 +179,11 @@ export class AjouterAlerteComponent implements OnInit {
             this.alerteCapteur.maxValue = undefined;
         } else {
             this.alerteCapteur.maxValue = Number.parseFloat(this.alerteCapteurForm.controls['max'].value);
+        }
+        if (this.alerteCapteurForm.controls['marge'].value == "") {
+            this.alerteCapteur.marge = undefined;
+        } else {
+            this.alerteCapteur.marge = Number.parseFloat(this.alerteCapteurForm.controls['marge'].value);
         }
         this.onButtonCreerAlerteCapteurClickInProgress = true;
         this._api.postAlerteCapteur(this.alerteCapteur.idCapteur, this.alerteCapteur)

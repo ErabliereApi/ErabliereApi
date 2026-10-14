@@ -223,6 +223,14 @@ export class AlerteComponent implements OnInit {
     return (Number.parseInt(str)) + " " + symbol;
   }
 
+  formatDate(date?: string) {
+    if (date == null) {
+      return "";
+    }
+
+    return new Date(date).toLocaleString();
+  }
+
   formatNumber(i?: number, symbol?: string, doNoDivide: boolean = false) {
     if (i == null) {
       return null;

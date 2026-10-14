@@ -8,6 +8,10 @@ export class AlerteCapteur {
   texterA?: string;
   minValue?: number;
   maxValue?: number;
+  marge?: number;
+  estEnAlerte?: boolean;
+  dateChangementEtat?: string;
+  lastOccurence?: string;
   dc?: string
   isEnable?: boolean;
   capteur?: Capteur;

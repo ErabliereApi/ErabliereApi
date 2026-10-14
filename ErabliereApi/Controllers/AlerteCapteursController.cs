@@ -111,6 +111,7 @@ public class AlerteCapteursController : ControllerBase
             TexterA = alerte.TexterA,
             MinValue = alerte.MinValue,
             MaxValue = alerte.MaxValue,
+            Marge = alerte.Marge,
             IsEnable = alerte.IsEnable,
             DC = alerte.DC ?? DateTime.Now
         }, token);
@@ -137,19 +138,27 @@ public class AlerteCapteursController : ControllerBase
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à modifier.");
         }
 
-        var alerteCapteur = await _depot.AlerteCapteurs.Include(a => a.Capteur).FirstOrDefaultAsync(a => a.Id == alerte.Id, token);
+        var alerteCapteur = await _depot.AlerteCapteurs.Include(a => a.Capteur).FirstOrDefaultAsync(a => a.Id == alerte.Id && a.IdCapteur == id, token);
 
         if (alerteCapteur == null)
         {
             return NotFound("L'alerte de capteur n'existe pas");
         }
 
-        alerteCapteur.IdCapteur = alerte.IdCapteur;
+        if (alerteCapteur.MinValue != alerte.MinValue ||
+            alerteCapteur.MaxValue != alerte.MaxValue ||
+            alerteCapteur.Marge != alerte.Marge ||
+            (alerteCapteur.IsEnable && !alerte.IsEnable))
+        {
+            ReinitialiserEtat(alerteCapteur);
+        }
+
         alerteCapteur.IsEnable = alerte.IsEnable;
         alerteCapteur.EnvoyerA = alerte.EnvoyerA;
         alerteCapteur.TexterA = alerte.TexterA;
         alerteCapteur.MaxValue = alerte.MaxValue;
         alerteCapteur.MinValue = alerte.MinValue;
+        alerteCapteur.Marge = alerte.Marge;
         alerteCapteur.Nom = alerte.Nom;
         alerteCapteur.DM = DateTimeOffset.UtcNow;
 
@@ -225,6 +234,7 @@ public class AlerteCapteursController : ControllerBase
         if (entity is not null && entity.IdCapteur == id)
         {
             entity.IsEnable = false;
+            ReinitialiserEtat(entity);
 
             await _depot.SaveChangesAsync(token);
 
@@ -232,6 +242,17 @@ public class AlerteCapteursController : ControllerBase
         }
 
         return NotFound();
+    }
+
+    /// <summary>
+    /// Remet l'alerte à l'état normal sans envoyer de message. Les seuils ayant changé ou l'alerte
+    /// ayant été désactivée, l'état sera réévalué à la prochaine donnée. La date empêche une
+    /// donnée envoyée en différé de relancer l'alerte sur la base de l'ancienne configuration.
+    /// </summary>
+    private static void ReinitialiserEtat(AlerteCapteur alerte)
+    {
+        alerte.EstEnAlerte = false;
+        alerte.DateChangementEtat = DateTimeOffset.Now;
     }
 
     /// <summary>

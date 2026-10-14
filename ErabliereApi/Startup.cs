@@ -138,6 +138,7 @@ public class Startup
         // Notifications
         services.AddEmailServices(Configuration)
                 .AddSMSServices(Configuration)
+                .AddAlerteCapteurServices()
                 .AddTransient<NotificationService>();
 
 
