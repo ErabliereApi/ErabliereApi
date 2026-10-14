@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Delete;
 using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
@@ -165,7 +166,7 @@ public class DompeuxController : ControllerBase
     [HttpDelete("{idDompeux}")]
     [ValiderIPRules]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Supprimer(Guid id, Guid idDompeux, Dompeux donnee)
+    public async Task<IActionResult> Supprimer(Guid id, Guid idDompeux, DeleteDompeux donnee)
     {
         if (id != donnee.IdErabliere)
         {
@@ -176,7 +177,16 @@ public class DompeuxController : ControllerBase
             return BadRequest("L'id du dompeux de la route ne concorde pas avec l'id du dompeux");
         }
 
-        _context.Dompeux.Remove(donnee);
+        // ValiderOwnership ne protège que l'érablière de la route : le dompeux est chargé par le
+        // serveur et doit lui appartenir, sinon l'id du corps viserait le dompeux d'un autre client.
+        var entity = await _context.Dompeux.FirstOrDefaultAsync(d => d.Id == idDompeux && d.IdErabliere == id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        _context.Dompeux.Remove(entity);
 
         await _context.SaveChangesAsync();
 

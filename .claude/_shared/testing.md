@@ -24,7 +24,7 @@ dotnet test --filter "FullyQualifiedName~MyTestName"   # one test
 ## Guards that will fail your build
 
 - **`WriteEndpointsBindDtoNotEntityTest`** — reflects over every controller and rejects any
-  `POST`/`PUT`/`PATCH` binding an EF entity. Read [write-endpoint-dto.md](write-endpoint-dto.md)
+  `POST`/`PUT`/`PATCH`/`DELETE` binding an EF entity. Read [write-endpoint-dto.md](write-endpoint-dto.md)
   before adding a write endpoint; that file explains the failure and the fix.
 - Its sibling test also fails when an entry in `ExceptionsConnues` has gone stale — so fixing a
   violation means deleting its exception in the same change.

@@ -13,10 +13,12 @@ using Xunit.Abstractions;
 namespace ErabliereApi.Test;
 
 /// <summary>
-/// Test d'architecture (anti over-posting) : aucune action POST/PUT/PATCH d'un contrôleur
+/// Test d'architecture (anti over-posting) : aucune action POST/PUT/PATCH/DELETE d'un contrôleur
 /// ne doit lier une entité EF (namespace <c>ErabliereApi.Donnees</c>) comme corps de requête.
 /// Il faut utiliser un DTO dédié (<c>ErabliereApi.Donnees.Action.Post</c> / <c>.Put</c>) sans
 /// propriété de navigation. Voir la section « No entity binding on write endpoints » du CLAUDE.md.
+/// Un DELETE qui lie l'entité la supprime par la clé du corps, sans vérifier qu'elle appartient
+/// à la ressource de la route : il lie un DTO <c>ErabliereApi.Donnees.Action.Delete</c> et charge l'entité.
 /// </summary>
 public class WriteEndpointsBindDtoNotEntityTest
 {
@@ -57,8 +59,8 @@ public class WriteEndpointsBindDtoNotEntityTest
 
         Assert.True(
             nouvellesViolations.Count == 0,
-            "Ces actions POST/PUT/PATCH lient une entité EF au lieu d'un DTO (risque d'over-posting). " +
-            "Créez un DTO Post*/Put* sans propriété de navigation. Voir CLAUDE.md.\n" +
+            "Ces actions POST/PUT/PATCH/DELETE lient une entité EF au lieu d'un DTO (risque d'over-posting). " +
+            "Créez un DTO Post*/Put*/Delete* sans propriété de navigation. Voir CLAUDE.md.\n" +
             string.Join("\n", nouvellesViolations));
     }
 
@@ -128,7 +130,7 @@ public class WriteEndpointsBindDtoNotEntityTest
     private static bool EstEndpointDEcriture(MethodInfo method)
     {
         return method.GetCustomAttributes().Any(a =>
-            a is HttpPostAttribute || a is HttpPutAttribute || a is HttpPatchAttribute);
+            a is HttpPostAttribute || a is HttpPutAttribute || a is HttpPatchAttribute || a is HttpDeleteAttribute);
     }
 
     /// <summary>

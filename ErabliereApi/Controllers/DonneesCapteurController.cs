@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Delete;
 using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,16 +74,26 @@ public class DonneesCapteurController : ControllerBase
     /// <param name="token">Token d'annulation</param>s
     /// <response code="204">Le capteur a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du capteur à supprimer.</response>
+    /// <response code="404">La donnée n'existe pas sur ce capteur.</response>
     [HttpDelete]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Supprimer(Guid id, DonneeCapteur capteur, CancellationToken token)
+    public async Task<IActionResult> Supprimer(Guid id, DeleteDonneeCapteur capteur, CancellationToken token)
     {
         if (id != capteur.IdCapteur)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id du capteur dans la donnée à supprimer.");
         }
 
-        _depot.Remove(capteur);
+        // ValiderOwnership ne protège que le capteur de la route : la donnée est chargée par le
+        // serveur et doit lui appartenir, sinon l'id du corps viserait la donnée d'un autre client.
+        var entity = await _depot.DonneesCapteur.FirstOrDefaultAsync(d => d.Id == capteur.Id && d.IdCapteur == id, token);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        _depot.Remove(entity);
 
         await _depot.SaveChangesAsync(token);
 

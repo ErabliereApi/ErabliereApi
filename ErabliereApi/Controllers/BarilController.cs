@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Delete;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
@@ -123,16 +124,26 @@ public class BarilController : ControllerBase
     /// <param name="token">Le token d'annulation</param>
     /// <response code="202">Le baril a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id du baril à supprimer.</response>
+    /// <response code="404">Le baril n'existe pas dans cette érablière.</response>
     [HttpDelete]
     [ValiderOwnership("id")]
-    public async Task<IActionResult> Supprimer(Guid id, Baril baril, CancellationToken token)
+    public async Task<IActionResult> Supprimer(Guid id, DeleteBaril baril, CancellationToken token)
     {
         if (id != baril.IdErabliere)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id du baril à supprimer.");
         }
 
-        _depot.Remove(baril);
+        // ValiderOwnership ne protège que l'érablière de la route : le baril est chargé par le
+        // serveur et doit lui appartenir, sinon l'id du corps viserait le baril d'un autre client.
+        var entity = await _depot.Barils.FirstOrDefaultAsync(b => b.Id == baril.Id && b.IdErabliere == id, token);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        _depot.Remove(entity);
 
         await _depot.SaveChangesAsync(token);
 

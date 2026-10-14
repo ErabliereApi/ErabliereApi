@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Delete;
 using ErabliereApi.Donnees.Action.Get;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
@@ -290,7 +291,7 @@ public class DonneesController : ControllerBase
     [ValiderIPRules]
     [ValiderOwnership("id")]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> Supprimer(Guid id, Guid idDonnee, Donnee donnee)
+    public async Task<IActionResult> Supprimer(Guid id, Guid idDonnee, DeleteDonnee donnee)
     {
         if (id != donnee.IdErabliere)
         {
