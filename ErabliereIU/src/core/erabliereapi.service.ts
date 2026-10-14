@@ -1,10 +1,11 @@
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthorisationFactoryService } from 'src/core/authorisation/authorisation-factory-service';
 import { IAuthorisationSerivce } from 'src/core/authorisation/iauthorisation-service';
 import { EnvironmentService } from 'src/environments/environment.service';
 import { Alerte } from 'src/model/alerte';
 import { AlerteCapteur } from 'src/model/alerteCapteur';
+import { EpisodeAlerteCapteur } from 'src/model/episodeAlerteCapteur';
 import { Baril } from 'src/model/baril';
 import { Capteur } from 'src/model/capteur';
 import { Conversation, ErabliereAICapabilities, Message, PostPrompt, PromptResponse, ToolActivity } from 'src/model/conversation';
@@ -143,6 +144,21 @@ export class ErabliereApi {
         const rtn = await firstValueFrom(this._httpClient.get<AlerteCapteur[]>(
             this._environmentService.apiUrl + '/erablieres/' + idErabliereSelectionnee + "/alertesCapteur?include=Capteur",
             { headers: headers }));
+        return rtn ?? [];
+    }
+
+    async getEpisodesAlerteCapteur(idCapteur: any, debut?: Date, fin?: Date): Promise<EpisodeAlerteCapteur[]> {
+        const headers = await this.getHeaders();
+        let params = new HttpParams();
+        if (debut) {
+            params = params.set('debut', debut.toISOString());
+        }
+        if (fin) {
+            params = params.set('fin', fin.toISOString());
+        }
+        const rtn = await firstValueFrom(this._httpClient.get<EpisodeAlerteCapteur[]>(
+            this._environmentService.apiUrl + '/Capteurs/' + idCapteur + '/EpisodesAlerte',
+            { headers: headers, params: params }));
         return rtn ?? [];
     }
 

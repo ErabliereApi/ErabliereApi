@@ -1033,6 +1033,48 @@ namespace Depot.Sql.Migrations
                     b.ToTable("Entailles");
                 });
 
+            modelBuilder.Entity("ErabliereApi.Donnees.EpisodeAlerteCapteur", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateDebut")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateFin")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("IdAlerteCapteur")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdCapteur")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NomAlerte")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("RaisonFin")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("ValeurDebut")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<decimal?>("ValeurFin")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdAlerteCapteur", "DateFin");
+
+                    b.HasIndex("IdCapteur", "DateDebut");
+
+                    b.ToTable("EpisodesAlerteCapteur");
+                });
+
             modelBuilder.Entity("ErabliereApi.Donnees.Erabliere", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2006,6 +2048,22 @@ namespace Depot.Sql.Migrations
                     b.Navigation("Erabliere");
 
                     b.Navigation("LigneTubelure");
+                });
+
+            modelBuilder.Entity("ErabliereApi.Donnees.EpisodeAlerteCapteur", b =>
+                {
+                    b.HasOne("ErabliereApi.Donnees.AlerteCapteur", "AlerteCapteur")
+                        .WithMany()
+                        .HasForeignKey("IdAlerteCapteur");
+
+                    b.HasOne("ErabliereApi.Donnees.Capteur", "Capteur")
+                        .WithMany()
+                        .HasForeignKey("IdCapteur")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("AlerteCapteur");
+
+                    b.Navigation("Capteur");
                 });
 
             modelBuilder.Entity("ErabliereApi.Donnees.Horaire", b =>

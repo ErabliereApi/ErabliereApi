@@ -34,6 +34,11 @@ namespace ErabliereApi.Depot.Sql
         public DbSet<AlerteCapteur> AlerteCapteurs { get; private set; }
 
         /// <summary>
+        /// Table des épisodes d'alerte des capteurs
+        /// </summary>
+        public DbSet<EpisodeAlerteCapteur> EpisodesAlerteCapteur { get; private set; }
+
+        /// <summary>
         /// Table des appareils
         /// </summary>
         public DbSet<Appareil> Appareils { get; private set; }
