@@ -62,6 +62,13 @@ public class PostAlerteCapteur
     public decimal? Marge { get; set; }
 
     /// <summary>
+    /// Minutes sans réception de donnée avant d'avertir que le capteur est muet (panne de courant
+    /// ou perte de réseau). Null : le silence n'est pas surveillé. Au plus 7 jours.
+    /// </summary>
+    [Range(1, 10080)]
+    public int? DelaiSilenceMinutes { get; set; }
+
+    /// <summary>
     /// Indique si l'alerte est activé
     /// </summary>
     public bool IsEnable { get; set; }

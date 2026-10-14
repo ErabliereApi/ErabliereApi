@@ -76,6 +76,9 @@ public class TriggerAlertV3Attribute : ActionFilterAttribute
                 }
 
                 // Pas le jeton de la requête : un client qui abandonne ne doit pas interrompre le changement d'état.
+                await context.HttpContext.RequestServices.GetRequiredService<SilenceCapteurService>()
+                    .SignalerReceptionAsync([_idCapteur], CancellationToken.None);
+
                 await alerteCapteurService.EvaluerAsync(
                     _idCapteur,
                     _donnee.V,

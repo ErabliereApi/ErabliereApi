@@ -94,6 +94,10 @@
           <einput [formGroup]="alerteCapteurForm" type="number" name="marge" arialabel="Marge de retour" symbole={{capteurSymbole()}} />
           <small class="form-text text-muted">L'alerte se termine seulement quand la valeur dépasse le seuil de cette marge. Évite une rafale de messages quand la valeur oscille autour du seuil.</small>
         </div>
+        <div class="form-group mb-2 col-md-6">
+          <einput [formGroup]="alerteCapteurForm" type="number" name="delaiSilence" arialabel="Délai de silence" symbole="min" />
+          <small class="form-text text-muted">L'alerte prévient quand le capteur n'a rien envoyé depuis ce nombre de minutes : panne de courant ou perte de réseau. Laisser vide pour ne pas surveiller le silence.</small>
+        </div>
       </div>
       <ebutton buttonId="creer-alerte-capteur-btn" type="primary" class="mt-2 me-2 mb-3"
         (clicked)="onButtonCreerAlerteCapteurClick()" [inProgress]="onButtonCreerAlerteCapteurClickInProgress">Créer</ebutton>

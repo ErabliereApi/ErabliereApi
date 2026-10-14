@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using StackExchange.Profiling;
@@ -266,13 +267,17 @@ public static class ServiceCollectionExtension
 
     /// <summary>
     /// Ajoute les services des alertes de capteur : le suivi de l'état des alertes, la file
-    /// d'attente des messages et le service d'arrière-plan qui les envoie.
+    /// d'attente des messages, le service d'arrière-plan qui les envoie et celui qui repère
+    /// les capteurs muets.
     /// </summary>
     public static IServiceCollection AddAlerteCapteurServices(this IServiceCollection services)
     {
+        services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<FileNotificationsAlerte>();
         services.AddScoped<AlerteCapteurService>();
+        services.AddScoped<SilenceCapteurService>();
         services.AddHostedService<EnvoiNotificationsAlerteService>();
+        services.AddHostedService<SurveillanceSilenceCapteursService>();
 
         return services;
     }

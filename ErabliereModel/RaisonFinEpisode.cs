@@ -29,5 +29,11 @@ public enum RaisonFinEpisode
     /// L'alerte a été supprimée pendant l'épisode.
     /// La fin n'a pas été mesurée : la date est celle de la suppression.
     /// </summary>
-    AlerteSupprimee = 3
+    AlerteSupprimee = 3,
+
+    /// <summary>
+    /// Le capteur muet a recommencé à envoyer des données. La date de fin est l'heure de réception
+    /// de la première donnée reçue, sans valeur.
+    /// </summary>
+    DonneesReprises = 4
 }

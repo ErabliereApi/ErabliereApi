@@ -9,6 +9,8 @@ export class AlerteCapteur {
   minValue?: number;
   maxValue?: number;
   marge?: number;
+  delaiSilenceMinutes?: number;
+  enSilenceDepuis?: string;
   estEnAlerte?: boolean;
   dateChangementEtat?: string;
   lastOccurence?: string;

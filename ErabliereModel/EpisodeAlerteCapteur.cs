@@ -71,6 +71,12 @@ public class EpisodeAlerteCapteur : IIdentifiable<Guid?, EpisodeAlerteCapteur>, 
     /// </summary>
     public RaisonFinEpisode? RaisonFin { get; set; }
 
+    /// <summary>
+    /// Ce que l'épisode mesure : une valeur hors des seuils, ou un capteur muet.
+    /// Un épisode de silence n'a pas de valeur, ses dates sont des heures de réception.
+    /// </summary>
+    public TypeEpisodeAlerte Type { get; set; }
+
     /// <inheritdoc />
     public Capteur? Owner { get => Capteur; set { Capteur = value; } }
 

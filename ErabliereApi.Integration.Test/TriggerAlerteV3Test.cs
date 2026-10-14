@@ -2,10 +2,12 @@ using AutoFixture;
 using ErabliereApi.Donnees;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Integration.Test.ApplicationFactory;
+using ErabliereApi.Depot.Sql;
 using ErabliereApi.Services;
 using ErabliereApi.Services.Notifications;
 using ErabliereApi.Test.Autofixture;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MimeKit;
 using NSubstitute;
@@ -206,6 +208,86 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
         Assert.Empty((await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{monCapteur}/AlerteCapteurs", _serializerOptions))!);
     }
 
+    [Fact]
+    public async Task UneDonneeDateeDuPasse_TermineLeSilence()
+    {
+        var client = CreateClient();
+
+        var id = await CreateErabiere(client);
+
+        var capteurId = await CréerCapteurEtAlerte(client, id, null, null, delaiSilenceMinutes: 3);
+
+        Assert.StartsWith("Capteur muet : ", Assert.Single(await RendreMuet(capteurId)));
+
+        // L'appareil renvoie en différé une donnée de l'avant-veille : c'est la réception qui compte.
+        var response = await client.PostAsJsonAsync($"Capteurs/{capteurId}/DonneesCapteurV2", new PostDonneeCapteurV2
+        {
+            IdCapteur = capteurId,
+            V = 1m,
+            D = DateTimeOffset.Now.AddDays(-2)
+        });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.StartsWith("Données reprises : ", Assert.Single(await LireSujetsEnvoyes()));
+        Assert.Contains(await LireEpisodes(client, $"Capteurs/{capteurId}/EpisodesAlerte"),
+            e => e.Type == TypeEpisodeAlerte.Silence && e.RaisonFin == RaisonFinEpisode.DonneesReprises);
+    }
+
+    [Fact]
+    public async Task UnLotTermineLeSilence()
+    {
+        var client = CreateClient();
+
+        var id = await CreateErabiere(client);
+
+        var capteurId = await CréerCapteurEtAlerte(client, id, null, null, delaiSilenceMinutes: 3);
+
+        Assert.Single(await RendreMuet(capteurId));
+
+        var response = await client.PostAsJsonAsync($"Erablieres/{id}/Capteurs/DonneesCapteurV2/PostMany", new[]
+        {
+            new PostDonneeCapteurV2 { IdCapteur = capteurId, V = 1m, D = DateTimeOffset.Now.AddHours(-3) },
+            new PostDonneeCapteurV2 { IdCapteur = capteurId, V = 1m, D = DateTimeOffset.Now.AddHours(-2) }
+        });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.StartsWith("Données reprises : ", Assert.Single(await LireSujetsEnvoyes()));
+    }
+
+    /// <summary>
+    /// Recule la dernière réception du capteur d'une heure et lance une vérification des capteurs
+    /// muets, sans attendre le service d'arrière-plan. Retourne les sujets des courriels envoyés.
+    /// </summary>
+    private async Task<string[]> RendreMuet(Guid capteurId)
+    {
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var depot = scope.ServiceProvider.GetRequiredService<ErabliereDbContext>();
+            var capteur = await depot.Capteurs.SingleAsync(c => c.Id == capteurId);
+            capteur.DateDerniereReception = DateTimeOffset.Now.AddHours(-1);
+            await depot.SaveChangesAsync();
+
+            await scope.ServiceProvider.GetRequiredService<SilenceCapteurService>().DetecterSilencesAsync(CancellationToken.None);
+        }
+
+        return await LireSujetsEnvoyes();
+    }
+
+    private async Task<string[]> LireSujetsEnvoyes()
+    {
+        await AttendreEnvois();
+
+        var emailService = _factory.Services.GetRequiredService<IEmailService>();
+
+        var sujets = emailService.ReceivedCalls()
+                                 .Select(c => ((MimeMessage)c.GetArguments()[0]!).Subject)
+                                 .ToArray();
+
+        emailService.ClearReceivedCalls();
+
+        return sujets;
+    }
+
     private async Task EnvoyerDonneeDatee(HttpClient client, Guid capteurId, decimal valeur, DateTimeOffset date)
     {
         var response = await client.PostAsJsonAsync($"Capteurs/{capteurId}/DonneesCapteurV2", new PostDonneeCapteurV2
@@ -254,17 +336,7 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        await AttendreEnvois();
-
-        var emailService = _factory.Services.GetRequiredService<IEmailService>();
-
-        var sujets = emailService.ReceivedCalls()
-                                 .Select(c => ((MimeMessage)c.GetArguments()[0]!).Subject)
-                                 .ToArray();
-
-        emailService.ClearReceivedCalls();
-
-        return sujets;
+        return await LireSujetsEnvoyes();
     }
 
     /// <summary>
@@ -282,7 +354,7 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
         Assert.Equal(0, file.EnAttente);
     }
 
-    private async Task<Guid> CréerCapteurEtAlerte(HttpClient client, Guid id, decimal? min, decimal? max)
+    private async Task<Guid> CréerCapteurEtAlerte(HttpClient client, Guid id, decimal? min, decimal? max, int? delaiSilenceMinutes = null)
     {
         var postCapteur = _fixture.Create<PostCapteur>();
         postCapteur.IdErabliere = id;
@@ -301,6 +373,7 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
             EnvoyerA = "test@test.com",
             MaxValue = max,
             MinValue = min,
+            DelaiSilenceMinutes = delaiSilenceMinutes,
             IsEnable = true,
             Nom = "Humidité sous-sol"
         };

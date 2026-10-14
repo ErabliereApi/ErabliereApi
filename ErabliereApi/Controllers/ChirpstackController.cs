@@ -27,6 +27,7 @@ public class ChirpstackController : ErabliereApiBaseController
     private readonly IConfiguration _config;
     private readonly ILogger<ChirpstackController> _logger;
     private readonly AlerteCapteurService _alerteCapteurService;
+    private readonly SilenceCapteurService _silenceCapteurService;
 
     /// <summary>
     /// Constructeur
@@ -36,18 +37,21 @@ public class ChirpstackController : ErabliereApiBaseController
     /// <param name="serviceProvider"></param>
     /// <param name="logger"></param>
     /// <param name="alerteCapteurService"></param>
+    /// <param name="silenceCapteurService"></param>
     public ChirpstackController(
         ErabliereDbContext context,
         IConfiguration config,
         IServiceProvider serviceProvider,
         ILogger<ChirpstackController> logger,
-        AlerteCapteurService alerteCapteurService)
+        AlerteCapteurService alerteCapteurService,
+        SilenceCapteurService silenceCapteurService)
          : base(serviceProvider, context, config)
     {
         _context = context;
         _config = config;
         _logger = logger;
         _alerteCapteurService = alerteCapteurService;
+        _silenceCapteurService = silenceCapteurService;
     }
 
     /// <summary>
@@ -281,6 +285,11 @@ public class ChirpstackController : ErabliereApiBaseController
 
     private async Task ExecuteAlerteFeatureAsync(List<DonneeCapteur> nouvellesDonnees)
     {
+        // Toute donnée reçue compte, même sans valeur : le capteur n'est plus muet.
+        await _silenceCapteurService.SignalerReceptionAsync(
+            nouvellesDonnees.Where(d => d.IdCapteur.HasValue).Select(d => d.IdCapteur!.Value),
+            CancellationToken.None);
+
         try
         {
             foreach (var donnee in nouvellesDonnees)

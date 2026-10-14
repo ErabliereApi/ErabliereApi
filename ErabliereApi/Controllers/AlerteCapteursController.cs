@@ -113,6 +113,7 @@ public class AlerteCapteursController : ControllerBase
             MinValue = alerte.MinValue,
             MaxValue = alerte.MaxValue,
             Marge = alerte.Marge,
+            DelaiSilenceMinutes = alerte.DelaiSilenceMinutes,
             IsEnable = alerte.IsEnable,
             DC = alerte.DC ?? DateTime.Now
         }, token);
@@ -149,12 +150,21 @@ public class AlerteCapteursController : ControllerBase
         if (alerteCapteur.IsEnable && !alerte.IsEnable)
         {
             await ReinitialiserEtatAsync(alerteCapteur, RaisonFinEpisode.AlerteDesactivee, token);
+            await ReinitialiserSilenceAsync(alerteCapteur, RaisonFinEpisode.AlerteDesactivee, token);
         }
-        else if (alerteCapteur.MinValue != alerte.MinValue ||
-                 alerteCapteur.MaxValue != alerte.MaxValue ||
-                 alerteCapteur.Marge != alerte.Marge)
+        else
         {
-            await ReinitialiserEtatAsync(alerteCapteur, RaisonFinEpisode.AlerteModifiee, token);
+            if (alerteCapteur.MinValue != alerte.MinValue ||
+                alerteCapteur.MaxValue != alerte.MaxValue ||
+                alerteCapteur.Marge != alerte.Marge)
+            {
+                await ReinitialiserEtatAsync(alerteCapteur, RaisonFinEpisode.AlerteModifiee, token);
+            }
+
+            if (alerteCapteur.DelaiSilenceMinutes != alerte.DelaiSilenceMinutes)
+            {
+                await ReinitialiserSilenceAsync(alerteCapteur, RaisonFinEpisode.AlerteModifiee, token);
+            }
         }
 
         alerteCapteur.IsEnable = alerte.IsEnable;
@@ -163,6 +173,7 @@ public class AlerteCapteursController : ControllerBase
         alerteCapteur.MaxValue = alerte.MaxValue;
         alerteCapteur.MinValue = alerte.MinValue;
         alerteCapteur.Marge = alerte.Marge;
+        alerteCapteur.DelaiSilenceMinutes = alerte.DelaiSilenceMinutes;
         alerteCapteur.Nom = alerte.Nom;
         alerteCapteur.DM = DateTimeOffset.UtcNow;
 
@@ -239,6 +250,7 @@ public class AlerteCapteursController : ControllerBase
         {
             entity.IsEnable = false;
             await ReinitialiserEtatAsync(entity, RaisonFinEpisode.AlerteDesactivee, token);
+            await ReinitialiserSilenceAsync(entity, RaisonFinEpisode.AlerteDesactivee, token);
 
             await _depot.SaveChangesAsync(token);
 
@@ -261,16 +273,33 @@ public class AlerteCapteursController : ControllerBase
         alerte.EstEnAlerte = false;
         alerte.DateChangementEtat = maintenant;
 
-        await FermerEpisodesSansMesureAsync(alerte.Id, maintenant, raison, token);
+        await FermerEpisodesSansMesureAsync(alerte.Id, TypeEpisodeAlerte.Seuil, maintenant, raison, token);
+    }
+
+    /// <summary>
+    /// Remet le silence de l'alerte à l'état normal sans envoyer de message. Si le capteur est
+    /// encore muet, la surveillance le signalera de nouveau selon le délai en vigueur.
+    /// L'épisode de silence en cours est fermé maintenant : sa fin n'a pas été observée.
+    /// </summary>
+    private async Task ReinitialiserSilenceAsync(AlerteCapteur alerte, RaisonFinEpisode raison, CancellationToken token)
+    {
+        if (alerte.EnSilenceDepuis == null)
+        {
+            return;
+        }
+
+        alerte.EnSilenceDepuis = null;
+
+        await FermerEpisodesSansMesureAsync(alerte.Id, TypeEpisodeAlerte.Silence, DateTimeOffset.Now, raison, token);
     }
 
     /// <summary>
     /// Ferme les épisodes en cours d'une alerte à une date qui n'est pas celle d'une donnée.
     /// </summary>
-    private async Task FermerEpisodesSansMesureAsync(Guid? idAlerte, DateTimeOffset date, RaisonFinEpisode raison, CancellationToken token)
+    private async Task FermerEpisodesSansMesureAsync(Guid? idAlerte, TypeEpisodeAlerte type, DateTimeOffset date, RaisonFinEpisode raison, CancellationToken token)
     {
         var episodes = await _depot.EpisodesAlerteCapteur
-            .Where(e => e.IdAlerteCapteur == idAlerte && e.DateFin == null)
+            .Where(e => e.IdAlerteCapteur == idAlerte && e.Type == type && e.DateFin == null)
             .ToArrayAsync(token);
 
         foreach (var episode in episodes)

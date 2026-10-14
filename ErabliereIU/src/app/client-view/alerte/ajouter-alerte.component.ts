@@ -82,6 +82,7 @@ export class AjouterAlerteComponent implements OnInit {
             min: '',
             max: '',
             marge: '',
+            delaiSilence: '',
             idCapteur: ''
         });
     }
@@ -184,6 +185,11 @@ export class AjouterAlerteComponent implements OnInit {
             this.alerteCapteur.marge = undefined;
         } else {
             this.alerteCapteur.marge = Number.parseFloat(this.alerteCapteurForm.controls['marge'].value);
+        }
+        if (this.alerteCapteurForm.controls['delaiSilence'].value == "") {
+            this.alerteCapteur.delaiSilenceMinutes = undefined;
+        } else {
+            this.alerteCapteur.delaiSilenceMinutes = Number.parseInt(this.alerteCapteurForm.controls['delaiSilence'].value);
         }
         this.onButtonCreerAlerteCapteurClickInProgress = true;
         this._api.postAlerteCapteur(this.alerteCapteur.idCapteur, this.alerteCapteur)

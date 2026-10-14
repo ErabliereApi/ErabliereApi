@@ -148,6 +148,13 @@ namespace Depot.Sql.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("DelaiSilenceMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("EnSilenceDepuis")
+                        .IsConcurrencyToken()
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("EnvoyerA")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -458,6 +465,9 @@ namespace Depot.Sql.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("DM")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateDerniereReception")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<double?>("DisplayMax")
@@ -1056,6 +1066,9 @@ namespace Depot.Sql.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("RaisonFin")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("ValeurDebut")

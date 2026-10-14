@@ -62,6 +62,9 @@
                             Marge de retour
                         </th>
                         <th>
+                            Délai de silence
+                        </th>
+                        <th>
                             Capteur
                         </th>
                         <th></th>
@@ -89,6 +92,11 @@
                                 <span class="badge text-bg-danger">En alerte depuis {{formatDate(alerte.lastOccurence)}}</span>
                             </div>
                             }
+                            @if (alerte.isEnable && alerte.enSilenceDepuis) {
+                            <div>
+                                <span class="badge text-bg-warning">Muet depuis {{formatDate(alerte.enSilenceDepuis)}}</span>
+                            </div>
+                            }
                         </td>
                         <td>
                             <alerte-destinataires [destinataires]="alerte.envoyerA ?? ''">
@@ -106,6 +114,11 @@
                         </td>
                         <td>
                             {{formatNumber(alerte.marge, alerte.capteur?.symbole, true)}}
+                        </td>
+                        <td>
+                            @if (alerte.delaiSilenceMinutes) {
+                            {{alerte.delaiSilenceMinutes}} min
+                            }
                         </td>
                         <td>
                             {{alerte.capteur?.nom}}
