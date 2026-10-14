@@ -173,6 +173,39 @@ public class TriggerAlerteV3Test : IClassFixture<ErabliereApiApplicationFactory<
         Assert.Empty(await LireEpisodes(client, $"Capteurs/{capteurId}/EpisodesAlerte?debut={Uri.EscapeDataString(debut.AddDays(1).ToString("O"))}"));
     }
 
+    [Fact]
+    public async Task SupprimerAvecUnCorps_NeSupprimeQueLesAlertesDuCapteurDeLaRoute()
+    {
+        var client = CreateClient();
+
+        var id = await CreateErabiere(client);
+
+        var monCapteur = await CréerCapteurEtAlerte(client, id, 0m, null);
+        var autreCapteur = await CréerCapteurEtAlerte(client, id, 0m, null);
+
+        var alertes = await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{autreCapteur}/AlerteCapteurs", _serializerOptions);
+        var alerteAutre = Assert.Single(alertes!);
+
+        // Le corps complet, comme l'envoie le proxy, mais avec l'alerte d'un autre capteur
+        alerteAutre.IdCapteur = monCapteur;
+        var refuse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"Capteurs/{monCapteur}/AlerteCapteurs")
+        {
+            Content = JsonContent.Create(alerteAutre, options: _serializerOptions)
+        });
+
+        Assert.Equal(HttpStatusCode.NotFound, refuse.StatusCode);
+        Assert.Single((await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{autreCapteur}/AlerteCapteurs", _serializerOptions))!);
+
+        var mienne = Assert.Single((await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{monCapteur}/AlerteCapteurs", _serializerOptions))!);
+        var accepte = await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"Capteurs/{monCapteur}/AlerteCapteurs")
+        {
+            Content = JsonContent.Create(mienne, options: _serializerOptions)
+        });
+
+        Assert.Equal(HttpStatusCode.NoContent, accepte.StatusCode);
+        Assert.Empty((await client.GetFromJsonAsync<AlerteCapteur[]>($"Capteurs/{monCapteur}/AlerteCapteurs", _serializerOptions))!);
+    }
+
     private async Task EnvoyerDonneeDatee(HttpClient client, Guid capteurId, decimal valeur, DateTimeOffset date)
     {
         var response = await client.PostAsJsonAsync($"Capteurs/{capteurId}/DonneesCapteurV2", new PostDonneeCapteurV2

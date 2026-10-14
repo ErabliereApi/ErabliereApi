@@ -1,6 +1,7 @@
 ﻿using ErabliereApi.Attributes;
 using ErabliereApi.Depot.Sql;
 using ErabliereApi.Donnees;
+using ErabliereApi.Donnees.Action.Delete;
 using ErabliereApi.Donnees.Action.Post;
 using ErabliereApi.Donnees.Action.Put;
 using Microsoft.AspNetCore.Authorization;
@@ -313,18 +314,28 @@ public class AlerteCapteursController : ControllerBase
     /// <param name="token">Jeton d'annulation de la tâche</param>
     /// <response code="204">L'alerte a été correctement supprimé.</response>
     /// <response code="400">L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.</response>
+    /// <response code="404">L'alerte n'existe pas sur ce capteur.</response>
     [HttpDelete]
     [ValiderOwnership("id", typeof(Capteur))]
-    public async Task<IActionResult> Supprimer(Guid id, AlerteCapteur alerte, CancellationToken token)
+    public async Task<IActionResult> Supprimer(Guid id, DeleteAlerteCapteur alerte, CancellationToken token)
     {
         if (id != alerte.IdCapteur)
         {
             return BadRequest("L'id de la route ne concorde pas avec l'id de l'alerte à supprimer.");
         }
 
-        await DetacherEpisodesAsync(alerte.Id, token);
+        // ValiderOwnership ne protège que le capteur de la route : l'alerte est chargée par le
+        // serveur et doit lui appartenir, sinon l'id du corps viserait l'alerte d'un autre client.
+        var entity = await _depot.AlerteCapteurs.FirstOrDefaultAsync(a => a.Id == alerte.Id && a.IdCapteur == id, token);
 
-        _depot.Remove(alerte);
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        await DetacherEpisodesAsync(entity.Id, token);
+
+        _depot.Remove(entity);
 
         await _depot.SaveChangesAsync(token);
 
