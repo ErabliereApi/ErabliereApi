@@ -45,11 +45,39 @@ public class AlerteCapteurService
 
         foreach (var alerte in alertes)
         {
-            var transition = AlerteCapteurTransition.Evaluer(alerte, valeur, date);
+            var (transition, debut) = await AppliquerTransitionAsync(alerte, valeur, date, token);
 
             if (transition == TypeTransitionAlerte.Aucune)
             {
                 continue;
+            }
+
+            // Après le changement d'état, pas avec lui : seule la requête qui a gagné la course
+            // touche à l'épisode, même avec un fournisseur sans transaction (InMemory).
+            await EnregistrerEpisodeAsync(alerte, transition, valeur, date, debut, token);
+
+            _logger.LogInformation("Alerte {AlerteId} {AlerteNom} : {Transition} à {Date}", alerte.Id, alerte.Nom, transition, date);
+
+            _file.Ajouter(AlerteCapteurMessage.Creer(alerte, transition, valeur, date, debut));
+        }
+    }
+
+    /// <summary>
+    /// Enregistre le changement d'état causé par la donnée, s'il y en a un. En cas de conflit,
+    /// l'alerte est relue et la donnée réévaluée : une autre requête a pu appliquer le même
+    /// changement (il n'y a alors plus rien à faire), ou seulement modifier le silence de l'alerte,
+    /// qui partage la ligne (le changement d'état doit alors être appliqué quand même).
+    /// </summary>
+    private async Task<(TypeTransitionAlerte transition, DateTimeOffset? debut)> AppliquerTransitionAsync(
+        AlerteCapteur alerte, decimal valeur, DateTimeOffset date, CancellationToken token)
+    {
+        for (var essai = 1; ; essai++)
+        {
+            var transition = AlerteCapteurTransition.Evaluer(alerte, valeur, date);
+
+            if (transition == TypeTransitionAlerte.Aucune)
+            {
+                return (transition, null);
             }
 
             var debut = alerte.LastOccurence;
@@ -65,26 +93,33 @@ public class AlerteCapteurService
             try
             {
                 await _depot.SaveChangesAsync(token);
+
+                return (transition, debut);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException) when (essai < NombreEssais)
             {
-                // Une autre requête a changé l'état entre-temps et a déposé son message.
-                _logger.LogInformation("Alerte {AlerteId} : changement d'état déjà appliqué par une autre requête", alerte.Id);
+                _logger.LogInformation("Alerte {AlerteId} : modifiée par une autre requête, la donnée est réévaluée", alerte.Id);
 
                 await _depot.Entry(alerte).ReloadAsync(token);
 
-                continue;
+                if (_depot.Entry(alerte).State == EntityState.Detached || !alerte.IsEnable)
+                {
+                    // Alerte supprimée ou désactivée entre-temps.
+                    return (TypeTransitionAlerte.Aucune, null);
+                }
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                _logger.LogWarning("Alerte {AlerteId} : changement d'état abandonné après {Essais} conflits", alerte.Id, essai);
 
-            // Après le changement d'état, pas avec lui : seule la requête qui a gagné la course
-            // touche à l'épisode, même avec un fournisseur sans transaction (InMemory).
-            await EnregistrerEpisodeAsync(alerte, transition, valeur, date, debut, token);
+                await _depot.Entry(alerte).ReloadAsync(token);
 
-            _logger.LogInformation("Alerte {AlerteId} {AlerteNom} : {Transition} à {Date}", alerte.Id, alerte.Nom, transition, date);
-
-            _file.Ajouter(AlerteCapteurMessage.Creer(alerte, transition, valeur, date, debut));
+                return (TypeTransitionAlerte.Aucune, null);
+            }
         }
     }
+
+    private const int NombreEssais = 3;
 
     private async Task EnregistrerEpisodeAsync(AlerteCapteur alerte, TypeTransitionAlerte transition, decimal valeur, DateTimeOffset date, DateTimeOffset? debut, CancellationToken token)
     {
@@ -134,7 +169,7 @@ public class AlerteCapteurService
     private async Task FermerEpisodesAsync(AlerteCapteur alerte, decimal valeur, DateTimeOffset date, DateTimeOffset? debut, CancellationToken token)
     {
         var episodes = await _depot.EpisodesAlerteCapteur
-            .Where(e => e.IdAlerteCapteur == alerte.Id && e.DateFin == null)
+            .Where(e => e.IdAlerteCapteur == alerte.Id && e.Type == TypeEpisodeAlerte.Seuil && e.DateFin == null)
             .ToArrayAsync(token);
 
         if (episodes.Length == 0)

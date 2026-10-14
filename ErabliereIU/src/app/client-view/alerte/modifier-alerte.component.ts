@@ -34,7 +34,8 @@ export class ModifierAlerteComponent implements OnInit {
             destinataireSMS: '',
             min: '',
             max: '',
-            marge: ''
+            marge: '',
+            delaiSilence: ''
         });
     }
     
@@ -64,7 +65,8 @@ export class ModifierAlerteComponent implements OnInit {
                 destinataireSMS: alerteCapteur.texterA,
                 min: alerteCapteur.minValue,
                 max: alerteCapteur.maxValue,
-                marge: alerteCapteur.marge ?? null
+                marge: alerteCapteur.marge ?? null,
+                delaiSilence: alerteCapteur.delaiSilenceMinutes ?? null
             });
         }
     }
@@ -144,6 +146,12 @@ export class ModifierAlerteComponent implements OnInit {
             alerte.marge = parseFloat(margeInForm.toString());
         } else {
             alerte.marge = undefined;
+        }
+        let delaiSilenceInForm = this.alerteCapteurForm.controls['delaiSilence'].value;
+        if (delaiSilenceInForm != null && delaiSilenceInForm !== "") {
+            alerte.delaiSilenceMinutes = parseInt(delaiSilenceInForm.toString());
+        } else {
+            alerte.delaiSilenceMinutes = undefined;
         }
         this._api.putAlerteCapteur(alerte.idCapteur, alerte)
                  .then(r => {

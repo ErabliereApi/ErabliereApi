@@ -18,5 +18,9 @@ public class AlerteCapteurEntityConfiguration : IEntityTypeConfiguration<AlerteC
         // Deux requêtes simultanées ne peuvent pas appliquer le même changement d'état :
         // la seconde échoue et n'envoie pas de message.
         builder.Property(e => e.DateChangementEtat).IsConcurrencyToken();
+
+        // Même garde pour le silence : chaque instance de l'API surveille les capteurs muets,
+        // seule celle qui enregistre le début (ou la fin) du silence envoie le message.
+        builder.Property(e => e.EnSilenceDepuis).IsConcurrencyToken();
     }
 }

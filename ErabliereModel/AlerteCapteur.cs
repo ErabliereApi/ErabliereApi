@@ -96,6 +96,18 @@ public class AlerteCapteur : IIdentifiable<Guid?, AlerteCapteur>, ILevelTwoOwnab
     /// </summary>
     public DateTimeOffset? LastOccurence { get; set; }
 
+    /// <summary>
+    /// Nombre de minutes sans réception de donnée après lequel le capteur est considéré muet,
+    /// par exemple parce que le courant ou le réseau est tombé. Null : le silence n'est pas surveillé.
+    /// </summary>
+    public int? DelaiSilenceMinutes { get; set; }
+
+    /// <summary>
+    /// Heure de la dernière réception avant le silence en cours. Null si le capteur n'est pas muet.
+    /// Indépendant de <see cref="EstEnAlerte"/>, qui porte l'état des seuils. Géré par le serveur.
+    /// </summary>
+    public DateTimeOffset? EnSilenceDepuis { get; set; }
+
     /// <inheritdoc />
     public Capteur? Owner { get => Capteur; set { Capteur = value; } }
 

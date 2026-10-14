@@ -40,6 +40,7 @@ type Periode = '30j' | '12m' | 'tout';
                         <th>Fin</th>
                         <th>Durée</th>
                         <th>Alerte</th>
+                        <th>Type</th>
                         <th>Valeur au début</th>
                         <th>Valeur à la fin</th>
                     </tr>
@@ -51,7 +52,7 @@ type Periode = '30j' | '12m' | 'tout';
                         <td>
                             @if (episode.dateFin) {
                             {{formaterDate(episode.dateFin)}}
-                            @if (episode.raisonFin && episode.raisonFin !== 'RetourNormale') {
+                            @if (episode.raisonFin && episode.raisonFin !== 'RetourNormale' && episode.raisonFin !== 'DonneesReprises') {
                             <div><small class="text-body-secondary">Fin non mesurée : {{libelleRaison(episode.raisonFin)}}</small></div>
                             }
                             } @else {
@@ -65,6 +66,7 @@ type Periode = '30j' | '12m' | 'tout';
                             {{formaterDuree(episode)}}
                         </td>
                         <td>{{episode.nomAlerte}}</td>
+                        <td>{{episode.type === 'Silence' ? 'Capteur muet' : 'Hors seuil'}}</td>
                         <td>{{formaterValeur(episode.valeurDebut)}}</td>
                         <td>{{formaterValeur(episode.valeurFin)}}</td>
                     </tr>

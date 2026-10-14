@@ -90,6 +90,13 @@ public class Capteur : IIdentifiable<Guid?, Capteur>, IErabliereOwnable, ILocali
     public DateTimeOffset? LastMessageTime { get; set; }
 
     /// <summary>
+    /// Heure du serveur à la réception de la dernière donnée, quelle que soit la date de la donnée.
+    /// Sert à détecter un capteur muet (voir <see cref="AlerteCapteur.DelaiSilenceMinutes"/>).
+    /// Géré par le serveur.
+    /// </summary>
+    public DateTimeOffset? DateDerniereReception { get; set; }
+
+    /// <summary>
     /// Indique si le capteur est en ligne
     /// </summary>
     public bool? Online { get; set; }
