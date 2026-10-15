@@ -25,6 +25,7 @@ public class ApiKeyMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         bool authorizeRequest = true;
+        string reason = "Something is wrong with the token";
 
         if (context.Request.Headers.TryGetValue(XApiKeyHeader, out var apiKey))
         {
@@ -64,7 +65,14 @@ public class ApiKeyMiddleware : IMiddleware
                     logger.LogInformation("Skipping last usage update to reduce db load. apiKeyEntity.LastUsage was {LastUsage}", apiKeyEntity.LastUsage);
                 }
 
-                await AuthorizeRequestAsync(context, dbContext, apiKeyEntity);
+                if (!await AuthorizeRequestAsync(context, dbContext, apiKeyEntity))
+                {
+                    // Une clé restreinte hors de ses routes ou de ses verbes est refusée ici, et non
+                    // plus loin par [Authorize] : sur une action [AllowAnonymous], ou quand
+                    // l'authentification est désactivée, elle agirait sinon au nom de son client.
+                    authorizeRequest = false;
+                    reason = "The api key is not authorized for this route or verb";
+                }
             }
             else
             {
@@ -79,20 +87,27 @@ public class ApiKeyMiddleware : IMiddleware
         else
         {
             context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            context.Response.Headers.Append("X-ErabliereApi-ApiKey-Reason", "Something is wrong with the token");
+            context.Response.Headers.Append("X-ErabliereApi-ApiKey-Reason", reason);
         }
     }
 
-    private static async Task AuthorizeRequestAsync(HttpContext context, ErabliereDbContext dbContext, ApiKey apiKeyEntity)
+    private static async Task<bool> AuthorizeRequestAsync(HttpContext context, ErabliereDbContext dbContext, ApiKey apiKeyEntity)
     {
         var apiKeyAuthContext = context.RequestServices.GetRequiredService<ApiKeyAuthorizationContext>();
 
         var authorizeVerb = apiKeyEntity.AuthorizeVerbs == null || apiKeyEntity.AuthorizeVerbs.Contains(context.Request.Method, StringComparison.InvariantCultureIgnoreCase);
         var authorizeUri = apiKeyEntity.AuthorizeUris == null || VerifyUris(apiKeyEntity.AuthorizeUris, context.Request.Path);
 
-        apiKeyAuthContext.Authorize = authorizeVerb && authorizeUri;
+        if (!(authorizeVerb && authorizeUri))
+        {
+            return false;
+        }
+
+        apiKeyAuthContext.Authorize = true;
         apiKeyAuthContext.Customer = await dbContext.Customers.FindAsync([apiKeyEntity.CustomerId], cancellationToken: context.RequestAborted);
         apiKeyAuthContext.ApiKey = apiKeyEntity;
+
+        return true;
     }
 
     private static bool VerifyUris(string authorizeUris, PathString path)

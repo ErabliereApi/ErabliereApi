@@ -5,19 +5,20 @@ import { Appareil } from "src/model/appareil";
 import { CopyTextButtonComponent } from "src/generic/copy-text-button.component";
 import { EButtonComponent } from "src/generic/ebutton.component";
 import { DatePipe } from "@angular/common";
+import { KitsPanneComponent } from "./kits-panne.component";
 
 @Component({
     selector: 'appareils',
     changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './appareils.component.html',
-    imports: [CopyTextButtonComponent, EButtonComponent, DatePipe]
+    imports: [CopyTextButtonComponent, EButtonComponent, DatePipe, KitsPanneComponent]
 })
 export class AppareilsComponent implements OnInit {
     appareils?: Appareil[];
     loadingInProgress = false;
     loadingNmapResultInProgress = false;
     deleteAppareilInProgress = false;
-    private erabliereId: any;
+    erabliereId: any;
 
     constructor(private readonly api: ErabliereApi, private readonly route: ActivatedRoute) {
 
