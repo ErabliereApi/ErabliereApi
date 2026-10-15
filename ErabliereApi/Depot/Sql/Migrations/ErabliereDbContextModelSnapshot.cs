@@ -1282,6 +1282,53 @@ namespace Depot.Sql.Migrations
                     b.ToTable("InspectionDonnees");
                 });
 
+            modelBuilder.Entity("ErabliereApi.Donnees.Kit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DC")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DM")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateRevocation")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("IdApiKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdCapteurAlimentation")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdCapteurAutonomie")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdCapteurCharge")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IdErabliere")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Nom")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdApiKey");
+
+                    b.HasIndex("IdErabliere");
+
+                    b.ToTable("Kits");
+                });
+
             modelBuilder.Entity("ErabliereApi.Donnees.LigneTubelure", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2104,6 +2151,17 @@ namespace Depot.Sql.Migrations
                         .HasForeignKey("OwnerId");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("ErabliereApi.Donnees.Kit", b =>
+                {
+                    b.HasOne("ErabliereApi.Donnees.Erabliere", "Erabliere")
+                        .WithMany()
+                        .HasForeignKey("IdErabliere")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Erabliere");
                 });
 
             modelBuilder.Entity("ErabliereApi.Donnees.LigneTubelure", b =>

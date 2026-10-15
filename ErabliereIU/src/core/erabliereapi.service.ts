@@ -33,6 +33,7 @@ import { PutRapport, Rapport } from 'src/model/rapport';
 import { PostImageGenerationResponse } from 'src/model/postImageGenerationResponse';
 import { Horaire } from 'src/model/horaire';
 import { Appareil } from 'src/model/appareil';
+import { Kit, PostKitPanne, PostKitPanneResponse } from 'src/model/kit';
 import { IpInfo } from 'src/model/ipinfo';
 import { WeatherProviderResponse } from 'src/model/weatherProviderResponse';
 import { ChirpstackSrvConfig } from 'src/model/chripstacksrvconfig';
@@ -927,6 +928,24 @@ export class ErabliereApi {
     async supprimerTousLesAppareils(erabliereId: any) {
         const headers = await this.getHeaders();
         return firstValueFrom(this._httpClient.delete(this._environmentService.apiUrl + '/erablieres/' + erabliereId + '/appareil', { headers: headers }));
+    }
+
+    async getKits(erabliereId: any): Promise<Kit[]> {
+        const headers = await this.getHeaders();
+        const rtn = await firstValueFrom(this._httpClient.get<Kit[]>(this._environmentService.apiUrl + '/Erablieres/' + erabliereId + '/Kits', { headers: headers }));
+        return rtn ?? [];
+    }
+
+    async postKitPanne(erabliereId: any, kit: PostKitPanne): Promise<PostKitPanneResponse> {
+        const headers = await this.getHeaders();
+        // Le kit appelle l'api à la même adresse que l'application, apiUrl est vide quand elles partagent l'origine
+        kit.url = this._environmentService.apiUrl || window.location.origin;
+        return firstValueFrom(this._httpClient.post<PostKitPanneResponse>(this._environmentService.apiUrl + '/Erablieres/' + erabliereId + '/Kits/Panne', kit, { headers: headers }));
+    }
+
+    async revoquerKit(erabliereId: any, idKit: any): Promise<void> {
+        const headers = await this.getHeaders();
+        await firstValueFrom(this._httpClient.delete<void>(this._environmentService.apiUrl + '/Erablieres/' + erabliereId + '/Kits/' + idKit, { headers: headers }));
     }
 
     async importerScanNmap(erabliereId: any, file: File) {

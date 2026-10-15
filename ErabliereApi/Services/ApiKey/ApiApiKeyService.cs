@@ -52,17 +52,7 @@ public class ApiApiKeyService : IApiKeyService
             throw new InvalidOperationException("customer is supposed to have Id");
         }
 
-        var apiKeyBytes = Guid.NewGuid().ToByteArray();
-
-        var apiKeyObj = new ApiKey
-        {
-            Key = HashApiKey(apiKeyBytes),
-            CustomerId = param.Customer.Id.Value,
-            CreationTime = DateTimeOffset.Now,
-            Name = param.Name ?? ""
-        };
-
-        var originalKey = Convert.ToBase64String(apiKeyBytes);
+        var (apiKeyObj, originalKey) = PreparerApiKey(param.Customer.Id.Value, param.Name);
 
         using (var scope = _scopeFactory.CreateScope())
         {
@@ -76,6 +66,22 @@ public class ApiApiKeyService : IApiKeyService
         await SendEmailAsync(param.Customer.Email, originalKey, token);
 
         return (apiKeyObj, originalKey);
+    }
+
+    /// <inheritdoc />
+    public (ApiKey, string) PreparerApiKey(Guid customerId, string? name)
+    {
+        var apiKeyBytes = Guid.NewGuid().ToByteArray();
+
+        var apiKeyObj = new ApiKey
+        {
+            Key = HashApiKey(apiKeyBytes),
+            CustomerId = customerId,
+            CreationTime = DateTimeOffset.Now,
+            Name = name ?? ""
+        };
+
+        return (apiKeyObj, Convert.ToBase64String(apiKeyBytes));
     }
 
     private async Task SendEmailAsync(string email, string originalKey, CancellationToken token)

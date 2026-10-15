@@ -576,6 +576,11 @@ public class ErablieresController : ErabliereApiBaseController
 
             _context.CustomerErablieres.RemoveRange(customerErabliere);
 
+            // Les kits disparaissent en cascade, leurs clés d'API ne doivent pas leur survivre
+            var kits = await _context.Kits.Where(k => k.IdErabliere == id).ToArrayAsync(token);
+
+            await KitsController.RevoquerClesAsync(_context, kits, DateTimeOffset.Now, token);
+
             _context.Remove(entity);
 
             await _context.SaveChangesAsync(token);

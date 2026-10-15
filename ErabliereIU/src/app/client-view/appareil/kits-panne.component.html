@@ -1,0 +1,102 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Kits de détection de panne de courant</h5>
+        <p class="card-text">
+            Un Raspberry Pi avec une batterie de secours qui envoie l'alimentation secteur, la charge et
+            l'autonomie avec le script <code>monitorUpsV2.py</code>. L'ajout d'un kit crée ses trois capteurs,
+            une alerte de panne, une alerte de silence et une clé d'API qui ne peut qu'envoyer des données
+            à ces trois capteurs.
+        </p>
+
+        @if (!configuration) {
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="kitNom" class="form-label">Nom</label>
+                <input id="kitNom" class="form-control form-control-sm" maxlength="30" [(ngModel)]="nouveauKit.nom">
+            </div>
+            <div class="col-md-4">
+                <label for="kitDelai" class="form-label">Délai de silence (minutes)</label>
+                <input id="kitDelai" type="number" min="1" max="10080" class="form-control form-control-sm"
+                    [(ngModel)]="nouveauKit.delaiSilenceMinutes">
+            </div>
+            <div class="col-md-4">
+                <ebutton type="primary" size="sm" (clicked)="ajouterKit()" [inProgress]="ajoutEnCours">
+                    Ajouter un kit panne
+                </ebutton>
+            </div>
+        </div>
+        <p class="form-text mb-0">
+            Pendant une panne, le routeur tombe souvent avec le courant : c'est l'alerte de silence qui avertit.
+            Elle se déclenche aussi si le kit n'a rien envoyé dans ce délai après sa création.
+        </p>
+        }
+
+        @if (erreur) {
+        <div class="alert alert-danger mt-2 mb-0">{{ erreur }}</div>
+        }
+
+        @if (configuration) {
+        <div class="alert alert-warning mt-2">
+            Copiez la configuration maintenant : la clé d'API ne sera plus jamais affichée.
+            Si vous la perdez, révoquez le kit et ajoutez-en un nouveau.
+        </div>
+        <p class="mb-1">
+            Sur le kit, collez cette commande dans un terminal. Elle écrit
+            <code>~/.erabliereapi/{{ configuration.nomFichierConfiguration }}</code> et
+            <code>~/.erabliereapi/{{ configuration.nomFichierAuthentification }}</code>.
+        </p>
+        <div class="d-flex gap-2 align-items-start">
+            <pre class="bg-body-tertiary border rounded p-2 mb-2 flex-grow-1"><code>{{ commandeInstallation }}</code></pre>
+            <copy-id-button [text]="commandeInstallation" title="Copier la commande"></copy-id-button>
+        </div>
+        <p class="mb-2">
+            Installez ensuite NUT, upsmon et la crontab comme décrit dans la section <code>monitorUpsV2.py</code>
+            du <a href="https://github.com/ErabliereApi/ErabliereApi/blob/master/PythonScripts/Readme.md#monitorupsv2py"
+                target="_blank" rel="noopener">Readme des scripts</a>.
+        </p>
+        <ebutton type="outline-secondary" size="sm" (clicked)="fermerConfiguration()">
+            J'ai copié la configuration
+        </ebutton>
+        }
+    </div>
+</div>
+
+@if (kits.length > 0) {
+<div class="table-responsive mb-3">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Kit</th>
+                <th>Ajouté le</th>
+                <th>Dernière utilisation</th>
+                <th>Statut</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (kit of kits; track kit.id) {
+            <tr>
+                <td>{{ kit.nom }}</td>
+                <td>{{ kit.dc | date:'short' }}</td>
+                <td>{{ kit.derniereUtilisation ? (kit.derniereUtilisation | date:'short') : 'Jamais' }}</td>
+                <td>
+                    @if (kit.dateRevocation) {
+                    <span class="badge text-bg-secondary">Révoqué le {{ kit.dateRevocation | date:'short' }}</span>
+                    } @else {
+                    <span class="badge text-bg-success">Actif</span>
+                    }
+                </td>
+                <td>
+                    @if (!kit.dateRevocation) {
+                    <ebutton type="outline-warning" size="sm" (clicked)="revoquerKit(kit)"
+                        [inProgress]="revocationEnCours === kit.id">
+                        Révoquer
+                    </ebutton>
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}

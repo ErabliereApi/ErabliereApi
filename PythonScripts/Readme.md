@@ -134,6 +134,10 @@ Même mesures que `monitorUps.py`, avec en plus :
 
 Installer et configurer NUT comme pour `monitorUps.py`, puis créer `~/.erabliereapi/monitorUps.json`. `capteurAutonomie` est optionnel.
 
+Le plus simple : dans l'application, page **Appareils** de l'érablière, bouton **Ajouter un kit panne**. L'API crée les trois capteurs, l'alerte de panne (alimentation à 0), l'alerte de silence sur la charge et une clé d'API qui ne peut que faire des `POST` de données vers ces trois capteurs. La page affiche une seule fois une commande à coller sur le kit, qui écrit `monitorUps.json` (avec `"authType": "ApiKey"`) et `auth.<hôte>.config`. Révoquer le kit depuis la même page coupe sa clé ; les capteurs et leur historique restent.
+
+Pour une configuration manuelle :
+
 ```json
 {
     "ups": "ups@localhost",

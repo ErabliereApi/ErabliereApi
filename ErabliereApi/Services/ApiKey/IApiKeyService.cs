@@ -32,6 +32,15 @@ public interface IApiKeyService
     Task<(ApiKey, string)> CreateApiKeyAsync(CreateApiKeyParameters param, CancellationToken token);
 
     /// <summary>
+    /// Préparer une clé d'api sans l'enregistrer ni l'envoyer par courriel. L'appelant ajoute
+    /// la clé à son propre contexte, dans la même transaction que les entités qui l'utilisent.
+    /// </summary>
+    /// <param name="customerId">L'id de l'utilisateur au nom duquel la clé agit</param>
+    /// <param name="name">Le nom de la clé</param>
+    /// <returns>La clé avec son hachage, et la clé originale à remettre une seule fois</returns>
+    (ApiKey, string) PreparerApiKey(Guid customerId, string? name);
+
+    /// <summary>
     /// Hash an api key from a string
     /// </summary>
     /// <param name="key"></param>

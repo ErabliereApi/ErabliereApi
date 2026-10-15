@@ -178,6 +178,11 @@ namespace ErabliereApi.Depot.Sql
         /// </summary>
         public DbSet<Abonnement> Abonnements { get; private set; }
 
+        /// <summary>
+        /// Table des kits matériels rattachés aux érablières
+        /// </summary>
+        public DbSet<Kit> Kits { get; private set; }
+
 #pragma warning restore S1144 // Unused private types or members should be removed
 
         /// <inheritdoc />
