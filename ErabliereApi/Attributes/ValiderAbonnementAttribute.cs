@@ -42,46 +42,66 @@ public class ValiderAbonnementAttribute : ActionFilterAttribute
     /// </summary>
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var config = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-
-        if (!string.Equals(config["Abonnement.ValiderPlan"], "true", StringComparison.OrdinalIgnoreCase))
-        {
-            await base.OnActionExecutionAsync(context, next);
-            return;
-        }
-
-        if (await PossedeAbonnementPermisAsync(context))
+        if (await EstPermisAsync(context.HttpContext, _plansPermis))
         {
             await base.OnActionExecutionAsync(context, next);
         }
         else
         {
-            var forbidenReasonMessage = $"Un abonnement actif d'un des forfaits suivants est requis : {string.Join(", ", _plansPermis)}";
-            context.HttpContext.Response.Headers["X-ErabliereApi-ForbidenReason"] = forbidenReasonMessage;
             context.Result = new ForbidResult();
-
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValiderAbonnementAttribute>>();
-            using var scope = context.HttpContext.RequestServices.CreateScope();
-            logger.LogWarning("Access denied on {Path} : user {User} has no active subscription in plans [{Plans}]",
-                context.HttpContext.Request.Path.ToString().Sanatize(),
-                UsersUtils.GetUniqueName(scope, context.HttpContext.User),
-                string.Join(", ", _plansPermis));
         }
     }
 
-    private async Task<bool> PossedeAbonnementPermisAsync(ActionExecutingContext context)
+    /// <summary>
+    /// Vérifie que l'utilisateur de la requête possède un abonnement actif d'un des
+    /// forfaits permis. Toujours vrai lorsque 'Abonnement.ValiderPlan' ne vaut pas "true".
+    /// </summary>
+    /// <remarks>
+    /// Partagé avec les endpoints qui ne passent pas par MVC (l'endpoint AG-UI de
+    /// CopilotKit) afin que la règle reste à un seul endroit. En cas de refus, l'en-tête
+    /// 'X-ErabliereApi-ForbidenReason' est ajouté à la réponse et le refus est journalisé ;
+    /// il revient à l'appelant de produire la réponse 403.
+    /// </remarks>
+    public static async Task<bool> EstPermisAsync(HttpContext httpContext, string[] plansPermis)
     {
-        using var scope = context.HttpContext.RequestServices.CreateScope();
+        var config = httpContext.RequestServices.GetRequiredService<IConfiguration>();
 
-        var uniqueName = UsersUtils.GetUniqueName(scope, context.HttpContext.User);
+        if (!string.Equals(config["Abonnement.ValiderPlan"], "true", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (await PossedeAbonnementPermisAsync(httpContext, plansPermis))
+        {
+            return true;
+        }
+
+        var forbidenReasonMessage = $"Un abonnement actif d'un des forfaits suivants est requis : {string.Join(", ", plansPermis)}";
+        httpContext.Response.Headers["X-ErabliereApi-ForbidenReason"] = forbidenReasonMessage;
+
+        var logger = httpContext.RequestServices.GetRequiredService<ILogger<ValiderAbonnementAttribute>>();
+        using var scope = httpContext.RequestServices.CreateScope();
+        logger.LogWarning("Access denied on {Path} : user {User} has no active subscription in plans [{Plans}]",
+            httpContext.Request.Path.ToString().Sanatize(),
+            UsersUtils.GetUniqueName(scope, httpContext.User),
+            string.Join(", ", plansPermis));
+
+        return false;
+    }
+
+    private static async Task<bool> PossedeAbonnementPermisAsync(HttpContext httpContext, string[] plansPermis)
+    {
+        using var scope = httpContext.RequestServices.CreateScope();
+
+        var uniqueName = UsersUtils.GetUniqueName(scope, httpContext.User);
 
         if (string.IsNullOrWhiteSpace(uniqueName))
         {
             return false;
         }
 
-        var dbContext = context.HttpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
-        var token = context.HttpContext.RequestAborted;
+        var dbContext = httpContext.RequestServices.GetRequiredService<ErabliereDbContext>();
+        var token = httpContext.RequestAborted;
 
         var customer = await dbContext.Customers.AsNoTracking()
             .FirstOrDefaultAsync(c => c.UniqueName == uniqueName, token);
@@ -95,10 +115,10 @@ public class ValiderAbonnementAttribute : ActionFilterAttribute
         // écrite ici : la règle « quel forfait cet utilisateur a-t-il en ce moment »
         // doit rester à un seul endroit, aussi consommé par GET /api/Abonnements/Courant
         // et par le serveur MCP.
-        var abonnementService = context.HttpContext.RequestServices.GetRequiredService<IAbonnementService>();
+        var abonnementService = httpContext.RequestServices.GetRequiredService<IAbonnementService>();
 
         var plan = await abonnementService.ObtenirPlanCourantAsync(customer.Id.Value, DateTimeOffset.Now, token);
 
-        return Array.Exists(_plansPermis, p => string.Equals(p, plan, StringComparison.OrdinalIgnoreCase));
+        return Array.Exists(plansPermis, p => string.Equals(p, plan, StringComparison.OrdinalIgnoreCase));
     }
 }

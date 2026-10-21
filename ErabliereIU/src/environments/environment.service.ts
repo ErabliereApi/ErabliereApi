@@ -10,6 +10,7 @@ export class EnvironmentService {
   scopes?: string
   stsAuthority?: string
   authEnable?: boolean
+  copilotKitEnabled?: boolean
   checkoutEnabled: boolean | undefined;
 
   constructor() { }
@@ -29,5 +30,6 @@ export class EnvironmentService {
     this.scopes = c.scopes;
     this.stsAuthority = c.stsAuthority;
     this.authEnable = c.authEnable;
+    this.copilotKitEnabled = c.copilotKitEnabled;
   }
 }

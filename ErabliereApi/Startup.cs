@@ -1,3 +1,4 @@
+using ErabliereApi.Services.AI.CopilotKit;
 using static System.Boolean;
 using static System.StringComparison;
 using ErabliereApi.Authorization;
@@ -174,6 +175,9 @@ public class Startup
 
         // ErabliereAI: the provider, the prompt builder and the read-only tool set
         services.AddErabliereAI(Configuration);
+
+        // Proof of concept: ErabliereAI over AG-UI for CopilotKit, off unless ErabliereAI:CopilotKit:Enabled
+        services.AddErabliereCopilot(Configuration);
     }
 
     /// <summary>
@@ -287,6 +291,7 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+            endpoints.MapErabliereCopilot(Configuration);
             endpoints.MapHealthChecks("/health", new HealthCheckOptions
             {
                 Predicate = r => !r.Tags.Contains("live")

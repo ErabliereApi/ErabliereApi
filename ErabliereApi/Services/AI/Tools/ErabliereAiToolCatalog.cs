@@ -65,6 +65,23 @@ public class ErabliereAiToolCatalog
     public IReadOnlyCollection<string> ToolNames => _functions.Keys;
 
     /// <summary>
+    /// The exposed tools as functions, in declaration order, for hosts that hand
+    /// Microsoft.Extensions.AI tools to the model rather than OpenAI chat tools.
+    /// </summary>
+    public IReadOnlyCollection<AIFunction> Functions => _functions.Values;
+
+    /// <summary>
+    /// The parameter schema of a tool, as handed to the model: without the
+    /// '$schema' keyword the chat completion apis reject.
+    /// </summary>
+    public static JsonElement ModelSchema(AIFunction function)
+    {
+        using var schema = JsonDocument.Parse(WithoutSchemaKeyword(function.JsonSchema));
+
+        return schema.RootElement.Clone();
+    }
+
+    /// <summary>
     /// Finds an exposed tool by the name the model used, or null when the model
     /// invented one.
     /// </summary>

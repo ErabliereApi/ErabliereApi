@@ -6,4 +6,5 @@ export class OAuthConfig {
     scopes?: string
     appRoot?: string
     authEnable?: boolean
+    copilotKitEnabled?: boolean
 }

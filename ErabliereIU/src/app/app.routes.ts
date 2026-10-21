@@ -116,6 +116,12 @@ export const routes: Routes = [
             {
                 path: 'images',
                 component: AiImagesComponent
+            },
+            {
+                path: 'copilot',
+                // Chargé à la demande : CopilotKit pèse plusieurs Mo, qu'aucune autre
+                // page ne doit payer.
+                loadChildren: () => import('./ai-view/copilot/copilot.routes').then(m => m.COPILOT_ROUTES)
             }
         ]
     },

@@ -20,6 +20,7 @@ export class AiNavBarComponent implements OnInit {
   isLoggedIn: boolean;
   isAdminUser: boolean = false;
   mapFeatureEnable: boolean = false;
+  copilotKitEnabled: boolean = false;
 
   constructor(
       authFactoryService: AuthorisationFactoryService,
@@ -29,6 +30,7 @@ export class AiNavBarComponent implements OnInit {
     this._authService = authFactoryService.getAuthorisationService()
     this.useAuthentication = this._environmentService.authEnable ?? false;
     this.isLoggedIn = !this.useAuthentication
+    this.copilotKitEnabled = this._environmentService.copilotKitEnabled ?? false;
   }
 
   ngOnInit(): void {
